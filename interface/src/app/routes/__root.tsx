@@ -1,7 +1,11 @@
 import { Toaster } from "@mason/ui/toaster";
-import { Outlet } from "react-router";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { Inspector } from "~/components/inspector";
 import { Sidebar, SidebarToggle } from "~/components/sidebar";
+
+export const Route = createRootRoute({
+  component: RootLayout,
+});
 
 function RootLayout() {
   return (
@@ -20,5 +24,3 @@ function RootLayout() {
     </>
   );
 }
-
-export { RootLayout };

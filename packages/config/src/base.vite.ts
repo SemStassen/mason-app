@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
+import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
 import i18nextLoader from "vite-plugin-i18next-loader";
@@ -23,6 +24,11 @@ export default defineConfig({
     exclude: ["@electric-sql/pglite"],
   },
   plugins: [
+    process.env.PACKAGE_TYPE === "app" &&
+      TanStackRouterVite({
+        routesDirectory: "../../interface/src/app/routes",
+        generatedRouteTree: "../../interface/src/app/routeTree.gen.ts",
+      }),
     i18nextLoader({
       paths: [fileURLToPath(url.href)],
       namespaceResolution: "relativePath",

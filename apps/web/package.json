@@ -5,7 +5,7 @@
   "scripts": {
     "build": "vite build",
     "clean": "git clean -xdf node_modules",
-    "dev": "vite",
+    "dev": "PACKAGE_TYPE=app vite",
     "format": "biome format --write .",
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"

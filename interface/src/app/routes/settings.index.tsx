@@ -1,5 +1,9 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { InterfaceAndThemeForm } from "~/components/forms/interface-and-theme-form";
-import { ProfileForm } from "~/components/forms/profile-form";
+
+export const Route = createFileRoute("/settings/")({
+  component: SettingsPage,
+});
 
 function SettingsPage() {
   return (
@@ -18,5 +22,3 @@ function SettingsPage() {
     </div>
   );
 }
-
-export { SettingsPage };

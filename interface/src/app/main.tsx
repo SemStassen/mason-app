@@ -1,27 +1,24 @@
-import { BrowserRouter, Route, Routes } from "react-router";
-import { RootLayout } from "./routes/root-layout";
-
+import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { Providers } from "./providers";
-import { RootPage } from "./routes/root-page";
-import { SettingsLayout } from "./routes/settings-layout";
-import { SettingsPage } from "./routes/settings-page";
+import { routeTree } from "./routeTree.gen";
 import "@mason/ui/globals.css";
+
+const router = createRouter({
+  routeTree,
+  defaultPreload: "intent",
+});
+
+// Register router for type safety
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
+}
 
 function MasonInterfaceRoot() {
   return (
     <Providers>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<RootLayout />}>
-            <Route index={true} element={<RootPage />} />
-            <Route element={<SettingsLayout />}>
-              <Route path="/tracker" element={<div>Tracker</div>} />
-              <Route path="/projects" element={<div>Projects</div>} />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </Providers>
   );
 }

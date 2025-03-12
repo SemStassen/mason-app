@@ -3,10 +3,10 @@ import { Hotkey } from "@mason/ui/hotkey";
 import { Icons } from "@mason/ui/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mason/ui/tooltip";
 import { cn } from "@mason/ui/utils";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { observer } from "mobx-react-lite";
 import { AnimatePresence, motion } from "motion/react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { NavLink, useNavigate } from "react-router";
 import { HOTKEYS } from "~/lib/constants/hotkeys";
 import { uiStore } from "~/stores/ui-store";
 
@@ -48,25 +48,23 @@ interface NavitemProps {
 
 function NavItem({ item }: NavitemProps) {
   const navigate = useNavigate();
-  useHotkeys(item.hotkey, () => navigate(item.path));
+  useHotkeys(item.hotkey, () => navigate({ to: item.path }));
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <li>
-          <NavLink
+          <Link
             to={item.path}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center py-1 px-2 rounded-md w-full justify-start gap-2 text-contrast-50 text-sm hover:bg-contrast-5 hover:text-foreground",
-                isActive &&
-                  "bg-primary-900/15 text-primary/75 hover:bg-primary-900/25 hover:text-primary",
-              )
-            }
+            activeProps={{
+              className:
+                "bg-primary-900/15 text-primary/75 hover:bg-primary-900/25 hover:text-primary",
+            }}
+            className="flex items-center py-1 px-2 rounded-md w-full justify-start gap-2 text-contrast-50 text-sm hover:bg-contrast-5 hover:text-foreground"
           >
             <item.Icon />
             {item.name}
-          </NavLink>
+          </Link>
         </li>
       </TooltipTrigger>
       <TooltipContent side="right">

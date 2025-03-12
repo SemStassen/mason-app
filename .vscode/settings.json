@@ -18,8 +18,17 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.preferences.autoImportFileExcludePatterns": [],
   "terminal.integrated.localEchoStyle": "dim",
-  "search.exclude": {
-    "**/node_modules": true
+
+  "tailwindCSS.experimental.configFile": "packages/ui/src/globals.css",
+
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true
   },
-  "tailwindCSS.experimental.configFile": "packages/ui/src/globals.css"
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/routeTree.gen.ts": true
+  }
 }
