@@ -1,0 +1,11 @@
+{
+  "extends": "@mason/config/base.tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["./src/*"]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["src"],
+  "exclude": ["dist"]
+}

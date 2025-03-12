@@ -1,0 +1,34 @@
+{
+  "name": "@mason/db",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf node_modules",
+    "db:migrate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx seed.ts",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.2.17",
+    "@electric-sql/pglite-react": "^0.2.17",
+    "@electric-sql/pglite-repl": "^0.2.17",
+    "@electric-sql/pglite-sync": "^0.2.20",
+    "drizzle-orm": "^0.39.3",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "drizzle-kit": "^0.30.4",
+    "drizzle-seed": "^0.3.1",
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    "./db": "./src/db.ts",
+    "./repl": "./src/repl.ts",
+    "./schema": "./src/schema.ts",
+    "./sync": "./src/sync.ts"
+  }
+}

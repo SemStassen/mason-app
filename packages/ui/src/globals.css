@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--app-background);
+  --color-foreground: var(--app-foreground);
+  --color-popover: var(--app-popover);
+  --color-border: var(--app-border);
+
+  --color-sidebar: var(--app-sidebar);
+
+  --color-primary-50: oklch(97.96% 0.021959 44.4414);
+  --color-primary-100: oklch(93.96% 0.041959 44.4414);
+  --color-primary-200: oklch(89.96% 0.071959 44.4414);
+  --color-primary-300: oklch(85.96% 0.101959 44.4414);
+  --color-primary-400: oklch(81.96% 0.141959 44.4414);
+  --color-primary-500: oklch(77.96% 0.171959 44.4414);
+  --color-primary-600: oklch(73.96% 0.191959 44.4414);
+  --color-primary-700: oklch(69.96% 0.201959 44.4414);
+  --color-primary-800: oklch(65.96% 0.181959 44.4414);
+  --color-primary-900: oklch(61.96% 0.151959 44.4414);
+  --color-primary-950: oklch(57.96% 0.121959 44.4414);
+
+  --color-primary: oklch(69.96% 0.201959 44.4414);
+
+  --color-contrast-5: var(--contrast-5);
+  --color-contrast-10: var(--contrast-10);
+  --color-contrast-20: var(--contrast-20);
+  --color-contrast-30: var(--contrast-30);
+  --color-contrast-50: var(--contrast-50);
+  --color-contrast-60: var(--contrast-60);
+  --color-contrast-75: var(--contrast-75);
+
+  --color-black: oklch(0% 0 0);
+  --color-white: oklch(100% 0 0);
+}
+
+@layer base {
+  :root {
+    --app-background: oklch(99.45% 0.0017 67.8);
+    --app-foreground: oklch(0% 0 0);
+    --app-border: rgba(55, 55, 55, 0.1);
+    --app-popover: oklch(97.07% 0.0084 56.31);
+
+    --app-sidebar: oklch(98.68% 0.0042 56.38);
+
+    --contrast-5: rgba(0, 0, 0, 0.05);
+    --contrast-10: rgba(0, 0, 0, 0.1);
+    --contrast-20: rgba(0, 0, 0, 0.2);
+    --contrast-30: rgba(0, 0, 0, 0.3);
+    --contrast-50: rgba(0, 0, 0, 0.5);
+    --contrast-60: rgba(0, 0, 0, 0.6);
+    --contrast-75: rgba(0, 0, 0, 0.75);
+  }
+
+  .dark {
+    --app-background: oklch(23.22% 0.0049 67.58);
+    --app-foreground: oklch(100% 0 0);
+    --app-border: rgba(255, 255, 255, 0.1);
+    --app-popover: oklch(25.95% 0.0082 59.3);
+
+    --app-sidebar: oklch(21.02% 0.0016 17.28);
+
+    --contrast-5: rgba(255, 255, 255, 0.05);
+    --contrast-10: rgba(255, 255, 255, 0.1);
+    --contrast-20: rgba(255, 255, 255, 0.2);
+    --contrast-30: rgba(255, 255, 255, 0.3);
+    --contrast-50: rgba(255, 255, 255, 0.5);
+    --contrast-60: rgba(255, 255, 255, 0.6);
+    --contrast-75: rgba(255, 255, 255, 0.75);
+  }
+
+  * {
+    border: var(--app-border);
+  }
+}

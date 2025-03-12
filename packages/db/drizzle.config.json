@@ -1,0 +1,8 @@
+{
+  "schema": "./src/schema.ts",
+  "dialect": "postgresql",
+  "out": "migrations",
+  "dbCredentials": {
+    "url": "postgres://electric_user:password@localhost:5442/electric"
+  }
+}
