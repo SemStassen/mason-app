@@ -1,4 +1,31 @@
 export const HOTKEYS = {
+  tracker: {
+    goToNextPeriod: {
+      key: "right",
+      keyDescription: "Arrow right",
+      description: "Go to next view",
+    },
+    goToPreviousPeriod: {
+      key: "left",
+      keyDescription: "Arrow left",
+      description: "Go to previous view",
+    },
+    goToToday: {
+      key: "t",
+      keyDescription: "t",
+      description: "Go to today",
+    },
+    setDayView: {
+      key: "d",
+      keyDescription: "d",
+      description: "Set day view",
+    },
+    setWeekView: {
+      key: "w",
+      keyDescription: "w",
+      description: "Set week view",
+    },
+  },
   navigation: {
     toggleSidebar: {
       key: "[",

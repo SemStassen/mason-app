@@ -7,7 +7,6 @@ import { electricSync } from "@electric-sql/pglite-sync";
 import { live } from "@electric-sql/pglite/live";
 import type { vector } from "@electric-sql/pglite/vector";
 import { PGliteWorker } from "@electric-sql/pglite/worker";
-
 import { migrate } from "./migrations";
 import PGWorker from "./pglite-worker.ts?worker";
 
@@ -18,6 +17,7 @@ export type PGliteWithExtensions = PGliteWorker &
     live: typeof live;
     vector: typeof vector;
     sync: ReturnType<typeof electricSync>;
+    // fuzzystrmatch: typeof fuzzystrmatch;
   }>;
 
 export const { PGliteProvider, usePGlite } =
@@ -25,11 +25,12 @@ export const { PGliteProvider, usePGlite } =
 
 export async function createPGlite() {
   const pg = (await PGliteWorker.create(new PGWorker(), {
-    id: "electric-demo",
+    id: "mason",
     dataDir: "idb://mason",
     extensions: {
-      live,
+      live: live,
       sync: electricSync(),
+      // fuzzystrmatch: fuzzystrmatch,
     },
   })) as PGliteWithExtensions;
 

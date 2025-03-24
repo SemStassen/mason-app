@@ -1,69 +1,124 @@
-import { type InferSelectModel, relations } from "drizzle-orm";
+import type { InferSelectModel } from "drizzle-orm";
 import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
-export type Organization = InferSelectModel<typeof organizationsTable>;
-export const organizationsTable = pgTable("organizations", {
-  uuid: uuid("uuid").primaryKey().defaultRandom(),
-  // General
-  name: varchar("name").notNull(),
-});
+const tableMetadata = {
+  created_at: timestamp("created_at", {
+    withTimezone: true,
+    precision: 0,
+  })
+    .defaultNow()
+    .notNull(),
+  updated_at: timestamp("updated_at", {
+    withTimezone: true,
+    precision: 0,
+  })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+};
 
+export type Workspace = InferSelectModel<typeof workspacesTable>;
 export const workspacesTable = pgTable("workspaces", {
   uuid: uuid("uuid").primaryKey().defaultRandom(),
-  // References
-  organizationUuid: uuid("organization_uuid")
-    .references(() => organizationsTable.uuid, {
-      onDelete: "cascade",
-    })
-    .notNull(),
   // General
   name: varchar("name").notNull(),
+  // Metadata
+  ...tableMetadata,
 });
 
-export const workspaceRelations = relations(workspacesTable, ({ many }) => ({
-  users: many(usersToWorkspacesTable),
-}));
+// export type Team = InferSelectModel<typeof teamsTable>;
+// export const teamsTable = pgTable("teams", {
+//   uuid: uuid("uuid").primaryKey().defaultRandom(),
+//   // References
+//   workspace_uuid: uuid("workspace_uuid")
+//     .references(() => workspacesTable.uuid, {
+//       onDelete: "cascade",
+//     })
+//     .notNull(),
+//   // General
+//   name: varchar("name").notNull(),
+// });
+
+// export const teamRelations = relations(teamsTable, ({ many }) => ({
+//   users: many(usersToTeamsTable),
+// }));
 
 export type User = InferSelectModel<typeof usersTable>;
 export const usersTable = pgTable("users", {
   uuid: uuid("uuid").primaryKey().defaultRandom(),
   // References
-  organizationUuid: uuid("organization_uuid")
-    .references(() => organizationsTable.uuid, {
+  workspace_uuid: uuid("workspace_uuid")
+    .references(() => workspacesTable.uuid, {
       onDelete: "cascade",
     })
     .notNull(),
   // General
   name: varchar("name").notNull(),
-  displayName: varchar("display_name").notNull(),
+  display_name: varchar("display_name").notNull(),
+  // Metadata
+  ...tableMetadata,
 });
 
-export const userRelations = relations(usersTable, ({ many }) => ({
-  workspaces: many(usersToWorkspacesTable),
-}));
+// export const userRelations = relations(usersTable, ({ many }) => ({
+//   teams: many(usersToTeamsTable),
+// }));
 
+export type Project = InferSelectModel<typeof projectsTable>;
+export const projectsTable = pgTable("projects", {
+  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  // References
+  workspace_uuid: uuid("workspace_uuid")
+    .references(() => workspacesTable.uuid, { onDelete: "cascade" })
+    .notNull(),
+  created_by: uuid("created_by").references(() => usersTable.uuid, {
+    onDelete: "set null",
+  }),
+  // General
+  name: varchar("name").notNull(),
+  // Metadata
+  ...tableMetadata,
+});
+
+export const activitiesTable = pgTable("activities", {
+  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  // References
+  project_uuid: uuid("project_uuid")
+    .references(() => projectsTable.uuid, { onDelete: "cascade" })
+    .notNull(),
+  // General
+  name: varchar("name").notNull(),
+  // Metadata
+  ...tableMetadata,
+});
+
+export type TimeEntry = InferSelectModel<typeof timeEntriesTable>;
 export const timeEntriesTable = pgTable("time_entries", {
   uuid: uuid("uuid").primaryKey().defaultRandom(),
   // References
-  userUuid: uuid("user_uuid")
-    .notNull()
-    .references(() => usersTable.uuid, { onDelete: "cascade" }),
+  user_uuid: uuid("user_uuid")
+    .references(() => usersTable.uuid, { onDelete: "cascade" })
+    .notNull(),
+  activity_uuid: uuid("activity_uuid")
+    .references(() => activitiesTable.uuid, { onDelete: "cascade" })
+    .notNull(),
   // General
-  startedAt: timestamp("started_at", {
+  started_at: timestamp("started_at", {
     withTimezone: true,
     precision: 0,
   }).notNull(),
-  stoppedAt: timestamp("stopped_at", {
+  stopped_at: timestamp("stopped_at", {
     withTimezone: true,
     precision: 0,
   }),
+  // Metadata
+  ...tableMetadata,
 });
 
-export const usersToWorkspacesTable = pgTable("users_to_workspaces", {
-  userUuid: uuid("user_uuid")
-    .notNull()
-    .references(() => usersTable.uuid, { onDelete: "cascade" }),
-  workspaceUuid: uuid("workspace_uuid")
-    .notNull()
-    .references(() => workspacesTable.uuid, { onDelete: "cascade" }),
-});
+// export const usersToTeamsTable = pgTable("users_to_teams", {
+//   user_uuid: uuid("user_uuid")
+//     .references(() => usersTable.uuid, { onDelete: "cascade" })
+//     .notNull(),
+//   team_uuid: uuid("team_uuid")
+//     .references(() => teamsTable.uuid, { onDelete: "cascade" })
+//     .notNull(),
+// });

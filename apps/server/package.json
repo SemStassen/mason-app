@@ -1,0 +1,11 @@
+{
+  "name": "@mason/server",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "hono": "^4.7.5"
+  }
+}

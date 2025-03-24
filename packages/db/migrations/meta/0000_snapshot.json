@@ -1,11 +1,11 @@
 {
-  "id": "1c341d49-0e74-40c0-9377-1ef3c57b406e",
+  "id": "be9c2c20-a8b4-48db-8f76-25c004e887d2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.organizations": {
-      "name": "organizations",
+    "public.activities": {
+      "name": "activities",
       "schema": "",
       "columns": {
         "uuid": {
@@ -15,15 +15,128 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "project_uuid": {
+          "name": "project_uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
         "name": {
           "name": "name",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "activities_project_uuid_projects_uuid_fk": {
+          "name": "activities_project_uuid_projects_uuid_fk",
+          "tableFrom": "activities",
+          "tableTo": "projects",
+          "columnsFrom": [
+            "project_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.projects": {
+      "name": "projects",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "workspace_uuid": {
+          "name": "workspace_uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "projects_workspace_uuid_workspaces_uuid_fk": {
+          "name": "projects_workspace_uuid_workspaces_uuid_fk",
+          "tableFrom": "projects",
+          "tableTo": "workspaces",
+          "columnsFrom": [
+            "workspace_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "projects_created_by_users_uuid_fk": {
+          "name": "projects_created_by_users_uuid_fk",
+          "tableFrom": "projects",
+          "tableTo": "users",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -47,6 +160,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "activity_uuid": {
+          "name": "activity_uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
         "started_at": {
           "name": "started_at",
           "type": "timestamp (0) with time zone",
@@ -58,6 +177,20 @@
           "type": "timestamp (0) with time zone",
           "primaryKey": false,
           "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -68,6 +201,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "time_entries_activity_uuid_activities_uuid_fk": {
+          "name": "time_entries_activity_uuid_activities_uuid_fk",
+          "tableFrom": "time_entries",
+          "tableTo": "activities",
+          "columnsFrom": [
+            "activity_uuid"
           ],
           "columnsTo": [
             "uuid"
@@ -93,8 +239,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "organization_uuid": {
-          "name": "organization_uuid",
+        "workspace_uuid": {
+          "name": "workspace_uuid",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -110,65 +256,27 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "users_organization_uuid_organizations_uuid_fk": {
-          "name": "users_organization_uuid_organizations_uuid_fk",
+        "users_workspace_uuid_workspaces_uuid_fk": {
+          "name": "users_workspace_uuid_workspaces_uuid_fk",
           "tableFrom": "users",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.users_to_workspaces": {
-      "name": "users_to_workspaces",
-      "schema": "",
-      "columns": {
-        "user_uuid": {
-          "name": "user_uuid",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "workspace_uuid": {
-          "name": "workspace_uuid",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "users_to_workspaces_user_uuid_users_uuid_fk": {
-          "name": "users_to_workspaces_user_uuid_users_uuid_fk",
-          "tableFrom": "users_to_workspaces",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "users_to_workspaces_workspace_uuid_workspaces_uuid_fk": {
-          "name": "users_to_workspaces_workspace_uuid_workspaces_uuid_fk",
-          "tableFrom": "users_to_workspaces",
           "tableTo": "workspaces",
           "columnsFrom": [
             "workspace_uuid"
@@ -197,35 +305,29 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "organization_uuid": {
-          "name": "organization_uuid",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "workspaces_organization_uuid_organizations_uuid_fk": {
-          "name": "workspaces_organization_uuid_organizations_uuid_fk",
-          "tableFrom": "workspaces",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

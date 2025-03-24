@@ -1,11 +1,11 @@
 import type { PGliteWorker } from "@electric-sql/pglite/worker";
 
-import migration from "../migrations/0000_confused_lila_cheney.sql?raw";
+import migration from "../migrations/0000_remarkable_paper_doll.sql?raw";
 
 /**
  * This definitely needs to be made more robust
  * For example a schema-hash could be used to check for migrations
- * Similar to how linear does it
+ * similar to how linear does it
  */
 export const migrate = async (pg: PGliteWorker) => {
   const tables = await pg.query(

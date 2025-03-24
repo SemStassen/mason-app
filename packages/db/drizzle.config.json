@@ -3,6 +3,6 @@
   "dialect": "postgresql",
   "out": "migrations",
   "dbCredentials": {
-    "url": "postgres://electric_user:password@localhost:5442/electric"
+    "url": "postgres://electric_user:password@localhost:5442/mason"
   }
 }

@@ -72,12 +72,36 @@ const FormItemContext = createContext<FormItemContextValue>(
   {} as FormItemContextValue,
 );
 
-const FormItem = ({ className, ...props }: React.ComponentProps<"div">) => {
+const FormSection = ({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"section">) => {
+  return (
+    <section
+      className={cn(
+        "rounded-md bg-contrast-5 ring ring-contrast-10",
+        className,
+      )}
+      {...props}
+    >
+      <ul className="flex flex-col">{children}</ul>
+    </section>
+  );
+};
+
+const FormItem = ({ className, ...props }: React.ComponentProps<"li">) => {
   const id = useId();
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div className={cn(className)} {...props} />
+      <li
+        className={cn(
+          "flex flex-col justify-between gap-1.5 border-contrast-10 border-b p-3 last:border-0 sm:flex-row sm:items-center",
+          className,
+        )}
+        {...props}
+      />
     </FormItemContext.Provider>
   );
 };
@@ -116,7 +140,11 @@ const FormDescription = ({ className, ...props }: DescriptionProps) => {
   const { formDescriptionId } = useFormField();
 
   return (
-    <Description id={formDescriptionId} className={className} {...props} />
+    <Description
+      id={formDescriptionId}
+      className={cn("mb-0.5 text-contrast-75", className)}
+      {...props}
+    />
   );
 };
 
@@ -135,7 +163,7 @@ const FormMessage = ({
   return (
     <p
       id={formMessageId}
-      className={cn("text-[0.8rem] font-medium text-destructive", className)}
+      className={cn("font-medium text-[0.8rem] text-destructive", className)}
       {...props}
     >
       {body}
@@ -146,6 +174,7 @@ const FormMessage = ({
 export {
   useFormField,
   Form,
+  FormSection,
   FormItem,
   FormLabel,
   FormControl,

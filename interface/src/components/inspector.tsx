@@ -22,13 +22,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mason/ui/tabs";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { useLiveIncrementalQuery } from "~/hooks/use-live-query";
-import { uiStore } from "~/stores/ui-store";
+import { rootStore } from "~/stores/root-store";
 
 const TABLES = [
-  {
-    name: "Organizations",
-    value: "organizations",
-  },
   {
     name: "Workspaces",
     value: "workspaces",
@@ -38,12 +34,16 @@ const TABLES = [
     value: "users",
   },
   {
-    name: "Time Entries",
-    value: "time_entries",
+    name: "Projects",
+    value: "projects",
   },
   {
-    name: "Users to Workspaces",
-    value: "users_to_workspaces",
+    name: "Activities",
+    value: "activities",
+  },
+  {
+    name: "Time Entries",
+    value: "time_entries",
   },
 ];
 
@@ -106,6 +106,8 @@ function TableTabsContent() {
 }
 
 const Inspector = observer(() => {
+  const { uiStore } = rootStore;
+
   const pg = usePGlite();
 
   return (
@@ -124,7 +126,7 @@ const Inspector = observer(() => {
         <SheetTitle>Inspector</SheetTitle>
         <Tabs
           defaultValue="repl"
-          className="flex-1 flex flex-col overflow-hidden"
+          className="flex flex-1 flex-col overflow-hidden"
         >
           <TabsList>
             <TabsTrigger value="repl">REPL</TabsTrigger>
@@ -133,7 +135,7 @@ const Inspector = observer(() => {
           <TabsContent value="repl" className="overflow-y-scroll">
             <Repl pg={pg} />
           </TabsContent>
-          <TabsContent value="tables" className="flex flex-col">
+          <TabsContent value="tables" className="flex flex-col overflow-hidden">
             <TableTabsContent />
           </TabsContent>
         </Tabs>

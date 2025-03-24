@@ -4,26 +4,20 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { cn } from "../utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        default: "bg-primary hover:bg-primary/90",
+        outline: "border border-input bg-background hover:bg-contrast-5",
+        contrast: "bg-contrast-10 text-contrast-60",
         ghost:
           "text-contrast-75 hover:bg-contrast-10 group-data-[state='open']/trigger:bg-contrast-10",
-        link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md text-xs px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-7 w-7 px-0.5 py-0.5",
+        default: "h-9 px-4 py-2",
+        sm: "h-8 gap-1 px-3 text-xs",
+        icon: "h-8 w-8 px-0.5 py-0.5",
       },
     },
     defaultVariants: {

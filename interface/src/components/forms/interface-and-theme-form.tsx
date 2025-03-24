@@ -8,16 +8,18 @@ import {
   SelectValue,
 } from "@mason/ui/select";
 import { observer } from "mobx-react-lite";
-import { uiStore } from "~/stores/ui-store";
+import { rootStore } from "~/stores/root-store";
 
 type FormValues = {
   theme: "light" | "dark" | "system";
 };
 
 const InterfaceAndThemeForm = observer(() => {
+  const { uiStore } = rootStore;
+
   return (
-    <ul className="flex flex-col bg-muted rounded-md">
-      <div className="flex gap-2 justify-between items-center p-3">
+    <ul className="flex flex-col rounded-md bg-contrast-5 ring ring-contrast-10">
+      <div className="flex items-center justify-between gap-2 p-3">
         <div className="flex flex-col gap-0.5">
           <Label>Interface theme</Label>
           <Description>Select your interface color schema</Description>

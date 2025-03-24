@@ -1,201 +1,273 @@
 import { Button } from "@mason/ui/button";
 import { Icons } from "@mason/ui/icons";
-import { uiStore } from "~/stores/ui-store";
 
+import { Badge } from "@mason/ui/badge";
+import { Calendar } from "@mason/ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@mason/ui/dropdown";
+import { Hotkey } from "@mason/ui/hotkey";
+import { Popover, PopoverContent, PopoverTrigger } from "@mason/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mason/ui/tooltip";
 import { cn } from "@mason/ui/utils";
-import { addDays, format, isSameDay } from "date-fns";
+import { addDays, endOfDay, format, isSameDay, startOfDay } from "date-fns";
 import { observer } from "mobx-react-lite";
-import { useEffect, useRef } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { Fragment } from "react/jsx-runtime";
+import { RouteHeader } from "~/app/route-header";
+import { Route } from "~/app/routes/tracker.index";
+import { useLiveQuery } from "~/hooks/use-live-query";
+import { HOTKEYS } from "~/lib/constants/hotkeys";
 import { formatters, getDayProgressPercentage } from "~/lib/utils/dates";
+import { rootStore } from "~/stores/root-store";
 
-const TrackerHeader = observer(() => {
-  const trackerStore = uiStore.tracker;
+const GoToTodayButton = observer(() => {
+  const hotkey = HOTKEYS.tracker.goToToday.key;
+  const { trackerStore } = rootStore;
+
+  useHotkeys(hotkey, () => trackerStore.goToToday());
 
   return (
-    <header className="px-3 h-11 shrink-0 flex items-center border-b justify-between">
-      <div
-        className="flex gap-1.5 items-center flex-1 transition-[margin]"
-        style={{
-          marginLeft: uiStore.isSidebarOpen ? 0 : 48,
-          marginRight: uiStore.isSidebarOpen ? 48 : 0,
-        }}
-      >
-        <div className="flex gap-1 text-sm">
-          <span>Aug</span>
-          <span className="text-contrast-75">/</span>
-          <span>Sep</span>
-          <span className="text-contrast-60">
-            {uiStore.tracker.dateInView.getFullYear()}
-          </span>
-        </div>
-        <div className="bg-muted text-contrast-60 py-1 px-1.5 rounded-md text-xs">
-          W22
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          //     onClick={() => updateDateInViewByDays(-1 * daysInView)}
-        >
-          <Icons.ChevronLeft />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          //     onClick={() => updateDateInViewByDays(1 * daysInView)}
-        >
-          <Icons.ChevronRight />
-        </Button>
-        {/* TODO: Add an animation to this */}
-        {/* {!isSameDay(dateInView, currentDate) && (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="w-auto"
-        onClick={() => setDateInView(currentDate)}
-      >
-        Today
-      </Button>
-    )} */}
-      </div>
-      <div className="flex items-center gap-2 flex-1 justify-end">
-        {/* <Badge variant="outline">Personal</Badge> */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost">
-                    <Icons.DotsThreeHorizontal />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent collisionPadding={{ right: 8 }}>
-                  Open options
-                </TooltipContent>
-              </Tooltip>
-            </span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent collisionPadding={{ right: 12 }}>
-            <DropdownMenuCheckboxItem
-              checked={trackerStore.daysInView === 1}
-              onCheckedChange={() => trackerStore.setDaysInView(1)}
-            >
-              Day view
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={trackerStore.daysInView === 7}
-              onCheckedChange={() => trackerStore.setDaysInView(7)}
-            >
-              Week view
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="ps-8">
-                Show number of days
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuCheckboxItem
-                    checked={trackerStore.daysInView === 2}
-                    onCheckedChange={() => trackerStore.setDaysInView(2)}
-                  >
-                    2 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={trackerStore.daysInView === 3}
-                    onCheckedChange={() => trackerStore.setDaysInView(3)}
-                  >
-                    3 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={trackerStore.daysInView === 4}
-                    onCheckedChange={() => trackerStore.setDaysInView(4)}
-                  >
-                    4 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={trackerStore.daysInView === 5}
-                    onCheckedChange={() => trackerStore.setDaysInView(5)}
-                  >
-                    5 days
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={trackerStore.daysInView === 6}
-                    onCheckedChange={() => trackerStore.setDaysInView(6)}
-                  >
-                    6 days
-                  </DropdownMenuCheckboxItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </header>
+    !trackerStore.isTodayInView && (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => trackerStore.goToToday()}
+          >
+            Today
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          Go to today <Hotkey>{hotkey}</Hotkey>
+        </TooltipContent>
+      </Tooltip>
+    )
   );
 });
 
-const SCROLL_SNAP_BUFFER = 30;
-const VISIBLE_DAYS_BUFFER_MULTIPLIER = 4;
+const getNavigationText = (
+  daysInView: number,
+  direction: "previous" | "next",
+) => {
+  if (daysInView === 7) return `Go to ${direction} week`;
+  if (daysInView === 1) return `Go to ${direction} day`;
+  return `Go to ${direction} ${daysInView} days`;
+};
 
-const TrackerCalendar = observer(() => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+const TrackerNavigation = observer(() => {
+  const { trackerStore } = rootStore;
 
-  const trackerStore = uiStore.tracker;
-
-  const daysInViewOffset =
-    (trackerStore.daysInView * VISIBLE_DAYS_BUFFER_MULTIPLIER) / 2 -
-    trackerStore.daysInView;
-  const dayWidth = 100 / SCROLL_SNAP_BUFFER / trackerStore.daysInView;
-  const dayOffsetToStartOfWeek = 0;
-
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      const scrollWidth = scrollContainerRef.current.scrollWidth;
-      scrollContainerRef.current.scrollLeft = scrollWidth * 0.5;
-    }
-  }, [trackerStore.daysInView]);
+  useHotkeys(HOTKEYS.tracker.goToNextPeriod.key, () =>
+    trackerStore.goToNextPeriod(),
+  );
+  useHotkeys(HOTKEYS.tracker.goToPreviousPeriod.key, () =>
+    trackerStore.goToPreviousPeriod(),
+  );
 
   return (
-    <div
-      ref={scrollContainerRef}
-      className="[scrollbar-width:none] [&::-webkit-scrollbar]:hidden overflow-x-hidden snap-x snap-mandatory h-full scroll-ps-16"
-    >
-      <div
-        className="relative isolate"
-        style={{
-          width: `calc(${SCROLL_SNAP_BUFFER} * (100% - 62px))`,
-        }}
-      >
-        {/**
-         * DAY SCROLL SNAPPING
-         */}
-        <div className="absolute inset-0 grid auto-cols-fr grid-flow-col ml-16 [&_>_*]:snap-start">
-          {Array.from({
-            length: SCROLL_SNAP_BUFFER * trackerStore.daysInView,
-          }).map((_, index) => {
-            // biome-ignore lint/suspicious/noArrayIndexKey: not dynamic
-            return <div key={index} />;
-          })}
-        </div>
+    <div className="flex flex-1 items-center gap-1.5">
+      <Popover>
+        <PopoverTrigger asChild>
+          <span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="w-24 gap-1">
+                  {trackerStore.dateInViewMonth.map((month, index) => (
+                    <Fragment key={month}>
+                      {index === 1 && (
+                        <span className="text-contrast-75">/</span>
+                      )}
+                      <span key={month} className="text-contrast-60">
+                        {month.toLocaleString()}
+                      </span>
+                    </Fragment>
+                  ))}
+                  <span className="text-contrast-60">
+                    {trackerStore.dateInViewYear
+                      .toString()
+                      .slice(
+                        trackerStore.dateInViewMonth.length === 1 ? 0 : -2,
+                      )}
+                  </span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Change date</TooltipContent>
+            </Tooltip>
+          </span>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={trackerStore.dateInView}
+            onSelect={(date: Date | undefined) => {
+              if (date) {
+                trackerStore.setDateInView(date);
+              }
+            }}
+            weekStartsOn={trackerStore.weekStartsOn}
+          />
+        </PopoverContent>
+      </Popover>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge variant="contrast">W{trackerStore.dateInViewWeekNumber}</Badge>
+        </TooltipTrigger>
+        <TooltipContent>
+          Week {trackerStore.dateInViewWeekNumber}
+        </TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => trackerStore.goToPreviousPeriod()}
+          >
+            <Icons.ChevronLeft />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          {getNavigationText(trackerStore.daysInView, "previous")}{" "}
+          <Hotkey>←</Hotkey>
+        </TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => trackerStore.goToNextPeriod()}
+          >
+            <Icons.ChevronRight />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          {getNavigationText(trackerStore.daysInView, "next")}{" "}
+          <Hotkey>→</Hotkey>
+        </TooltipContent>
+      </Tooltip>
+      <GoToTodayButton />
+    </div>
+  );
+});
+
+const TrackerOptions = observer(() => {
+  const { trackerStore } = rootStore;
+
+  useHotkeys(HOTKEYS.tracker.setDayView.key, () =>
+    trackerStore.setDaysInView(1),
+  );
+  useHotkeys(HOTKEYS.tracker.setWeekView.key, () =>
+    trackerStore.setDaysInView(7),
+  );
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="icon" variant="ghost">
+                <Icons.DotsThreeHorizontal />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent align="end">Open options</TooltipContent>
+          </Tooltip>
+        </span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuCheckboxItem
+          checked={trackerStore.daysInView === 1}
+          onCheckedChange={() => trackerStore.setDaysInView(1)}
+        >
+          Day view <Hotkey>{HOTKEYS.tracker.setDayView.key}</Hotkey>
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={trackerStore.daysInView === 7}
+          onCheckedChange={() => trackerStore.setDaysInView(7)}
+        >
+          Week view <Hotkey>{HOTKEYS.tracker.setWeekView.key}</Hotkey>
+        </DropdownMenuCheckboxItem>
+        {/* <DropdownMenuSub>
+        <DropdownMenuSubTrigger className="ps-8">
+          Show number of days
+        </DropdownMenuSubTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuSubContent>
+            <DropdownMenuCheckboxItem
+              checked={trackerStore.daysInView === 2}
+              onCheckedChange={() => trackerStore.setDaysInView(2)}
+            >
+              2 days
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={trackerStore.daysInView === 3}
+              onCheckedChange={() => trackerStore.setDaysInView(3)}
+            >
+              3 days
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={trackerStore.daysInView === 4}
+              onCheckedChange={() => trackerStore.setDaysInView(4)}
+            >
+              4 days
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={trackerStore.daysInView === 5}
+              onCheckedChange={() => trackerStore.setDaysInView(5)}
+            >
+              5 days
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={trackerStore.daysInView === 6}
+              onCheckedChange={() => trackerStore.setDaysInView(6)}
+            >
+              6 days
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuPortal>
+      </DropdownMenuSub> */}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+});
+
+function TrackerHeader() {
+  return (
+    <RouteHeader>
+      <div className="flex flex-1 items-center justify-end gap-2">
+        {/* <Badge variant="outline">Personal</Badge> */}
+        <TrackerNavigation />
+        <TrackerOptions />
+      </div>
+    </RouteHeader>
+  );
+}
+
+const TrackerCalendar = observer(() => {
+  const { trackerStore } = rootStore;
+
+  const { liveTimeEntries } = Route.useLoaderData();
+
+  const timeEntries = useLiveQuery(liveTimeEntries);
+
+  return (
+    <div className="h-full overflow-x-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="relative isolate">
         {/**
          * TOPBAR
          */}
-        <div className="sticky top-0 inset-0 z-20">
+        <div className="sticky inset-0 top-0 z-20">
           {/**
            * TIMEZONE
            */}
-          <div className="sticky left-0 size-0 z-30">
-            <div className="h-10 w-16 bg-background flex items-center px-2 gap-2 border-r border-muted">
+          <div className="sticky left-0 z-30 size-0">
+            <div className="flex h-10 w-16 items-center gap-2 border-muted border-r bg-background px-2">
               <div className="text-xs">
                 {new Date()
                   .toLocaleDateString(undefined, {
@@ -209,35 +281,23 @@ const TrackerCalendar = observer(() => {
           {/**
            * DAYS
            */}
-          <div className="relative overflow-hidden bg-background h-[40px] ml-16 border-b border-muted">
+          <div className="ml-16 flex h-[40px] bg-background">
             {Array.from({
-              length: VISIBLE_DAYS_BUFFER_MULTIPLIER * trackerStore.daysInView,
+              length: trackerStore.daysInView,
             }).map((_, index) => {
-              const currentDay = addDays(
-                uiStore.tracker.dateInView,
-                index - daysInViewOffset,
-              );
+              const currentDay = addDays(trackerStore.dateInView, index);
               return (
                 <div
                   // biome-ignore lint/suspicious/noArrayIndexKey: count won't change
                   key={index}
-                  className="absolute top-0 h-full flex items-center justify-center"
-                  style={{
-                    width: `${dayWidth}%`,
-                    left: `${
-                      50 + // Starts from center of container (50%)
-                      (index - dayOffsetToStartOfWeek) * // Adjusts for day position relative to start of week
-                        dayWidth - // Multiplies by width of each day cell
-                      dayWidth * daysInViewOffset // Shifts everything left by half the total view width
-                    }%`,
-                  }}
+                  className="flex flex-1 items-center justify-center"
                 >
                   {format(currentDay, "EEE")}
                   <span
                     className={cn(
                       "ml-1",
                       isSameDay(currentDay, trackerStore.currentDate) &&
-                        "flex items-center justify-center bg-primary text-white h-7 w-7 rounded-md",
+                        "flex h-7 w-7 items-center justify-center rounded-md bg-primary text-white",
                     )}
                   >
                     {format(currentDay, "dd")}
@@ -247,39 +307,29 @@ const TrackerCalendar = observer(() => {
             })}
           </div>
           {/**
-           * ALL DAY
+           * ALL DAY EVENTS (TOP)
            */}
           <div className="h-6">
             <div className="sticky left-0 size-0">
-              <div className="w-screen border-y border-muted h-6 bg-background" />
+              <div className="h-6 w-screen border-muted border-y bg-background" />
             </div>
             <div className="sticky left-0 z-20 size-0">
-              <div className="text-xs flex w-16 h-6 justify-end border-y border-r border-muted bg-background px-2">
+              <div className="flex h-6 w-16 justify-end border-muted border-y border-r bg-background px-2 text-xs">
                 <div className="flex items-center">all-day</div>
               </div>
             </div>
             {/**
              * This will probably require different positioning then normal events
              */}
-            <div className="relative overflow-hidden ml-16">
+            <div className="ml-16 flex">
               {Array.from({
-                length:
-                  VISIBLE_DAYS_BUFFER_MULTIPLIER * trackerStore.daysInView,
+                length: trackerStore.daysInView,
               }).map((_, index) => {
                 return (
                   <div
                     // biome-ignore lint/suspicious/noArrayIndexKey: count won't change
                     key={index}
-                    className="absolute top-0 h-full flex items-center justify-center"
-                    style={{
-                      width: `${dayWidth}%`,
-                      left: `${
-                        50 + // Starts from center of container (50%)
-                        (index - dayOffsetToStartOfWeek) * // Adjusts for day position relative to start of week
-                          dayWidth - // Multiplies by width of each day cell
-                        dayWidth * daysInViewOffset // Shifts everything left by half the total view width
-                      }%`,
-                    }}
+                    className="flex flex-1 items-center justify-center"
                   />
                 );
               })}
@@ -290,7 +340,7 @@ const TrackerCalendar = observer(() => {
          * CURRENT TIME MARKER (LINE)
          */}
         <div className="pointer-events-none sticky left-0 z-10 size-0">
-          <div className="relative h-[2000px]">
+          <div className="relative h-[300vh]">
             <div
               className="absolute h-px w-screen bg-red-400/60 transition-[top,opacity]"
               style={{
@@ -299,9 +349,9 @@ const TrackerCalendar = observer(() => {
             />
           </div>
         </div>
-        {/* HOURLY OVERVIEW */}
-        <div className="sticky left-0 size-0 z-10">
-          <div className="relative h-[2000px] w-16 flex flex-col border-r border-muted bg-background">
+        {/* HOURS (ON THE LEFT) */}
+        <div className="sticky left-0 z-10 size-0">
+          <div className="relative flex h-[300vh] w-16 flex-col border-muted border-r bg-background">
             {Array.from({ length: 24 }).map((_, index) => {
               if (index === 0) {
                 return;
@@ -311,98 +361,130 @@ const TrackerCalendar = observer(() => {
                 <div
                   // biome-ignore lint/suspicious/noArrayIndexKey: not dynamic
                   key={index}
-                  className="absolute inset-x-0 -translate-y-1/2"
+                  className="-translate-y-1/2 absolute inset-x-0"
                   style={{
                     top: `calc(calc(100% / 24) * ${index})`,
                   }}
                 >
-                  <div className="grow text-xs text-muted-foreground text-center">
+                  <div className="grow text-center text-muted-foreground text-xs">
                     {formatters.time(new Date(0, 0, 0, index))}
                   </div>
                 </div>
               );
             })}
-            {/* <div
-              className="absolute inset-x-0 -translate-y-1/2"
+            {/**
+             * CURRENT TIME STAMP
+             */}
+            <div
+              className="-translate-y-1/2 absolute inset-x-0"
               style={{
-                top: `${calculateDayProgressPercentage(new Date(currentTime))}%`,
+                top: `${getDayProgressPercentage(trackerStore.currentDate)}%`,
               }}
             >
-              <div className="grow text-xs text-destructive text-center">
-                {formatters.time(currentTime, uses24HourClock ? "24h" : "12h")}
+              <div className="grow text-center text-red-400 text-xs">
+                {formatters.time(trackerStore.currentDate)}
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
 
+        {/**
+         * TIME ENTRIES
+         */}
         <div
-          className="relative overflow-hidden h-[2000px] ml-16"
+          className="relative ml-16 h-[300vh] overflow-hidden"
           style={{
             backgroundSize: "100% calc(100% / 24)",
             backgroundImage:
               "linear-gradient(to bottom, var(--color-popover) 1px, transparent 1px), repeating-linear-gradient(transparent, transparent calc(calc(100% / 4) - 2px), var(--color-popover) calc(100% / 4))",
           }}
         >
-          {/* {Array.from({ length: 7 * uiStore.tracker.daysInView }).map(
-            (_, index) => {
-              const currentDayStart = startOfDay(
-                addDays(dateInView, index - daysInViewOffset),
-              );
-              const currentDayEnd = endOfDay(
-                addDays(dateInView, index - daysInViewOffset),
-              );
-              return (
-                <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: count won't change
-                  key={index}
-                  className="absolute top-0 isolate h-full"
-                  style={{
-                    width: `${dayWidth}%`,
-                    left: `${50 - dayWidth * daysInViewOffset + (index - dayOffsetToStartOfWeek) * dayWidth}%`,
-                  }}
-                >
-                  <div className="relative h-full before:absolute before:h-full before:bg-muted before:w-px"> */}
-          {/* {convertedTimeEntries.map(
-                  ({ uuid, project, startedAt, stoppedAt, note }) => {
-                    if (
-                      (startedAt >= currentDayStart &&
-                        startedAt <= currentDayEnd) ||
-                      (stoppedAt >= currentDayStart &&
-                        stoppedAt <= currentDayEnd) ||
-                      (startedAt <= currentDayStart &&
-                        stoppedAt >= currentDayEnd)
-                    ) {
-                      const entryStart =
-                        startedAt < currentDayStart
-                          ? currentDayStart
-                          : startedAt;
-                      const entryEnd =
-                        stoppedAt > currentDayEnd ? currentDayEnd : stoppedAt;
+          {Array.from({ length: trackerStore.daysInView }).map((_, index) => {
+            const currentDayStart = startOfDay(
+              addDays(trackerStore.dateInView, index),
+            );
+            const currentDayEnd = endOfDay(
+              addDays(trackerStore.dateInView, index),
+            );
+            return (
+              <div
+                // biome-ignore lint/suspicious/noArrayIndexKey: count won't change
+                key={index}
+                className="absolute top-0 h-full"
+                style={{
+                  width: `${100 / trackerStore.daysInView}%`,
+                  left: `${(100 / trackerStore.daysInView) * index}%`,
+                }}
+              >
+                <div className="relative h-full before:absolute before:h-full before:w-px before:bg-popover">
+                  {timeEntries?.rows.map(
+                    ({ uuid, started_at, stopped_at: _stopped_at }) => {
+                      const stopped_at =
+                        _stopped_at || trackerStore.currentDate;
 
-                      return (
-                        <TimeEntry
-                          key={uuid}
-                          projectName={project?.name}
-                          projectHexColor={project?.hexColor}
-                          uuid={uuid}
-                          startedAt={startedAt}
-                          stoppedAt={stoppedAt}
-                          note={note}
-                          style={{
-                            top: `${((entryStart.getHours() + entryStart.getMinutes() / 60) * 100) / 24}%`,
-                            height: `${Math.max(((entryEnd.getTime() - entryStart.getTime()) / (1000 * 60 * 60)) * (100 / 24), 1.04)}%`,
-                          }}
-                        />
-                      );
-                    }
-                    return null;
-                  },
-                )} */}
-          {/* </div>
+                      if (
+                        (started_at >= currentDayStart &&
+                          started_at <= currentDayEnd) ||
+                        (stopped_at >= currentDayStart &&
+                          stopped_at <= currentDayEnd) ||
+                        (started_at <= currentDayStart &&
+                          stopped_at >= currentDayEnd)
+                      ) {
+                        const entryStart =
+                          started_at < currentDayStart
+                            ? currentDayStart
+                            : started_at;
+                        const entryEnd =
+                          stopped_at > currentDayEnd
+                            ? currentDayEnd
+                            : stopped_at;
+
+                        return (
+                          <div
+                            key={uuid}
+                            className={cn("absolute")}
+                            style={{
+                              top: `${((entryStart.getHours() + entryStart.getMinutes() / 60) * 100) / 24}%`,
+                              left: 2,
+                              width: "calc(100% - 12px)",
+                              height: `${Math.max(((entryEnd.getTime() - entryStart.getTime()) / (1000 * 60 * 60)) * (100 / 24), 1.04)}%`,
+                            }}
+                          >
+                            <button
+                              className="flex h-full w-full overflow-hidden rounded-md bg-purple-800 text-start "
+                              type="button"
+                            >
+                              <div className="h-full w-1 flex-none bg-purple-600" />
+                              <div className="p-2">
+                                <div className="flex flex-col text-sm text-white">
+                                  <div className="font-semibold">
+                                    Event name
+                                  </div>
+                                  <div className="-space-y-1 flex flex-col">
+                                    <div>
+                                      {formatters.duration(
+                                        entryStart,
+                                        entryEnd,
+                                      )}
+                                    </div>
+                                    <div>
+                                      {formatters.time(entryStart)} -{" "}
+                                      {formatters.time(entryEnd)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </button>
+                          </div>
+                        );
+                      }
+                      return null;
+                    },
+                  )}
                 </div>
-              );
-            },
-          )} */}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -411,10 +493,10 @@ const TrackerCalendar = observer(() => {
 
 function Tracker() {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex w-full flex-col">
       <TrackerHeader />
-      <div className="w-full h-full flex overflow-auto">
-        <div className="w-full h-full">
+      <div className="flex h-full w-full overflow-auto">
+        <div className="h-full w-full">
           <TrackerCalendar />
         </div>
         {/* <AnimatePresence>

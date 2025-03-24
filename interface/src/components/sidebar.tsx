@@ -2,13 +2,12 @@ import { Button } from "@mason/ui/button";
 import { Hotkey } from "@mason/ui/hotkey";
 import { Icons } from "@mason/ui/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mason/ui/tooltip";
-import { cn } from "@mason/ui/utils";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { observer } from "mobx-react-lite";
 import { AnimatePresence, motion } from "motion/react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { HOTKEYS } from "~/lib/constants/hotkeys";
-import { uiStore } from "~/stores/ui-store";
+import { rootStore } from "~/stores/root-store";
 
 const NAV_ITEMS = [
   {
@@ -26,7 +25,7 @@ const NAV_ITEMS = [
   {
     name: "Projects",
     path: "/projects",
-    Icon: () => <Icons.Organization size={22} />,
+    Icon: () => <Icons.Target size={22} />,
     hotkey: HOTKEYS.navigation.goToProjects.key,
   },
   {
@@ -60,7 +59,7 @@ function NavItem({ item }: NavitemProps) {
               className:
                 "bg-primary-900/15 text-primary/75 hover:bg-primary-900/25 hover:text-primary",
             }}
-            className="flex items-center py-1 px-2 rounded-md w-full justify-start gap-2 text-contrast-50 text-sm hover:bg-contrast-5 hover:text-foreground"
+            className="flex w-full items-center justify-start gap-2 rounded-md px-2 py-1 text-contrast-50 text-sm hover:bg-contrast-5 hover:text-foreground"
           >
             <item.Icon />
             {item.name}
@@ -68,13 +67,15 @@ function NavItem({ item }: NavitemProps) {
         </li>
       </TooltipTrigger>
       <TooltipContent side="right">
-        {item.name} <Hotkey>{item.hotkey}</Hotkey>
+        Go to {item.name.toLowerCase()} <Hotkey>{item.hotkey}</Hotkey>
       </TooltipContent>
     </Tooltip>
   );
 }
 
 const Sidebar = observer(() => {
+  const { uiStore } = rootStore;
+
   return (
     <AnimatePresence initial={false}>
       {uiStore.isSidebarOpen && (
@@ -88,9 +89,9 @@ const Sidebar = observer(() => {
           animate={{ width: 292 }}
           exit={{ width: 0 }}
         >
-          <div className="h-full flex-none w-[292px] flex flex-col justify-between px-4 pt-4 pb-2">
+          <div className="flex h-full w-[292px] flex-none flex-col justify-between px-4 pt-4 pb-2">
             {/* Logo and navigation */}
-            <div className="flex h-full flex-col w-full space-y-6">
+            <div className="flex h-full w-full flex-col space-y-6">
               <div className="h-20" />
               <div>
                 <nav className="flex flex-col">
@@ -102,9 +103,9 @@ const Sidebar = observer(() => {
                 </nav>
               </div>
             </div>
-            <div className="flex justify-between items-center">
-              <small className="text-xs text-contrast-50">
-                Mason - Beta v0.1
+            <div className="flex items-center justify-between">
+              <small className="text-contrast-50 text-xs">
+                Mason - Alpha v0.1
               </small>
               <Button
                 variant="ghost"
@@ -122,6 +123,7 @@ const Sidebar = observer(() => {
 });
 
 const SidebarToggle = observer(() => {
+  const { uiStore } = rootStore;
   const hotkey = HOTKEYS.navigation.toggleSidebar.key;
 
   useHotkeys(hotkey, () => uiStore.toggleSidebar());
@@ -137,10 +139,7 @@ const SidebarToggle = observer(() => {
           <Icons.Sidebar />
         </Button>
       </TooltipTrigger>
-      <TooltipContent
-        className="flex items-center gap-1"
-        collisionPadding={{ left: 8 }}
-      >
+      <TooltipContent className="flex items-center gap-1" align="start">
         {uiStore.isSidebarOpen ? "close sidebar" : "open sidebar"}
         <Hotkey>{hotkey}</Hotkey>
       </TooltipContent>

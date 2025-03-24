@@ -6,8 +6,6 @@ import {
 import { sync } from "@mason/db/sync";
 import { TooltipProvider } from "@mason/ui/tooltip";
 import { useEffect, useState } from "react";
-import { createContext } from "~/lib/utils/create-context";
-import { appStore } from "~/stores/app-store";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -31,7 +29,7 @@ function Providers({ children }: ProvidersProps) {
 
   if (!pgForProvider || syncStatus !== "success") {
     return (
-      <div className="w-screen h-screen grid place-content-center">
+      <div className="grid h-screen w-screen place-content-center">
         Mason is Loading
       </div>
     );

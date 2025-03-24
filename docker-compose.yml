@@ -10,7 +10,7 @@ services:
     environment:
       POSTGRES_USER: electric_user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: electric
+      POSTGRES_DB: mason
     volumes:
       - pg:/var/lib/postgresql/data
     networks:
@@ -29,9 +29,10 @@ services:
       -c hot_standby_feedback=on
 
   electric:
-    image: electricsql/electric:1.0.0-beta.23
+    image: electricsql/electric:1.0.0
     environment:
-      DATABASE_URL: postgresql://electric_user:password@pg:5432/electric?sslmode=disable
+      DATABASE_URL: postgresql://electric_user:password@pg:5432/mason?sslmode=disable
+      ELECTRIC_INSECURE: true
     ports:
       - "4027:3000"
     depends_on:

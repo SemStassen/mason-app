@@ -1,4 +1,4 @@
-import { Toaster } from "@mason/ui/toaster";
+import { Toaster } from "@mason/ui/sonner";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { Inspector } from "~/components/inspector";
 import { Sidebar, SidebarToggle } from "~/components/sidebar";
@@ -10,10 +10,10 @@ export const Route = createRootRoute({
 function RootLayout() {
   return (
     <>
-      <div className="overflow-hidden h-screen w-screen overscroll-x-none bg-background text-foreground">
-        <div className="relative h-full w-full flex">
+      <div className="h-screen w-screen overflow-hidden overscroll-x-none bg-background text-foreground">
+        <div className="relative flex h-full w-full">
           <Sidebar />
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2 left-3">
             <SidebarToggle />
           </div>
           <Outlet />

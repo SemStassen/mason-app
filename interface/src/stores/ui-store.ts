@@ -4,57 +4,11 @@ type Theme = "system" | "light" | "dark";
 
 const LOCAL_STORAGE_KEY = "mason:ui";
 
-class TrackerStore {
-  dateInView = new Date();
-  daysInView = 1;
-
-  currentDate = new Date();
-  private intervalId?: number;
-
-  constructor() {
-    makeAutoObservable(this);
-    this.startUpdatingCurrentDate();
-  }
-
-  setDateInView(date: Date) {
-    this.dateInView = date;
-  }
-
-  setDaysInView(amount: number) {
-    this.daysInView = amount;
-  }
-
-  private startUpdatingCurrentDate() {
-    // Calculate delay until start of next minute
-    const now = new Date();
-    const msUntilNextMinute =
-      60000 - (now.getSeconds() * 1000 + now.getMilliseconds());
-
-    // Initial timeout to align with start of next minute
-    setTimeout(() => {
-      this.currentDate = new Date();
-
-      // Then update every minute
-      this.intervalId = setInterval(() => {
-        this.currentDate = new Date();
-      }, 60000);
-    }, msUntilNextMinute);
-  }
-
-  dispose() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
-  }
-}
-
 class UiStore {
   // General
   isSidebarOpen = true;
   uses24HourClock = true;
   theme: Theme = "system";
-
-  tracker = new TrackerStore();
 
   // Developer debug tools
   isInspectorOpen = false;
@@ -132,5 +86,4 @@ class UiStore {
   }
 }
 
-const uiStore = new UiStore();
-export { uiStore };
+export { UiStore };

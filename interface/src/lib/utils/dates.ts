@@ -1,15 +1,36 @@
-import { format, getHours, getMinutes } from "date-fns";
-import { uiStore } from "~/stores/ui-store";
+import {
+  format,
+  formatDuration,
+  getHours,
+  getMinutes,
+  intervalToDuration,
+} from "date-fns";
+import { rootStore } from "~/stores/root-store";
 
 const formatters = {
   time: (date: Date) => {
-    const timeFormat = uiStore.uses24HourClock
+    const timeFormat = rootStore.uiStore.uses24HourClock
       ? getMinutes(date) === 0
         ? "ha"
         : "h:mma"
       : "HH:mm";
 
     return format(date, timeFormat);
+  },
+  duration: (startDate: Date, endDate: Date) => {
+    const baseFormat = formatDuration(
+      intervalToDuration({ start: startDate, end: endDate }),
+      {
+        format: ["hours", "minutes"],
+        zero: true,
+      },
+    );
+
+    return baseFormat.replace(" hours", "h").replace(" minutes", "m");
+  },
+  month: {
+    short: (date: Date) => format(date, "MMM"),
+    long: (date: Date) => format(date, "MMMM"),
   },
 };
 

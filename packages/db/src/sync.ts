@@ -7,27 +7,12 @@ export async function sync(pg: PGliteWithExtensions) {
     shape: {
       url: ELECTRIC_URL,
       params: {
-        table: "organizations",
-      },
-    },
-    table: "organizations",
-    primaryKey: ["uuid"],
-    shapeKey: "organizations",
-    commitGranularity: "up-to-date",
-    useCopy: true,
-  });
-
-  await pg.sync.syncShapeToTable({
-    shape: {
-      url: ELECTRIC_URL,
-      params: {
         table: "workspaces",
       },
     },
     table: "workspaces",
     primaryKey: ["uuid"],
     shapeKey: "workspaces",
-    commitGranularity: "up-to-date",
     useCopy: true,
   });
 
@@ -41,7 +26,32 @@ export async function sync(pg: PGliteWithExtensions) {
     table: "users",
     primaryKey: ["uuid"],
     shapeKey: "users",
-    commitGranularity: "up-to-date",
+    useCopy: true,
+  });
+
+  await pg.sync.syncShapeToTable({
+    shape: {
+      url: ELECTRIC_URL,
+      params: {
+        table: "projects",
+      },
+    },
+    table: "projects",
+    primaryKey: ["uuid"],
+    shapeKey: "projects",
+    useCopy: true,
+  });
+
+  await pg.sync.syncShapeToTable({
+    shape: {
+      url: ELECTRIC_URL,
+      params: {
+        table: "activities",
+      },
+    },
+    table: "activities",
+    primaryKey: ["uuid"],
+    shapeKey: "activities",
     useCopy: true,
   });
 
@@ -55,21 +65,6 @@ export async function sync(pg: PGliteWithExtensions) {
     table: "time_entries",
     primaryKey: ["uuid"],
     shapeKey: "time_entries",
-    commitGranularity: "up-to-date",
-    useCopy: true,
-  });
-
-  await pg.sync.syncShapeToTable({
-    shape: {
-      url: ELECTRIC_URL,
-      params: {
-        table: "users_to_workspaces",
-      },
-    },
-    table: "users_to_workspaces",
-    primaryKey: ["uuid"],
-    shapeKey: "users_to_workspaces",
-    commitGranularity: "up-to-date",
     useCopy: true,
   });
 }
