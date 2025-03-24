@@ -19,6 +19,9 @@ export default defineConfig({
     port: 8002,
   },
   resolve: {},
+  worker: {
+    format: "es",
+  },
   optimizeDeps: {
     // See: https://pglite.dev/docs/bundler-support#vite
     exclude: ["@electric-sql/pglite"],
