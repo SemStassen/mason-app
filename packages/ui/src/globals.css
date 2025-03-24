@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* These were added because tailwind does not seem to register them automatically */
+@source "../src";
+@source "../../../interface/src";
+
 @theme {
   --color-background: var(--app-background);
   --color-foreground: var(--app-foreground);

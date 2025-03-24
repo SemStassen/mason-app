@@ -161,7 +161,7 @@ function ProjectPage() {
         </div>
       </RouteHeader>
       <div className="flex grow">
-        <div className="w-full">
+        <div className="w-full px-8 py-4">
           <h2 className="text-2xl">{project.name}</h2>
           <div>
             <h3>Project details</h3>
