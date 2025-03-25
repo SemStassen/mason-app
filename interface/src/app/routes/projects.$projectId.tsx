@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@mason/ui/dropdown";
 import { Icons } from "@mason/ui/icons";
+import { Input } from "@mason/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mason/ui/tooltip";
 import { cn } from "@mason/ui/utils";
 import { Link, createFileRoute } from "@tanstack/react-router";
@@ -24,6 +25,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useLiveQuery } from "~/hooks/use-live-query";
 import { getPGliteConnection } from "~/lib/db";
 import { copyCurrentUrlToClipboard } from "~/lib/utils/copy-current-url";
+import { displayName } from "~/lib/utils/display-name";
 import { rootStore } from "~/stores/root-store";
 import { RouteHeader } from "../route-header";
 
@@ -39,7 +41,7 @@ export const Route = createFileRoute("/projects/$projectId")({
       limit: 100,
     });
 
-    return { liveProjects };
+    return { pg, liveProjects };
   },
   component: ProjectPage,
 });
@@ -126,7 +128,7 @@ const ProjectInfoPanel = observer(() => {
 });
 
 function ProjectPage() {
-  const { liveProjects } = Route.useLoaderData();
+  const { pg, liveProjects } = Route.useLoaderData();
 
   const projects = useLiveQuery(liveProjects);
 
@@ -151,21 +153,48 @@ function ProjectPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{project.name}</BreadcrumbPage>
+              <BreadcrumbPage>
+                {displayName(project.name, "project")}
+              </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div>
+        <div className="flex gap-1">
           <OpenInfoPanel />
           <OptionsMenu />
         </div>
       </RouteHeader>
-      <div className="flex grow">
-        <div className="w-full px-8 py-4">
-          <h2 className="text-2xl">{project.name}</h2>
-          <div>
-            <h3>Project details</h3>
-            <p>Project details go here</p>
+      <div className="flex h-full grow">
+        <div className="flex w-full flex-col">
+          <div className="px-8 py-4">
+            <Input
+              size="lg"
+              placeholder="Add project name..."
+              defaultValue={project.name}
+              onBlur={(e) => {
+                // MUTATION
+                pg.query("UPDATE projects SET name = $1 WHERE uuid = $2", [
+                  e.target.value,
+                  project.uuid,
+                ]);
+              }}
+            />
+            <div>
+              <h3>Project details</h3>
+              <p>Project details go here</p>
+            </div>
+          </div>
+          <div className="flex items-center border-b p-4">
+            <Input />
+          </div>
+          <div className="grow overflow-auto pb-16">
+            <div className="flex h-9 items-center border-contrast-10 border-b bg-accent pr-4 pl-9.5 text-contrast-75">
+              Activities
+            </div>
+            <div className="h-80">Activity</div>
+            <div className="h-80">Activity</div>
+            <div className="h-80">Activity</div>
+            <div className="h-80">Activity</div>
           </div>
         </div>
         <ProjectInfoPanel />

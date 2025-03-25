@@ -28,6 +28,7 @@ import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { useLiveQuery } from "~/hooks/use-live-query";
 import { getPGliteConnection } from "~/lib/db";
+import { displayName } from "~/lib/utils/display-name";
 import { rootStore } from "~/stores/root-store";
 import { RouteHeader } from "../route-header";
 
@@ -153,24 +154,41 @@ function DisplayOptions() {
   );
 }
 
+function CreateProject() {
+  return (
+    <Button variant="outline" size="sm">
+      <Icons.Plus />
+      New
+    </Button>
+  );
+}
+
 function ProjectsSearch() {
   const { search } = Route.useSearch();
   const navigate = Route.useNavigate();
 
+  const updateSearch = (newValue: string) => {
+    navigate({
+      search: (prev) => ({ ...prev, search: newValue }),
+    });
+  };
+
   return (
     <Input
-      className="w-40"
-      IconLeft={<Icons.Search />}
+      className="w-60"
+      variant="outline"
+      iconLeft={<Icons.Search />}
+      iconRight={
+        search && (
+          <Icons.X
+            className="cursor-pointer"
+            onClick={() => updateSearch("")}
+          />
+        )
+      }
       placeholder="Search by name..."
       value={search}
-      onChange={(e) => {
-        navigate({
-          search: (prev) => ({
-            ...prev,
-            search: e.target.value,
-          }),
-        });
-      }}
+      onChange={(e) => updateSearch(e.target.value)}
     />
   );
 }
@@ -201,11 +219,10 @@ function Projects() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <DisplayOptions />
-        {/* <Button variant="outline" size="sm">
-          <Icons.Plus />
-          New
-        </Button> */}
+        <div className="flex gap-1">
+          <DisplayOptions />
+          <CreateProject />
+        </div>
       </RouteHeader>
       <div className="flex items-center border-b p-4">
         <ProjectsSearch />
@@ -224,7 +241,7 @@ function Projects() {
               params={{ projectId: project.uuid }}
             >
               <Icons.Folder />
-              {project.name}
+              {displayName(project.name, "project")}
             </Link>
           );
         })}
