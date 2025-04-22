@@ -105,7 +105,13 @@ class TrackerStore {
   }
 
   setDaysInView(amount: number) {
+    const isTodayInView = this.isTodayInView;
+
     this.daysInView = amount;
+
+    if (amount === 1 && isTodayInView) {
+      this.goToToday();
+    }
 
     if (amount !== 1) {
       this.snapToStartOfWeek();

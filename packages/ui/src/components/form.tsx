@@ -95,7 +95,7 @@ const FormItem = ({ className, ...props }: React.ComponentProps<"li">) => {
     <FormItemContext.Provider value={{ id }}>
       <li
         className={cn(
-          "flex flex-col justify-between gap-1.5 border-contrast-10 border-b p-3 last:border-0 sm:flex-row sm:items-center",
+          "flex flex-col justify-between gap-1.5 border-contrast-10 border-b last:border-0 sm:flex-row sm:items-center",
           className,
         )}
         {...props}

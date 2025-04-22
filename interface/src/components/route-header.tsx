@@ -9,7 +9,7 @@ const RouteHeader = observer(
     return (
       <header
         className={cn(
-          "flex h-11 shrink-0 items-center justify-between border-b text-foreground text-sm transition-[padding]",
+          "flex h-12 shrink-0 items-center justify-between border-b text-foreground text-sm transition-[padding]",
           className,
         )}
         style={{

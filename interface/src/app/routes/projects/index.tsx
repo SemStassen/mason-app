@@ -1,4 +1,5 @@
-import type { User, Workspace } from "@mason/db/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { InsertProject, User, Workspace } from "@mason/db/schema";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,6 +7,16 @@ import {
   BreadcrumbPage,
 } from "@mason/ui/breadcrumb";
 import { Button } from "@mason/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogMain,
+  DialogTrigger,
+} from "@mason/ui/dialog";
+import { Form, FormControl, FormField, FormItem } from "@mason/ui/form";
 import { Icons } from "@mason/ui/icons";
 import { Input } from "@mason/ui/input";
 import { Label } from "@mason/ui/label";
@@ -17,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@mason/ui/select";
+import { toast } from "@mason/ui/sonner";
 import { Toggle } from "@mason/ui/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mason/ui/tooltip";
 import {
@@ -25,12 +37,14 @@ import {
   stripSearchParams,
 } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { List, ListContent, ListHeader, ListItem } from "~/components/list";
+import { RouteHeader } from "~/components/route-header";
 import { useLiveQuery } from "~/hooks/use-live-query";
 import { getPGliteConnection } from "~/lib/db";
 import { displayName } from "~/lib/utils/display-name";
 import { rootStore } from "~/stores/root-store";
-import { RouteHeader } from "../route-header";
 
 const projectsSearchDefault = {
   sortBy: "name",
@@ -67,7 +81,9 @@ export const Route = createFileRoute("/projects/")({
   loader: async ({ abortController, deps }) => {
     const pg = await getPGliteConnection();
     const liveWorkspaces = pg.live.query<Workspace>({
-      query: "SELECT * FROM workspaces WHERE uuid = $1",
+      query: `
+        SELECT * FROM workspaces WHERE uuid = $1
+      `,
       params: [rootStore.appStore.workspaceUuid],
       signal: abortController.signal,
       offset: 0,
@@ -75,14 +91,18 @@ export const Route = createFileRoute("/projects/")({
     });
 
     const liveProjects = pg.live.query<User>({
-      query: `SELECT * FROM projects WHERE workspace_uuid = $1 AND name ILIKE $2 ORDER BY ${deps.sortBy} ${deps.sortOrder}`,
+      query: `
+        SELECT * FROM projects 
+        WHERE workspace_uuid = $1 AND name ILIKE $2 
+        ORDER BY ${deps.sortBy} ${deps.sortOrder}
+      `,
       params: [rootStore.appStore.workspaceUuid, `%${deps.search}%`],
       signal: abortController.signal,
       offset: 0,
       limit: 100,
     });
 
-    return { liveWorkspaces, liveProjects };
+    return { pg, liveWorkspaces, liveProjects };
   },
   component: Projects,
 });
@@ -154,12 +174,90 @@ function DisplayOptions() {
   );
 }
 
+const createProjectSchema = z.object({
+  name: z.string().min(1),
+  workspace_uuid: z.string(),
+  hex_color: z.string(),
+}) satisfies z.ZodType<InsertProject>;
+
 function CreateProject() {
+  const { pg } = Route.useLoaderData();
+
+  const form = useForm<z.infer<typeof createProjectSchema>>({
+    resolver: zodResolver(createProjectSchema),
+    defaultValues: {
+      name: "",
+      workspace_uuid: rootStore.appStore.workspaceUuid,
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof createProjectSchema>) => {
+    // MUTATION
+    try {
+      await pg.query(
+        "INSERT INTO projects (name, workspace_uuid) VALUES ($1, $2)",
+        [values.name, values.workspace_uuid],
+      );
+      form.reset();
+    } catch (e) {
+      toast.error("Something went wrong creating a new project");
+    }
+  };
+
   return (
-    <Button variant="outline" size="sm">
-      <Icons.Plus />
-      New
-    </Button>
+    <Dialog>
+      <DialogTrigger asChild>
+        <span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Icons.Plus />
+                Create project
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent align="end">Create new project</TooltipContent>
+          </Tooltip>
+        </span>
+      </DialogTrigger>
+      <DialogContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogHeader />
+            <DialogMain>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        autoFocus={true}
+                        placeholder="Add project name..."
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </DialogMain>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button
+                  type="submit"
+                  variant="default"
+                  disabled={form.formState.isSubmitting}
+                >
+                  Create project
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -177,6 +275,7 @@ function ProjectsSearch() {
     <Input
       className="w-60"
       variant="outline"
+      size="sm"
       iconLeft={<Icons.Search />}
       iconRight={
         search && (
@@ -219,33 +318,34 @@ function Projects() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="flex gap-1">
+      </RouteHeader>
+      <div className="flex items-center justify-between border-b p-4">
+        <ProjectsSearch />
+        <div className="flex gap-2">
           <DisplayOptions />
           <CreateProject />
         </div>
-      </RouteHeader>
-      <div className="flex items-center border-b p-4">
-        <ProjectsSearch />
       </div>
-      <div className="grow overflow-auto pb-16">
-        <div className="flex h-9 items-center border-contrast-10 border-b bg-accent pr-4 pl-9.5 text-contrast-75">
-          {workspace.name}
-        </div>
-        {projects?.map((project) => {
-          return (
-            <Link
-              key={project.uuid}
-              type="button"
-              className="flex h-18 w-full items-center gap-2 border-contrast-5 not-last:border-b px-4 text-sm hover:bg-contrast-5"
-              to="/projects/$projectId"
-              params={{ projectId: project.uuid }}
-            >
-              <Icons.Folder />
-              {displayName(project.name, "project")}
-            </Link>
-          );
-        })}
-      </div>
+      <List>
+        <ListHeader>{workspace.name}</ListHeader>
+        <ListContent>
+          {projects?.map((project) => {
+            return (
+              <ListItem key={project.uuid}>
+                <Link
+                  type="button"
+                  className="inset-0.5 flex w-full items-center gap-2 border-contrast-5 not-last:border-b text-sm hover:bg-contrast-5 "
+                  to="/projects/$projectUuid"
+                  params={{ projectUuid: project.uuid }}
+                >
+                  <Icons.Folder />
+                  {displayName(project.name, "project")}
+                </Link>
+              </ListItem>
+            );
+          })}
+        </ListContent>
+      </List>
     </div>
   );
 }

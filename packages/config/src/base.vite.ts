@@ -29,6 +29,8 @@ export default defineConfig({
   plugins: [
     process.env.PACKAGE_TYPE === "app" &&
       TanStackRouterVite({
+        target: "react",
+        virtualRouteConfig: "../../interface/src/app/routes.ts",
         routesDirectory: "../../interface/src/app/routes",
         generatedRouteTree: "../../interface/src/app/routeTree.gen.ts",
       }),

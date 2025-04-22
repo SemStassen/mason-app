@@ -39,10 +39,20 @@ async function main() {
   const projects = await db
     .insert(schema.projectsTable)
     .values(
-      Array.from({ length: 20 }, () => {
+      Array.from({ length: 10 }, () => {
         return {
           workspace_uuid: workspaces[0].uuid,
+          creator_uuid: faker.helpers.maybe(
+            () => users[faker.number.int(users.length)].uuid,
+            { probability: 0.9 },
+          ),
+          lead_uuid: faker.helpers.maybe(
+            () => users[faker.number.int(users.length)].uuid,
+            { probability: 0.7 },
+          ),
           name: faker.commerce.productName(),
+          hex_color: faker.color.rgb(),
+          is_billable: faker.datatype.boolean(),
         };
       }),
     )
@@ -51,7 +61,7 @@ async function main() {
   const activities = await db
     .insert(schema.activitiesTable)
     .values(
-      Array.from({ length: 20 }, (_, i) => {
+      Array.from({ length: 100 }, (_, i) => {
         return {
           project_uuid: projects[i % projects.length].uuid,
           name: faker.helpers.arrayElement([

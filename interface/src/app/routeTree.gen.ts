@@ -8,52 +8,64 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as SettingsImport } from './routes/settings'
-import { Route as IndexImport } from './routes/index'
-import { Route as TrackerIndexImport } from './routes/tracker.index'
-import { Route as SettingsIndexImport } from './routes/settings.index'
-import { Route as ProjectsIndexImport } from './routes/projects.index'
-import { Route as ProjectsProjectIdImport } from './routes/projects.$projectId'
+import { Route as rootRoute } from './routes/root'
+import { Route as trackerIndexImport } from './routes/tracker/index'
+import { Route as settingsLayoutImport } from './routes/settings/layout'
+import { Route as indexImport } from './routes/index'
+import { Route as projectsProjectUuidIndexImport } from './routes/projects/$projectUuid/index'
+import { Route as settingsIndexImport } from './routes/settings/index'
+import { Route as projectsIndexImport } from './routes/projects/index'
+
+// Create Virtual Routes
+
+const ProjectsImport = createFileRoute('/projects')()
 
 // Create/Update Routes
 
-const SettingsRoute = SettingsImport.update({
+const trackerIndexRoute = trackerIndexImport.update({
+  id: '/tracker',
+  path: '/tracker',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const settingsLayoutRoute = settingsLayoutImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
+const ProjectsRoute = ProjectsImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const indexRoute = indexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
 
-const TrackerIndexRoute = TrackerIndexImport.update({
-  id: '/tracker/',
-  path: '/tracker/',
-  getParentRoute: () => rootRoute,
+const projectsProjectUuidIndexRoute = projectsProjectUuidIndexImport.update({
+  id: '/$projectUuid',
+  path: '/$projectUuid',
+  getParentRoute: () => ProjectsRoute,
 } as any)
 
-const SettingsIndexRoute = SettingsIndexImport.update({
+const settingsIndexRoute = settingsIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => SettingsRoute,
+  getParentRoute: () => settingsLayoutRoute,
 } as any)
 
-const ProjectsIndexRoute = ProjectsIndexImport.update({
-  id: '/projects/',
-  path: '/projects/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ProjectsProjectIdRoute = ProjectsProjectIdImport.update({
-  id: '/projects/$projectId',
-  path: '/projects/$projectId',
-  getParentRoute: () => rootRoute,
+const projectsIndexRoute = projectsIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectsRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -64,124 +76,147 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexImport
+      preLoaderRoute: typeof indexImport
+      parentRoute: typeof rootRoute
+    }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsImport
       parentRoute: typeof rootRoute
     }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
-      preLoaderRoute: typeof SettingsImport
+      preLoaderRoute: typeof settingsLayoutImport
       parentRoute: typeof rootRoute
     }
-    '/projects/$projectId': {
-      id: '/projects/$projectId'
-      path: '/projects/$projectId'
-      fullPath: '/projects/$projectId'
-      preLoaderRoute: typeof ProjectsProjectIdImport
+    '/tracker': {
+      id: '/tracker'
+      path: '/tracker'
+      fullPath: '/tracker'
+      preLoaderRoute: typeof trackerIndexImport
       parentRoute: typeof rootRoute
     }
     '/projects/': {
       id: '/projects/'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof ProjectsIndexImport
-      parentRoute: typeof rootRoute
+      path: '/'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof projectsIndexImport
+      parentRoute: typeof ProjectsImport
     }
     '/settings/': {
       id: '/settings/'
       path: '/'
       fullPath: '/settings/'
-      preLoaderRoute: typeof SettingsIndexImport
-      parentRoute: typeof SettingsImport
+      preLoaderRoute: typeof settingsIndexImport
+      parentRoute: typeof settingsLayoutImport
     }
-    '/tracker/': {
-      id: '/tracker/'
-      path: '/tracker'
-      fullPath: '/tracker'
-      preLoaderRoute: typeof TrackerIndexImport
-      parentRoute: typeof rootRoute
+    '/projects/$projectUuid': {
+      id: '/projects/$projectUuid'
+      path: '/$projectUuid'
+      fullPath: '/projects/$projectUuid'
+      preLoaderRoute: typeof projectsProjectUuidIndexImport
+      parentRoute: typeof ProjectsImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface SettingsRouteChildren {
-  SettingsIndexRoute: typeof SettingsIndexRoute
+interface ProjectsRouteChildren {
+  projectsIndexRoute: typeof projectsIndexRoute
+  projectsProjectUuidIndexRoute: typeof projectsProjectUuidIndexRoute
 }
 
-const SettingsRouteChildren: SettingsRouteChildren = {
-  SettingsIndexRoute: SettingsIndexRoute,
+const ProjectsRouteChildren: ProjectsRouteChildren = {
+  projectsIndexRoute: projectsIndexRoute,
+  projectsProjectUuidIndexRoute: projectsProjectUuidIndexRoute,
 }
 
-const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
-  SettingsRouteChildren,
+const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
+  ProjectsRouteChildren,
+)
+
+interface settingsLayoutRouteChildren {
+  settingsIndexRoute: typeof settingsIndexRoute
+}
+
+const settingsLayoutRouteChildren: settingsLayoutRouteChildren = {
+  settingsIndexRoute: settingsIndexRoute,
+}
+
+const settingsLayoutRouteWithChildren = settingsLayoutRoute._addFileChildren(
+  settingsLayoutRouteChildren,
 )
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/settings': typeof SettingsRouteWithChildren
-  '/projects/$projectId': typeof ProjectsProjectIdRoute
-  '/projects': typeof ProjectsIndexRoute
-  '/settings/': typeof SettingsIndexRoute
-  '/tracker': typeof TrackerIndexRoute
+  '/': typeof indexRoute
+  '/projects': typeof ProjectsRouteWithChildren
+  '/settings': typeof settingsLayoutRouteWithChildren
+  '/tracker': typeof trackerIndexRoute
+  '/projects/': typeof projectsIndexRoute
+  '/settings/': typeof settingsIndexRoute
+  '/projects/$projectUuid': typeof projectsProjectUuidIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/projects/$projectId': typeof ProjectsProjectIdRoute
-  '/projects': typeof ProjectsIndexRoute
-  '/settings': typeof SettingsIndexRoute
-  '/tracker': typeof TrackerIndexRoute
+  '/': typeof indexRoute
+  '/tracker': typeof trackerIndexRoute
+  '/projects': typeof projectsIndexRoute
+  '/settings': typeof settingsIndexRoute
+  '/projects/$projectUuid': typeof projectsProjectUuidIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/settings': typeof SettingsRouteWithChildren
-  '/projects/$projectId': typeof ProjectsProjectIdRoute
-  '/projects/': typeof ProjectsIndexRoute
-  '/settings/': typeof SettingsIndexRoute
-  '/tracker/': typeof TrackerIndexRoute
+  '/': typeof indexRoute
+  '/projects': typeof ProjectsRouteWithChildren
+  '/settings': typeof settingsLayoutRouteWithChildren
+  '/tracker': typeof trackerIndexRoute
+  '/projects/': typeof projectsIndexRoute
+  '/settings/': typeof settingsIndexRoute
+  '/projects/$projectUuid': typeof projectsProjectUuidIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/settings'
-    | '/projects/$projectId'
     | '/projects'
-    | '/settings/'
+    | '/settings'
     | '/tracker'
+    | '/projects/'
+    | '/settings/'
+    | '/projects/$projectUuid'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/projects/$projectId' | '/projects' | '/settings' | '/tracker'
+  to: '/' | '/tracker' | '/projects' | '/settings' | '/projects/$projectUuid'
   id:
     | '__root__'
     | '/'
+    | '/projects'
     | '/settings'
-    | '/projects/$projectId'
+    | '/tracker'
     | '/projects/'
     | '/settings/'
-    | '/tracker/'
+    | '/projects/$projectUuid'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  SettingsRoute: typeof SettingsRouteWithChildren
-  ProjectsProjectIdRoute: typeof ProjectsProjectIdRoute
-  ProjectsIndexRoute: typeof ProjectsIndexRoute
-  TrackerIndexRoute: typeof TrackerIndexRoute
+  indexRoute: typeof indexRoute
+  ProjectsRoute: typeof ProjectsRouteWithChildren
+  settingsLayoutRoute: typeof settingsLayoutRouteWithChildren
+  trackerIndexRoute: typeof trackerIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  SettingsRoute: SettingsRouteWithChildren,
-  ProjectsProjectIdRoute: ProjectsProjectIdRoute,
-  ProjectsIndexRoute: ProjectsIndexRoute,
-  TrackerIndexRoute: TrackerIndexRoute,
+  indexRoute: indexRoute,
+  ProjectsRoute: ProjectsRouteWithChildren,
+  settingsLayoutRoute: settingsLayoutRouteWithChildren,
+  trackerIndexRoute: trackerIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -192,36 +227,44 @@ export const routeTree = rootRoute
 {
   "routes": {
     "__root__": {
-      "filePath": "__root.tsx",
+      "filePath": "root.tsx",
       "children": [
         "/",
+        "/projects",
         "/settings",
-        "/projects/$projectId",
-        "/projects/",
-        "/tracker/"
+        "/tracker"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
+    "/projects": {
+      "filePath": "",
+      "children": [
+        "/projects/",
+        "/projects/$projectUuid"
+      ]
+    },
     "/settings": {
-      "filePath": "settings.tsx",
+      "filePath": "settings/layout.tsx",
       "children": [
         "/settings/"
       ]
     },
-    "/projects/$projectId": {
-      "filePath": "projects.$projectId.tsx"
+    "/tracker": {
+      "filePath": "tracker/index.tsx"
     },
     "/projects/": {
-      "filePath": "projects.index.tsx"
+      "filePath": "projects/index.tsx",
+      "parent": "/projects"
     },
     "/settings/": {
-      "filePath": "settings.index.tsx",
+      "filePath": "settings/index.tsx",
       "parent": "/settings"
     },
-    "/tracker/": {
-      "filePath": "tracker.index.tsx"
+    "/projects/$projectUuid": {
+      "filePath": "projects/$projectUuid/index.tsx",
+      "parent": "/projects"
     }
   }
 }

@@ -2,7 +2,7 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { cn } from "../utils";
 
 const inputVariants = cva(
-  "relative flex rounded-md bg-transparent text-contrast-50 text-sm disabled:cursor-not-allowed disabled:opacity-50",
+  "relative flex w-full rounded-md bg-transparent text-contrast-50 text-sm disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -50,7 +50,7 @@ const Input = ({
       <input
         type={type}
         className={cn(
-          "w-full cursor-pointer px-3 text-foreground placeholder:text-contrast-50 focus:cursor-text focus:outline-none",
+          "w-full cursor-default px-3 text-foreground placeholder:text-contrast-50 focus:cursor-text focus:outline-none",
           iconLeft && "pl-9",
           iconRight && "pr-9",
         )}

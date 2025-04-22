@@ -1,5 +1,5 @@
 {
-  "id": "be9c2c20-a8b4-48db-8f76-25c004e887d2",
+  "id": "bbb11f55-7224-462f-9f03-102d5073ef9f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -81,8 +81,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "created_by": {
-          "name": "created_by",
+        "creator_uuid": {
+          "name": "creator_uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lead_uuid": {
+          "name": "lead_uuid",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
@@ -92,6 +98,25 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "hex_color": {
+          "name": "hex_color",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_billable": {
+          "name": "is_billable",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "notes": {
+          "name": "notes",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -123,12 +148,25 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "projects_created_by_users_uuid_fk": {
-          "name": "projects_created_by_users_uuid_fk",
+        "projects_creator_uuid_users_uuid_fk": {
+          "name": "projects_creator_uuid_users_uuid_fk",
           "tableFrom": "projects",
           "tableTo": "users",
           "columnsFrom": [
-            "created_by"
+            "creator_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "projects_lead_uuid_users_uuid_fk": {
+          "name": "projects_lead_uuid_users_uuid_fk",
+          "tableFrom": "projects",
+          "tableTo": "users",
+          "columnsFrom": [
+            "lead_uuid"
           ],
           "columnsTo": [
             "uuid"

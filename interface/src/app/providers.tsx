@@ -2,8 +2,8 @@ import {
   PGliteProvider,
   type PGliteWithExtensions,
   createPGlite,
-} from "@mason/db/db";
-import { sync } from "@mason/db/sync";
+  sync,
+} from "@mason/db/client";
 import { TooltipProvider } from "@mason/ui/tooltip";
 import { useEffect, useState } from "react";
 
@@ -30,14 +30,14 @@ function Providers({ children }: ProvidersProps) {
   if (!pgForProvider || syncStatus !== "success") {
     return (
       <div className="grid h-screen w-screen place-content-center">
-        Mason is Loading
+        Mason is Loading...
       </div>
     );
   }
 
   return (
     <PGliteProvider db={pgForProvider}>
-      <TooltipProvider delayDuration={200} disableHoverableContent={true}>
+      <TooltipProvider delayDuration={400} disableHoverableContent={true}>
         {children}
       </TooltipProvider>
     </PGliteProvider>

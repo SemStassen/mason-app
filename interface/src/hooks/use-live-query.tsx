@@ -4,8 +4,7 @@
  */
 
 import type { LiveQuery, LiveQueryResults } from "@electric-sql/pglite/live";
-import { query as buildQuery } from "@electric-sql/pglite/template";
-import { usePGlite } from "@mason/db/db";
+import { usePGlite } from "@mason/db/client";
 import { useEffect, useRef, useState } from "react";
 
 function paramsEqual(

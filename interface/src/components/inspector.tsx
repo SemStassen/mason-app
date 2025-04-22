@@ -1,5 +1,4 @@
-import { usePGlite } from "@mason/db/db";
-import { Repl } from "@mason/db/repl";
+import { usePGlite } from "@mason/db/client";
 import { Button } from "@mason/ui/button";
 import { Icons } from "@mason/ui/icons";
 import {
@@ -133,7 +132,7 @@ const Inspector = observer(() => {
             <TabsTrigger value="tables">Tables</TabsTrigger>
           </TabsList>
           <TabsContent value="repl" className="overflow-y-scroll">
-            <Repl pg={pg} />
+            {/* <Repl pg={pg} /> */}
           </TabsContent>
           <TabsContent value="tables" className="flex flex-col overflow-hidden">
             <TableTabsContent />

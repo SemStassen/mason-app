@@ -1,0 +1,24 @@
+{
+  "name": "@mason/auth",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf node_modules",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@mason/db": "workspace:*",
+    "@mason/env": "workspace:*",
+    "better-auth": "^1.2.7"
+  },
+  "exports": {
+    "./client": "./src/client/index.ts",
+    "./server": "./src/server/index.ts"
+  }
+}
