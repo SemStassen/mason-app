@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /* These were added because tailwind does not seem to register them automatically */
 @source "../src";
@@ -34,9 +35,59 @@
   --color-contrast-50: var(--contrast-50);
   --color-contrast-60: var(--contrast-60);
   --color-contrast-75: var(--contrast-75);
+  --color-contrast-90: var(--contrast-90);
 
   --color-black: oklch(0% 0 0);
   --color-white: oklch(100% 0 0);
+
+  /* Animations */
+  --animate-collapsible-down: collapsible-down 0.2s ease-out;
+  --animate-collapsible-up: collapsible-up 0.2s ease-out;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+  @keyframes collapsible-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes collapsible-up {
+    from {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {
@@ -56,13 +107,14 @@
     --contrast-50: rgba(30, 10, 0, 0.5);
     --contrast-60: rgba(30, 10, 0, 0.6);
     --contrast-75: rgba(30, 10, 0, 0.75);
+    --contrast-90: rgba(30, 10, 0, 0.9);
   }
 
   .dark {
     --app-background: oklch(23.22% 0.0049 67.58);
     --app-foreground: oklch(100% 0 0);
     --app-border: rgba(255, 255, 255, 0.1);
-    --app-popover: oklch(25.95% 0.0082 59.3);
+    --app-popover: oklch(32.95% 0.0082 79.3);
     --app-accent: oklch(21.02% 0.0086 50);
 
     --app-sidebar: oklch(21.02% 0.0016 17.28);
@@ -74,6 +126,7 @@
     --contrast-50: rgba(255, 245, 225, 0.5);
     --contrast-60: rgba(255, 245, 225, 0.6);
     --contrast-75: rgba(255, 245, 225, 0.75);
+    --contrast-90: rgba(255, 245, 225, 0.9);
   }
 
   * {

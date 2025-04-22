@@ -11,8 +11,8 @@ interface AppSettings {
 }
 
 class AppStore {
-  userUuid = "8b356b88-a6ad-46d9-962c-d6f585b2b31a";
-  workspaceUuid = "81d32fe9-456b-4a8f-960b-5968d294ee60";
+  userUuid = "070b6f5e-77fb-4841-b92b-359646fe1e61";
+  workspaceUuid = "8964dc14-37d3-4648-8353-b5c378e9559d";
   startOfWeekDay: WeekStartDay = 1;
 
   constructor() {

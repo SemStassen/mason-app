@@ -2,10 +2,19 @@
   "name": "@mason/server",
   "private": true,
   "type": "module",
-  "devDependencies": {
-    "typescript": "^5.0.0"
+  "scripts": {
+    "build": "vite build",
+    "clean": "git clean -xdf node_modules",
+    "dev": "NODE_ENV=development bun run --hot src/index.ts",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
   },
   "dependencies": {
+    "@mason/auth": "workspace:*",
     "hono": "^4.7.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
   }
 }

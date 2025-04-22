@@ -1,11 +1,10 @@
+import { clientEnv } from "@mason/env/client";
 import type { PGliteWithExtensions } from "./db";
-
-const ELECTRIC_URL = "http://localhost:4027/v1/shape";
 
 export async function sync(pg: PGliteWithExtensions) {
   await pg.sync.syncShapeToTable({
     shape: {
-      url: ELECTRIC_URL,
+      url: clientEnv.ELECTRIC_URL,
       params: {
         table: "workspaces",
       },
@@ -18,7 +17,7 @@ export async function sync(pg: PGliteWithExtensions) {
 
   await pg.sync.syncShapeToTable({
     shape: {
-      url: ELECTRIC_URL,
+      url: clientEnv.ELECTRIC_URL,
       params: {
         table: "users",
       },
@@ -31,7 +30,7 @@ export async function sync(pg: PGliteWithExtensions) {
 
   await pg.sync.syncShapeToTable({
     shape: {
-      url: ELECTRIC_URL,
+      url: clientEnv.ELECTRIC_URL,
       params: {
         table: "projects",
       },
@@ -44,7 +43,7 @@ export async function sync(pg: PGliteWithExtensions) {
 
   await pg.sync.syncShapeToTable({
     shape: {
-      url: ELECTRIC_URL,
+      url: clientEnv.ELECTRIC_URL,
       params: {
         table: "activities",
       },
@@ -57,7 +56,7 @@ export async function sync(pg: PGliteWithExtensions) {
 
   await pg.sync.syncShapeToTable({
     shape: {
-      url: ELECTRIC_URL,
+      url: clientEnv.ELECTRIC_URL,
       params: {
         table: "time_entries",
       },

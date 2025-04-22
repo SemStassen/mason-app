@@ -6,7 +6,7 @@ import {
 } from "@mason/ui/breadcrumb";
 import { Icons } from "@mason/ui/icons";
 import { createFileRoute } from "@tanstack/react-router";
-import { RouteHeader } from "../route-header";
+import { RouteHeader } from "../../components/route-header";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,

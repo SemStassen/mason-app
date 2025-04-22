@@ -1,4 +1,4 @@
-import { usePGlite } from "@mason/db/db";
+import { usePGlite } from "@mason/db/client";
 import {
   Form,
   FormControl,

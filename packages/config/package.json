@@ -7,7 +7,6 @@
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"
   },
-  "dependencies": {},
   "devDependencies": {
     "@tanstack/router-plugin": "^1.114.17",
     "@vitejs/plugin-react-swc": "^3.8.0",

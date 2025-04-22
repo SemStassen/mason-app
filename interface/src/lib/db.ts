@@ -1,4 +1,4 @@
-import { type PGliteWithExtensions, createPGlite } from "@mason/db/db";
+import { type PGliteWithExtensions, createPGlite } from "@mason/db/client";
 
 let pgConnection: PGliteWithExtensions | null = null;
 

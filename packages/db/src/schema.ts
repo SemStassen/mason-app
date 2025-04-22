@@ -1,5 +1,13 @@
-import type { InferSelectModel } from "drizzle-orm";
-import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import {
+  boolean,
+  date,
+  json,
+  pgTable,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 const tableMetadata = {
   created_at: timestamp("created_at", {
@@ -26,23 +34,6 @@ export const workspacesTable = pgTable("workspaces", {
   ...tableMetadata,
 });
 
-// export type Team = InferSelectModel<typeof teamsTable>;
-// export const teamsTable = pgTable("teams", {
-//   uuid: uuid("uuid").primaryKey().defaultRandom(),
-//   // References
-//   workspace_uuid: uuid("workspace_uuid")
-//     .references(() => workspacesTable.uuid, {
-//       onDelete: "cascade",
-//     })
-//     .notNull(),
-//   // General
-//   name: varchar("name").notNull(),
-// });
-
-// export const teamRelations = relations(teamsTable, ({ many }) => ({
-//   users: many(usersToTeamsTable),
-// }));
-
 export type User = InferSelectModel<typeof usersTable>;
 export const usersTable = pgTable("users", {
   uuid: uuid("uuid").primaryKey().defaultRandom(),
@@ -53,16 +44,62 @@ export const usersTable = pgTable("users", {
     })
     .notNull(),
   // General
-  name: varchar("name").notNull(),
   display_name: varchar("display_name").notNull(),
+  email: varchar("email").notNull(),
+  email_verified: boolean("email_verified").default(false).notNull(),
+  image_url: varchar("image_url"),
   // Metadata
   ...tableMetadata,
 });
 
-// export const userRelations = relations(usersTable, ({ many }) => ({
-//   teams: many(usersToTeamsTable),
-// }));
+export type InsertSession = InferInsertModel<typeof sessionsTable>;
+export type Session = InferSelectModel<typeof sessionsTable>;
+export const sessionsTable = pgTable("sessions", {
+  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  // References
+  user_uuid: uuid("user_uuid")
+    .references(() => usersTable.uuid, { onDelete: "cascade" })
+    .notNull(),
+  // General
+  session_token: varchar("session_token").notNull(),
+  expires_at: date("expires_at").notNull(),
+  ip_address: varchar("ip_address").notNull(),
+  user_agent: varchar("user_agent").notNull(),
+  // Metadata
+  ...tableMetadata,
+});
 
+export const AccountsTable = pgTable("accounts", {
+  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  // References
+  user_uuid: uuid("user_uuid")
+    .references(() => usersTable.uuid, { onDelete: "cascade" })
+    .notNull(),
+  // General
+  account_id: varchar("account_id").notNull(),
+  provider_id: varchar("provider_id").notNull(),
+  access_token: varchar("access_token"),
+  refresh_token: varchar("refresh_token"),
+  access_token_expires_at: date("access_token_expires_at"),
+  refresh_token_expires_at: date("refresh_token_expires_at"),
+  scope: varchar("scope"),
+  idToken: varchar("id_token"),
+  password: varchar("password"),
+  // Metadata
+  ...tableMetadata,
+});
+
+export const VerificationsTable = pgTable("verifications", {
+  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  // General
+  identifier: varchar("identifier").notNull(),
+  value: varchar("value").notNull(),
+  expires_at: date("expires_at").notNull(),
+  // Metadata
+  ...tableMetadata,
+});
+
+export type InsertProject = InferInsertModel<typeof projectsTable>;
 export type Project = InferSelectModel<typeof projectsTable>;
 export const projectsTable = pgTable("projects", {
   uuid: uuid("uuid").primaryKey().defaultRandom(),
@@ -70,15 +107,26 @@ export const projectsTable = pgTable("projects", {
   workspace_uuid: uuid("workspace_uuid")
     .references(() => workspacesTable.uuid, { onDelete: "cascade" })
     .notNull(),
-  created_by: uuid("created_by").references(() => usersTable.uuid, {
+  creator_uuid: uuid("creator_uuid").references(() => usersTable.uuid, {
+    onDelete: "set null",
+  }),
+  lead_uuid: uuid("lead_uuid").references(() => usersTable.uuid, {
     onDelete: "set null",
   }),
   // General
   name: varchar("name").notNull(),
+  hex_color: varchar("hex_color").notNull(),
+  is_billable: boolean("is_billable").default(true).notNull(),
+  notes: json("notes").$type<{
+    // Generic object type
+    [key: string]: string;
+  }>(),
   // Metadata
   ...tableMetadata,
 });
 
+export type InsertActivity = InferInsertModel<typeof activitiesTable>;
+export type Activity = InferSelectModel<typeof activitiesTable>;
 export const activitiesTable = pgTable("activities", {
   uuid: uuid("uuid").primaryKey().defaultRandom(),
   // References
@@ -113,12 +161,3 @@ export const timeEntriesTable = pgTable("time_entries", {
   // Metadata
   ...tableMetadata,
 });
-
-// export const usersToTeamsTable = pgTable("users_to_teams", {
-//   user_uuid: uuid("user_uuid")
-//     .references(() => usersTable.uuid, { onDelete: "cascade" })
-//     .notNull(),
-//   team_uuid: uuid("team_uuid")
-//     .references(() => teamsTable.uuid, { onDelete: "cascade" })
-//     .notNull(),
-// });
