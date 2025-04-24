@@ -3,6 +3,7 @@ import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
 import { authRoute } from "./routes/auth";
+import { v1Route } from "./routes/v1";
 
 const app = new Hono().basePath("/api");
 
@@ -25,6 +26,8 @@ app.get("/ping", (c) => {
 });
 
 app.route("/auth", authRoute);
+
+app.route("/v1", v1Route);
 
 console.log("Starting server on port 8001");
 

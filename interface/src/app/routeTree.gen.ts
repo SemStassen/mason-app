@@ -13,210 +13,316 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/root'
-import { Route as trackerIndexImport } from './routes/tracker/index'
-import { Route as settingsLayoutImport } from './routes/settings/layout'
-import { Route as indexImport } from './routes/index'
-import { Route as projectsProjectUuidIndexImport } from './routes/projects/$projectUuid/index'
-import { Route as settingsIndexImport } from './routes/settings/index'
-import { Route as projectsIndexImport } from './routes/projects/index'
+import { Route as authLayoutImport } from './routes/(auth)/layout'
+import { Route as appLayoutImport } from './routes/(app)/layout'
+import { Route as authSignUpIndexImport } from './routes/(auth)/sign-up/index'
+import { Route as authSignInIndexImport } from './routes/(auth)/sign-in/index'
+import { Route as appTrackerIndexImport } from './routes/(app)/tracker/index'
+import { Route as appIndexImport } from './routes/(app)/index'
+import { Route as appSettingsLayoutImport } from './routes/(app)/settings/layout'
+import { Route as appProjectsProjectUuidIndexImport } from './routes/(app)/projects/$projectUuid/index'
+import { Route as appSettingsIndexImport } from './routes/(app)/settings/index'
+import { Route as appProjectsIndexImport } from './routes/(app)/projects/index'
 
 // Create Virtual Routes
 
-const ProjectsImport = createFileRoute('/projects')()
+const AppLayoutProjectsImport = createFileRoute('/_app-layout/projects')()
 
 // Create/Update Routes
 
-const trackerIndexRoute = trackerIndexImport.update({
+const authLayoutRoute = authLayoutImport.update({
+  id: '/_auth-layout',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const appLayoutRoute = appLayoutImport.update({
+  id: '/_app-layout',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const authSignUpIndexRoute = authSignUpIndexImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => authLayoutRoute,
+} as any)
+
+const authSignInIndexRoute = authSignInIndexImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => authLayoutRoute,
+} as any)
+
+const appTrackerIndexRoute = appTrackerIndexImport.update({
   id: '/tracker',
   path: '/tracker',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => appLayoutRoute,
 } as any)
 
-const settingsLayoutRoute = settingsLayoutImport.update({
+const appIndexRoute = appIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => appLayoutRoute,
+} as any)
+
+const appSettingsLayoutRoute = appSettingsLayoutImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => appLayoutRoute,
 } as any)
 
-const ProjectsRoute = ProjectsImport.update({
+const AppLayoutProjectsRoute = AppLayoutProjectsImport.update({
   id: '/projects',
   path: '/projects',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => appLayoutRoute,
 } as any)
 
-const indexRoute = indexImport.update({
+const appProjectsProjectUuidIndexRoute =
+  appProjectsProjectUuidIndexImport.update({
+    id: '/$projectUuid',
+    path: '/$projectUuid',
+    getParentRoute: () => AppLayoutProjectsRoute,
+  } as any)
+
+const appSettingsIndexRoute = appSettingsIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => appSettingsLayoutRoute,
 } as any)
 
-const projectsProjectUuidIndexRoute = projectsProjectUuidIndexImport.update({
-  id: '/$projectUuid',
-  path: '/$projectUuid',
-  getParentRoute: () => ProjectsRoute,
-} as any)
-
-const settingsIndexRoute = settingsIndexImport.update({
+const appProjectsIndexRoute = appProjectsIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => settingsLayoutRoute,
-} as any)
-
-const projectsIndexRoute = projectsIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProjectsRoute,
+  getParentRoute: () => AppLayoutProjectsRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof indexImport
+    '/_app-layout': {
+      id: '/_app-layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof appLayoutImport
       parentRoute: typeof rootRoute
     }
-    '/projects': {
-      id: '/projects'
+    '/_auth-layout': {
+      id: '/_auth-layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authLayoutImport
+      parentRoute: typeof rootRoute
+    }
+    '/_app-layout/projects': {
+      id: '/_app-layout/projects'
       path: '/projects'
       fullPath: '/projects'
-      preLoaderRoute: typeof ProjectsImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AppLayoutProjectsImport
+      parentRoute: typeof appLayoutImport
     }
-    '/settings': {
-      id: '/settings'
+    '/_app-layout/settings': {
+      id: '/_app-layout/settings'
       path: '/settings'
       fullPath: '/settings'
-      preLoaderRoute: typeof settingsLayoutImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof appSettingsLayoutImport
+      parentRoute: typeof appLayoutImport
     }
-    '/tracker': {
-      id: '/tracker'
+    '/_app-layout/': {
+      id: '/_app-layout/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof appIndexImport
+      parentRoute: typeof appLayoutImport
+    }
+    '/_app-layout/tracker': {
+      id: '/_app-layout/tracker'
       path: '/tracker'
       fullPath: '/tracker'
-      preLoaderRoute: typeof trackerIndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof appTrackerIndexImport
+      parentRoute: typeof appLayoutImport
     }
-    '/projects/': {
-      id: '/projects/'
+    '/_auth-layout/sign-in': {
+      id: '/_auth-layout/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof authSignInIndexImport
+      parentRoute: typeof authLayoutImport
+    }
+    '/_auth-layout/sign-up': {
+      id: '/_auth-layout/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof authSignUpIndexImport
+      parentRoute: typeof authLayoutImport
+    }
+    '/_app-layout/projects/': {
+      id: '/_app-layout/projects/'
       path: '/'
       fullPath: '/projects/'
-      preLoaderRoute: typeof projectsIndexImport
-      parentRoute: typeof ProjectsImport
+      preLoaderRoute: typeof appProjectsIndexImport
+      parentRoute: typeof AppLayoutProjectsImport
     }
-    '/settings/': {
-      id: '/settings/'
+    '/_app-layout/settings/': {
+      id: '/_app-layout/settings/'
       path: '/'
       fullPath: '/settings/'
-      preLoaderRoute: typeof settingsIndexImport
-      parentRoute: typeof settingsLayoutImport
+      preLoaderRoute: typeof appSettingsIndexImport
+      parentRoute: typeof appSettingsLayoutImport
     }
-    '/projects/$projectUuid': {
-      id: '/projects/$projectUuid'
+    '/_app-layout/projects/$projectUuid': {
+      id: '/_app-layout/projects/$projectUuid'
       path: '/$projectUuid'
       fullPath: '/projects/$projectUuid'
-      preLoaderRoute: typeof projectsProjectUuidIndexImport
-      parentRoute: typeof ProjectsImport
+      preLoaderRoute: typeof appProjectsProjectUuidIndexImport
+      parentRoute: typeof AppLayoutProjectsImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface ProjectsRouteChildren {
-  projectsIndexRoute: typeof projectsIndexRoute
-  projectsProjectUuidIndexRoute: typeof projectsProjectUuidIndexRoute
+interface AppLayoutProjectsRouteChildren {
+  appProjectsIndexRoute: typeof appProjectsIndexRoute
+  appProjectsProjectUuidIndexRoute: typeof appProjectsProjectUuidIndexRoute
 }
 
-const ProjectsRouteChildren: ProjectsRouteChildren = {
-  projectsIndexRoute: projectsIndexRoute,
-  projectsProjectUuidIndexRoute: projectsProjectUuidIndexRoute,
+const AppLayoutProjectsRouteChildren: AppLayoutProjectsRouteChildren = {
+  appProjectsIndexRoute: appProjectsIndexRoute,
+  appProjectsProjectUuidIndexRoute: appProjectsProjectUuidIndexRoute,
 }
 
-const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
-  ProjectsRouteChildren,
+const AppLayoutProjectsRouteWithChildren =
+  AppLayoutProjectsRoute._addFileChildren(AppLayoutProjectsRouteChildren)
+
+interface appSettingsLayoutRouteChildren {
+  appSettingsIndexRoute: typeof appSettingsIndexRoute
+}
+
+const appSettingsLayoutRouteChildren: appSettingsLayoutRouteChildren = {
+  appSettingsIndexRoute: appSettingsIndexRoute,
+}
+
+const appSettingsLayoutRouteWithChildren =
+  appSettingsLayoutRoute._addFileChildren(appSettingsLayoutRouteChildren)
+
+interface appLayoutRouteChildren {
+  AppLayoutProjectsRoute: typeof AppLayoutProjectsRouteWithChildren
+  appSettingsLayoutRoute: typeof appSettingsLayoutRouteWithChildren
+  appIndexRoute: typeof appIndexRoute
+  appTrackerIndexRoute: typeof appTrackerIndexRoute
+}
+
+const appLayoutRouteChildren: appLayoutRouteChildren = {
+  AppLayoutProjectsRoute: AppLayoutProjectsRouteWithChildren,
+  appSettingsLayoutRoute: appSettingsLayoutRouteWithChildren,
+  appIndexRoute: appIndexRoute,
+  appTrackerIndexRoute: appTrackerIndexRoute,
+}
+
+const appLayoutRouteWithChildren = appLayoutRoute._addFileChildren(
+  appLayoutRouteChildren,
 )
 
-interface settingsLayoutRouteChildren {
-  settingsIndexRoute: typeof settingsIndexRoute
+interface authLayoutRouteChildren {
+  authSignInIndexRoute: typeof authSignInIndexRoute
+  authSignUpIndexRoute: typeof authSignUpIndexRoute
 }
 
-const settingsLayoutRouteChildren: settingsLayoutRouteChildren = {
-  settingsIndexRoute: settingsIndexRoute,
+const authLayoutRouteChildren: authLayoutRouteChildren = {
+  authSignInIndexRoute: authSignInIndexRoute,
+  authSignUpIndexRoute: authSignUpIndexRoute,
 }
 
-const settingsLayoutRouteWithChildren = settingsLayoutRoute._addFileChildren(
-  settingsLayoutRouteChildren,
+const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
+  authLayoutRouteChildren,
 )
 
 export interface FileRoutesByFullPath {
-  '/': typeof indexRoute
-  '/projects': typeof ProjectsRouteWithChildren
-  '/settings': typeof settingsLayoutRouteWithChildren
-  '/tracker': typeof trackerIndexRoute
-  '/projects/': typeof projectsIndexRoute
-  '/settings/': typeof settingsIndexRoute
-  '/projects/$projectUuid': typeof projectsProjectUuidIndexRoute
+  '': typeof authLayoutRouteWithChildren
+  '/projects': typeof AppLayoutProjectsRouteWithChildren
+  '/settings': typeof appSettingsLayoutRouteWithChildren
+  '/': typeof appIndexRoute
+  '/tracker': typeof appTrackerIndexRoute
+  '/sign-in': typeof authSignInIndexRoute
+  '/sign-up': typeof authSignUpIndexRoute
+  '/projects/': typeof appProjectsIndexRoute
+  '/settings/': typeof appSettingsIndexRoute
+  '/projects/$projectUuid': typeof appProjectsProjectUuidIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof indexRoute
-  '/tracker': typeof trackerIndexRoute
-  '/projects': typeof projectsIndexRoute
-  '/settings': typeof settingsIndexRoute
-  '/projects/$projectUuid': typeof projectsProjectUuidIndexRoute
+  '': typeof authLayoutRouteWithChildren
+  '/': typeof appIndexRoute
+  '/tracker': typeof appTrackerIndexRoute
+  '/sign-in': typeof authSignInIndexRoute
+  '/sign-up': typeof authSignUpIndexRoute
+  '/projects': typeof appProjectsIndexRoute
+  '/settings': typeof appSettingsIndexRoute
+  '/projects/$projectUuid': typeof appProjectsProjectUuidIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof indexRoute
-  '/projects': typeof ProjectsRouteWithChildren
-  '/settings': typeof settingsLayoutRouteWithChildren
-  '/tracker': typeof trackerIndexRoute
-  '/projects/': typeof projectsIndexRoute
-  '/settings/': typeof settingsIndexRoute
-  '/projects/$projectUuid': typeof projectsProjectUuidIndexRoute
+  '/_app-layout': typeof appLayoutRouteWithChildren
+  '/_auth-layout': typeof authLayoutRouteWithChildren
+  '/_app-layout/projects': typeof AppLayoutProjectsRouteWithChildren
+  '/_app-layout/settings': typeof appSettingsLayoutRouteWithChildren
+  '/_app-layout/': typeof appIndexRoute
+  '/_app-layout/tracker': typeof appTrackerIndexRoute
+  '/_auth-layout/sign-in': typeof authSignInIndexRoute
+  '/_auth-layout/sign-up': typeof authSignUpIndexRoute
+  '/_app-layout/projects/': typeof appProjectsIndexRoute
+  '/_app-layout/settings/': typeof appSettingsIndexRoute
+  '/_app-layout/projects/$projectUuid': typeof appProjectsProjectUuidIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
+    | ''
     | '/projects'
     | '/settings'
+    | '/'
     | '/tracker'
+    | '/sign-in'
+    | '/sign-up'
     | '/projects/'
     | '/settings/'
     | '/projects/$projectUuid'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tracker' | '/projects' | '/settings' | '/projects/$projectUuid'
-  id:
-    | '__root__'
+  to:
+    | ''
     | '/'
+    | '/tracker'
+    | '/sign-in'
+    | '/sign-up'
     | '/projects'
     | '/settings'
-    | '/tracker'
-    | '/projects/'
-    | '/settings/'
     | '/projects/$projectUuid'
+  id:
+    | '__root__'
+    | '/_app-layout'
+    | '/_auth-layout'
+    | '/_app-layout/projects'
+    | '/_app-layout/settings'
+    | '/_app-layout/'
+    | '/_app-layout/tracker'
+    | '/_auth-layout/sign-in'
+    | '/_auth-layout/sign-up'
+    | '/_app-layout/projects/'
+    | '/_app-layout/settings/'
+    | '/_app-layout/projects/$projectUuid'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  indexRoute: typeof indexRoute
-  ProjectsRoute: typeof ProjectsRouteWithChildren
-  settingsLayoutRoute: typeof settingsLayoutRouteWithChildren
-  trackerIndexRoute: typeof trackerIndexRoute
+  appLayoutRoute: typeof appLayoutRouteWithChildren
+  authLayoutRoute: typeof authLayoutRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  indexRoute: indexRoute,
-  ProjectsRoute: ProjectsRouteWithChildren,
-  settingsLayoutRoute: settingsLayoutRouteWithChildren,
-  trackerIndexRoute: trackerIndexRoute,
+  appLayoutRoute: appLayoutRouteWithChildren,
+  authLayoutRoute: authLayoutRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -229,42 +335,68 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "root.tsx",
       "children": [
-        "/",
-        "/projects",
-        "/settings",
-        "/tracker"
+        "/_app-layout",
+        "/_auth-layout"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/_app-layout": {
+      "filePath": "(app)/layout.tsx",
+      "children": [
+        "/_app-layout/projects",
+        "/_app-layout/settings",
+        "/_app-layout/",
+        "/_app-layout/tracker"
+      ]
     },
-    "/projects": {
+    "/_auth-layout": {
+      "filePath": "(auth)/layout.tsx",
+      "children": [
+        "/_auth-layout/sign-in",
+        "/_auth-layout/sign-up"
+      ]
+    },
+    "/_app-layout/projects": {
       "filePath": "",
+      "parent": "/_app-layout",
       "children": [
-        "/projects/",
-        "/projects/$projectUuid"
+        "/_app-layout/projects/",
+        "/_app-layout/projects/$projectUuid"
       ]
     },
-    "/settings": {
-      "filePath": "settings/layout.tsx",
+    "/_app-layout/settings": {
+      "filePath": "(app)/settings/layout.tsx",
+      "parent": "/_app-layout",
       "children": [
-        "/settings/"
+        "/_app-layout/settings/"
       ]
     },
-    "/tracker": {
-      "filePath": "tracker/index.tsx"
+    "/_app-layout/": {
+      "filePath": "(app)/index.tsx",
+      "parent": "/_app-layout"
     },
-    "/projects/": {
-      "filePath": "projects/index.tsx",
-      "parent": "/projects"
+    "/_app-layout/tracker": {
+      "filePath": "(app)/tracker/index.tsx",
+      "parent": "/_app-layout"
     },
-    "/settings/": {
-      "filePath": "settings/index.tsx",
-      "parent": "/settings"
+    "/_auth-layout/sign-in": {
+      "filePath": "(auth)/sign-in/index.tsx",
+      "parent": "/_auth-layout"
     },
-    "/projects/$projectUuid": {
-      "filePath": "projects/$projectUuid/index.tsx",
-      "parent": "/projects"
+    "/_auth-layout/sign-up": {
+      "filePath": "(auth)/sign-up/index.tsx",
+      "parent": "/_auth-layout"
+    },
+    "/_app-layout/projects/": {
+      "filePath": "(app)/projects/index.tsx",
+      "parent": "/_app-layout/projects"
+    },
+    "/_app-layout/settings/": {
+      "filePath": "(app)/settings/index.tsx",
+      "parent": "/_app-layout/settings"
+    },
+    "/_app-layout/projects/$projectUuid": {
+      "filePath": "(app)/projects/$projectUuid/index.tsx",
+      "parent": "/_app-layout/projects"
     }
   }
 }

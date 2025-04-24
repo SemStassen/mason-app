@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { InsertProject, User, Workspace } from "@mason/db/schema";
+import type { InsertProject, Project, Workspace } from "@mason/db/schema";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -68,7 +68,7 @@ const projectsSearchSchema = z.object({
   search: z.string().default(projectsSearchDefault.search),
 });
 
-export const Route = createFileRoute("/projects/")({
+export const Route = createFileRoute("/_app-layout/projects/")({
   validateSearch: zodValidator(projectsSearchSchema),
   search: {
     middlewares: [stripSearchParams(projectsSearchDefault)],
@@ -90,7 +90,7 @@ export const Route = createFileRoute("/projects/")({
       limit: 100,
     });
 
-    const liveProjects = pg.live.query<User>({
+    const liveProjects = pg.live.query<Project>({
       query: `
         SELECT * FROM projects 
         WHERE workspace_uuid = $1 AND name ILIKE $2 

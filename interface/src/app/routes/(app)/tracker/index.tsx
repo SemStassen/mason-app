@@ -4,7 +4,7 @@ import { Tracker } from "~/components/tracker";
 import { getPGliteConnection } from "~/lib/db";
 import { rootStore } from "~/stores/root-store";
 
-export const Route = createFileRoute("/tracker")({
+export const Route = createFileRoute("/_app-layout/tracker")({
   loader: async ({ abortController }) => {
     const pg = await getPGliteConnection();
     const liveTimeEntries = pg.live.query<

@@ -5,6 +5,9 @@ import { betterAuth } from "better-auth";
 export const auth = betterAuth({
   appName: "Mason",
   database: pool,
+  emailAndPassword: {
+    enabled: true,
+  },
   socialProviders: {
     github: {
       clientId: serverEnv.GITHUB_CLIENT_ID,
@@ -66,5 +69,3 @@ export const auth = betterAuth({
     },
   },
 });
-
-export type Session = typeof auth.$Infer.Session;

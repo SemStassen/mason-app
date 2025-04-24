@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "bun build --outdir=dist src/index.ts",
     "clean": "git clean -xdf node_modules",
     "dev": "NODE_ENV=development bun run --hot src/index.ts",
     "format": "biome format --write .",

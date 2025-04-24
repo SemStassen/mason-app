@@ -58,7 +58,7 @@ const activitiesSearchSchema = z.object({
   search: z.string().default(activitiesSearchDefault.search),
 });
 
-export const Route = createFileRoute("/projects/$projectUuid")({
+export const Route = createFileRoute("/_app-layout/projects/$projectUuid")({
   validateSearch: zodValidator(activitiesSearchSchema),
   search: {
     middlewares: [stripSearchParams(activitiesSearchDefault)],
