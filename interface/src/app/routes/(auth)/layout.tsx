@@ -6,7 +6,7 @@ export const Route = createFileRoute("/_auth-layout")({
 
 function AuthLayout() {
   return (
-    <div className="grid h-screen w-screen place-content-center overflow-hidden">
+    <div className="h-screen w-screen overflow-hidden">
       <Outlet />
     </div>
   );
