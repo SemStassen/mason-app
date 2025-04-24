@@ -1,5 +1,4 @@
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { Providers } from "./providers";
 import { routeTree } from "./routeTree.gen";
 import "@mason/ui/globals.css";
 
@@ -16,11 +15,7 @@ declare module "@tanstack/react-router" {
 }
 
 function MasonInterfaceRoot() {
-  return (
-    <Providers>
-      <RouterProvider router={router} />
-    </Providers>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export { MasonInterfaceRoot };

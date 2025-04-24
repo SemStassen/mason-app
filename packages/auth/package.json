@@ -8,14 +8,14 @@
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"
   },
-  "devDependencies": {
-    "@mason/config": "workspace:*",
-    "typescript": "^5"
-  },
   "dependencies": {
     "@mason/db": "workspace:*",
     "@mason/env": "workspace:*",
     "better-auth": "^1.2.7"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "typescript": "^5"
   },
   "exports": {
     "./client": "./src/client/index.ts",

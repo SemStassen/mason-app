@@ -3,10 +3,10 @@ import { z } from "zod";
 import { sharedEnv } from "..";
 
 export const clientEnv = createEnv({
-  server: {
-    ELECTRIC_URL: z.string(),
+  server: {},
+  client: {
+    VITE_ELECTRIC_URL: z.string().optional(),
   },
-  client: {},
   clientPrefix: "VITE_",
   runtimeEnv: import.meta.env,
   extends: [sharedEnv],

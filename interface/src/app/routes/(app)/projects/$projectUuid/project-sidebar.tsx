@@ -4,8 +4,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@mason/ui/collapsible";
-import {} from "@mason/ui/command";
-import {} from "@mason/ui/popover";
 import { RichEditor } from "@mason/ui/rich-editor";
 import { ToggleGroup, ToggleGroupItem } from "@mason/ui/toggle-group";
 import { observer } from "mobx-react-lite";
@@ -18,7 +16,7 @@ import {
 import { useLiveQuery } from "~/hooks/use-live-query";
 import { rootStore } from "~/stores/root-store";
 import { Route } from ".";
-import { UpdateLeadCombobox } from "./(components)/update-lead-combobox";
+import { UpdateLeadCombobox } from "./_components/update-lead-combobox";
 
 const ProjectSidebar = observer(() => {
   const { projectUuid } = Route.useParams();
