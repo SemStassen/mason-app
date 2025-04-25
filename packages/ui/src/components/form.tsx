@@ -8,6 +8,7 @@ import {
   useFormContext,
 } from "react-hook-form";
 
+import { type VariantProps, cva } from "class-variance-authority";
 import { createContext, useContext, useId } from "react";
 import { cn } from "../utils";
 import { Description, type DescriptionProps } from "./description";
@@ -88,16 +89,32 @@ const FormSection = ({
   );
 };
 
-const FormItem = ({ className, ...props }: React.ComponentProps<"li">) => {
+const formItemVariants = cva(
+  "flex justify-between gap-1.5 border-contrast-10 border-b last:border-0",
+  {
+    variants: {
+      direction: {
+        horizontal: "flex-row sm:items-center",
+        vertical: "flex-col",
+      },
+    },
+    defaultVariants: {
+      direction: "horizontal",
+    },
+  },
+);
+
+interface FormItemProps
+  extends React.ComponentProps<"li">,
+    VariantProps<typeof formItemVariants> {}
+
+const FormItem = ({ className, direction, ...props }: FormItemProps) => {
   const id = useId();
 
   return (
     <FormItemContext.Provider value={{ id }}>
       <li
-        className={cn(
-          "flex flex-col justify-between gap-1.5 border-contrast-10 border-b last:border-0 sm:flex-row sm:items-center",
-          className,
-        )}
+        className={cn(formItemVariants({ direction, className }))}
         {...props}
       />
     </FormItemContext.Provider>

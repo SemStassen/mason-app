@@ -1,22 +1,182 @@
 {
-  "id": "bbb11f55-7224-462f-9f03-102d5073ef9f",
+  "id": "5941d31f-f8c8-48a7-aa0f-f7edbea3d406",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.activities": {
-      "name": "activities",
+    "public.accounts": {
+      "name": "accounts",
       "schema": "",
       "columns": {
-        "uuid": {
-          "name": "uuid",
+        "id": {
+          "name": "id",
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "project_uuid": {
-          "name": "project_uuid",
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_token_expires_at": {
+          "name": "access_token_expires_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token_expires_at": {
+          "name": "refresh_token_expires_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_token": {
+          "name": "id_token",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "accounts_user_id_users_id_fk": {
+          "name": "accounts_user_id_users_id_fk",
+          "tableFrom": "accounts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.verifications": {
+      "name": "verifications",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.activities": {
+      "name": "activities",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "project_id": {
+          "name": "project_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -44,15 +204,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "activities_project_uuid_projects_uuid_fk": {
-          "name": "activities_project_uuid_projects_uuid_fk",
+        "activities_project_id_projects_id_fk": {
+          "name": "activities_project_id_projects_id_fk",
           "tableFrom": "activities",
           "tableTo": "projects",
           "columnsFrom": [
-            "project_uuid"
+            "project_id"
           ],
           "columnsTo": [
-            "uuid"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -68,27 +228,27 @@
       "name": "projects",
       "schema": "",
       "columns": {
-        "uuid": {
-          "name": "uuid",
+        "id": {
+          "name": "id",
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "workspace_uuid": {
-          "name": "workspace_uuid",
+        "workspace_id": {
+          "name": "workspace_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "creator_uuid": {
-          "name": "creator_uuid",
+        "creator_id": {
+          "name": "creator_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
-        "lead_uuid": {
-          "name": "lead_uuid",
+        "lead_id": {
+          "name": "lead_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
@@ -135,43 +295,121 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "projects_workspace_uuid_workspaces_uuid_fk": {
-          "name": "projects_workspace_uuid_workspaces_uuid_fk",
+        "projects_workspace_id_workspaces_id_fk": {
+          "name": "projects_workspace_id_workspaces_id_fk",
           "tableFrom": "projects",
           "tableTo": "workspaces",
           "columnsFrom": [
-            "workspace_uuid"
+            "workspace_id"
           ],
           "columnsTo": [
-            "uuid"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "projects_creator_uuid_users_uuid_fk": {
-          "name": "projects_creator_uuid_users_uuid_fk",
+        "projects_creator_id_users_id_fk": {
+          "name": "projects_creator_id_users_id_fk",
           "tableFrom": "projects",
           "tableTo": "users",
           "columnsFrom": [
-            "creator_uuid"
+            "creator_id"
           ],
           "columnsTo": [
-            "uuid"
+            "id"
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "projects_lead_uuid_users_uuid_fk": {
-          "name": "projects_lead_uuid_users_uuid_fk",
+        "projects_lead_id_users_id_fk": {
+          "name": "projects_lead_id_users_id_fk",
           "tableFrom": "projects",
           "tableTo": "users",
           "columnsFrom": [
-            "lead_uuid"
+            "lead_id"
           ],
           "columnsTo": [
-            "uuid"
+            "id"
           ],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sessions": {
+      "name": "sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "session_token": {
+          "name": "session_token",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (0) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -185,21 +423,21 @@
       "name": "time_entries",
       "schema": "",
       "columns": {
-        "uuid": {
-          "name": "uuid",
+        "id": {
+          "name": "id",
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "user_uuid": {
-          "name": "user_uuid",
+        "user_id": {
+          "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "activity_uuid": {
-          "name": "activity_uuid",
+        "activity_id": {
+          "name": "activity_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -233,28 +471,28 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "time_entries_user_uuid_users_uuid_fk": {
-          "name": "time_entries_user_uuid_users_uuid_fk",
+        "time_entries_user_id_users_id_fk": {
+          "name": "time_entries_user_id_users_id_fk",
           "tableFrom": "time_entries",
           "tableTo": "users",
           "columnsFrom": [
-            "user_uuid"
+            "user_id"
           ],
           "columnsTo": [
-            "uuid"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "time_entries_activity_uuid_activities_uuid_fk": {
-          "name": "time_entries_activity_uuid_activities_uuid_fk",
+        "time_entries_activity_id_activities_id_fk": {
+          "name": "time_entries_activity_id_activities_id_fk",
           "tableFrom": "time_entries",
           "tableTo": "activities",
           "columnsFrom": [
-            "activity_uuid"
+            "activity_id"
           ],
           "columnsTo": [
-            "uuid"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -270,22 +508,16 @@
       "name": "users",
       "schema": "",
       "columns": {
-        "uuid": {
-          "name": "uuid",
+        "id": {
+          "name": "id",
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "workspace_uuid": {
-          "name": "workspace_uuid",
+        "workspace_id": {
+          "name": "workspace_id",
           "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -294,6 +526,25 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -312,15 +563,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "users_workspace_uuid_workspaces_uuid_fk": {
-          "name": "users_workspace_uuid_workspaces_uuid_fk",
+        "users_workspace_id_workspaces_id_fk": {
+          "name": "users_workspace_id_workspaces_id_fk",
           "tableFrom": "users",
           "tableTo": "workspaces",
           "columnsFrom": [
-            "workspace_uuid"
+            "workspace_id"
           ],
           "columnsTo": [
-            "uuid"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -336,8 +587,8 @@
       "name": "workspaces",
       "schema": "",
       "columns": {
-        "uuid": {
-          "name": "uuid",
+        "id": {
+          "name": "id",
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,

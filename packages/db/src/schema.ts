@@ -27,7 +27,7 @@ const tableMetadata = {
 
 export type Workspace = InferSelectModel<typeof workspacesTable>;
 export const workspacesTable = pgTable("workspaces", {
-  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   // General
   name: varchar("name").notNull(),
   // Metadata
@@ -36,10 +36,10 @@ export const workspacesTable = pgTable("workspaces", {
 
 export type User = InferSelectModel<typeof usersTable>;
 export const usersTable = pgTable("users", {
-  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   // References
-  workspace_uuid: uuid("workspace_uuid")
-    .references(() => workspacesTable.uuid, {
+  workspace_id: uuid("workspace_id")
+    .references(() => workspacesTable.id, {
       onDelete: "cascade",
     })
     .notNull(),
@@ -55,10 +55,10 @@ export const usersTable = pgTable("users", {
 export type InsertSession = InferInsertModel<typeof sessionsTable>;
 export type Session = InferSelectModel<typeof sessionsTable>;
 export const sessionsTable = pgTable("sessions", {
-  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   // References
-  user_uuid: uuid("user_uuid")
-    .references(() => usersTable.uuid, { onDelete: "cascade" })
+  user_id: uuid("user_id")
+    .references(() => usersTable.id, { onDelete: "cascade" })
     .notNull(),
   // General
   session_token: varchar("session_token").notNull(),
@@ -70,10 +70,10 @@ export const sessionsTable = pgTable("sessions", {
 });
 
 export const AccountsTable = pgTable("accounts", {
-  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   // References
-  user_uuid: uuid("user_uuid")
-    .references(() => usersTable.uuid, { onDelete: "cascade" })
+  user_id: uuid("user_id")
+    .references(() => usersTable.id, { onDelete: "cascade" })
     .notNull(),
   // General
   account_id: varchar("account_id").notNull(),
@@ -90,7 +90,7 @@ export const AccountsTable = pgTable("accounts", {
 });
 
 export const VerificationsTable = pgTable("verifications", {
-  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   // General
   identifier: varchar("identifier").notNull(),
   value: varchar("value").notNull(),
@@ -102,15 +102,15 @@ export const VerificationsTable = pgTable("verifications", {
 export type InsertProject = InferInsertModel<typeof projectsTable>;
 export type Project = InferSelectModel<typeof projectsTable>;
 export const projectsTable = pgTable("projects", {
-  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   // References
-  workspace_uuid: uuid("workspace_uuid")
-    .references(() => workspacesTable.uuid, { onDelete: "cascade" })
+  workspace_id: uuid("workspace_id")
+    .references(() => workspacesTable.id, { onDelete: "cascade" })
     .notNull(),
-  creator_uuid: uuid("creator_uuid").references(() => usersTable.uuid, {
+  creator_id: uuid("creator_id").references(() => usersTable.id, {
     onDelete: "set null",
   }),
-  lead_uuid: uuid("lead_uuid").references(() => usersTable.uuid, {
+  lead_id: uuid("lead_id").references(() => usersTable.id, {
     onDelete: "set null",
   }),
   // General
@@ -128,10 +128,10 @@ export const projectsTable = pgTable("projects", {
 export type InsertActivity = InferInsertModel<typeof activitiesTable>;
 export type Activity = InferSelectModel<typeof activitiesTable>;
 export const activitiesTable = pgTable("activities", {
-  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   // References
-  project_uuid: uuid("project_uuid")
-    .references(() => projectsTable.uuid, { onDelete: "cascade" })
+  project_id: uuid("project_id")
+    .references(() => projectsTable.id, { onDelete: "cascade" })
     .notNull(),
   // General
   name: varchar("name").notNull(),
@@ -141,13 +141,13 @@ export const activitiesTable = pgTable("activities", {
 
 export type TimeEntry = InferSelectModel<typeof timeEntriesTable>;
 export const timeEntriesTable = pgTable("time_entries", {
-  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   // References
-  user_uuid: uuid("user_uuid")
-    .references(() => usersTable.uuid, { onDelete: "cascade" })
+  user_id: uuid("user_id")
+    .references(() => usersTable.id, { onDelete: "cascade" })
     .notNull(),
-  activity_uuid: uuid("activity_uuid")
-    .references(() => activitiesTable.uuid, { onDelete: "cascade" })
+  activity_id: uuid("activity_id")
+    .references(() => activitiesTable.id, { onDelete: "cascade" })
     .notNull(),
   // General
   started_at: timestamp("started_at", {
