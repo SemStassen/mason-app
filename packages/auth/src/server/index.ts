@@ -5,6 +5,12 @@ import { betterAuth } from "better-auth";
 export const auth = betterAuth({
   appName: "Mason",
   database: pool,
+  trustedOrigins: ["http://localhost:8002"],
+  advanced: {
+    database: {
+      generateId: false,
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },

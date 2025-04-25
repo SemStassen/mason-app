@@ -5,7 +5,7 @@ import { sharedEnv } from "..";
 export const clientEnv = createEnv({
   server: {},
   client: {
-    VITE_ELECTRIC_URL: z.string().optional(),
+    VITE_ELECTRIC_URL: z.string(),
   },
   clientPrefix: "VITE_",
   runtimeEnv: import.meta.env,
