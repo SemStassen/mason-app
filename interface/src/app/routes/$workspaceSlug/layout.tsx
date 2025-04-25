@@ -1,10 +1,10 @@
 import { Toaster } from "@mason/ui/sonner";
-import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { Inspector } from "~/components/inspector";
 import { Sidebar, SidebarToggle } from "~/components/sidebar";
 import { Providers } from "./providers";
 
-export const Route = createRootRoute({
+export const Route = createFileRoute("/$workspaceSlug/_app-layout")({
   component: AppLayout,
 });
 

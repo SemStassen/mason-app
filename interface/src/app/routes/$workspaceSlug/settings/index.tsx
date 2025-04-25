@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { InterfaceAndThemeForm } from "~/components/forms/interface-and-theme-form";
 import { ProfileForm } from "~/components/forms/profile-form";
 
-export const Route = createFileRoute("/_app-layout/settings/")({
+export const Route = createFileRoute("/$workspaceSlug/_app-layout/settings/")({
   component: SettingsPage,
 });
 

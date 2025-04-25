@@ -1,10 +1,10 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_auth-layout")({
-  component: AuthLayout,
+export const Route = createFileRoute("/_onboarding-layout")({
+  component: OnboardingLayout,
 });
 
-function AuthLayout() {
+function OnboardingLayout() {
   return (
     <div className="grid h-screen w-screen place-content-center overflow-hidden bg-background px-8 text-foreground">
       <Outlet />

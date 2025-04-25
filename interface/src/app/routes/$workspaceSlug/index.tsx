@@ -8,7 +8,7 @@ import { Icons } from "@mason/ui/icons";
 import { createFileRoute } from "@tanstack/react-router";
 import { RouteHeader } from "../../../components/route-header";
 
-export const Route = createFileRoute("/_app-layout/")({
+export const Route = createFileRoute("/$workspaceSlug/_app-layout/")({
   component: Dashboard,
 });
 

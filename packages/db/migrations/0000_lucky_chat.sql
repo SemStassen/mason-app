@@ -31,6 +31,27 @@ CREATE TABLE "activities" (
 	"updated_at" timestamp (0) with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "invitations" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"inviter_id" uuid NOT NULL,
+	"workspace_id" uuid NOT NULL,
+	"email" varchar NOT NULL,
+	"role" varchar NOT NULL,
+	"status" varchar NOT NULL,
+	"expires_at" date NOT NULL,
+	"created_at" timestamp (0) with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp (0) with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "members" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"workspace_id" uuid NOT NULL,
+	"role" varchar NOT NULL,
+	"created_at" timestamp (0) with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp (0) with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "projects" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"workspace_id" uuid NOT NULL,
@@ -51,6 +72,7 @@ CREATE TABLE "sessions" (
 	"expires_at" date NOT NULL,
 	"ip_address" varchar NOT NULL,
 	"user_agent" varchar NOT NULL,
+	"active_workspace_id" uuid,
 	"created_at" timestamp (0) with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp (0) with time zone DEFAULT now() NOT NULL
 );
@@ -67,7 +89,6 @@ CREATE TABLE "time_entries" (
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"workspace_id" uuid NOT NULL,
 	"display_name" varchar NOT NULL,
 	"email" varchar NOT NULL,
 	"email_verified" boolean DEFAULT false NOT NULL,
@@ -79,16 +100,22 @@ CREATE TABLE "users" (
 CREATE TABLE "workspaces" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar NOT NULL,
+	"slug" varchar NOT NULL,
+	"logo_url" varchar,
+	"metadata" varchar,
 	"created_at" timestamp (0) with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp (0) with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "activities" ADD CONSTRAINT "activities_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "invitations" ADD CONSTRAINT "invitations_inviter_id_users_id_fk" FOREIGN KEY ("inviter_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "invitations" ADD CONSTRAINT "invitations_workspace_id_workspaces_id_fk" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "members" ADD CONSTRAINT "members_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "members" ADD CONSTRAINT "members_workspace_id_workspaces_id_fk" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "projects" ADD CONSTRAINT "projects_workspace_id_workspaces_id_fk" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "projects" ADD CONSTRAINT "projects_creator_id_users_id_fk" FOREIGN KEY ("creator_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "projects" ADD CONSTRAINT "projects_lead_id_users_id_fk" FOREIGN KEY ("lead_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "time_entries" ADD CONSTRAINT "time_entries_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "time_entries" ADD CONSTRAINT "time_entries_activity_id_activities_id_fk" FOREIGN KEY ("activity_id") REFERENCES "public"."activities"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "users" ADD CONSTRAINT "users_workspace_id_workspaces_id_fk" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "time_entries" ADD CONSTRAINT "time_entries_activity_id_activities_id_fk" FOREIGN KEY ("activity_id") REFERENCES "public"."activities"("id") ON DELETE cascade ON UPDATE no action;

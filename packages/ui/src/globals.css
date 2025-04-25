@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@import "@fontsource-variable/inter";
+
 /* These were added because tailwind does not seem to register them automatically */
 @source "../src";
 @source "../../../interface/src";
@@ -8,6 +10,8 @@
 @theme {
   --color-background: var(--app-background);
   --color-foreground: var(--app-foreground);
+  --color-card: var(--app-card);
+  --color-card-foreground: var(--app-card-foreground);
   --color-popover: var(--app-popover);
   --color-border: var(--app-border);
   --color-accent: var(--app-accent);
@@ -92,8 +96,10 @@
 
 @layer base {
   :root {
-    --app-background: oklch(99.45% 0.0017 67.8);
-    --app-foreground: oklch(0% 0 0);
+    --app-background: oklch(0.97 0 102.07);
+    --app-foreground: oklch(0.22 0 102.07);
+    --app-card: oklch(1 0 102.07);
+    --app-card-foreground: oklch(0.31 0.0026 283.36);
     --app-border: rgba(55, 55, 55, 0.1);
     --app-popover: oklch(97.07% 0.0084 56.31);
     --app-accent: oklch(96.27% 0.0085 50);
@@ -130,6 +136,7 @@
   }
 
   * {
+    font-family: "Inter variable", sans-serif;
     border: var(--app-border);
     scrollbar-width: thin;
     scrollbar-color: var(--contrast-30) transparent;

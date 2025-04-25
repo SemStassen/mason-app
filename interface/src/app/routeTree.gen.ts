@@ -13,32 +13,50 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/root'
+import { Route as onboardingLayoutImport } from './routes/(onboarding)/layout'
 import { Route as authLayoutImport } from './routes/(auth)/layout'
-import { Route as appLayoutImport } from './routes/(app)/layout'
+import { Route as onboardingCreateWorkspaceIndexImport } from './routes/(onboarding)/create-workspace/index'
 import { Route as authSignUpIndexImport } from './routes/(auth)/sign-up/index'
 import { Route as authSignInIndexImport } from './routes/(auth)/sign-in/index'
-import { Route as appTrackerIndexImport } from './routes/(app)/tracker/index'
-import { Route as appIndexImport } from './routes/(app)/index'
-import { Route as appSettingsLayoutImport } from './routes/(app)/settings/layout'
-import { Route as appProjectsProjectUuidIndexImport } from './routes/(app)/projects/$projectUuid/index'
-import { Route as appSettingsIndexImport } from './routes/(app)/settings/index'
-import { Route as appProjectsIndexImport } from './routes/(app)/projects/index'
+import { Route as workspaceSlugLayoutImport } from './routes/$workspaceSlug/layout'
+import { Route as workspaceSlugTrackerIndexImport } from './routes/$workspaceSlug/tracker/index'
+import { Route as workspaceSlugIndexImport } from './routes/$workspaceSlug/index'
+import { Route as workspaceSlugSettingsLayoutImport } from './routes/$workspaceSlug/settings/layout'
+import { Route as workspaceSlugProjectsProjectIdIndexImport } from './routes/$workspaceSlug/projects/$projectId/index'
+import { Route as workspaceSlugSettingsIndexImport } from './routes/$workspaceSlug/settings/index'
+import { Route as workspaceSlugProjectsIndexImport } from './routes/$workspaceSlug/projects/index'
 
 // Create Virtual Routes
 
-const AppLayoutProjectsImport = createFileRoute('/_app-layout/projects')()
+const WorkspaceSlugImport = createFileRoute('/$workspaceSlug')()
+const WorkspaceSlugAppLayoutProjectsImport = createFileRoute(
+  '/$workspaceSlug/_app-layout/projects',
+)()
 
 // Create/Update Routes
+
+const onboardingLayoutRoute = onboardingLayoutImport.update({
+  id: '/_onboarding-layout',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const authLayoutRoute = authLayoutImport.update({
   id: '/_auth-layout',
   getParentRoute: () => rootRoute,
 } as any)
 
-const appLayoutRoute = appLayoutImport.update({
-  id: '/_app-layout',
+const WorkspaceSlugRoute = WorkspaceSlugImport.update({
+  id: '/$workspaceSlug',
+  path: '/$workspaceSlug',
   getParentRoute: () => rootRoute,
 } as any)
+
+const onboardingCreateWorkspaceIndexRoute =
+  onboardingCreateWorkspaceIndexImport.update({
+    id: '/create-workspace',
+    path: '/create-workspace',
+    getParentRoute: () => onboardingLayoutRoute,
+  } as any)
 
 const authSignUpIndexRoute = authSignUpIndexImport.update({
   id: '/sign-up',
@@ -52,58 +70,69 @@ const authSignInIndexRoute = authSignInIndexImport.update({
   getParentRoute: () => authLayoutRoute,
 } as any)
 
-const appTrackerIndexRoute = appTrackerIndexImport.update({
+const workspaceSlugLayoutRoute = workspaceSlugLayoutImport.update({
+  id: '/_app-layout',
+  getParentRoute: () => WorkspaceSlugRoute,
+} as any)
+
+const workspaceSlugTrackerIndexRoute = workspaceSlugTrackerIndexImport.update({
   id: '/tracker',
   path: '/tracker',
-  getParentRoute: () => appLayoutRoute,
+  getParentRoute: () => workspaceSlugLayoutRoute,
 } as any)
 
-const appIndexRoute = appIndexImport.update({
+const workspaceSlugIndexRoute = workspaceSlugIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => appLayoutRoute,
+  getParentRoute: () => workspaceSlugLayoutRoute,
 } as any)
 
-const appSettingsLayoutRoute = appSettingsLayoutImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => appLayoutRoute,
-} as any)
-
-const AppLayoutProjectsRoute = AppLayoutProjectsImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => appLayoutRoute,
-} as any)
-
-const appProjectsProjectUuidIndexRoute =
-  appProjectsProjectUuidIndexImport.update({
-    id: '/$projectUuid',
-    path: '/$projectUuid',
-    getParentRoute: () => AppLayoutProjectsRoute,
+const workspaceSlugSettingsLayoutRoute =
+  workspaceSlugSettingsLayoutImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => workspaceSlugLayoutRoute,
   } as any)
 
-const appSettingsIndexRoute = appSettingsIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => appSettingsLayoutRoute,
-} as any)
+const WorkspaceSlugAppLayoutProjectsRoute =
+  WorkspaceSlugAppLayoutProjectsImport.update({
+    id: '/projects',
+    path: '/projects',
+    getParentRoute: () => workspaceSlugLayoutRoute,
+  } as any)
 
-const appProjectsIndexRoute = appProjectsIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppLayoutProjectsRoute,
-} as any)
+const workspaceSlugProjectsProjectIdIndexRoute =
+  workspaceSlugProjectsProjectIdIndexImport.update({
+    id: '/$projectId',
+    path: '/$projectId',
+    getParentRoute: () => WorkspaceSlugAppLayoutProjectsRoute,
+  } as any)
+
+const workspaceSlugSettingsIndexRoute = workspaceSlugSettingsIndexImport.update(
+  {
+    id: '/',
+    path: '/',
+    getParentRoute: () => workspaceSlugSettingsLayoutRoute,
+  } as any,
+)
+
+const workspaceSlugProjectsIndexRoute = workspaceSlugProjectsIndexImport.update(
+  {
+    id: '/',
+    path: '/',
+    getParentRoute: () => WorkspaceSlugAppLayoutProjectsRoute,
+  } as any,
+)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_app-layout': {
-      id: '/_app-layout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof appLayoutImport
+    '/$workspaceSlug': {
+      id: '/$workspaceSlug'
+      path: '/$workspaceSlug'
+      fullPath: '/$workspaceSlug'
+      preLoaderRoute: typeof WorkspaceSlugImport
       parentRoute: typeof rootRoute
     }
     '/_auth-layout': {
@@ -113,33 +142,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authLayoutImport
       parentRoute: typeof rootRoute
     }
-    '/_app-layout/projects': {
-      id: '/_app-layout/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof AppLayoutProjectsImport
-      parentRoute: typeof appLayoutImport
+    '/_onboarding-layout': {
+      id: '/_onboarding-layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof onboardingLayoutImport
+      parentRoute: typeof rootRoute
     }
-    '/_app-layout/settings': {
-      id: '/_app-layout/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof appSettingsLayoutImport
-      parentRoute: typeof appLayoutImport
-    }
-    '/_app-layout/': {
-      id: '/_app-layout/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof appIndexImport
-      parentRoute: typeof appLayoutImport
-    }
-    '/_app-layout/tracker': {
-      id: '/_app-layout/tracker'
-      path: '/tracker'
-      fullPath: '/tracker'
-      preLoaderRoute: typeof appTrackerIndexImport
-      parentRoute: typeof appLayoutImport
+    '/$workspaceSlug/_app-layout': {
+      id: '/$workspaceSlug/_app-layout'
+      path: ''
+      fullPath: '/$workspaceSlug'
+      preLoaderRoute: typeof workspaceSlugLayoutImport
+      parentRoute: typeof WorkspaceSlugImport
     }
     '/_auth-layout/sign-in': {
       id: '/_auth-layout/sign-in'
@@ -155,72 +170,127 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSignUpIndexImport
       parentRoute: typeof authLayoutImport
     }
-    '/_app-layout/projects/': {
-      id: '/_app-layout/projects/'
-      path: '/'
-      fullPath: '/projects/'
-      preLoaderRoute: typeof appProjectsIndexImport
-      parentRoute: typeof AppLayoutProjectsImport
+    '/_onboarding-layout/create-workspace': {
+      id: '/_onboarding-layout/create-workspace'
+      path: '/create-workspace'
+      fullPath: '/create-workspace'
+      preLoaderRoute: typeof onboardingCreateWorkspaceIndexImport
+      parentRoute: typeof onboardingLayoutImport
     }
-    '/_app-layout/settings/': {
-      id: '/_app-layout/settings/'
-      path: '/'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof appSettingsIndexImport
-      parentRoute: typeof appSettingsLayoutImport
+    '/$workspaceSlug/_app-layout/projects': {
+      id: '/$workspaceSlug/_app-layout/projects'
+      path: '/projects'
+      fullPath: '/$workspaceSlug/projects'
+      preLoaderRoute: typeof WorkspaceSlugAppLayoutProjectsImport
+      parentRoute: typeof workspaceSlugLayoutImport
     }
-    '/_app-layout/projects/$projectUuid': {
-      id: '/_app-layout/projects/$projectUuid'
-      path: '/$projectUuid'
-      fullPath: '/projects/$projectUuid'
-      preLoaderRoute: typeof appProjectsProjectUuidIndexImport
-      parentRoute: typeof AppLayoutProjectsImport
+    '/$workspaceSlug/_app-layout/settings': {
+      id: '/$workspaceSlug/_app-layout/settings'
+      path: '/settings'
+      fullPath: '/$workspaceSlug/settings'
+      preLoaderRoute: typeof workspaceSlugSettingsLayoutImport
+      parentRoute: typeof workspaceSlugLayoutImport
+    }
+    '/$workspaceSlug/_app-layout/': {
+      id: '/$workspaceSlug/_app-layout/'
+      path: '/'
+      fullPath: '/$workspaceSlug/'
+      preLoaderRoute: typeof workspaceSlugIndexImport
+      parentRoute: typeof workspaceSlugLayoutImport
+    }
+    '/$workspaceSlug/_app-layout/tracker': {
+      id: '/$workspaceSlug/_app-layout/tracker'
+      path: '/tracker'
+      fullPath: '/$workspaceSlug/tracker'
+      preLoaderRoute: typeof workspaceSlugTrackerIndexImport
+      parentRoute: typeof workspaceSlugLayoutImport
+    }
+    '/$workspaceSlug/_app-layout/projects/': {
+      id: '/$workspaceSlug/_app-layout/projects/'
+      path: '/'
+      fullPath: '/$workspaceSlug/projects/'
+      preLoaderRoute: typeof workspaceSlugProjectsIndexImport
+      parentRoute: typeof WorkspaceSlugAppLayoutProjectsImport
+    }
+    '/$workspaceSlug/_app-layout/settings/': {
+      id: '/$workspaceSlug/_app-layout/settings/'
+      path: '/'
+      fullPath: '/$workspaceSlug/settings/'
+      preLoaderRoute: typeof workspaceSlugSettingsIndexImport
+      parentRoute: typeof workspaceSlugSettingsLayoutImport
+    }
+    '/$workspaceSlug/_app-layout/projects/$projectId': {
+      id: '/$workspaceSlug/_app-layout/projects/$projectId'
+      path: '/$projectId'
+      fullPath: '/$workspaceSlug/projects/$projectId'
+      preLoaderRoute: typeof workspaceSlugProjectsProjectIdIndexImport
+      parentRoute: typeof WorkspaceSlugAppLayoutProjectsImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface AppLayoutProjectsRouteChildren {
-  appProjectsIndexRoute: typeof appProjectsIndexRoute
-  appProjectsProjectUuidIndexRoute: typeof appProjectsProjectUuidIndexRoute
+interface WorkspaceSlugAppLayoutProjectsRouteChildren {
+  workspaceSlugProjectsIndexRoute: typeof workspaceSlugProjectsIndexRoute
+  workspaceSlugProjectsProjectIdIndexRoute: typeof workspaceSlugProjectsProjectIdIndexRoute
 }
 
-const AppLayoutProjectsRouteChildren: AppLayoutProjectsRouteChildren = {
-  appProjectsIndexRoute: appProjectsIndexRoute,
-  appProjectsProjectUuidIndexRoute: appProjectsProjectUuidIndexRoute,
+const WorkspaceSlugAppLayoutProjectsRouteChildren: WorkspaceSlugAppLayoutProjectsRouteChildren =
+  {
+    workspaceSlugProjectsIndexRoute: workspaceSlugProjectsIndexRoute,
+    workspaceSlugProjectsProjectIdIndexRoute:
+      workspaceSlugProjectsProjectIdIndexRoute,
+  }
+
+const WorkspaceSlugAppLayoutProjectsRouteWithChildren =
+  WorkspaceSlugAppLayoutProjectsRoute._addFileChildren(
+    WorkspaceSlugAppLayoutProjectsRouteChildren,
+  )
+
+interface workspaceSlugSettingsLayoutRouteChildren {
+  workspaceSlugSettingsIndexRoute: typeof workspaceSlugSettingsIndexRoute
 }
 
-const AppLayoutProjectsRouteWithChildren =
-  AppLayoutProjectsRoute._addFileChildren(AppLayoutProjectsRouteChildren)
+const workspaceSlugSettingsLayoutRouteChildren: workspaceSlugSettingsLayoutRouteChildren =
+  {
+    workspaceSlugSettingsIndexRoute: workspaceSlugSettingsIndexRoute,
+  }
 
-interface appSettingsLayoutRouteChildren {
-  appSettingsIndexRoute: typeof appSettingsIndexRoute
+const workspaceSlugSettingsLayoutRouteWithChildren =
+  workspaceSlugSettingsLayoutRoute._addFileChildren(
+    workspaceSlugSettingsLayoutRouteChildren,
+  )
+
+interface workspaceSlugLayoutRouteChildren {
+  WorkspaceSlugAppLayoutProjectsRoute: typeof WorkspaceSlugAppLayoutProjectsRouteWithChildren
+  workspaceSlugSettingsLayoutRoute: typeof workspaceSlugSettingsLayoutRouteWithChildren
+  workspaceSlugIndexRoute: typeof workspaceSlugIndexRoute
+  workspaceSlugTrackerIndexRoute: typeof workspaceSlugTrackerIndexRoute
 }
 
-const appSettingsLayoutRouteChildren: appSettingsLayoutRouteChildren = {
-  appSettingsIndexRoute: appSettingsIndexRoute,
+const workspaceSlugLayoutRouteChildren: workspaceSlugLayoutRouteChildren = {
+  WorkspaceSlugAppLayoutProjectsRoute:
+    WorkspaceSlugAppLayoutProjectsRouteWithChildren,
+  workspaceSlugSettingsLayoutRoute:
+    workspaceSlugSettingsLayoutRouteWithChildren,
+  workspaceSlugIndexRoute: workspaceSlugIndexRoute,
+  workspaceSlugTrackerIndexRoute: workspaceSlugTrackerIndexRoute,
 }
 
-const appSettingsLayoutRouteWithChildren =
-  appSettingsLayoutRoute._addFileChildren(appSettingsLayoutRouteChildren)
+const workspaceSlugLayoutRouteWithChildren =
+  workspaceSlugLayoutRoute._addFileChildren(workspaceSlugLayoutRouteChildren)
 
-interface appLayoutRouteChildren {
-  AppLayoutProjectsRoute: typeof AppLayoutProjectsRouteWithChildren
-  appSettingsLayoutRoute: typeof appSettingsLayoutRouteWithChildren
-  appIndexRoute: typeof appIndexRoute
-  appTrackerIndexRoute: typeof appTrackerIndexRoute
+interface WorkspaceSlugRouteChildren {
+  workspaceSlugLayoutRoute: typeof workspaceSlugLayoutRouteWithChildren
 }
 
-const appLayoutRouteChildren: appLayoutRouteChildren = {
-  AppLayoutProjectsRoute: AppLayoutProjectsRouteWithChildren,
-  appSettingsLayoutRoute: appSettingsLayoutRouteWithChildren,
-  appIndexRoute: appIndexRoute,
-  appTrackerIndexRoute: appTrackerIndexRoute,
+const WorkspaceSlugRouteChildren: WorkspaceSlugRouteChildren = {
+  workspaceSlugLayoutRoute: workspaceSlugLayoutRouteWithChildren,
 }
 
-const appLayoutRouteWithChildren = appLayoutRoute._addFileChildren(
-  appLayoutRouteChildren,
+const WorkspaceSlugRouteWithChildren = WorkspaceSlugRoute._addFileChildren(
+  WorkspaceSlugRouteChildren,
 )
 
 interface authLayoutRouteChildren {
@@ -237,92 +307,117 @@ const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
   authLayoutRouteChildren,
 )
 
+interface onboardingLayoutRouteChildren {
+  onboardingCreateWorkspaceIndexRoute: typeof onboardingCreateWorkspaceIndexRoute
+}
+
+const onboardingLayoutRouteChildren: onboardingLayoutRouteChildren = {
+  onboardingCreateWorkspaceIndexRoute: onboardingCreateWorkspaceIndexRoute,
+}
+
+const onboardingLayoutRouteWithChildren =
+  onboardingLayoutRoute._addFileChildren(onboardingLayoutRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '': typeof authLayoutRouteWithChildren
-  '/projects': typeof AppLayoutProjectsRouteWithChildren
-  '/settings': typeof appSettingsLayoutRouteWithChildren
-  '/': typeof appIndexRoute
-  '/tracker': typeof appTrackerIndexRoute
+  '/$workspaceSlug': typeof workspaceSlugLayoutRouteWithChildren
+  '': typeof onboardingLayoutRouteWithChildren
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
-  '/projects/': typeof appProjectsIndexRoute
-  '/settings/': typeof appSettingsIndexRoute
-  '/projects/$projectUuid': typeof appProjectsProjectUuidIndexRoute
+  '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
+  '/$workspaceSlug/projects': typeof WorkspaceSlugAppLayoutProjectsRouteWithChildren
+  '/$workspaceSlug/settings': typeof workspaceSlugSettingsLayoutRouteWithChildren
+  '/$workspaceSlug/': typeof workspaceSlugIndexRoute
+  '/$workspaceSlug/tracker': typeof workspaceSlugTrackerIndexRoute
+  '/$workspaceSlug/projects/': typeof workspaceSlugProjectsIndexRoute
+  '/$workspaceSlug/settings/': typeof workspaceSlugSettingsIndexRoute
+  '/$workspaceSlug/projects/$projectId': typeof workspaceSlugProjectsProjectIdIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '': typeof authLayoutRouteWithChildren
-  '/': typeof appIndexRoute
-  '/tracker': typeof appTrackerIndexRoute
+  '/$workspaceSlug': typeof workspaceSlugIndexRoute
+  '': typeof onboardingLayoutRouteWithChildren
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
-  '/projects': typeof appProjectsIndexRoute
-  '/settings': typeof appSettingsIndexRoute
-  '/projects/$projectUuid': typeof appProjectsProjectUuidIndexRoute
+  '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
+  '/$workspaceSlug/tracker': typeof workspaceSlugTrackerIndexRoute
+  '/$workspaceSlug/projects': typeof workspaceSlugProjectsIndexRoute
+  '/$workspaceSlug/settings': typeof workspaceSlugSettingsIndexRoute
+  '/$workspaceSlug/projects/$projectId': typeof workspaceSlugProjectsProjectIdIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/_app-layout': typeof appLayoutRouteWithChildren
+  '/$workspaceSlug': typeof WorkspaceSlugRouteWithChildren
   '/_auth-layout': typeof authLayoutRouteWithChildren
-  '/_app-layout/projects': typeof AppLayoutProjectsRouteWithChildren
-  '/_app-layout/settings': typeof appSettingsLayoutRouteWithChildren
-  '/_app-layout/': typeof appIndexRoute
-  '/_app-layout/tracker': typeof appTrackerIndexRoute
+  '/_onboarding-layout': typeof onboardingLayoutRouteWithChildren
+  '/$workspaceSlug/_app-layout': typeof workspaceSlugLayoutRouteWithChildren
   '/_auth-layout/sign-in': typeof authSignInIndexRoute
   '/_auth-layout/sign-up': typeof authSignUpIndexRoute
-  '/_app-layout/projects/': typeof appProjectsIndexRoute
-  '/_app-layout/settings/': typeof appSettingsIndexRoute
-  '/_app-layout/projects/$projectUuid': typeof appProjectsProjectUuidIndexRoute
+  '/_onboarding-layout/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
+  '/$workspaceSlug/_app-layout/projects': typeof WorkspaceSlugAppLayoutProjectsRouteWithChildren
+  '/$workspaceSlug/_app-layout/settings': typeof workspaceSlugSettingsLayoutRouteWithChildren
+  '/$workspaceSlug/_app-layout/': typeof workspaceSlugIndexRoute
+  '/$workspaceSlug/_app-layout/tracker': typeof workspaceSlugTrackerIndexRoute
+  '/$workspaceSlug/_app-layout/projects/': typeof workspaceSlugProjectsIndexRoute
+  '/$workspaceSlug/_app-layout/settings/': typeof workspaceSlugSettingsIndexRoute
+  '/$workspaceSlug/_app-layout/projects/$projectId': typeof workspaceSlugProjectsProjectIdIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/$workspaceSlug'
     | ''
-    | '/projects'
-    | '/settings'
-    | '/'
-    | '/tracker'
     | '/sign-in'
     | '/sign-up'
-    | '/projects/'
-    | '/settings/'
-    | '/projects/$projectUuid'
+    | '/create-workspace'
+    | '/$workspaceSlug/projects'
+    | '/$workspaceSlug/settings'
+    | '/$workspaceSlug/'
+    | '/$workspaceSlug/tracker'
+    | '/$workspaceSlug/projects/'
+    | '/$workspaceSlug/settings/'
+    | '/$workspaceSlug/projects/$projectId'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/$workspaceSlug'
     | ''
-    | '/'
-    | '/tracker'
     | '/sign-in'
     | '/sign-up'
-    | '/projects'
-    | '/settings'
-    | '/projects/$projectUuid'
+    | '/create-workspace'
+    | '/$workspaceSlug/tracker'
+    | '/$workspaceSlug/projects'
+    | '/$workspaceSlug/settings'
+    | '/$workspaceSlug/projects/$projectId'
   id:
     | '__root__'
-    | '/_app-layout'
+    | '/$workspaceSlug'
     | '/_auth-layout'
-    | '/_app-layout/projects'
-    | '/_app-layout/settings'
-    | '/_app-layout/'
-    | '/_app-layout/tracker'
+    | '/_onboarding-layout'
+    | '/$workspaceSlug/_app-layout'
     | '/_auth-layout/sign-in'
     | '/_auth-layout/sign-up'
-    | '/_app-layout/projects/'
-    | '/_app-layout/settings/'
-    | '/_app-layout/projects/$projectUuid'
+    | '/_onboarding-layout/create-workspace'
+    | '/$workspaceSlug/_app-layout/projects'
+    | '/$workspaceSlug/_app-layout/settings'
+    | '/$workspaceSlug/_app-layout/'
+    | '/$workspaceSlug/_app-layout/tracker'
+    | '/$workspaceSlug/_app-layout/projects/'
+    | '/$workspaceSlug/_app-layout/settings/'
+    | '/$workspaceSlug/_app-layout/projects/$projectId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  appLayoutRoute: typeof appLayoutRouteWithChildren
+  WorkspaceSlugRoute: typeof WorkspaceSlugRouteWithChildren
   authLayoutRoute: typeof authLayoutRouteWithChildren
+  onboardingLayoutRoute: typeof onboardingLayoutRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  appLayoutRoute: appLayoutRouteWithChildren,
+  WorkspaceSlugRoute: WorkspaceSlugRouteWithChildren,
   authLayoutRoute: authLayoutRouteWithChildren,
+  onboardingLayoutRoute: onboardingLayoutRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -335,17 +430,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "root.tsx",
       "children": [
-        "/_app-layout",
-        "/_auth-layout"
+        "/$workspaceSlug",
+        "/_auth-layout",
+        "/_onboarding-layout"
       ]
     },
-    "/_app-layout": {
-      "filePath": "(app)/layout.tsx",
+    "/$workspaceSlug": {
+      "filePath": "",
       "children": [
-        "/_app-layout/projects",
-        "/_app-layout/settings",
-        "/_app-layout/",
-        "/_app-layout/tracker"
+        "/$workspaceSlug/_app-layout"
       ]
     },
     "/_auth-layout": {
@@ -355,28 +448,21 @@ export const routeTree = rootRoute
         "/_auth-layout/sign-up"
       ]
     },
-    "/_app-layout/projects": {
-      "filePath": "",
-      "parent": "/_app-layout",
+    "/_onboarding-layout": {
+      "filePath": "(onboarding)/layout.tsx",
       "children": [
-        "/_app-layout/projects/",
-        "/_app-layout/projects/$projectUuid"
+        "/_onboarding-layout/create-workspace"
       ]
     },
-    "/_app-layout/settings": {
-      "filePath": "(app)/settings/layout.tsx",
-      "parent": "/_app-layout",
+    "/$workspaceSlug/_app-layout": {
+      "filePath": "$workspaceSlug/layout.tsx",
+      "parent": "/$workspaceSlug",
       "children": [
-        "/_app-layout/settings/"
+        "/$workspaceSlug/_app-layout/projects",
+        "/$workspaceSlug/_app-layout/settings",
+        "/$workspaceSlug/_app-layout/",
+        "/$workspaceSlug/_app-layout/tracker"
       ]
-    },
-    "/_app-layout/": {
-      "filePath": "(app)/index.tsx",
-      "parent": "/_app-layout"
-    },
-    "/_app-layout/tracker": {
-      "filePath": "(app)/tracker/index.tsx",
-      "parent": "/_app-layout"
     },
     "/_auth-layout/sign-in": {
       "filePath": "(auth)/sign-in/index.tsx",
@@ -386,17 +472,44 @@ export const routeTree = rootRoute
       "filePath": "(auth)/sign-up/index.tsx",
       "parent": "/_auth-layout"
     },
-    "/_app-layout/projects/": {
-      "filePath": "(app)/projects/index.tsx",
-      "parent": "/_app-layout/projects"
+    "/_onboarding-layout/create-workspace": {
+      "filePath": "(onboarding)/create-workspace/index.tsx",
+      "parent": "/_onboarding-layout"
     },
-    "/_app-layout/settings/": {
-      "filePath": "(app)/settings/index.tsx",
-      "parent": "/_app-layout/settings"
+    "/$workspaceSlug/_app-layout/projects": {
+      "filePath": "",
+      "parent": "/$workspaceSlug/_app-layout",
+      "children": [
+        "/$workspaceSlug/_app-layout/projects/",
+        "/$workspaceSlug/_app-layout/projects/$projectId"
+      ]
     },
-    "/_app-layout/projects/$projectUuid": {
-      "filePath": "(app)/projects/$projectUuid/index.tsx",
-      "parent": "/_app-layout/projects"
+    "/$workspaceSlug/_app-layout/settings": {
+      "filePath": "$workspaceSlug/settings/layout.tsx",
+      "parent": "/$workspaceSlug/_app-layout",
+      "children": [
+        "/$workspaceSlug/_app-layout/settings/"
+      ]
+    },
+    "/$workspaceSlug/_app-layout/": {
+      "filePath": "$workspaceSlug/index.tsx",
+      "parent": "/$workspaceSlug/_app-layout"
+    },
+    "/$workspaceSlug/_app-layout/tracker": {
+      "filePath": "$workspaceSlug/tracker/index.tsx",
+      "parent": "/$workspaceSlug/_app-layout"
+    },
+    "/$workspaceSlug/_app-layout/projects/": {
+      "filePath": "$workspaceSlug/projects/index.tsx",
+      "parent": "/$workspaceSlug/_app-layout/projects"
+    },
+    "/$workspaceSlug/_app-layout/settings/": {
+      "filePath": "$workspaceSlug/settings/index.tsx",
+      "parent": "/$workspaceSlug/_app-layout/settings"
+    },
+    "/$workspaceSlug/_app-layout/projects/$projectId": {
+      "filePath": "$workspaceSlug/projects/$projectId/index.tsx",
+      "parent": "/$workspaceSlug/_app-layout/projects"
     }
   }
 }

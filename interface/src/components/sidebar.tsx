@@ -2,59 +2,65 @@ import { Button } from "@mason/ui/button";
 import { Hotkey } from "@mason/ui/hotkey";
 import { Icons } from "@mason/ui/icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mason/ui/tooltip";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, linkOptions, useNavigate } from "@tanstack/react-router";
 import { observer } from "mobx-react-lite";
 import { AnimatePresence, motion } from "motion/react";
+import type React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { HOTKEYS } from "~/lib/constants/hotkeys";
 import { rootStore } from "~/stores/root-store";
 
-const NAV_ITEMS = [
+interface NavItemProps {
+  to: string;
+  label: string;
+  Icon: () => React.ReactElement;
+  hotkey: string;
+  exact: boolean;
+}
+const NAV_ITEMS = linkOptions<Array<NavItemProps>>([
   {
-    name: "Dashboard",
-    path: "/",
+    to: "/$workspaceSlug",
+    label: "Dashboard",
     Icon: () => <Icons.Home size={22} />,
     hotkey: HOTKEYS.navigation.goToDashboard.key,
+    exact: true,
   },
   {
-    name: "Tracker",
-    path: "/tracker",
+    to: "/$workspaceSlug/tracker",
+    label: "Tracker",
     Icon: () => <Icons.Calendar size={22} />,
     hotkey: HOTKEYS.navigation.goToTracker.key,
+    exact: false,
   },
   {
-    name: "Projects",
-    path: "/projects",
+    to: "/$workspaceSlug/projects",
+    label: "Projects",
     Icon: () => <Icons.Target size={22} />,
     hotkey: HOTKEYS.navigation.goToProjects.key,
+    exact: false,
   },
   {
-    name: "Settings",
-    path: "/settings",
+    to: "/$workspaceSlug/settings",
+    label: "Settings",
     Icon: () => <Icons.Settings size={22} />,
     hotkey: HOTKEYS.navigation.goToSettings.key,
+    exact: false,
   },
-];
+]);
 
-interface NavitemProps {
-  item: {
-    name: string;
-    path: string;
-    Icon: () => React.JSX.Element;
-    hotkey: string;
-  };
-}
-
-function NavItem({ item }: NavitemProps) {
+function NavItem({ item }: { item: NavItemProps }) {
   const navigate = useNavigate();
-  useHotkeys(item.hotkey, () => navigate({ to: item.path }));
+  useHotkeys(item.hotkey, () => navigate({ to: item.to }));
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <li>
           <Link
-            to={item.path}
+            to={item.to}
+            activeOptions={{
+              exact: item.exact,
+            }}
             activeProps={{
               className:
                 "bg-primary-900/15 text-primary/75 hover:bg-primary-900/25 hover:text-primary",
@@ -62,12 +68,12 @@ function NavItem({ item }: NavitemProps) {
             className="flex w-full items-center justify-start gap-2 rounded-md px-2 py-1 text-contrast-50 text-sm hover:bg-contrast-5 hover:text-foreground"
           >
             <item.Icon />
-            {item.name}
+            {item.label}
           </Link>
         </li>
       </TooltipTrigger>
       <TooltipContent side="right">
-        Go to {item.name.toLowerCase()} <Hotkey>{item.hotkey}</Hotkey>
+        Go to {item.label.toLowerCase()} <Hotkey>{item.hotkey}</Hotkey>
       </TooltipContent>
     </Tooltip>
   );
@@ -97,7 +103,7 @@ const Sidebar = observer(() => {
                 <nav className="flex flex-col">
                   <ul className="space-y-0.5">
                     {NAV_ITEMS.map((item) => {
-                      return <NavItem key={item.path} item={item} />;
+                      return <NavItem key={item.to} item={item} />;
                     })}
                   </ul>
                 </nav>

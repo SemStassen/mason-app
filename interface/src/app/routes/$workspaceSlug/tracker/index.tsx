@@ -4,7 +4,7 @@ import { Tracker } from "~/components/tracker";
 import { getPGliteConnection } from "~/lib/db";
 import { rootStore } from "~/stores/root-store";
 
-export const Route = createFileRoute("/_app-layout/tracker")({
+export const Route = createFileRoute("/$workspaceSlug/_app-layout/tracker")({
   loader: async ({ abortController }) => {
     const pg = await getPGliteConnection();
     const liveTimeEntries = pg.live.query<
@@ -25,11 +25,11 @@ export const Route = createFileRoute("/_app-layout/tracker")({
             )
           ) as activity
         FROM time_entries
-        INNER JOIN activities ON time_entries.activity_uuid = activities.uuid
-        INNER JOIN projects ON activities.project_uuid = projects.uuid
-        WHERE time_entries.user_uuid = $1
+        INNER JOIN activities ON time_entries.activity_id = activities.id
+        INNER JOIN projects ON activities.project_id = projects.id
+        WHERE time_entries.user_id = $1
       `,
-      params: [rootStore.appStore.userUuid],
+      params: [rootStore.appStore.userId],
       signal: abortController.signal,
       offset: 0,
       limit: 100,

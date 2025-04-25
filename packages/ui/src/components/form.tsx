@@ -90,11 +90,11 @@ const FormSection = ({
 };
 
 const formItemVariants = cva(
-  "flex justify-between gap-1.5 border-contrast-10 border-b last:border-0",
+  "flex justify-between gap-1.5 border-contrast-10 ",
   {
     variants: {
       direction: {
-        horizontal: "flex-row sm:items-center",
+        horizontal: "flex-row border-b last:border-0 sm:items-center",
         vertical: "flex-col",
       },
     },

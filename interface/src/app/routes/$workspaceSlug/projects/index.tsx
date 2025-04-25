@@ -39,7 +39,7 @@ import {
 import { zodValidator } from "@tanstack/zod-adapter";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { List, ListContent, ListHeader, ListItem } from "~/components/list";
+import { List, ListContent, ListItem } from "~/components/list";
 import { RouteHeader } from "~/components/route-header";
 import { useLiveQuery } from "~/hooks/use-live-query";
 import { getPGliteConnection } from "~/lib/db";
@@ -68,7 +68,7 @@ const projectsSearchSchema = z.object({
   search: z.string().default(projectsSearchDefault.search),
 });
 
-export const Route = createFileRoute("/_app-layout/projects/")({
+export const Route = createFileRoute("/$workspaceSlug/_app-layout/projects/")({
   validateSearch: zodValidator(projectsSearchSchema),
   search: {
     middlewares: [stripSearchParams(projectsSearchDefault)],
@@ -82,9 +82,9 @@ export const Route = createFileRoute("/_app-layout/projects/")({
     const pg = await getPGliteConnection();
     const liveWorkspaces = pg.live.query<Workspace>({
       query: `
-        SELECT * FROM workspaces WHERE uuid = $1
+        SELECT * FROM workspaces WHERE id = $1
       `,
-      params: [rootStore.appStore.workspaceUuid],
+      params: [rootStore.appStore.workspaceId],
       signal: abortController.signal,
       offset: 0,
       limit: 100,
@@ -93,10 +93,10 @@ export const Route = createFileRoute("/_app-layout/projects/")({
     const liveProjects = pg.live.query<Project>({
       query: `
         SELECT * FROM projects 
-        WHERE workspace_uuid = $1 AND name ILIKE $2 
+        WHERE workspace_id = $1 AND name ILIKE $2 
         ORDER BY ${deps.sortBy} ${deps.sortOrder}
       `,
-      params: [rootStore.appStore.workspaceUuid, `%${deps.search}%`],
+      params: [rootStore.appStore.workspaceId, `%${deps.search}%`],
       signal: abortController.signal,
       offset: 0,
       limit: 100,
@@ -176,7 +176,7 @@ function DisplayOptions() {
 
 const createProjectSchema = z.object({
   name: z.string().min(1),
-  workspace_uuid: z.string(),
+  workspace_id: z.string(),
   hex_color: z.string(),
 }) satisfies z.ZodType<InsertProject>;
 
@@ -187,7 +187,7 @@ function CreateProject() {
     resolver: zodResolver(createProjectSchema),
     defaultValues: {
       name: "",
-      workspace_uuid: rootStore.appStore.workspaceUuid,
+      workspace_id: rootStore.appStore.workspaceId,
     },
   });
 
@@ -196,7 +196,7 @@ function CreateProject() {
     try {
       await pg.query(
         "INSERT INTO projects (name, workspace_uuid) VALUES ($1, $2)",
-        [values.name, values.workspace_uuid],
+        [values.name, values.workspace_id],
       );
       form.reset();
     } catch (e) {
@@ -301,9 +301,9 @@ function Projects() {
   const workspace = workspacesData?.rows[0];
   const projects = projectsData?.rows;
 
-  if (!workspace) {
-    return null;
-  }
+  // if (!workspace) {
+  //   return null;
+  // }
 
   return (
     <div className="flex h-full w-full flex-col">
@@ -327,16 +327,19 @@ function Projects() {
         </div>
       </div>
       <List>
-        <ListHeader>{workspace.name}</ListHeader>
+        {/* <ListHeader>{workspace.name}</ListHeader> */}
         <ListContent>
           {projects?.map((project) => {
             return (
-              <ListItem key={project.uuid}>
+              <ListItem key={project.id}>
                 <Link
                   type="button"
                   className="inset-0.5 flex w-full items-center gap-2 border-contrast-5 not-last:border-b text-sm hover:bg-contrast-5 "
-                  to="/projects/$projectUuid"
-                  params={{ projectUuid: project.uuid }}
+                  from="/$workspaceSlug/projects"
+                  to="/$workspaceSlug/projects/$projectId"
+                  params={{
+                    projectId: project.id,
+                  }}
                 >
                   <Icons.Folder />
                   {displayName(project.name, "project")}

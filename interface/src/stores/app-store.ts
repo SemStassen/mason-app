@@ -6,13 +6,13 @@ const LOCAL_STORAGE_KEY = "mason:app";
 export type WeekStartDay = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 interface AppSettings {
-  userUuid: string;
+  userId: string;
   startOfWeekDay: WeekStartDay;
 }
 
 class AppStore {
-  userUuid = "070b6f5e-77fb-4841-b92b-359646fe1e61";
-  workspaceUuid = "8964dc14-37d3-4648-8353-b5c378e9559d";
+  userId = "070b6f5e-77fb-4841-b92b-359646fe1e61";
+  workspaceId = "8964dc14-37d3-4648-8353-b5c378e9559d";
   startOfWeekDay: WeekStartDay = 1;
 
   constructor() {
@@ -21,7 +21,7 @@ class AppStore {
 
     reaction(
       () => ({
-        userUuid: this.userUuid,
+        userUuid: this.userId,
         startOfWeekDay: this.startOfWeekDay,
       }),
       (data) => {
@@ -39,8 +39,8 @@ class AppStore {
     if (app) {
       const data = JSON.parse(app) as Partial<AppSettings>;
 
-      if (data.userUuid) {
-        this.userUuid = data.userUuid;
+      if (data.userId) {
+        this.userId = data.userId;
       }
 
       if (data.startOfWeekDay !== undefined) {
