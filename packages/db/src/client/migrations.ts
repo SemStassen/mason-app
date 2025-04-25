@@ -1,6 +1,6 @@
 import type { PGliteWorker } from "@electric-sql/pglite/worker";
 
-import migration from "../../migrations/0000_overjoyed_tempest.sql?raw";
+import migration from "../../migrations/0000_lucky_chat.sql?raw";
 
 /**
  * This definitely needs to be made more robust

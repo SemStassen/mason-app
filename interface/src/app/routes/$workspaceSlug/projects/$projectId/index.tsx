@@ -58,7 +58,9 @@ const activitiesSearchSchema = z.object({
   search: z.string().default(activitiesSearchDefault.search),
 });
 
-export const Route = createFileRoute("/_app-layout/projects/$projectUuid")({
+export const Route = createFileRoute(
+  "/$workspaceSlug/_app-layout/projects/$projectId",
+)({
   validateSearch: zodValidator(activitiesSearchSchema),
   search: {
     middlewares: [stripSearchParams(activitiesSearchDefault)],
@@ -71,9 +73,9 @@ export const Route = createFileRoute("/_app-layout/projects/$projectUuid")({
 
     const liveUsers = pg.live.query<User>({
       query: `
-        SELECT * FROM users WHERE workspace_uuid = $1
+        SELECT * FROM users WHERE workspace_id = $1
       `,
-      params: [rootStore.appStore.workspaceUuid],
+      params: [rootStore.appStore.workspaceId],
       signal: abortController.signal,
       offset: 0,
       limit: 100,
@@ -81,9 +83,9 @@ export const Route = createFileRoute("/_app-layout/projects/$projectUuid")({
 
     const liveProjects = pg.live.query<Project>({
       query: `
-        SELECT * FROM projects WHERE uuid = $1
+        SELECT * FROM projects WHERE id = $1
       `,
-      params: [params.projectUuid],
+      params: [params.projectId],
       signal: abortController.signal,
       offset: 0,
       limit: 100,
@@ -92,9 +94,9 @@ export const Route = createFileRoute("/_app-layout/projects/$projectUuid")({
     const liveActivities = pg.live.query<Activity>({
       query: `
         SELECT * from activities
-        WHERE project_uuid = $1 AND name ILIKE $2
+        WHERE project_id = $1 AND name ILIKE $2
       `,
-      params: [params.projectUuid, `%${deps.search}%`],
+      params: [params.projectId, `%${deps.search}%`],
       signal: abortController.signal,
       offset: 0,
       limit: 100,
@@ -195,18 +197,18 @@ function ActivitiesSearch() {
 
 const createActivitySchema = z.object({
   name: z.string().min(1),
-  project_uuid: z.string(),
+  project_id: z.string(),
 }) satisfies z.ZodType<InsertActivity>;
 
 function CreateActivity() {
-  const { projectUuid } = Route.useParams();
+  const { projectId } = Route.useParams();
   const { pg } = Route.useLoaderData();
 
   const form = useForm<z.infer<typeof createActivitySchema>>({
     resolver: zodResolver(createActivitySchema),
     defaultValues: {
       name: "",
-      project_uuid: projectUuid,
+      project_id: projectId,
     },
   });
 
@@ -215,9 +217,9 @@ function CreateActivity() {
     try {
       await pg.query(
         `
-          INSERT INTO activities (name, project_uuid) VALUES ($1, $2)
+          INSERT INTO activities (name, project_id) VALUES ($1, $2)
         `,
-        [values.name, values.project_uuid],
+        [values.name, values.project_id],
       );
       form.reset();
     } catch (e) {
@@ -301,7 +303,10 @@ function ProjectPage() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/projects">
+                <Link
+                  from="/$workspaceSlug/projects/$projectId"
+                  to="/$workspaceSlug/projects"
+                >
                   <Icons.Target />
                   Projects
                 </Link>
@@ -329,9 +334,9 @@ function ProjectPage() {
               defaultValue={project.name}
               onBlur={(e) => {
                 // MUTATION
-                pg.query("UPDATE projects SET name = $1 WHERE uuid = $2", [
+                pg.query("UPDATE projects SET name = $1 WHERE id = $2", [
                   e.target.value,
-                  project.uuid,
+                  project.id,
                 ]);
               }}
             />
@@ -350,7 +355,7 @@ function ProjectPage() {
             </ListHeader>
             <ListContent>
               {activities?.map((activity) => (
-                <ListItem key={activity.uuid}>{activity.name}</ListItem>
+                <ListItem key={activity.id}>{activity.name}</ListItem>
               ))}
             </ListContent>
           </List>

@@ -6,4 +6,4 @@ export const authRoute = new Hono();
 
 authRoute.use("*", cors());
 
-authRoute.on(["POST", "GET"], "**", (c) => auth.handler(c.req.raw));
+authRoute.on(["POST", "GET"], "*", (c) => auth.handler(c.req.raw));

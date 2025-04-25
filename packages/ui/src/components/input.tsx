@@ -1,4 +1,5 @@
 import { type VariantProps, cva } from "class-variance-authority";
+import { useRef } from "react";
 import { cn } from "../utils";
 
 const inputVariants = cva(
@@ -25,8 +26,9 @@ const inputVariants = cva(
 );
 
 export interface InputProps
-  extends Omit<React.ComponentProps<"input">, "size">,
+  extends Omit<React.ComponentProps<"input">, "size" | "prefix">,
     VariantProps<typeof inputVariants> {
+  prefix?: React.ReactNode;
   iconLeft?: React.ReactNode;
   iconRight?: React.ReactNode;
 }
@@ -36,15 +38,26 @@ const Input = ({
   type,
   variant,
   size,
+  prefix,
   iconLeft,
   iconRight,
   ...props
 }: InputProps) => {
+  const prefixRef = useRef<HTMLSpanElement>(null);
+
   return (
     <div className={cn(inputVariants({ variant, size, className }))}>
       {iconLeft && (
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+        <div
+          className="absolute inset-y-0 left-0 flex items-center pl-3"
+          aria-hidden={true}
+        >
           {iconLeft}
+        </div>
+      )}
+      {prefix && (
+        <div className="-translate-y-1/2 absolute top-1/2 left-3">
+          <span ref={prefixRef}>{prefix}</span>
         </div>
       )}
       <input
@@ -54,10 +67,18 @@ const Input = ({
           iconLeft && "pl-9",
           iconRight && "pr-9",
         )}
+        style={{
+          paddingLeft: prefixRef.current
+            ? prefixRef.current.offsetWidth + 12
+            : undefined,
+        }}
         {...props}
       />
       {iconRight && (
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+        <div
+          className="absolute inset-y-0 right-0 flex items-center pr-3"
+          aria-hidden={true}
+        >
           {iconRight}
         </div>
       )}

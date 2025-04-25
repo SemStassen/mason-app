@@ -25,24 +25,9 @@ const tableMetadata = {
     .notNull(),
 };
 
-export type Workspace = InferSelectModel<typeof workspacesTable>;
-export const workspacesTable = pgTable("workspaces", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  // General
-  name: varchar("name").notNull(),
-  // Metadata
-  ...tableMetadata,
-});
-
 export type User = InferSelectModel<typeof usersTable>;
 export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  // References
-  workspace_id: uuid("workspace_id")
-    .references(() => workspacesTable.id, {
-      onDelete: "cascade",
-    })
-    .notNull(),
   // General
   display_name: varchar("display_name").notNull(),
   email: varchar("email").notNull(),
@@ -52,8 +37,6 @@ export const usersTable = pgTable("users", {
   ...tableMetadata,
 });
 
-export type InsertSession = InferInsertModel<typeof sessionsTable>;
-export type Session = InferSelectModel<typeof sessionsTable>;
 export const sessionsTable = pgTable("sessions", {
   id: uuid("id").primaryKey().defaultRandom(),
   // References
@@ -65,6 +48,7 @@ export const sessionsTable = pgTable("sessions", {
   expires_at: date("expires_at").notNull(),
   ip_address: varchar("ip_address").notNull(),
   user_agent: varchar("user_agent").notNull(),
+  active_workspace_id: uuid("active_workspace_id"),
   // Metadata
   ...tableMetadata,
 });
@@ -94,6 +78,51 @@ export const VerificationsTable = pgTable("verifications", {
   // General
   identifier: varchar("identifier").notNull(),
   value: varchar("value").notNull(),
+  expires_at: date("expires_at").notNull(),
+  // Metadata
+  ...tableMetadata,
+});
+
+export type Workspace = InferSelectModel<typeof workspacesTable>;
+export const workspacesTable = pgTable("workspaces", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  // General
+  name: varchar("name").notNull(),
+  slug: varchar("slug").notNull(),
+  logo_url: varchar("logo_url"),
+  metadata: varchar("metadata"),
+  // Metadata
+  ...tableMetadata,
+});
+
+export const membersTable = pgTable("members", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  // References
+  user_id: uuid("user_id")
+    .references(() => usersTable.id, { onDelete: "cascade" })
+    .notNull(),
+  workspace_id: uuid("workspace_id")
+    .references(() => workspacesTable.id, { onDelete: "cascade" })
+    .notNull(),
+  // General
+  role: varchar("role").notNull(),
+  // Metadata
+  ...tableMetadata,
+});
+
+export const invitationsTable = pgTable("invitations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  // References
+  inviter_id: uuid("inviter_id")
+    .references(() => usersTable.id, { onDelete: "cascade" })
+    .notNull(),
+  workspace_id: uuid("workspace_id")
+    .references(() => workspacesTable.id, { onDelete: "cascade" })
+    .notNull(),
+  // General
+  email: varchar("email").notNull(),
+  role: varchar("role").notNull(),
+  status: varchar("status").notNull(),
   expires_at: date("expires_at").notNull(),
   // Metadata
   ...tableMetadata,

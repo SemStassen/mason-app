@@ -1,3 +1,6 @@
+import { SignInWithGithub } from "@mason/auth/client";
+import { Button } from "@mason/ui/button";
+import { Icons } from "@mason/ui/icons";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_auth-layout/sign-up")({
@@ -5,5 +8,20 @@ export const Route = createFileRoute("/_auth-layout/sign-up")({
 });
 
 function SignUpPage() {
-  return <div className="flex w-full flex-col">Signup</div>;
+  return (
+    <div className="flex max-w-[460px] flex-col items-center space-y-6">
+      <h1 className="text-center font-medium text-2xl">Sign up to Mason</h1>
+      <div>
+        <Button
+          variant="default"
+          size="lg"
+          className="w-full"
+          onClick={async () => await SignInWithGithub()}
+        >
+          <Icons.Github />
+          Sign in with Github
+        </Button>
+      </div>
+    </div>
+  );
 }

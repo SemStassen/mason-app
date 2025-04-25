@@ -2,7 +2,7 @@ import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import { cn } from "@mason/ui/utils";
 import { addDays, endOfDay, startOfDay } from "date-fns";
 import { observer } from "mobx-react-lite";
-import { Route } from "~/app/routes/(app)/tracker";
+import { Route } from "~/app/routes/$workspaceSlug/tracker";
 import { useLiveQuery } from "~/hooks/use-live-query";
 import { formatters } from "~/lib/utils/dates";
 import { rootStore } from "~/stores/root-store";

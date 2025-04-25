@@ -19,7 +19,7 @@ import { Route } from ".";
 import { UpdateLeadCombobox } from "./_components/update-lead-combobox";
 
 const ProjectSidebar = observer(() => {
-  const { projectUuid } = Route.useParams();
+  const { projectId } = Route.useParams();
   const { pg, liveUsers, liveProjects } = Route.useLoaderData();
   const { projectPageStore } = rootStore;
 
@@ -39,8 +39,8 @@ const ProjectSidebar = observer(() => {
       .join(", ");
 
     return pg.query(
-      `UPDATE projects SET ${setClause} WHERE uuid = $${Object.keys(data).length + 1}`,
-      [...Object.values(data), projectUuid],
+      `UPDATE projects SET ${setClause} WHERE id = $${Object.keys(data).length + 1}`,
+      [...Object.values(data), projectId],
     );
   };
 
@@ -68,10 +68,10 @@ const ProjectSidebar = observer(() => {
                   <PropertyContent>
                     <UpdateLeadCombobox
                       users={users}
-                      leadUuid={project.lead_uuid}
+                      leadUuid={project.lead_id}
                       onChange={(val) =>
                         handleMutation({
-                          lead_uuid: val,
+                          lead_id: val,
                         })
                       }
                     />

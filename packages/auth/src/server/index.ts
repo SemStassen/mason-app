@@ -1,6 +1,7 @@
 import { pool } from "@mason/db/server";
 import { serverEnv } from "@mason/env/server";
 import { betterAuth } from "better-auth";
+import { organization } from "better-auth/plugins";
 
 export const auth = betterAuth({
   appName: "Mason",
@@ -23,7 +24,6 @@ export const auth = betterAuth({
   user: {
     modelName: "users",
     fields: {
-      id: "uuid",
       name: "display_name",
       email: "email",
       emailVerified: "email_verified",
@@ -35,8 +35,7 @@ export const auth = betterAuth({
   session: {
     modelName: "sessions",
     fields: {
-      id: "uuid",
-      userId: "user_uuid",
+      userId: "user_id",
       token: "session_token",
       expiresAt: "expires_at",
       ipAddress: "ip_address",
@@ -48,8 +47,7 @@ export const auth = betterAuth({
   account: {
     modelName: "accounts",
     fields: {
-      id: "uuid",
-      userId: "user_uuid",
+      userId: "user_id",
       accountId: "account_id",
       providerId: "provider_id",
       accessToken: "access_token",
@@ -66,7 +64,6 @@ export const auth = betterAuth({
   verification: {
     modelName: "verifications",
     fields: {
-      id: "uuid",
       identifier: "identifier",
       value: "value",
       expiresAt: "expires_at",
@@ -74,4 +71,49 @@ export const auth = betterAuth({
       updatedAt: "updated_at",
     },
   },
+  plugins: [
+    organization({
+      schema: {
+        organization: {
+          modelName: "workspaces",
+          fields: {
+            name: "name",
+            slug: "slug",
+            logo: "logo_url",
+            metadata: "metadata",
+            createdAt: "created_at",
+            updatedAt: "updated_at",
+          },
+        },
+        member: {
+          modelName: "members",
+          fields: {
+            userId: "user_id",
+            organizationId: "workspace_id",
+            role: "role",
+            createdAt: "created_at",
+            updatedAt: "updated_at",
+          },
+        },
+        invitation: {
+          modelName: "invitations",
+          fields: {
+            inviterId: "inviter_id",
+            organizationId: "workspace_id",
+            email: "email",
+            role: "role",
+            status: "status",
+            expiresAt: "expires_at",
+            createdAt: "created_at",
+            updatedAt: "updated_at",
+          },
+        },
+        session: {
+          fields: {
+            activeOrganizationId: "active_workspace_id",
+          },
+        },
+      },
+    }),
+  ],
 });
