@@ -1,19 +1,17 @@
 import { authClient } from "@mason/auth/client";
+import { clientEnv } from "@mason/env/client";
 import { Outlet, createRootRoute, redirect } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { rootStore } from "~/stores/root-store";
 
 export const Route = createRootRoute({
   component: RootLayout,
   beforeLoad: async ({ location }) => {
-    const { data: session } = await authClient.getSession();
+    const { isLoggedIn } = await authClient.masonCheckAuthStatus({});
 
-    // First check if the user is authenticated
-    if (!session || !session.session) {
-      if (
-        location.pathname === "/sign-in" ||
-        location.pathname === "/sign-up"
-      ) {
-        return;
-      }
+    if (!isLoggedIn) {
+      const isAuthRoute = ["/sign-in", "/sign-up"].includes(location.pathname);
+      if (isAuthRoute) return;
 
       throw redirect({
         to: "/sign-in",
@@ -23,36 +21,63 @@ export const Route = createRootRoute({
       });
     }
 
-    // Then check if the user has an organization
-    const { data: workspaces } = await authClient.organization.list();
+    // Check if the user has a workspace
+    const { activeWorkspaceId, userId } = rootStore.appStore;
 
-    if (!workspaces || workspaces.length === 0) {
-      if (location.pathname === "/create-workspace") {
-        return;
+    if (!userId) {
+      const { data: session } = await authClient.getSession();
+
+      if (!session) {
+        throw redirect({
+          to: "/sign-in",
+          search: {
+            redirect: location.href,
+          },
+        });
       }
 
-      throw redirect({
-        to: "/create-workspace",
-      });
+      rootStore.appStore.setUserId(session.session.userId);
     }
 
-    if (location.pathname.includes(workspaces[0].slug)) {
+    if (!activeWorkspaceId) {
+      const { data: workspaces } = await authClient.organization.list();
+
+      if (!workspaces || workspaces.length === 0) {
+        if (location.pathname === "/create-workspace") {
+          return;
+        }
+
+        throw redirect({
+          to: "/create-workspace",
+        });
+      }
+
+      for (const workspace of workspaces) {
+        rootStore.appStore.addWorkspaceId(workspace.id);
+      }
+      rootStore.appStore.setActiveWorkspaceId(workspaces[0].id);
+    }
+
+    if (location.pathname.includes(rootStore.appStore.activeWorkspaceId)) {
       return;
     }
 
     throw redirect({
       to: "/$workspaceSlug",
       params: {
-        workspaceSlug: workspaces[0].slug,
+        workspaceSlug: rootStore.appStore.activeWorkspaceId,
       },
     });
   },
 });
 
 function RootLayout() {
+  const showDevTools = clientEnv.MODE === "development";
+
   return (
     <>
       <Outlet />
+      {showDevTools && <TanStackRouterDevtools />}
     </>
   );
 }

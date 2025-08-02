@@ -1,4 +1,5 @@
 import { serverEnv } from "@mason/env/server";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 export const pool = new Pool({
@@ -8,3 +9,6 @@ export const pool = new Pool({
   password: serverEnv.DB_PASSWORD,
   database: "mason",
 });
+
+export const db = drizzle({ client: pool });
+export { eq } from "drizzle-orm";

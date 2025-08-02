@@ -1,5 +1,5 @@
 {
-  "id": "673261e7-d164-4748-8b57-25a2ea1ead2b",
+  "id": "e23b2db5-4796-4293-979f-534f149d6784",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -47,13 +47,13 @@
         },
         "access_token_expires_at": {
           "name": "access_token_expires_at",
-          "type": "date",
+          "type": "timestamp (0) with time zone",
           "primaryKey": false,
           "notNull": false
         },
         "refresh_token_expires_at": {
           "name": "refresh_token_expires_at",
-          "type": "date",
+          "type": "timestamp (0) with time zone",
           "primaryKey": false,
           "notNull": false
         },
@@ -137,7 +137,7 @@
         },
         "expires_at": {
           "name": "expires_at",
-          "type": "date",
+          "type": "timestamp (0) with time zone",
           "primaryKey": false,
           "notNull": true
         },
@@ -267,7 +267,7 @@
         },
         "expires_at": {
           "name": "expires_at",
-          "type": "date",
+          "type": "timestamp (0) with time zone",
           "primaryKey": false,
           "notNull": true
         },
@@ -542,7 +542,7 @@
         },
         "expires_at": {
           "name": "expires_at",
-          "type": "date",
+          "type": "timestamp (0) with time zone",
           "primaryKey": false,
           "notNull": true
         },
@@ -558,8 +558,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "active_organization_id": {
-          "name": "active_organization_id",
+        "active_workspace_id": {
+          "name": "active_workspace_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false

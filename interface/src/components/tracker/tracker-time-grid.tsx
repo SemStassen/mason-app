@@ -8,19 +8,19 @@ import { formatters } from "~/lib/utils/dates";
 import { rootStore } from "~/stores/root-store";
 
 function TimeEntry({
-  uuid,
+  id,
   started_at,
   stopped_at,
   hex_color,
   ...props
 }: React.ComponentProps<"div"> & {
-  uuid: string;
+  id: string;
   started_at: Date;
   stopped_at: Date;
   hex_color: string;
 }) {
   const { attributes, listeners, setNodeRef } = useDraggable({
-    id: uuid,
+    id: id,
   });
 
   return (
@@ -100,7 +100,7 @@ const DayColumn = observer(({ index }: { index: number }) => {
           );
         })}
         {timeEntries?.rows.map(
-          ({ uuid, started_at, stopped_at: _stopped_at, activity }) => {
+          ({ id, started_at, stopped_at: _stopped_at, activity }) => {
             // Use currentDate as fallback for _stopped_at if it is null,
             // indicating an ongoing time entry.
             const stopped_at = _stopped_at || trackerStore.currentDate;
@@ -117,14 +117,14 @@ const DayColumn = observer(({ index }: { index: number }) => {
 
               return (
                 <TimeEntry
-                  key={uuid}
+                  key={id}
                   style={{
                     top: `${((entryStart.getHours() + entryStart.getMinutes() / 60) * 100) / 24}%`,
                     left: 2,
                     width: "calc(100% - 12px)",
                     height: `${Math.max(((entryEnd.getTime() - entryStart.getTime()) / (1000 * 60 * 60)) * (100 / 24), 1.04)}%`,
                   }}
-                  uuid={uuid}
+                  id={id}
                   started_at={started_at}
                   stopped_at={stopped_at}
                   hex_color={activity.project.hex_color}

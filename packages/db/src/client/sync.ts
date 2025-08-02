@@ -10,9 +10,8 @@ export async function sync(pg: PGliteWithExtensions) {
       },
     },
     table: "workspaces",
-    primaryKey: ["uuid"],
+    primaryKey: ["id"],
     shapeKey: "workspaces",
-    useCopy: true,
   });
 
   await pg.sync.syncShapeToTable({
@@ -23,9 +22,20 @@ export async function sync(pg: PGliteWithExtensions) {
       },
     },
     table: "users",
-    primaryKey: ["uuid"],
+    primaryKey: ["id"],
     shapeKey: "users",
-    useCopy: true,
+  });
+
+  await pg.sync.syncShapeToTable({
+    shape: {
+      url: clientEnv.VITE_ELECTRIC_URL,
+      params: {
+        table: "members",
+      },
+    },
+    table: "members",
+    primaryKey: ["id"],
+    shapeKey: "members",
   });
 
   await pg.sync.syncShapeToTable({
@@ -36,9 +46,8 @@ export async function sync(pg: PGliteWithExtensions) {
       },
     },
     table: "projects",
-    primaryKey: ["uuid"],
+    primaryKey: ["id"],
     shapeKey: "projects",
-    useCopy: true,
   });
 
   await pg.sync.syncShapeToTable({
@@ -49,9 +58,8 @@ export async function sync(pg: PGliteWithExtensions) {
       },
     },
     table: "activities",
-    primaryKey: ["uuid"],
+    primaryKey: ["id"],
     shapeKey: "activities",
-    useCopy: true,
   });
 
   await pg.sync.syncShapeToTable({
@@ -62,8 +70,7 @@ export async function sync(pg: PGliteWithExtensions) {
       },
     },
     table: "time_entries",
-    primaryKey: ["uuid"],
+    primaryKey: ["id"],
     shapeKey: "time_entries",
-    useCopy: true,
   });
 }

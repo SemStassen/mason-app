@@ -1,7 +1,6 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
   boolean,
-  date,
   json,
   pgTable,
   timestamp,
@@ -45,7 +44,10 @@ export const sessionsTable = pgTable("sessions", {
     .notNull(),
   // General
   session_token: varchar("session_token").notNull(),
-  expires_at: date("expires_at").notNull(),
+  expires_at: timestamp("expires_at", {
+    withTimezone: true,
+    precision: 0,
+  }).notNull(),
   ip_address: varchar("ip_address").notNull(),
   user_agent: varchar("user_agent").notNull(),
   active_workspace_id: uuid("active_workspace_id"),
@@ -53,7 +55,7 @@ export const sessionsTable = pgTable("sessions", {
   ...tableMetadata,
 });
 
-export const AccountsTable = pgTable("accounts", {
+export const accountsTable = pgTable("accounts", {
   id: uuid("id").primaryKey().defaultRandom(),
   // References
   user_id: uuid("user_id")
@@ -64,8 +66,14 @@ export const AccountsTable = pgTable("accounts", {
   provider_id: varchar("provider_id").notNull(),
   access_token: varchar("access_token"),
   refresh_token: varchar("refresh_token"),
-  access_token_expires_at: date("access_token_expires_at"),
-  refresh_token_expires_at: date("refresh_token_expires_at"),
+  access_token_expires_at: timestamp("access_token_expires_at", {
+    withTimezone: true,
+    precision: 0,
+  }),
+  refresh_token_expires_at: timestamp("refresh_token_expires_at", {
+    withTimezone: true,
+    precision: 0,
+  }),
   scope: varchar("scope"),
   idToken: varchar("id_token"),
   password: varchar("password"),
@@ -73,12 +81,15 @@ export const AccountsTable = pgTable("accounts", {
   ...tableMetadata,
 });
 
-export const VerificationsTable = pgTable("verifications", {
+export const verificationsTable = pgTable("verifications", {
   id: uuid("id").primaryKey().defaultRandom(),
   // General
   identifier: varchar("identifier").notNull(),
   value: varchar("value").notNull(),
-  expires_at: date("expires_at").notNull(),
+  expires_at: timestamp("expires_at", {
+    withTimezone: true,
+    precision: 0,
+  }).notNull(),
   // Metadata
   ...tableMetadata,
 });
@@ -123,7 +134,10 @@ export const invitationsTable = pgTable("invitations", {
   email: varchar("email").notNull(),
   role: varchar("role").notNull(),
   status: varchar("status").notNull(),
-  expires_at: date("expires_at").notNull(),
+  expires_at: timestamp("expires_at", {
+    withTimezone: true,
+    precision: 0,
+  }).notNull(),
   // Metadata
   ...tableMetadata,
 });

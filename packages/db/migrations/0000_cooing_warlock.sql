@@ -5,8 +5,8 @@ CREATE TABLE "accounts" (
 	"provider_id" varchar NOT NULL,
 	"access_token" varchar,
 	"refresh_token" varchar,
-	"access_token_expires_at" date,
-	"refresh_token_expires_at" date,
+	"access_token_expires_at" timestamp (0) with time zone,
+	"refresh_token_expires_at" timestamp (0) with time zone,
 	"scope" varchar,
 	"id_token" varchar,
 	"password" varchar,
@@ -18,7 +18,7 @@ CREATE TABLE "verifications" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"identifier" varchar NOT NULL,
 	"value" varchar NOT NULL,
-	"expires_at" date NOT NULL,
+	"expires_at" timestamp (0) with time zone NOT NULL,
 	"created_at" timestamp (0) with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp (0) with time zone DEFAULT now() NOT NULL
 );
@@ -38,7 +38,7 @@ CREATE TABLE "invitations" (
 	"email" varchar NOT NULL,
 	"role" varchar NOT NULL,
 	"status" varchar NOT NULL,
-	"expires_at" date NOT NULL,
+	"expires_at" timestamp (0) with time zone NOT NULL,
 	"created_at" timestamp (0) with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp (0) with time zone DEFAULT now() NOT NULL
 );
@@ -69,7 +69,7 @@ CREATE TABLE "sessions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
 	"session_token" varchar NOT NULL,
-	"expires_at" date NOT NULL,
+	"expires_at" timestamp (0) with time zone NOT NULL,
 	"ip_address" varchar NOT NULL,
 	"user_agent" varchar NOT NULL,
 	"active_workspace_id" uuid,

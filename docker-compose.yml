@@ -29,7 +29,7 @@ services:
       -c hot_standby_feedback=on
 
   electric:
-    image: electricsql/electric:1.0.0
+    image: electricsql/electric:1.0.1
     environment:
       DATABASE_URL: postgresql://electric_user:password@pg:5432/mason?sslmode=disable
       ELECTRIC_INSECURE: true

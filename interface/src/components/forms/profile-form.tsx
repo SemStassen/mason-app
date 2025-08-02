@@ -46,8 +46,8 @@ function ProfileForm() {
                       onBlur={async () => {
                         field.onBlur();
                         await db.query(
-                          "UPDATE users SET name = $1 WHERE uuid = $2",
-                          [field.value, appStore.userUuid],
+                          "UPDATE users SET name = $1 WHERE id = $2",
+                          [field.value, appStore.userId],
                         );
                         toast("updated");
                       }}
@@ -76,8 +76,8 @@ function ProfileForm() {
                       onBlur={async () => {
                         field.onBlur();
                         await db.query(
-                          "UPDATE users SET display_name = $1 WHERE uuid = $2",
-                          [field.value, appStore.userUuid],
+                          "UPDATE users SET display_name = $1 WHERE id = $2",
+                          [field.value, appStore.userId],
                         );
                         toast("Updated");
                       }}

@@ -1,4 +1,4 @@
-import { SignInWithGithub } from "@mason/auth/client";
+import { signInWithGithub } from "@mason/auth/client";
 import { Button } from "@mason/ui/button";
 import { Icons } from "@mason/ui/icons";
 import { createFileRoute } from "@tanstack/react-router";
@@ -16,7 +16,7 @@ function SignUpPage() {
           variant="default"
           size="lg"
           className="w-full"
-          onClick={async () => await SignInWithGithub()}
+          onClick={async () => await signInWithGithub()}
         >
           <Icons.Github />
           Sign in with Github
