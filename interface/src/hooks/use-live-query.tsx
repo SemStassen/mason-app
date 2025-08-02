@@ -4,6 +4,7 @@
  */
 
 import type { LiveQuery, LiveQueryResults } from "@electric-sql/pglite/live";
+import { query as buildQuery } from "@electric-sql/pglite/template";
 import { usePGlite } from "@mason/db/client";
 import { useEffect, useRef, useState } from "react";
 
@@ -46,6 +47,7 @@ function useLiveQueryImpl<T = { [key: string]: unknown }>(
     currentParams = params;
   }
 
+  /* eslint-disable @eslint-react/hooks-extra/no-direct-set-state-in-use-effect */
   useEffect(() => {
     let cancelled = false;
     const cb = (results: LiveQueryResults<T>) => {
@@ -62,8 +64,7 @@ function useLiveQueryImpl<T = { [key: string]: unknown }>(
         cancelled = true;
         ret.then(({ unsubscribe }) => unsubscribe());
       };
-    }
-    if (query instanceof Promise) {
+    } else if (query instanceof Promise) {
       query.then((liveQuery) => {
         if (cancelled) return;
         liveQueryRef.current = liveQuery;
@@ -74,18 +75,18 @@ function useLiveQueryImpl<T = { [key: string]: unknown }>(
         cancelled = true;
         liveQueryRef.current?.unsubscribe(cb);
       };
-    }
-    if (liveQuery) {
+    } else if (liveQuery) {
       setResults(liveQuery.initialResults);
       liveQuery.subscribe(cb);
       return () => {
         cancelled = true;
         liveQuery.unsubscribe(cb);
       };
+    } else {
+      throw new Error("Should never happen");
     }
-
-    throw new Error("Should never happen");
   }, [db, key, query, currentParams, liveQuery]);
+  /* eslint-enable @eslint-react/hooks-extra/no-direct-set-state-in-use-effect */
 
   if (liveQueryChanged && liveQuery) {
     return liveQuery.initialResults;
@@ -122,15 +123,15 @@ export function useLiveQuery<T = { [key: string]: unknown }>(
   return useLiveQueryImpl<T>(query, params);
 }
 
-// useLiveQuery.sql = <T = { [key: string]: unknown }>(
-//   strings: TemplateStringsArray,
-//   ...values: any[]
-// ): LiveQueryResults<T> | undefined => {
-//   const { query, params } = buildQuery(strings, ...values);
-//   // eslint-disable-next-line react-compiler/react-compiler
-//   // eslint-disable-next-line react-hooks/rules-of-hooks
-//   return useLiveQueryImpl<T>(query, params);
-// };
+useLiveQuery.sql = <T = { [key: string]: unknown }>(
+  strings: TemplateStringsArray,
+  ...values: any[]
+): LiveQueryResults<T> | undefined => {
+  const { query, params } = buildQuery(strings, ...values);
+  // eslint-disable-next-line react-compiler/react-compiler
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  return useLiveQueryImpl<T>(query, params);
+};
 
 export function useLiveIncrementalQuery<T = { [key: string]: unknown }>(
   query: string,

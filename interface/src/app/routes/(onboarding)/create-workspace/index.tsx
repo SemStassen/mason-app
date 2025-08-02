@@ -65,7 +65,7 @@ function CreateWorkspacePage() {
   }, [name]);
 
   return (
-    <div className="flex max-w-[460px] flex-col items-center space-y-6">
+    <div className="flex max-w-[460px] flex-col items-center gap-6">
       <h1 className="text-center font-medium text-2xl">
         Create a new workspace
       </h1>

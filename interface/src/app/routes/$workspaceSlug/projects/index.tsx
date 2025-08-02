@@ -16,7 +16,13 @@ import {
   DialogMain,
   DialogTrigger,
 } from "@mason/ui/dialog";
-import { Form, FormControl, FormField, FormItem } from "@mason/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@mason/ui/form";
 import { Icons } from "@mason/ui/icons";
 import { Input } from "@mason/ui/input";
 import { Label } from "@mason/ui/label";
@@ -39,7 +45,7 @@ import {
 import { zodValidator } from "@tanstack/zod-adapter";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { List, ListContent, ListItem } from "~/components/list";
+import { List, ListContent, ListHeader, ListItem } from "~/components/list";
 import { RouteHeader } from "~/components/route-header";
 import { useLiveQuery } from "~/hooks/use-live-query";
 import { getPGliteConnection } from "~/lib/db";
@@ -80,11 +86,12 @@ export const Route = createFileRoute("/$workspaceSlug/_app-layout/projects/")({
   }),
   loader: async ({ abortController, deps }) => {
     const pg = await getPGliteConnection();
+
     const liveWorkspaces = pg.live.query<Workspace>({
       query: `
         SELECT * FROM workspaces WHERE id = $1
       `,
-      params: [rootStore.appStore.workspaceId],
+      params: [rootStore.appStore.activeWorkspaceId],
       signal: abortController.signal,
       offset: 0,
       limit: 100,
@@ -96,7 +103,7 @@ export const Route = createFileRoute("/$workspaceSlug/_app-layout/projects/")({
         WHERE workspace_id = $1 AND name ILIKE $2 
         ORDER BY ${deps.sortBy} ${deps.sortOrder}
       `,
-      params: [rootStore.appStore.workspaceId, `%${deps.search}%`],
+      params: [rootStore.appStore.activeWorkspaceId, `%${deps.search}%`],
       signal: abortController.signal,
       offset: 0,
       limit: 100,
@@ -187,7 +194,8 @@ function CreateProject() {
     resolver: zodResolver(createProjectSchema),
     defaultValues: {
       name: "",
-      workspace_id: rootStore.appStore.workspaceId,
+      workspace_id: rootStore.appStore.activeWorkspaceId,
+      hex_color: "#ffffff",
     },
   });
 
@@ -195,8 +203,8 @@ function CreateProject() {
     // MUTATION
     try {
       await pg.query(
-        "INSERT INTO projects (name, workspace_uuid) VALUES ($1, $2)",
-        [values.name, values.workspace_id],
+        "INSERT INTO projects (name, workspace_id, hex_color) VALUES ($1, $2, $3)",
+        [values.name, values.workspace_id, values.hex_color],
       );
       form.reset();
     } catch (e) {
@@ -236,6 +244,7 @@ function CreateProject() {
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -301,9 +310,9 @@ function Projects() {
   const workspace = workspacesData?.rows[0];
   const projects = projectsData?.rows;
 
-  // if (!workspace) {
-  //   return null;
-  // }
+  if (!workspace) {
+    return null;
+  }
 
   return (
     <div className="flex h-full w-full flex-col">
@@ -327,7 +336,7 @@ function Projects() {
         </div>
       </div>
       <List>
-        {/* <ListHeader>{workspace.name}</ListHeader> */}
+        <ListHeader>{workspace.name}</ListHeader>
         <ListContent>
           {projects?.map((project) => {
             return (

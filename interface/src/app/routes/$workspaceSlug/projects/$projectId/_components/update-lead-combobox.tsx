@@ -13,22 +13,22 @@ import { useState } from "react";
 
 interface UpdateLeadComboboxProps {
   users: User[];
-  leadUuid: Project["lead_uuid"];
-  onChange: (leadUuid: Project["lead_uuid"]) => void;
+  leadId: Project["lead_id"];
+  onChange: (leadId: Project["lead_id"]) => void;
 }
 
 function UpdateLeadCombobox({
   users,
-  leadUuid,
+  leadId,
   onChange,
 }: UpdateLeadComboboxProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const handleSelect = (uuid: Project["lead_uuid"]) => {
-    onChange(uuid);
+  const handleSelect = (id: Project["lead_id"]) => {
+    onChange(id);
     setIsOpen(false);
   };
 
-  const leadUser = users.find(({ uuid }) => uuid === leadUuid);
+  const leadUser = users.find(({ id }) => id === leadId);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -46,16 +46,16 @@ function UpdateLeadCombobox({
               <CommandItem
                 value="unassigned"
                 onSelect={() => handleSelect(null)}
-                isSelected={!leadUuid}
+                isSelected={!leadId}
               >
                 Unassigned
               </CommandItem>
               {users.map((user) => (
                 <CommandItem
-                  key={user.uuid}
+                  key={user.id}
                   value={user.display_name}
-                  onSelect={() => handleSelect(user.uuid)}
-                  isSelected={leadUuid === user.uuid}
+                  onSelect={() => handleSelect(user.id)}
+                  isSelected={leadId === user.id}
                 >
                   {user.display_name}
                 </CommandItem>

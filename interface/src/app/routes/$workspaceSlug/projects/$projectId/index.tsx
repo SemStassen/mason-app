@@ -73,9 +73,13 @@ export const Route = createFileRoute(
 
     const liveUsers = pg.live.query<User>({
       query: `
-        SELECT * FROM users WHERE workspace_id = $1
+        SELECT 
+          u.*
+        FROM members m
+        INNER JOIN users u ON m.user_id = u.id
+        WHERE m.workspace_id = $1 
       `,
-      params: [rootStore.appStore.workspaceId],
+      params: [rootStore.appStore.activeWorkspaceId],
       signal: abortController.signal,
       offset: 0,
       limit: 100,

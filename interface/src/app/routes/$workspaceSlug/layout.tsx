@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 
 export const Route = createFileRoute("/$workspaceSlug/_app-layout")({
   component: AppLayout,
+  beforeLoad: async ({ location }) => {},
 });
 
 function AppLayout() {

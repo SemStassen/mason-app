@@ -33,6 +33,10 @@ const TABLES = [
     value: "users",
   },
   {
+    name: "Members",
+    value: "members",
+  },
+  {
     name: "Projects",
     value: "projects",
   },
@@ -57,7 +61,7 @@ function TableTabsContent() {
   const tableData = useLiveIncrementalQuery(
     `SELECT * FROM ${selectedTable}`,
     [],
-    "uuid",
+    "id",
   );
 
   return (

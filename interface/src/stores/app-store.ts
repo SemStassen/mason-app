@@ -6,13 +6,15 @@ const LOCAL_STORAGE_KEY = "mason:app";
 export type WeekStartDay = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 interface AppSettings {
-  userId: string;
-  startOfWeekDay: WeekStartDay;
+  userId: string | null;
+  workspaceIds: Array<string>;
+  activeWorkspaceId: string | null;
 }
 
 class AppStore {
-  userId = "070b6f5e-77fb-4841-b92b-359646fe1e61";
-  workspaceId = "8964dc14-37d3-4648-8353-b5c378e9559d";
+  public userId: string | null = null;
+  public workspaceIds: Array<string> = [];
+  public activeWorkspaceId: string | null = null;
   startOfWeekDay: WeekStartDay = 1;
 
   constructor() {
@@ -21,8 +23,9 @@ class AppStore {
 
     reaction(
       () => ({
-        userUuid: this.userId,
-        startOfWeekDay: this.startOfWeekDay,
+        userId: this.userId,
+        workspaceIds: this.workspaceIds,
+        activeWorkspaceId: this.activeWorkspaceId,
       }),
       (data) => {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
@@ -30,22 +33,36 @@ class AppStore {
     );
   }
 
-  setStartOfWeekDay(day: WeekStartDay) {
-    this.startOfWeekDay = day;
+  setUserId(userId: string) {
+    this.userId = userId;
+  }
+
+  addWorkspaceId(workspaceId: string) {
+    if (!this.workspaceIds.includes(workspaceId)) {
+      this.workspaceIds.push(workspaceId);
+    }
+  }
+
+  removeWorkspaceId(workspaceId: string) {
+    this.workspaceIds = this.workspaceIds.filter((id) => id !== workspaceId);
+  }
+
+  setActiveWorkspaceId(workspaceId: string) {
+    if (!this.workspaceIds.includes(workspaceId)) {
+      throw new Error("Workspace ID not found in workspace IDs");
+    }
+
+    this.activeWorkspaceId = workspaceId;
   }
 
   loadFromLocalStorage() {
     const app = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (app) {
       const data = JSON.parse(app) as Partial<AppSettings>;
-
-      if (data.userId) {
-        this.userId = data.userId;
-      }
-
-      if (data.startOfWeekDay !== undefined) {
-        this.startOfWeekDay = data.startOfWeekDay;
-      }
+      if (data.userId) this.userId = data.userId;
+      if (data.workspaceIds) this.workspaceIds = data.workspaceIds;
+      if (data.activeWorkspaceId)
+        this.activeWorkspaceId = data.activeWorkspaceId;
     }
   }
 }

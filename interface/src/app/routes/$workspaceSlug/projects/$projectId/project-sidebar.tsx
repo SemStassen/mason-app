@@ -68,7 +68,7 @@ const ProjectSidebar = observer(() => {
                   <PropertyContent>
                     <UpdateLeadCombobox
                       users={users}
-                      leadUuid={project.lead_id}
+                      leadId={project.lead_id}
                       onChange={(val) =>
                         handleMutation({
                           lead_id: val,

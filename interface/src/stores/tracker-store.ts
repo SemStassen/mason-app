@@ -29,7 +29,7 @@ class TrackerStore {
    * This is the current date that is updated every minute.
    */
   currentDate = new Date();
-  private intervalId?: number;
+  private intervalId?: NodeJS.Timeout;
 
   constructor() {
     makeAutoObservable(this);
