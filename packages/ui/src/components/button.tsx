@@ -1,55 +1,66 @@
-import { Slot } from "@radix-ui/react-slot";
-import { type VariantProps, cva } from "class-variance-authority";
+import { mergeProps } from '@base-ui-components/react';
+import { useRender } from '@base-ui-components/react/use-render';
+import { cva, type VariantProps } from 'class-variance-authority';
+import type * as React from 'react';
 
-import { cn } from "../utils";
+import { cn } from '../utils';
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium text-sm outline-none transition-colors focus-visible:ring focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium text-xs outline-none transition-all duration-200 focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-white hover:bg-primary/80",
-        contrast:
-          "bg-contrast-10 text-contrast-60 hover:bg-contrast-20 hover:text-contrast-90",
+        default:
+          'bg-primary text-primary-foreground shadow-xs hover:bg-primary/80',
+        secondary:
+          'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
         ghost:
-          "bg-transparent text-contrast-75 hover:bg-contrast-10 hover:text-contrast-90 group-data-[state='open']/trigger:bg-contrast-10",
+          'text-foreground hover:bg-accent/80 hover:text-accent-foreground',
         outline:
-          "bg-background text-contrast-75 ring ring-border hover:bg-contrast-5 hover:text-contrast-90",
+          'border bg-transparent text-foreground shadow-xs hover:bg-accent/80 hover:text-accent-foreground',
+        link: 'text-foreground hover:underline',
+        destructive:
+          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/80 focus-visible:ring-destructive/50',
       },
       size: {
-        default: "h-9 gap-1 px-4 py-2",
-        sm: "h-8 gap-1 px-3 text-xs",
-        icon: "h-8 w-8 px-0.5 py-0.5 text-sm",
-        lg: "h-10 gap-2 px-4 py-3 text-base",
+        sm: 'h-8 gap-1 px-3',
+        md: 'h-9 px-4',
+        lg: 'h-10 px-5',
+        'icon-sm': "size-8 [&_svg:not([class*='size-'])]:size-3",
+        icon: 'size-9',
+        'icon-lg': "size-10 [&_svg:not([class*='size-'])]:size-5",
       },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default",
+      variant: 'default',
+      size: 'md',
     },
-  },
+  }
 );
 
 export interface ButtonProps
-  extends React.ComponentProps<"button">,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-}
+  extends VariantProps<typeof buttonVariants>,
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    useRender.ComponentProps<'button'> {}
 
-const Button = ({
+function Button({
   className,
   variant,
   size,
-  asChild = false,
+  render = <button type="button" />,
   ...props
-}: ButtonProps) => {
-  const Comp = asChild ? Slot : "button";
-  return (
-    <Comp
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  );
-};
+}: ButtonProps) {
+  const defaultProps = {
+    'data-slot': 'button',
+    className: cn(buttonVariants({ variant, size, className })),
+  } as const;
+
+  const element = useRender({
+    render,
+    props: mergeProps<'button'>(defaultProps, props),
+  });
+
+  return element;
+}
 
 export { Button, buttonVariants };

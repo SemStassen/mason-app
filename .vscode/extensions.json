@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "inlang.vs-code-extension",
+    "tauri-apps.tauri-vscode",
+    "rust-lang.rust-analyzer"
+  ]
+}

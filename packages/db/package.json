@@ -12,26 +12,22 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.3.0",
-    "@electric-sql/pglite-react": "^0.2.18",
-    "@electric-sql/pglite-repl": "^0.2.18",
-    "@electric-sql/pglite-sync": "^0.3.2",
     "@mason/env": "workspace:*",
     "drizzle-orm": "^0.39.3",
-    "pg": "^8.14.1",
-    "postgres": "^3.4.5"
+    "drizzle-zod": "^0.8.2",
+    "pg": "^8.16.3",
+    "zod": "^4.0.14"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.6.0",
+    "@faker-js/faker": "^9.9.0",
     "@mason/config": "workspace:*",
-    "@types/pg": "^8.11.13",
-    "drizzle-kit": "^0.30.4",
+    "@types/pg": "^8.15.5",
+    "drizzle-kit": "^0.30.6",
     "drizzle-seed": "^0.3.1",
-    "typescript": "^5.0.0"
+    "typescript": "workspace:^"
   },
   "exports": {
-    "./client": "./src/client/index.ts",
-    "./server": "./src/server/index.ts",
+    "./db": "./src/db.ts",
     "./schema": "./src/schema.ts"
   }
 }

@@ -1,45 +1,32 @@
-import { Hono } from "hono";
-import { showRoutes } from "hono/dev";
-import { logger } from "hono/logger";
-import { prettyJSON } from "hono/pretty-json";
-import { requestId } from "hono/request-id";
-import { authRoute } from "./routes/auth";
-import { v1Route } from "./routes/v1";
+import { HttpApiBuilder, HttpMiddleware, HttpServer } from '@effect/platform';
+import { BunHttpServer, BunRuntime } from '@effect/platform-bun';
+import { Layer } from 'effect';
+import { MasonApi } from '~/api/contract';
+import { AuthGroupLive } from './api/handlers/auth';
+import { PingGroupLive } from './api/handlers/ping';
+import { WorkspaceGroupLive } from './api/handlers/workspace';
+import { AuthService } from './services/auth';
+import { DatabaseService } from './services/db';
 
-const app = new Hono()
-  /**
-   * Config
-   */
-  .basePath("/api")
-  /**
-   * Middleware
-   */
-  .use("*", requestId())
-  .use("*", logger())
-  .use("*", prettyJSON())
-  /**
-   * TODO: ADD ERROR HANDLER
-   */
+const MasonApiLive = HttpApiBuilder.api(MasonApi)
+  .pipe(
+    Layer.provide(PingGroupLive),
+    Layer.provide(AuthGroupLive),
+    Layer.provide(WorkspaceGroupLive)
+  )
+  .pipe(
+    // Request
+    // Core
+    Layer.provide(AuthService.Default),
+    Layer.provide(DatabaseService.Default)
+  );
 
-  /**
-   * Ping
-   */
-  .get("/ping", (c) => {
-    return c.json({ message: "pong", requestId: c.get("requestId") }, 200);
-  })
-  /*
-   * Routes
-   */
-  .route("/auth", authRoute)
-  .route("/v1", v1Route);
+const HttpLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
+  Layer.provide(HttpApiBuilder.middlewareCors()),
+  Layer.provide(MasonApiLive),
+  HttpServer.withLogAddress,
+  Layer.provide(BunHttpServer.layer({ port: 8001 }))
+);
 
-console.log("Starting server on port 8001");
-
-showRoutes(app, {
-  verbose: true,
-});
-
-const server = { port: 8001, fetch: app.fetch };
-
-export default server;
-export type AppType = typeof app;
+// Launch the server
+Layer.launch(HttpLive).pipe(BunRuntime.runMain);

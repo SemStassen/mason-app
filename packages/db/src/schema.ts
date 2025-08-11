@@ -1,4 +1,3 @@
-import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
   boolean,
   json,
@@ -6,201 +5,224 @@ import {
   timestamp,
   uuid,
   varchar,
-} from "drizzle-orm/pg-core";
+} from 'drizzle-orm/pg-core';
+import { createSchemaFactory } from 'drizzle-zod';
+import z from 'zod';
+import { tableId, tableMetadata } from './snippets';
 
-const tableMetadata = {
-  created_at: timestamp("created_at", {
-    withTimezone: true,
-    precision: 0,
-  })
-    .defaultNow()
-    .notNull(),
-  updated_at: timestamp("updated_at", {
-    withTimezone: true,
-    precision: 0,
-  })
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-};
+const { createInsertSchema, createSelectSchema, createUpdateSchema } =
+  createSchemaFactory({ zodInstance: z });
 
-export type User = InferSelectModel<typeof usersTable>;
-export const usersTable = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const usersTable = pgTable('users', {
+  id: tableId,
   // General
-  display_name: varchar("display_name").notNull(),
-  email: varchar("email").notNull(),
-  email_verified: boolean("email_verified").default(false).notNull(),
-  image_url: varchar("image_url"),
+  displayName: varchar('display_name').notNull(),
+  email: varchar('email').notNull(),
+  emailVerified: boolean('email_verified').default(false).notNull(),
+  imageUrl: varchar('image_url'),
   // Metadata
   ...tableMetadata,
 });
+export const createUserSchema = createInsertSchema(usersTable);
+export const selectUserSchema = createSelectSchema(usersTable);
+export const updateUserSchema = createUpdateSchema(usersTable);
+export type User = z.infer<typeof selectUserSchema>;
 
-export const sessionsTable = pgTable("sessions", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const sessionsTable = pgTable('sessions', {
+  id: tableId,
   // References
-  user_id: uuid("user_id")
-    .references(() => usersTable.id, { onDelete: "cascade" })
+  userId: uuid('user_id')
+    .references(() => usersTable.id, { onDelete: 'cascade' })
     .notNull(),
   // General
-  session_token: varchar("session_token").notNull(),
-  expires_at: timestamp("expires_at", {
+  sessionToken: varchar('session_token').notNull(),
+  expiresAt: timestamp('expires_at', {
     withTimezone: true,
     precision: 0,
   }).notNull(),
-  ip_address: varchar("ip_address").notNull(),
-  user_agent: varchar("user_agent").notNull(),
-  active_workspace_id: uuid("active_workspace_id"),
+  ipAddress: varchar('ip_address').notNull(),
+  userAgent: varchar('user_agent').notNull(),
+  activeWorkspaceId: uuid('active_workspace_id'),
   // Metadata
   ...tableMetadata,
 });
+export const createSessionSchema = createInsertSchema(sessionsTable);
+export const selectSessionSchema = createSelectSchema(sessionsTable);
+export const updateSessionSchema = createUpdateSchema(sessionsTable);
+export type Session = z.infer<typeof selectSessionSchema>;
 
-export const accountsTable = pgTable("accounts", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const accountsTable = pgTable('accounts', {
+  id: tableId,
   // References
-  user_id: uuid("user_id")
-    .references(() => usersTable.id, { onDelete: "cascade" })
+  userId: uuid('user_id')
+    .references(() => usersTable.id, { onDelete: 'cascade' })
     .notNull(),
   // General
-  account_id: varchar("account_id").notNull(),
-  provider_id: varchar("provider_id").notNull(),
-  access_token: varchar("access_token"),
-  refresh_token: varchar("refresh_token"),
-  access_token_expires_at: timestamp("access_token_expires_at", {
+  accountId: varchar('account_id').notNull(),
+  providerId: varchar('provider_id').notNull(),
+  accessToken: varchar('access_token'),
+  refreshToken: varchar('refresh_token'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at', {
     withTimezone: true,
     precision: 0,
   }),
-  refresh_token_expires_at: timestamp("refresh_token_expires_at", {
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at', {
     withTimezone: true,
     precision: 0,
   }),
-  scope: varchar("scope"),
-  idToken: varchar("id_token"),
-  password: varchar("password"),
+  scope: varchar('scope'),
+  idToken: varchar('id_token'),
+  password: varchar('password'),
   // Metadata
   ...tableMetadata,
 });
+export const createAccountSchema = createInsertSchema(accountsTable);
+export const selectAccountSchema = createSelectSchema(accountsTable);
+export const updateAccountSchema = createUpdateSchema(accountsTable);
+export type Account = z.infer<typeof selectAccountSchema>;
 
-export const verificationsTable = pgTable("verifications", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const verificationsTable = pgTable('verifications', {
+  id: tableId,
   // General
-  identifier: varchar("identifier").notNull(),
-  value: varchar("value").notNull(),
-  expires_at: timestamp("expires_at", {
-    withTimezone: true,
-    precision: 0,
-  }).notNull(),
-  // Metadata
-  ...tableMetadata,
-});
-
-export type Workspace = InferSelectModel<typeof workspacesTable>;
-export const workspacesTable = pgTable("workspaces", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  // General
-  name: varchar("name").notNull(),
-  slug: varchar("slug").notNull(),
-  logo_url: varchar("logo_url"),
-  metadata: varchar("metadata"),
-  // Metadata
-  ...tableMetadata,
-});
-
-export const membersTable = pgTable("members", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  // References
-  user_id: uuid("user_id")
-    .references(() => usersTable.id, { onDelete: "cascade" })
-    .notNull(),
-  workspace_id: uuid("workspace_id")
-    .references(() => workspacesTable.id, { onDelete: "cascade" })
-    .notNull(),
-  // General
-  role: varchar("role").notNull(),
-  // Metadata
-  ...tableMetadata,
-});
-
-export const invitationsTable = pgTable("invitations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  // References
-  inviter_id: uuid("inviter_id")
-    .references(() => usersTable.id, { onDelete: "cascade" })
-    .notNull(),
-  workspace_id: uuid("workspace_id")
-    .references(() => workspacesTable.id, { onDelete: "cascade" })
-    .notNull(),
-  // General
-  email: varchar("email").notNull(),
-  role: varchar("role").notNull(),
-  status: varchar("status").notNull(),
-  expires_at: timestamp("expires_at", {
+  identifier: varchar('identifier').notNull(),
+  value: varchar('value').notNull(),
+  expiresAt: timestamp('expires_at', {
     withTimezone: true,
     precision: 0,
   }).notNull(),
   // Metadata
   ...tableMetadata,
 });
+export const createVerificationSchema = createInsertSchema(verificationsTable);
+export const selectVerificationSchema = createSelectSchema(verificationsTable);
+export const updateVerificationSchema = createUpdateSchema(verificationsTable);
+export type Verification = z.infer<typeof selectVerificationSchema>;
 
-export type InsertProject = InferInsertModel<typeof projectsTable>;
-export type Project = InferSelectModel<typeof projectsTable>;
-export const projectsTable = pgTable("projects", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const workspacesTable = pgTable('workspaces', {
+  id: tableId,
+  // General
+  name: varchar('name').notNull(),
+  slug: varchar('slug').notNull(),
+  logoUrl: varchar('logo_url'),
+  metadata: varchar('metadata'),
+  // Metadata
+  ...tableMetadata,
+});
+export const createWorkspaceSchema = createInsertSchema(workspacesTable);
+export const selectWorkspaceSchema = createSelectSchema(workspacesTable);
+export const updateWorkspaceSchema = createUpdateSchema(workspacesTable);
+export type Workspace = z.infer<typeof selectWorkspaceSchema>;
+
+export const membersTable = pgTable('members', {
+  id: tableId,
   // References
-  workspace_id: uuid("workspace_id")
-    .references(() => workspacesTable.id, { onDelete: "cascade" })
+  userId: uuid('user_id')
+    .references(() => usersTable.id, { onDelete: 'cascade' })
     .notNull(),
-  creator_id: uuid("creator_id").references(() => usersTable.id, {
-    onDelete: "set null",
+  workspaceId: uuid('workspace_id')
+    .references(() => workspacesTable.id, { onDelete: 'cascade' })
+    .notNull(),
+  // General
+  role: varchar('role').notNull(),
+  // Metadata
+  ...tableMetadata,
+});
+export const createMemberSchema = createInsertSchema(membersTable);
+export const selectMemberSchema = createSelectSchema(membersTable);
+export const updateMemberSchema = createUpdateSchema(membersTable);
+export type Member = z.infer<typeof selectMemberSchema>;
+
+export const invitationsTable = pgTable('invitations', {
+  id: tableId,
+  // References
+  inviterId: uuid('inviter_id')
+    .references(() => usersTable.id, { onDelete: 'cascade' })
+    .notNull(),
+  workspaceId: uuid('workspace_id')
+    .references(() => workspacesTable.id, { onDelete: 'cascade' })
+    .notNull(),
+  // General
+  email: varchar('email').notNull(),
+  role: varchar('role').notNull(),
+  status: varchar('status').notNull(),
+  expiresAt: timestamp('expires_at', {
+    withTimezone: true,
+    precision: 0,
+  }).notNull(),
+  // Metadata
+  ...tableMetadata,
+});
+export const createInvitationSchema = createInsertSchema(invitationsTable);
+export const selectInvitationSchema = createSelectSchema(invitationsTable);
+export const updateInvitationSchema = createUpdateSchema(invitationsTable);
+export type Invitation = z.infer<typeof selectInvitationSchema>;
+
+export const projectsTable = pgTable('projects', {
+  id: tableId,
+  // References
+  workspaceId: uuid('workspace_id')
+    .references(() => workspacesTable.id, { onDelete: 'cascade' })
+    .notNull(),
+  creatorId: uuid('creator_id').references(() => usersTable.id, {
+    onDelete: 'set null',
   }),
-  lead_id: uuid("lead_id").references(() => usersTable.id, {
-    onDelete: "set null",
+  leadId: uuid('lead_id').references(() => usersTable.id, {
+    onDelete: 'set null',
   }),
   // General
-  name: varchar("name").notNull(),
-  hex_color: varchar("hex_color").notNull(),
-  is_billable: boolean("is_billable").default(true).notNull(),
-  notes: json("notes").$type<{
+  name: varchar('name').notNull(),
+  hexColor: varchar('hex_color').notNull(),
+  isBillable: boolean('is_billable').default(true).notNull(),
+  notes: json('notes').$type<{
     // Generic object type
     [key: string]: string;
   }>(),
   // Metadata
   ...tableMetadata,
 });
+export const createProjectSchema = createInsertSchema(projectsTable);
+export const selectProjectSchema = createSelectSchema(projectsTable);
+export const updateProjectSchema = createUpdateSchema(projectsTable);
+export type Project = z.infer<typeof selectProjectSchema>;
 
-export type InsertActivity = InferInsertModel<typeof activitiesTable>;
-export type Activity = InferSelectModel<typeof activitiesTable>;
-export const activitiesTable = pgTable("activities", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const activitiesTable = pgTable('activities', {
+  id: tableId,
   // References
-  project_id: uuid("project_id")
-    .references(() => projectsTable.id, { onDelete: "cascade" })
+  projectId: uuid('project_id')
+    .references(() => projectsTable.id, { onDelete: 'cascade' })
     .notNull(),
   // General
-  name: varchar("name").notNull(),
+  name: varchar('name').notNull(),
   // Metadata
   ...tableMetadata,
 });
+export const createActivitySchema = createInsertSchema(activitiesTable);
+export const selectActivitySchema = createSelectSchema(activitiesTable);
+export const updateActivitySchema = createUpdateSchema(activitiesTable);
+export type Activity = z.infer<typeof selectActivitySchema>;
 
-export type TimeEntry = InferSelectModel<typeof timeEntriesTable>;
-export const timeEntriesTable = pgTable("time_entries", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const timeEntriesTable = pgTable('time_entries', {
+  id: tableId,
   // References
-  user_id: uuid("user_id")
-    .references(() => usersTable.id, { onDelete: "cascade" })
+  userId: uuid('user_id')
+    .references(() => usersTable.id, { onDelete: 'cascade' })
     .notNull(),
-  activity_id: uuid("activity_id")
-    .references(() => activitiesTable.id, { onDelete: "cascade" })
+  activityId: uuid('activity_id')
+    .references(() => activitiesTable.id, { onDelete: 'cascade' })
     .notNull(),
   // General
-  started_at: timestamp("started_at", {
+  startedAt: timestamp('started_at', {
     withTimezone: true,
     precision: 0,
   }).notNull(),
-  stopped_at: timestamp("stopped_at", {
+  stoppedAt: timestamp('stopped_at', {
     withTimezone: true,
     precision: 0,
   }),
   // Metadata
   ...tableMetadata,
 });
+export const createTimeEntrySchema = createInsertSchema(timeEntriesTable);
+export const selectTimeEntrySchema = createSelectSchema(timeEntriesTable);
+export const updateTimeEntrySchema = createUpdateSchema(timeEntriesTable);
+export type TimeEntry = z.infer<typeof selectTimeEntrySchema>;

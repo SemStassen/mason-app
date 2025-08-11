@@ -1,0 +1,16 @@
+.openapi-generator-ignore
+apis/AuthApi.ts
+apis/WorkspaceApi.ts
+apis/index.ts
+index.ts
+models/AuthSendEmailVerificationOTP200Response.ts
+models/AuthSendEmailVerificationOTPRequest.ts
+models/AuthSignInWithEmailOTPRequest.ts
+models/HttpApiDecodeError.ts
+models/InternalServerError.ts
+models/Issue.ts
+models/PropertyKey.ts
+models/PropertyKeyAnyOf.ts
+models/WorkspaceCreateWorkspaceRequest.ts
+models/index.ts
+runtime.ts

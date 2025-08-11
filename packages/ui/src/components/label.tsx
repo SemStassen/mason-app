@@ -1,23 +1,24 @@
-import * as LabelPrimitive from "@radix-ui/react-label";
-import { type VariantProps, cva } from "class-variance-authority";
+import { cva, type VariantProps } from 'class-variance-authority';
+import type * as React from 'react';
 
-import { cn } from "../utils";
+import { cn } from '../utils';
 
 const labelVariants = cva(
-  "font-medium text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+  'font-medium text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
 );
 
 export interface LabelProps
-  extends React.ComponentProps<typeof LabelPrimitive.Root>,
+  extends React.ComponentProps<'label'>,
     VariantProps<typeof labelVariants> {}
 
-const Label = ({ className, ...props }: LabelProps) => {
-  return (
-    <LabelPrimitive.Root
-      className={cn(labelVariants(), className)}
-      {...props}
-    />
-  );
+const Label = ({
+  className,
+  'aria-label': ariaLabel,
+  htmlFor,
+  ...props
+}: LabelProps) => {
+  // biome-ignore lint/a11y/noLabelWithoutControl: Fine for now
+  return <label className={cn(labelVariants(), className)} {...props} />;
 };
 
 export { Label, labelVariants };

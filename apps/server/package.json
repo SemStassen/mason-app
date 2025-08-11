@@ -5,19 +5,21 @@
   "scripts": {
     "build": "bun build --outdir=dist src/index.ts",
     "clean": "git clean -xdf node_modules",
-    "dev": "NODE_ENV=development bun run --hot src/index.ts",
+    "dev": "bun run --hot src/index.ts",
     "format": "biome format --write .",
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.5.0",
-    "@mason/auth": "workspace:*",
+    "@effect/platform": "workspace:^",
+    "@effect/platform-bun": "workspace:^",
+    "@effect/rpc": "^0.68.2",
     "@mason/db": "workspace:*",
-    "hono": "^4.7.8",
-    "zod": "^3.24.3"
+    "better-auth": "^1.3.4",
+    "effect": "workspace:^"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "@mason/config": "workspace:*",
+    "typescript": "workspace:^"
   }
 }

@@ -1,89 +1,59 @@
-import { type VariantProps, cva } from "class-variance-authority";
-import { useRef } from "react";
-import { cn } from "../utils";
+import type { Input as BaseInput } from '@base-ui-components/react/input';
+import type * as React from 'react';
 
-const inputVariants = cva(
-  "relative flex w-full rounded-md bg-transparent text-contrast-50 text-sm disabled:cursor-not-allowed disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default:
-          "bg-transparent focus-within:bg-contrast-5 hover:bg-contrast-5",
-        outline:
-          "border border-input focus-within:ring focus-within:ring-primary focus-visible:outline-none",
-      },
-      size: {
-        default: "h-9",
-        sm: "h-8",
-        lg: "h-11 font-semibold text-2xl",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  },
-);
+import { cn } from '../utils';
 
-export interface InputProps
-  extends Omit<React.ComponentProps<"input">, "size" | "prefix">,
-    VariantProps<typeof inputVariants> {
-  prefix?: React.ReactNode;
-  iconLeft?: React.ReactNode;
-  iconRight?: React.ReactNode;
+interface InputProps extends React.ComponentProps<typeof BaseInput> {
+  inputContainerClassName?: string;
+  leadingIcon?: React.ReactNode;
+  trailingIcon?: React.ReactNode;
 }
 
-const Input = ({
+function Input({
+  inputContainerClassName,
   className,
   type,
-  variant,
-  size,
-  prefix,
-  iconLeft,
-  iconRight,
+  leadingIcon,
+  trailingIcon,
   ...props
-}: InputProps) => {
-  const prefixRef = useRef<HTMLSpanElement>(null);
-
+}: InputProps) {
   return (
-    <div className={cn(inputVariants({ variant, size, className }))}>
-      {iconLeft && (
-        <div
-          className="absolute inset-y-0 left-0 flex items-center pl-3"
-          aria-hidden={true}
+    <div
+      className={cn('relative w-full', inputContainerClassName)}
+      data-slot="input-container"
+    >
+      {leadingIcon && (
+        <span
+          className="-translate-y-1/2 absolute top-1/2 left-3 shrink-0 text-muted-foreground [&_svg:not([class*='pointer-events-'])]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0"
+          data-slot="input-leading-icon"
         >
-          {iconLeft}
-        </div>
-      )}
-      {prefix && (
-        <div className="-translate-y-1/2 absolute top-1/2 left-3">
-          <span ref={prefixRef}>{prefix}</span>
-        </div>
+          {leadingIcon}
+        </span>
       )}
       <input
-        type={type}
         className={cn(
-          "w-full cursor-default px-3 text-foreground placeholder:text-contrast-50 focus:cursor-text focus:outline-none",
-          iconLeft && "pl-9",
-          iconRight && "pr-9",
+          'flex h-9 w-full min-w-0 rounded-md border bg-input px-3 py-1 text-base shadow-xs outline-none transition-[color,box-shadow] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+          'file:inline-flex file:h-7 file:border-0 file:bg-transparent file:font-medium file:text-foreground file:text-sm',
+          'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+          'aria-invalid:border-destructive aria-invalid:ring-destructive/50',
+          leadingIcon && 'pl-10',
+          trailingIcon && 'pr-10',
+          className
         )}
-        style={{
-          paddingLeft: prefixRef.current
-            ? prefixRef.current.offsetWidth + 12
-            : undefined,
-        }}
+        data-slot="input"
+        type={type}
         {...props}
       />
-      {iconRight && (
-        <div
-          className="absolute inset-y-0 right-0 flex items-center pr-3"
-          aria-hidden={true}
+      {trailingIcon && (
+        <span
+          className="-translate-y-1/2 absolute top-1/2 right-3 shrink-0 text-muted-foreground [&_svg:not([class*='pointer-events-'])]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0"
+          data-slot="input-trailing-icon"
         >
-          {iconRight}
-        </div>
+          {trailingIcon}
+        </span>
       )}
     </div>
   );
-};
+}
 
 export { Input };

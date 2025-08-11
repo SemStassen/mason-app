@@ -1,0 +1,10 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "actions": {
+    "tryAgain": "Try again"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "notFound": "Not found"
+  }
+}
