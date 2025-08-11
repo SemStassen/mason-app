@@ -1,0 +1,30 @@
+{
+  "name": "tauri-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@mason/interface": "workspace:*",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-opener": "^2",
+    "react": "workspace:^",
+    "react-dom": "workspace:^"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "@tailwindcss/vite": "workspace:^",
+    "@tauri-apps/cli": "^2",
+    "@types/react": "workspace:^",
+    "@types/react-dom": "workspace:^",
+    "@vitejs/plugin-react": "workspace:^",
+    "typescript": "~5.8.3",
+    "vite": "workspace:^",
+    "vite-tsconfig-paths": "workspace:^"
+  }
+}

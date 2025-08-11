@@ -1,10 +1,14 @@
 {
   "extends": "@mason/config/base.tsconfig.json",
+  "include": [
+    "src",
+    "../../packages/sdk/src/openapi",
+    "../../packages/sdk/scripts/generate.ts"
+  ],
+  "exclude": ["dist"],
   "compilerOptions": {
     "paths": {
       "~/*": ["./src/*"]
     }
-  },
-  "include": ["src"],
-  "exclude": ["dist"]
+  }
 }

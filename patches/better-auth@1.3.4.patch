@@ -1,0 +1,13 @@
+diff --git a/dist/plugins/email-otp/index.d.ts b/dist/plugins/email-otp/index.d.ts
+index d4e2866ecc3b217055e7d3309af472fc4a2f199b..e999f541f538b72bf28a4b4ecc247f5c92aa1407 100644
+--- a/dist/plugins/email-otp/index.d.ts
++++ b/dist/plugins/email-otp/index.d.ts
+@@ -84,7 +84,7 @@ declare const emailOTP: (options: EmailOTPOptions) => {
+                     user: User;
+                     url: string;
+                     token: string;
+-                }, request: Request | undefined) => Promise<void>) | undefined;
++                }, request: Request | undefined) => Promise<void>);
+             };
+         };
+     };

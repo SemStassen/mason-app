@@ -1,20 +1,13 @@
 {
   "name": "@mason/config",
+  "exports": {
+    "./*": "./src/*"
+  },
   "private": true,
   "scripts": {
     "clean": "git clean -xdf node_modules",
     "format": "biome format --write .",
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"
-  },
-  "devDependencies": {
-    "@tanstack/router-plugin": "^1.114.17",
-    "@vitejs/plugin-react-swc": "^3.8.0",
-    "@tailwindcss/vite": "^4.0.15",
-    "vite-plugin-i18next-loader": "^3.1.2",
-    "vite-tsconfig-paths": "^5.1.4"
-  },
-  "exports": {
-    "./*": "./src/*"
   }
 }

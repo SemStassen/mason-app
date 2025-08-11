@@ -1,37 +1,15 @@
 {
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
+  "$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+  "extends": ["ultracite"],
   "linter": {
-    "ignore": [".wrangler", "node_modules"],
-    "enabled": true,
     "rules": {
-      "recommended": true,
-      "a11y": {
-        "noSvgWithoutTitle": "off",
-        "useKeyWithClickEvents": "off"
-      },
-      "style": {
-        "noNonNullAssertion": "off"
-      },
-      "correctness": {
-        "useExhaustiveDependencies": "off",
-        "noUnusedImports": "warn"
-      },
       "nursery": {
-        "useSortedClasses": {
-          "level": "error",
-          "fix": "safe",
+        "useConsistentObjectDefinition": {
           "options": {
-            "attributes": ["className", "classNames"],
-            "functions": ["cn", "cva"]
+            "syntax": "explicit"
           }
         }
       }
     }
-  },
-  "formatter": {
-    "indentStyle": "space"
   }
 }

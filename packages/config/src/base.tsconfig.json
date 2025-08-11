@@ -3,8 +3,8 @@
   "display": "Default",
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],
-    "target": "ESNext",
     "module": "ESNext",
+    "target": "ES2022",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
@@ -16,11 +16,18 @@
 
     "strict": true,
     "skipLibCheck": true,
+    "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
 
     "experimentalDecorators": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+    "exactOptionalPropertyTypes": true,
+    "plugins": [
+      {
+        "name": "@effect/language-service"
+      }
+    ]
   }
 }

@@ -5,21 +5,25 @@
   "scripts": {
     "build": "vite build",
     "clean": "git clean -xdf node_modules",
-    "dev": "PACKAGE_TYPE=app vite",
+    "dev": "vite dev",
     "format": "biome format --write .",
     "lint": "biome check .",
-    "typecheck": "tsc -noEmit"
+    "typecheck": "tsc -noEmit",
+    "machine-translate": "inlang machine translate --project project.inlang"
   },
   "dependencies": {
     "@mason/interface": "workspace:*",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "workspace:^",
+    "react-dom": "workspace:^"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "typescript": "^5.0.0",
-    "vite": "^6.3.3"
+    "@tailwindcss/vite": "workspace:^",
+    "@types/react": "workspace:^",
+    "@types/react-dom": "workspace:^",
+    "@vitejs/plugin-react": "workspace:^",
+    "typescript": "workspace:^",
+    "vite": "workspace:^",
+    "vite-tsconfig-paths": "workspace:^"
   }
 }

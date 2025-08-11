@@ -1,57 +1,22 @@
-import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group";
-import type { VariantProps } from "class-variance-authority";
+import { ToggleGroup as BaseToggleGroup } from '@base-ui-components/react/toggle-group';
+import type * as React from 'react';
 
-import { createContext, useContext } from "react";
-import { cn } from "../utils";
-import { toggleVariants } from "./toggle";
+import { cn } from '../utils';
 
-const ToggleGroupContext = createContext<VariantProps<typeof toggleVariants>>({
-  size: "default",
-  variant: "default",
-});
-
-const ToggleGroup = ({
+function ToggleGroup({
   className,
-  variant,
-  size,
-  children,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
-  VariantProps<typeof toggleVariants>) => (
-  <ToggleGroupPrimitive.Root
-    className={cn("flex items-center justify-center gap-1", className)}
-    {...props}
-  >
-    <ToggleGroupContext.Provider value={{ variant, size }}>
-      {children}
-    </ToggleGroupContext.Provider>
-  </ToggleGroupPrimitive.Root>
-);
-
-const ToggleGroupItem = ({
-  className,
-  children,
-  variant,
-  size,
-  ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
-  VariantProps<typeof toggleVariants>) => {
-  const context = useContext(ToggleGroupContext);
-
+}: React.ComponentProps<typeof BaseToggleGroup>) {
   return (
-    <ToggleGroupPrimitive.Item
+    <BaseToggleGroup
       className={cn(
-        toggleVariants({
-          variant: context.variant || variant,
-          size: context.size || size,
-        }),
-        className,
+        'flex w-fit items-center shadow-xs [&_*[data-slot=toggle]]:border-y [&_*[data-slot=toggle]]:border-r [&_*[data-slot=toggle]]:first:rounded-r-none [&_*[data-slot=toggle]]:first:border [&_*[data-slot=toggle]]:last:rounded-l-none [&_*[data-slot=toggle]]:last:border-r [&_*[data-slot=toggle]]:[&:not(:first-child):not(:last-child)]:rounded-none',
+        className
       )}
+      data-slot="toggle-group"
       {...props}
-    >
-      {children}
-    </ToggleGroupPrimitive.Item>
+    />
   );
-};
+}
 
-export { ToggleGroup, ToggleGroupItem };
+export { ToggleGroup };
