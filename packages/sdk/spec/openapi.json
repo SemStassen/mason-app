@@ -5,7 +5,113 @@
     "version": "0.0.1"
   },
   "paths": {
-    "/auth/email-otp": {
+    "/api/ping": {
+      "get": {
+        "tags": [
+          "Ping"
+        ],
+        "operationId": "Ping.Ping",
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "The request did not match the expected schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpApiDecodeError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/session": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Auth.GetSession",
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "displayName",
+                        "email",
+                        "emailVerified",
+                        "imageUrl",
+                        "activeWorkspaceId"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "description": "a string at most 100 character(s) long",
+                          "title": "maxLength(100)",
+                          "maxLength": 100
+                        },
+                        "email": {
+                          "$ref": "#/components/schemas/NonEmptyString"
+                        },
+                        "emailVerified": {
+                          "type": "boolean"
+                        },
+                        "imageUrl": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "activeWorkspaceId": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request did not match the expected schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpApiDecodeError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/auth/email-otp": {
       "post": {
         "tags": [
           "Auth"
@@ -43,14 +149,7 @@
             }
           },
           "500": {
-            "description": "InternalServerError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalServerError"
-                }
-              }
-            }
+            "description": "InternalServerError"
           }
         },
         "requestBody": {
@@ -85,7 +184,7 @@
         }
       }
     },
-    "/auth/verify-email": {
+    "/api/auth/verify-email": {
       "post": {
         "tags": [
           "Auth"
@@ -117,20 +216,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HttpApiDecodeError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/HttpApiDecodeError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BadRequest"
+                    }
+                  ]
                 }
               }
             }
           },
           "500": {
-            "description": "InternalServerError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalServerError"
-                }
-              }
-            }
+            "description": "InternalServerError"
           }
         },
         "requestBody": {
@@ -160,7 +259,7 @@
         }
       }
     },
-    "/auth/github": {
+    "/api/auth/github": {
       "post": {
         "tags": [
           "Auth"
@@ -192,25 +291,25 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HttpApiDecodeError"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/HttpApiDecodeError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BadRequest"
+                    }
+                  ]
                 }
               }
             }
           },
           "500": {
-            "description": "InternalServerError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalServerError"
-                }
-              }
-            }
+            "description": "InternalServerError"
           }
         }
       }
     },
-    "/workspace/workspace": {
+    "/api/workspace/workspace": {
       "post": {
         "tags": [
           "Workspace"
@@ -248,14 +347,7 @@
             }
           },
           "500": {
-            "description": "InternalServerError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalServerError"
-                }
-              }
-            }
+            "description": "InternalServerError"
           }
         },
         "requestBody": {
@@ -386,49 +478,24 @@
           }
         ]
       },
-      "InternalServerError": {
-        "type": "object",
-        "required": [
-          "code",
-          "status",
-          "_tag"
-        ],
-        "properties": {
-          "code": {
-            "type": "string",
-            "enum": [
-              "INTERNAL_SERVER_ERROR"
-            ]
-          },
-          "status": {
-            "type": "number",
-            "enum": [
-              500
-            ]
-          },
-          "message": {
-            "type": "string"
-          },
-          "_tag": {
-            "type": "string",
-            "enum": [
-              "InternalServerError"
-            ]
-          }
-        },
-        "additionalProperties": false
-      },
       "NonEmptyString": {
         "type": "string",
         "description": "a non empty string",
         "title": "nonEmptyString",
         "minLength": 1
+      },
+      "BadRequest": {
+        "$id": "/schemas/void",
+        "title": "BadRequest"
       }
     },
     "securitySchemes": {}
   },
   "security": [],
   "tags": [
+    {
+      "name": "Ping"
+    },
     {
       "name": "Auth"
     },

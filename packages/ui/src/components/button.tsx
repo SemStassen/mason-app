@@ -47,7 +47,8 @@ function Button({
   className,
   variant,
   size,
-  render = <button type="button" />,
+  type = 'button',
+  render = <button type={type} />,
   ...props
 }: ButtonProps) {
   const defaultProps = {

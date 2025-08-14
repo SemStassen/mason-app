@@ -1,6 +1,6 @@
 import { createMasonClient } from '@mason/sdk/mason-client';
 
-const masonClient = createMasonClient({
-  basePath: '/api',
+export const masonClient = createMasonClient({
+  basePath: '',
   credentials: 'include',
 });

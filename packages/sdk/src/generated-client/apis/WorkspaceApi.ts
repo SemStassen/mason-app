@@ -17,7 +17,6 @@ import * as runtime from '../runtime';
 import type {
   AuthSendEmailVerificationOTP200Response,
   HttpApiDecodeError,
-  InternalServerError,
   WorkspaceCreateWorkspaceRequest,
 } from '../models/index';
 import {
@@ -25,8 +24,6 @@ import {
     AuthSendEmailVerificationOTP200ResponseToJSON,
     HttpApiDecodeErrorFromJSON,
     HttpApiDecodeErrorToJSON,
-    InternalServerErrorFromJSON,
-    InternalServerErrorToJSON,
     WorkspaceCreateWorkspaceRequestFromJSON,
     WorkspaceCreateWorkspaceRequestToJSON,
 } from '../models/index';
@@ -57,7 +54,7 @@ export class WorkspaceApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/workspace/workspace`;
+        let urlPath = `/api/workspace/workspace`;
 
         const response = await this.request({
             path: urlPath,
@@ -72,8 +69,8 @@ export class WorkspaceApi extends runtime.BaseAPI {
 
     /**
      */
-    async workspaceCreateWorkspace(requestParameters: WorkspaceCreateWorkspaceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthSendEmailVerificationOTP200Response> {
-        const response = await this.workspaceCreateWorkspaceRaw(requestParameters, initOverrides);
+    async workspaceCreateWorkspace(workspaceCreateWorkspaceRequest: WorkspaceCreateWorkspaceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthSendEmailVerificationOTP200Response> {
+        const response = await this.workspaceCreateWorkspaceRaw({ workspaceCreateWorkspaceRequest: workspaceCreateWorkspaceRequest }, initOverrides);
         return await response.value();
     }
 

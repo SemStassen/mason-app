@@ -8,7 +8,7 @@
     "lint": "biome check .",
     "typecheck": "tsc -noEmit",
     "pregenerate": "bun run ./scripts/generate",
-    "generate": "openapi-generator-cli generate -i spec/openapi.json -g typescript-fetch -o src/generated-client --additional-properties=supportsES6=true,useSingleRequestParameter=true,useUnionTypes=true"
+    "generate": "openapi-generator-cli generate -i spec/openapi.json -g typescript-fetch -o src/generated-client --additional-properties=supportsES6=true,useSingleRequestParameter=false,useUnionTypes=true"
   },
   "dependencies": {},
   "devDependencies": {

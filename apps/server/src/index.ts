@@ -8,24 +8,20 @@ import { WorkspaceGroupLive } from './api/handlers/workspace';
 import { AuthService } from './services/auth';
 import { DatabaseService } from './services/db';
 
-const MasonApiLive = HttpApiBuilder.api(MasonApi)
-  .pipe(
-    Layer.provide(PingGroupLive),
-    Layer.provide(AuthGroupLive),
-    Layer.provide(WorkspaceGroupLive)
-  )
-  .pipe(
-    // Request
-    // Core
-    Layer.provide(AuthService.Default),
-    Layer.provide(DatabaseService.Default)
-  );
+const MasonApiLive = HttpApiBuilder.api(MasonApi).pipe(
+  Layer.provide(PingGroupLive),
+  Layer.provide(AuthGroupLive),
+  Layer.provide(WorkspaceGroupLive)
+);
 
 const HttpLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
   Layer.provide(HttpApiBuilder.middlewareCors()),
   Layer.provide(MasonApiLive),
   HttpServer.withLogAddress,
-  Layer.provide(BunHttpServer.layer({ port: 8001 }))
+  Layer.provide(BunHttpServer.layer({ port: 8001 })),
+  // Provide long-lived resources at the outermost level so their scope spans the server lifetime
+  Layer.provide(AuthService.Default),
+  Layer.provide(DatabaseService.Default)
 );
 
 // Launch the server

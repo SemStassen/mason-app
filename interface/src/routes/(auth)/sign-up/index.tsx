@@ -1,30 +1,37 @@
 import { Button } from '@mason/ui/button';
 import { Icons } from '@mason/ui/icons';
-import { Input } from '@mason/ui/input';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@mason/ui/input-otp';
 import { Separator } from '@mason/ui/separator';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 import type React from 'react';
 import { useState } from 'react';
+import { masonClient } from '~/client';
+import { EnterEmailStep } from './-components/enter-email-step';
+import { VerifyEmailStep } from './-components/verify-email-step';
 
 export const Route = createFileRoute('/(auth)/sign-up/')({
   component: SignUpPage,
 });
 
-type ContentState = 'main' | 'email' | 'emailVerification';
+export type SignUpStep = 'chooseMethod' | 'enterEmail' | 'verifyEmail';
 
 function SignUpPage() {
-  const [contentState, setContentState] = useState<ContentState>('main');
+  const [currentStep, setCurrentStep] = useState<SignUpStep>('chooseMethod');
+  // Used to share state between the 'enterEmail' and 'verifyEmail' steps
+  const [email, setEmail] = useState('');
 
-  const content: Record<ContentState, React.ReactElement> = {
-    main: (
+  const handleGithubSignUp = () => {
+    masonClient.auth.authSignInWithGithub();
+  };
+
+  const stepContent: Record<SignUpStep, React.ReactElement> = {
+    chooseMethod: (
       <>
         <div className="space-y-6">
           <h1 className="text-center font-medium text-2xl">
             Create your workspace
           </h1>
-          <Button className="w-full" size="lg">
+          <Button className="w-full" onClick={handleGithubSignUp} size="lg">
             <Icons.Github />
             Continue with Github
           </Button>
@@ -36,7 +43,7 @@ function SignUpPage() {
           <div className="space-y-4">
             <Button
               className="w-full"
-              onClick={() => setContentState('email')}
+              onClick={() => setCurrentStep('enterEmail')}
               size="lg"
               variant="outline"
             >
@@ -55,63 +62,11 @@ function SignUpPage() {
         </div>
       </>
     ),
-    email: (
-      <>
-        <div className="space-y-6">
-          <h1 className="text-center font-medium text-2xl">
-            What's your email address?
-          </h1>
-          <div className="space-y-2">
-            <Input placeholder="Enter your email address..." />
-            <Button
-              className="w-full"
-              onClick={() => setContentState('emailVerification')}
-              size="lg"
-              variant="outline"
-            >
-              <Icons.Mail />
-              Continue with Email
-            </Button>
-          </div>
-        </div>
-        <Button
-          className="text-muted-foreground text-sm"
-          onClick={() => setContentState('main')}
-          variant="link"
-        >
-          Back to login
-        </Button>
-      </>
+    enterEmail: (
+      <EnterEmailStep setCurrentStep={setCurrentStep} setEmail={setEmail} />
     ),
-    emailVerification: (
-      <>
-        <div className="space-y-6">
-          <h1 className="text-center font-medium text-2xl">Check your email</h1>
-          <div className="space-y-2">
-            <InputOTP maxLength={6}>
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
-            <Button className="w-full" size="lg">
-              <Icons.Mail />
-              Continue with login code
-            </Button>
-          </div>
-        </div>
-        <Button
-          className="text-muted-foreground text-sm"
-          onClick={() => setContentState('main')}
-          variant="link"
-        >
-          Back to login
-        </Button>
-      </>
+    verifyEmail: (
+      <VerifyEmailStep email={email} setCurrentStep={setCurrentStep} />
     ),
   };
 
@@ -125,10 +80,10 @@ function SignUpPage() {
         className="flex w-[320px] flex-col items-center gap-8"
         exit={{ opacity: 0, scale: 0.9 }}
         initial={{ opacity: 0, scale: 0.9 }}
-        key={contentState}
+        key={currentStep}
         transition={{ type: 'spring', duration: 0.25 }}
       >
-        {content[contentState]}
+        {stepContent[currentStep]}
       </motion.div>
     </AnimatePresence>
   );
