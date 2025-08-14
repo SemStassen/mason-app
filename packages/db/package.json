@@ -5,14 +5,13 @@
   "scripts": {
     "clean": "git clean -xdf node_modules",
     "db:migrate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push",
+    "db:push": " bun --env-file=.env drizzle-kit push",
     "db:seed": "tsx seed.ts",
     "format": "biome format --write .",
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@mason/env": "workspace:*",
     "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.8.2",
     "pg": "^8.16.3",
@@ -28,6 +27,7 @@
   },
   "exports": {
     "./db": "./src/db.ts",
+    "./operators": "./src/operators.ts",
     "./schema": "./src/schema.ts"
   }
 }

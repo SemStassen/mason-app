@@ -1,9 +1,30 @@
-import { HttpApiEndpoint, HttpApiGroup } from '@effect/platform';
+import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from '@effect/platform';
 import { Schema } from 'effect';
+import { UserResponse } from '~/models/user.model';
 import { regex } from '~/utils/regex';
-import { InternalServerError } from '../error';
 
 export const AuthGroup = HttpApiGroup.make('Auth')
+  .add(
+    HttpApiEndpoint.get('GetSession')`/session`
+      .addSuccess(
+        Schema.Struct({
+          user: Schema.extend(
+            UserResponse.pick(
+              'id',
+              'displayName',
+              'email',
+              'emailVerified',
+              'imageUrl'
+            ),
+            Schema.Struct({
+              activeWorkspaceId: Schema.NullOr(Schema.String),
+            })
+          ),
+        })
+      )
+      .addError(HttpApiError.InternalServerError)
+      .addError(HttpApiError.Unauthorized)
+  )
   .add(
     HttpApiEndpoint.post('SendEmailVerificationOTP')`/email-otp`
       .setPayload(
@@ -17,7 +38,7 @@ export const AuthGroup = HttpApiGroup.make('Auth')
         })
       )
       .addSuccess(Schema.Struct({}))
-      .addError(InternalServerError)
+      .addError(HttpApiError.InternalServerError)
   )
   .add(
     HttpApiEndpoint.post('SignInWithEmailOTP')`/verify-email`
@@ -28,10 +49,12 @@ export const AuthGroup = HttpApiGroup.make('Auth')
         })
       )
       .addSuccess(Schema.Struct({}))
-      .addError(InternalServerError)
+      .addError(HttpApiError.BadRequest)
+      .addError(HttpApiError.InternalServerError)
   )
   .add(
     HttpApiEndpoint.post('SignInWithGithub')`/github`
       .addSuccess(Schema.Struct({}))
-      .addError(InternalServerError)
+      .addError(HttpApiError.BadRequest)
+      .addError(HttpApiError.InternalServerError)
   );

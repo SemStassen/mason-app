@@ -1,3 +1,6 @@
+diff --git a/node_modules/better-auth/.bun-tag-3cf862bc8b617ce2 b/.bun-tag-3cf862bc8b617ce2
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 diff --git a/dist/plugins/email-otp/index.d.ts b/dist/plugins/email-otp/index.d.ts
 index d4e2866ecc3b217055e7d3309af472fc4a2f199b..e999f541f538b72bf28a4b4ecc247f5c92aa1407 100644
 --- a/dist/plugins/email-otp/index.d.ts
@@ -11,3 +14,214 @@ index d4e2866ecc3b217055e7d3309af472fc4a2f199b..e999f541f538b72bf28a4b4ecc247f5c
              };
          };
      };
+diff --git a/dist/plugins/organization/index.d.ts b/dist/plugins/organization/index.d.ts
+index 9f70a8e6ab7fe36ecf1124e07a9cb07c5f85d7a0..00329d4cc4cea3d02a9f1166f5634077baca70ed 100644
+--- a/dist/plugins/organization/index.d.ts
++++ b/dist/plugins/organization/index.d.ts
+@@ -9251,12 +9251,12 @@ declare const organization: <O extends OrganizationOptions>(options?: Organizati
+     };
+     schema: {
+         team?: {
+-            modelName: string | undefined;
++            modelName?: string;
+             fields: {
+                 name: {
+                     type: "string";
+                     required: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 organizationId: {
+                     type: "string";
+@@ -9265,27 +9265,27 @@ declare const organization: <O extends OrganizationOptions>(options?: Organizati
+                         model: string;
+                         field: string;
+                     };
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 createdAt: {
+                     type: "date";
+                     required: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 updatedAt: {
+                     type: "date";
+                     required: false;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+             };
+-        } | undefined;
++        };
+         teamMember?: {
+-            modelName: string | undefined;
++            modelName?: string;
+             fields: {
+                 teamId: {
+                     type: "string";
+                     required: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 userId: {
+                     type: "string";
+@@ -9294,15 +9294,15 @@ declare const organization: <O extends OrganizationOptions>(options?: Organizati
+                         model: string;
+                         field: string;
+                     };
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 createdAt: {
+                     type: "date";
+                     required: false;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+             };
+-        } | undefined;
++        };
+         session: {
+             fields: O["teams"] extends {
+                 enabled: true;
+@@ -9323,39 +9323,39 @@ declare const organization: <O extends OrganizationOptions>(options?: Organizati
+             };
+         };
+         organization: {
+-            modelName: string | undefined;
++            modelName?: string;
+             fields: {
+                 name: {
+                     type: "string";
+                     required: true;
+                     sortable: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 slug: {
+                     type: "string";
+                     unique: true;
+                     sortable: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 logo: {
+                     type: "string";
+                     required: false;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 createdAt: {
+                     type: "date";
+                     required: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 metadata: {
+                     type: "string";
+                     required: false;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+             };
+         };
+         member: {
+-            modelName: string | undefined;
++            modelName?: string;
+             fields: {
+                 organizationId: {
+                     type: "string";
+@@ -9364,12 +9364,12 @@ declare const organization: <O extends OrganizationOptions>(options?: Organizati
+                         model: string;
+                         field: string;
+                     };
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 userId: {
+                     type: "string";
+                     required: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                     references: {
+                         model: string;
+                         field: string;
+@@ -9380,29 +9380,29 @@ declare const organization: <O extends OrganizationOptions>(options?: Organizati
+                     required: true;
+                     sortable: true;
+                     defaultValue: string;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 createdAt: {
+                     type: "date";
+                     required: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+             };
+         };
+         invitation: {
+-            modelName: string | undefined;
++            modelName?: string;
+             fields: {
+                 status: {
+                     type: "string";
+                     required: true;
+                     sortable: true;
+                     defaultValue: string;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 expiresAt: {
+                     type: "date";
+                     required: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 inviterId: {
+                     type: "string";
+@@ -9410,15 +9410,15 @@ declare const organization: <O extends OrganizationOptions>(options?: Organizati
+                         model: string;
+                         field: string;
+                     };
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                     required: true;
+                 };
+                 teamId?: {
+                     type: "string";
+                     required: false;
+                     sortable: true;
+-                    fieldName: string | undefined;
+-                } | undefined;
++                    fieldName?: string;
++                };
+                 organizationId: {
+                     type: "string";
+                     required: true;
+@@ -9426,19 +9426,19 @@ declare const organization: <O extends OrganizationOptions>(options?: Organizati
+                         model: string;
+                         field: string;
+                     };
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 email: {
+                     type: "string";
+                     required: true;
+                     sortable: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+                 role: {
+                     type: "string";
+                     required: false;
+                     sortable: true;
+-                    fieldName: string | undefined;
++                    fieldName?: string;
+                 };
+             };
+         };

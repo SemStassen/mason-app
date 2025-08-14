@@ -1,7 +1,10 @@
-import { HttpApiBuilder, HttpServerResponse } from '@effect/platform';
+import {
+  HttpApiBuilder,
+  HttpApiError,
+  HttpServerResponse,
+} from '@effect/platform';
 import { Effect } from 'effect';
 import { MasonApi } from '~/api/contract';
-import { InternalServerError } from '~/api/contract/error';
 
 export const WorkspaceGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -11,16 +14,7 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
       return handlers.handle('CreateWorkspace', () =>
         Effect.gen(function* () {
           return yield* HttpServerResponse.empty();
-        }).pipe(
-          Effect.mapError(
-            () =>
-              new InternalServerError({
-                code: 'INTERNAL_SERVER_ERROR',
-                status: 500,
-                message: 'Auth error',
-              })
-          )
-        )
+        }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
       );
     })
 );

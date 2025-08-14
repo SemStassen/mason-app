@@ -9,6 +9,7 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "@mason/sdk": "workspace:*",
     "@mason/ui": "workspace:*",
     "@tanstack/react-query": "^5.84.1",
@@ -17,7 +18,9 @@
     "@tanstack/react-start": "^1.130.15",
     "motion": "^12.23.12",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.62.0",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@inlang/cli": "^3.0.12",

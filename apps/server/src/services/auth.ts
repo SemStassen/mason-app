@@ -1,6 +1,9 @@
-import { betterAuth } from 'better-auth';
+import { eq } from '@mason/db/operators';
+// biome-ignore lint/performance/noNamespaceImport: Needed for schema
+import * as schema from '@mason/db/schema';
+import { type BetterAuthOptions, betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { emailOTP } from 'better-auth/plugins';
+import { customSession, emailOTP, organization } from 'better-auth/plugins';
 import { Config, Data, Effect } from 'effect';
 import { DatabaseService } from './db';
 
@@ -21,13 +24,14 @@ export class AuthService extends Effect.Service<AuthService>()(
 
       const db = yield* DatabaseService;
 
-      const betterAuthClient = betterAuth({
+      // This is required for the type inference to work in the customSession plugin
+      const betterAuthOptions = {
         appName: 'Mason',
         database: drizzleAdapter(db._drizzle, {
           provider: 'pg',
-          usePlural: true,
+          schema: schema,
         }),
-        trustedOrigins: ['http://localhost:8002'],
+        trustedOrigins: ['http://localhost:8002', 'http://localhost:8001'],
         advanced: {
           database: {
             generateId: false,
@@ -46,33 +50,86 @@ export class AuthService extends Effect.Service<AuthService>()(
         },
         // Schema
         user: {
-          modelName: 'users',
+          modelName: 'usersTable',
           fields: {
             image: 'imageUrl',
+            name: 'displayName',
           },
         },
         session: {
           cookieCache: {
             enabled: true,
-            maxAge: 5 * 60,
+            maxAge: 4 * 60 * 60,
           },
-          modelName: 'sessions',
+          updateAge: 2 * 60 * 60,
+          modelName: 'sessionsTable',
           fields: {
             token: 'sessionToken',
           },
         },
         account: {
-          modelName: 'accounts',
+          modelName: 'accountsTable',
         },
         verification: {
-          modelName: 'verifications',
+          modelName: 'verificationsTable',
         },
         plugins: [
           emailOTP({
             async sendVerificationOTP({ email, otp, type }) {
-              await console.log(email, otp, type);
+              return await Effect.runPromise(
+                Effect.gen(function* () {
+                  yield* Effect.log({ email, otp, type });
+                })
+              );
             },
           }),
+          organization({
+            schema: {
+              organization: {
+                modelName: 'workspacesTable',
+                fields: {
+                  logo: 'logoUrl',
+                },
+              },
+              member: {
+                modelName: 'membersTable',
+                fields: {
+                  organizationId: 'workspaceId',
+                },
+              },
+              invitation: {
+                modelName: 'invitationsTable',
+                fields: {
+                  organizationId: 'workspaceId',
+                },
+              },
+              session: {
+                fields: {
+                  activeOrganizationId: 'activeWorkspaceId',
+                },
+              },
+            },
+          }),
+        ],
+      } satisfies BetterAuthOptions;
+
+      const betterAuthClient = betterAuth({
+        ...betterAuthOptions,
+        plugins: [
+          ...betterAuthOptions.plugins,
+          customSession(async ({ user, session }) => {
+            return await Effect.runPromise(
+              Effect.gen(function* () {
+                yield db.use((conn) =>
+                  conn.query.usersTable.findFirst({
+                    where: eq(schema.usersTable.id, user.id),
+                  })
+                );
+
+                return { user, session };
+              })
+            );
+          }, betterAuthOptions),
         ],
       });
 

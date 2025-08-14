@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as WorkspaceSlugIndexRouteImport } from './routes/$workspaceSlug/index'
 import { Route as WorkspaceSlugLayoutRouteImport } from './routes/$workspaceSlug/layout'
+import { Route as onboardingCreateWorkspaceIndexRouteImport } from './routes/(onboarding)/create-workspace/index'
 import { Route as authSignUpIndexRouteImport } from './routes/(auth)/sign-up/index'
 import { Route as authSignInIndexRouteImport } from './routes/(auth)/sign-in/index'
 
@@ -29,6 +30,12 @@ const WorkspaceSlugLayoutRoute = WorkspaceSlugLayoutRouteImport.update({
   path: '/$workspaceSlug/layout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const onboardingCreateWorkspaceIndexRoute =
+  onboardingCreateWorkspaceIndexRouteImport.update({
+    id: '/(onboarding)/create-workspace/',
+    path: '/create-workspace/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const authSignUpIndexRoute = authSignUpIndexRouteImport.update({
   id: '/sign-up/',
   path: '/sign-up/',
@@ -46,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/$workspaceSlug': typeof WorkspaceSlugIndexRoute
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
+  '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof authRouteRouteWithChildren
@@ -53,6 +61,7 @@ export interface FileRoutesByTo {
   '/$workspaceSlug': typeof WorkspaceSlugIndexRoute
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
+  '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,6 +70,7 @@ export interface FileRoutesById {
   '/$workspaceSlug/': typeof WorkspaceSlugIndexRoute
   '/(auth)/sign-in/': typeof authSignInIndexRoute
   '/(auth)/sign-up/': typeof authSignUpIndexRoute
+  '/(onboarding)/create-workspace/': typeof onboardingCreateWorkspaceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -70,6 +80,7 @@ export interface FileRouteTypes {
     | '/$workspaceSlug'
     | '/sign-in'
     | '/sign-up'
+    | '/create-workspace'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -77,6 +88,7 @@ export interface FileRouteTypes {
     | '/$workspaceSlug'
     | '/sign-in'
     | '/sign-up'
+    | '/create-workspace'
   id:
     | '__root__'
     | '/(auth)'
@@ -84,12 +96,14 @@ export interface FileRouteTypes {
     | '/$workspaceSlug/'
     | '/(auth)/sign-in/'
     | '/(auth)/sign-up/'
+    | '/(onboarding)/create-workspace/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   authRouteRoute: typeof authRouteRouteWithChildren
   WorkspaceSlugLayoutRoute: typeof WorkspaceSlugLayoutRoute
   WorkspaceSlugIndexRoute: typeof WorkspaceSlugIndexRoute
+  onboardingCreateWorkspaceIndexRoute: typeof onboardingCreateWorkspaceIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -113,6 +127,13 @@ declare module '@tanstack/react-router' {
       path: '/$workspaceSlug/layout'
       fullPath: '/$workspaceSlug/layout'
       preLoaderRoute: typeof WorkspaceSlugLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(onboarding)/create-workspace/': {
+      id: '/(onboarding)/create-workspace/'
+      path: '/create-workspace'
+      fullPath: '/create-workspace'
+      preLoaderRoute: typeof onboardingCreateWorkspaceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/sign-up/': {
@@ -150,6 +171,7 @@ const rootRouteChildren: RootRouteChildren = {
   authRouteRoute: authRouteRouteWithChildren,
   WorkspaceSlugLayoutRoute: WorkspaceSlugLayoutRoute,
   WorkspaceSlugIndexRoute: WorkspaceSlugIndexRoute,
+  onboardingCreateWorkspaceIndexRoute: onboardingCreateWorkspaceIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

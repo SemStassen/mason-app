@@ -15,13 +15,15 @@
 
 import * as runtime from '../runtime';
 import type {
+  AuthGetSession200Response,
   AuthSendEmailVerificationOTP200Response,
   AuthSendEmailVerificationOTPRequest,
   AuthSignInWithEmailOTPRequest,
   HttpApiDecodeError,
-  InternalServerError,
 } from '../models/index';
 import {
+    AuthGetSession200ResponseFromJSON,
+    AuthGetSession200ResponseToJSON,
     AuthSendEmailVerificationOTP200ResponseFromJSON,
     AuthSendEmailVerificationOTP200ResponseToJSON,
     AuthSendEmailVerificationOTPRequestFromJSON,
@@ -30,8 +32,6 @@ import {
     AuthSignInWithEmailOTPRequestToJSON,
     HttpApiDecodeErrorFromJSON,
     HttpApiDecodeErrorToJSON,
-    InternalServerErrorFromJSON,
-    InternalServerErrorToJSON,
 } from '../models/index';
 
 export interface AuthSendEmailVerificationOTPOperationRequest {
@@ -46,6 +46,33 @@ export interface AuthSignInWithEmailOTPOperationRequest {
  * 
  */
 export class AuthApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async authGetSessionRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthGetSession200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/auth/session`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AuthGetSession200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async authGetSession(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthGetSession200Response> {
+        const response = await this.authGetSessionRaw(initOverrides);
+        return await response.value();
+    }
 
     /**
      */
@@ -64,7 +91,7 @@ export class AuthApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/auth/email-otp`;
+        let urlPath = `/api/auth/email-otp`;
 
         const response = await this.request({
             path: urlPath,
@@ -79,8 +106,8 @@ export class AuthApi extends runtime.BaseAPI {
 
     /**
      */
-    async authSendEmailVerificationOTP(requestParameters: AuthSendEmailVerificationOTPOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthSendEmailVerificationOTP200Response> {
-        const response = await this.authSendEmailVerificationOTPRaw(requestParameters, initOverrides);
+    async authSendEmailVerificationOTP(authSendEmailVerificationOTPRequest: AuthSendEmailVerificationOTPRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthSendEmailVerificationOTP200Response> {
+        const response = await this.authSendEmailVerificationOTPRaw({ authSendEmailVerificationOTPRequest: authSendEmailVerificationOTPRequest }, initOverrides);
         return await response.value();
     }
 
@@ -101,7 +128,7 @@ export class AuthApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/auth/verify-email`;
+        let urlPath = `/api/auth/verify-email`;
 
         const response = await this.request({
             path: urlPath,
@@ -116,8 +143,8 @@ export class AuthApi extends runtime.BaseAPI {
 
     /**
      */
-    async authSignInWithEmailOTP(requestParameters: AuthSignInWithEmailOTPOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthSendEmailVerificationOTP200Response> {
-        const response = await this.authSignInWithEmailOTPRaw(requestParameters, initOverrides);
+    async authSignInWithEmailOTP(authSignInWithEmailOTPRequest: AuthSignInWithEmailOTPRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthSendEmailVerificationOTP200Response> {
+        const response = await this.authSignInWithEmailOTPRaw({ authSignInWithEmailOTPRequest: authSignInWithEmailOTPRequest }, initOverrides);
         return await response.value();
     }
 
@@ -129,7 +156,7 @@ export class AuthApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/auth/github`;
+        let urlPath = `/api/auth/github`;
 
         const response = await this.request({
             path: urlPath,
