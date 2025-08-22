@@ -3,7 +3,9 @@
   "include": [
     "src",
     "../../packages/sdk/src/openapi",
-    "../../packages/sdk/scripts/generate.ts"
+    "../../packages/sdk/scripts/generate.ts",
+    "../../packages/core/src/api",
+    "../../packages/core/src/services"
   ],
   "exclude": ["dist"],
   "compilerOptions": {

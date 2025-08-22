@@ -1,4 +1,4 @@
-import { MasonInterfaceRoot } from '@mason/interface';
+import { MasonInterfaceRoot, PlatformProvider } from '@mason/interface';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -13,7 +13,13 @@ if (!rootElement.innerHTML) {
 function App() {
   return (
     <StrictMode>
-      <MasonInterfaceRoot />
+      <PlatformProvider
+        value={{
+          platform: 'web',
+        }}
+      >
+        <MasonInterfaceRoot />
+      </PlatformProvider>
     </StrictMode>
   );
 }

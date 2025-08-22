@@ -2,10 +2,11 @@ import { Button } from '@mason/ui/button';
 import { Icons } from '@mason/ui/icons';
 import { Separator } from '@mason/ui/separator';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { Effect } from 'effect';
 import { AnimatePresence, motion } from 'motion/react';
 import type React from 'react';
 import { useState } from 'react';
-import { masonClient } from '~/client';
+import { useMasonClient } from '~/client';
 import { EnterEmailStep } from './-components/enter-email-step';
 import { VerifyEmailStep } from './-components/verify-email-step';
 
@@ -16,12 +17,17 @@ export const Route = createFileRoute('/(auth)/sign-up/')({
 export type SignUpStep = 'chooseMethod' | 'enterEmail' | 'verifyEmail';
 
 function SignUpPage() {
+  const MasonClient = useMasonClient();
   const [currentStep, setCurrentStep] = useState<SignUpStep>('chooseMethod');
   // Used to share state between the 'enterEmail' and 'verifyEmail' steps
   const [email, setEmail] = useState('');
 
-  const handleGithubSignUp = () => {
-    masonClient.auth.authSignInWithGithub();
+  const handleGoogleSignUp = async () => {
+    await Effect.runPromise(
+      MasonClient.OAuth.SignInWithGoogle().pipe(
+        Effect.catchAll(() => Effect.succeed({ error: 'Unexpected error' }))
+      )
+    );
   };
 
   const stepContent: Record<SignUpStep, React.ReactElement> = {
@@ -31,9 +37,9 @@ function SignUpPage() {
           <h1 className="text-center font-medium text-2xl">
             Create your workspace
           </h1>
-          <Button className="w-full" onClick={handleGithubSignUp} size="lg">
-            <Icons.Github />
-            Continue with Github
+          <Button className="w-full" onClick={handleGoogleSignUp} size="lg">
+            <Icons.Google />
+            Continue with Google
           </Button>
           <Separator className="relative">
             <div className="-translate-x-1/2 -translate-y-1/2 -top-full absolute left-1/2 bg-background px-2">

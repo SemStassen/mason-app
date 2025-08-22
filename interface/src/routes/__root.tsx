@@ -1,33 +1,54 @@
 import { Toaster } from '@mason/ui/sonner';
-import { createRootRoute, Outlet, redirect } from '@tanstack/react-router';
-import { masonClient } from '~/client';
+import {
+  createRootRouteWithContext,
+  Outlet,
+  redirect,
+} from '@tanstack/react-router';
+import { Effect } from 'effect';
+import { createMasonClient } from '~/client';
+import type { Platform } from '~/utils/Platform';
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  platform: Platform;
+}>()({
   component: RootLayout,
-  beforeLoad: async ({ location }) => {
-    try {
-      const res = await masonClient.auth.authGetSession();
-    } catch (e) {
-      console.log(e);
-    }
+  beforeLoad: async ({ location, context }) => {
+    const MasonClient = createMasonClient(context.platform);
 
-    const { user } = await res.value();
-
-    if (!(user || ['/sign-up'].includes(location.pathname))) {
-      throw redirect({
-        to: '/sign-up',
-      });
-    }
-
-    if (
-      !(
-        user.activeWorkspaceId ||
-        location.pathname.includes('/create-workspace')
+    const sessionResult = await Effect.runPromise(
+      MasonClient.Auth.GetSession().pipe(
+        Effect.catchTags({
+          Unauthorized: () => Effect.succeed(null),
+          InternalServerError: () => Effect.succeed(null),
+        }),
+        Effect.catchAll(() => Effect.succeed(null))
       )
-    ) {
-      // If user exists but no active workspace, redirect to create-workspace
+    );
+    // If no session or user, redirect to sign-up (unless already there)
+    if (!sessionResult?.user) {
+      if (!['/sign-up'].includes(location.pathname)) {
+        throw redirect({
+          to: '/sign-up',
+        });
+      }
+      return;
+    }
+    const { user } = sessionResult;
+    // If user exists but no active workspace, redirect to create-workspace
+    if (!user.activeWorkspaceSlug) {
+      if (!['/create-workspace'].includes(location.pathname)) {
+        throw redirect({
+          to: '/create-workspace',
+        });
+      }
+      return;
+    }
+    if (!location.pathname.startsWith(`/${user.activeWorkspaceSlug}`)) {
       throw redirect({
-        to: '/create-workspace',
+        to: '/$workspaceSlug',
+        params: {
+          workspaceSlug: user.activeWorkspaceSlug,
+        },
       });
     }
   },
