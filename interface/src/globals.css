@@ -1,5 +1,5 @@
 @import "tailwindcss";
 @import "@mason/ui/globals.css";
 
-/* biome-ignore lint/nursery/noUnknownAtRule: This is necessary for tailwind to work */
+/* biome-ignore lint/suspicious/noUnknownAtRules: This is necessary for tailwind to work */
 @source "../src";

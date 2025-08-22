@@ -1,27 +1,22 @@
 import { HttpApiBuilder, HttpMiddleware, HttpServer } from '@effect/platform';
 import { BunHttpServer, BunRuntime } from '@effect/platform-bun';
+import { MasonLive } from '@mason/core/instrumentation';
 import { Layer } from 'effect';
-import { MasonApi } from '~/api/contract';
-import { AuthGroupLive } from './api/handlers/auth';
-import { PingGroupLive } from './api/handlers/ping';
-import { WorkspaceGroupLive } from './api/handlers/workspace';
-import { AuthService } from './services/auth';
-import { DatabaseService } from './services/db';
-
-const MasonApiLive = HttpApiBuilder.api(MasonApi).pipe(
-  Layer.provide(PingGroupLive),
-  Layer.provide(AuthGroupLive),
-  Layer.provide(WorkspaceGroupLive)
-);
 
 const HttpLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
-  Layer.provide(HttpApiBuilder.middlewareCors()),
-  Layer.provide(MasonApiLive),
+  Layer.provide(
+    HttpApiBuilder.middlewareCors({
+      allowedOrigins: [
+        'http://localhost:8001',
+        'http://localhost:8002',
+        'http://localhost:1420',
+        'tauri://localhost',
+      ],
+    })
+  ),
+  Layer.provide(MasonLive),
   HttpServer.withLogAddress,
-  Layer.provide(BunHttpServer.layer({ port: 8001 })),
-  // Provide long-lived resources at the outermost level so their scope spans the server lifetime
-  Layer.provide(AuthService.Default),
-  Layer.provide(DatabaseService.Default)
+  Layer.provide(BunHttpServer.layer({ port: 8001 }))
 );
 
 // Launch the server

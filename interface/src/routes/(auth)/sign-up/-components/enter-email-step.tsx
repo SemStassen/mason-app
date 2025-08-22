@@ -10,10 +10,11 @@ import {
 } from '@mason/ui/form';
 import { Icons } from '@mason/ui/icons';
 import { Input } from '@mason/ui/input';
+import { Effect } from 'effect';
 import type { Dispatch, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { masonClient } from '~/client';
+import { useMasonClient } from '~/client';
 import type { SignUpStep } from '..';
 
 const enterEmailSchema = z.object({
@@ -29,6 +30,7 @@ function EnterEmailStep({
   setCurrentStep: Dispatch<SetStateAction<SignUpStep>>;
   setEmail: Dispatch<SetStateAction<string>>;
 }) {
+  const MasonClient = useMasonClient();
   const form = useForm<FormValues>({
     resolver: zodResolver(enterEmailSchema),
     defaultValues: {
@@ -37,12 +39,16 @@ function EnterEmailStep({
   });
 
   const onSubmit = async (data: FormValues) => {
-    await masonClient.auth.authSendEmailVerificationOTPRaw({
-      authSendEmailVerificationOTPRequest: {
-        type: 'sign-in',
-        ...data,
-      },
-    });
+    await Effect.runPromise(
+      MasonClient.Auth.SendEmailVerificationOTP({
+        payload: {
+          ...data,
+          type: 'sign-in',
+        },
+      }).pipe(
+        Effect.catchAll(() => Effect.succeed({ error: 'Unexpected error' }))
+      )
+    );
     setCurrentStep('verifyEmail');
   };
 

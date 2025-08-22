@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as onboardingRouteRouteImport } from './routes/(onboarding)/route'
 import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as WorkspaceSlugIndexRouteImport } from './routes/$workspaceSlug/index'
 import { Route as WorkspaceSlugLayoutRouteImport } from './routes/$workspaceSlug/layout'
@@ -16,6 +17,10 @@ import { Route as onboardingCreateWorkspaceIndexRouteImport } from './routes/(on
 import { Route as authSignUpIndexRouteImport } from './routes/(auth)/sign-up/index'
 import { Route as authSignInIndexRouteImport } from './routes/(auth)/sign-in/index'
 
+const onboardingRouteRoute = onboardingRouteRouteImport.update({
+  id: '/(onboarding)',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const authRouteRoute = authRouteRouteImport.update({
   id: '/(auth)',
   getParentRoute: () => rootRouteImport,
@@ -32,9 +37,9 @@ const WorkspaceSlugLayoutRoute = WorkspaceSlugLayoutRouteImport.update({
 } as any)
 const onboardingCreateWorkspaceIndexRoute =
   onboardingCreateWorkspaceIndexRouteImport.update({
-    id: '/(onboarding)/create-workspace/',
+    id: '/create-workspace/',
     path: '/create-workspace/',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => onboardingRouteRoute,
   } as any)
 const authSignUpIndexRoute = authSignUpIndexRouteImport.update({
   id: '/sign-up/',
@@ -48,7 +53,7 @@ const authSignInIndexRoute = authSignInIndexRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof authRouteRouteWithChildren
+  '/': typeof onboardingRouteRouteWithChildren
   '/$workspaceSlug/layout': typeof WorkspaceSlugLayoutRoute
   '/$workspaceSlug': typeof WorkspaceSlugIndexRoute
   '/sign-in': typeof authSignInIndexRoute
@@ -56,7 +61,7 @@ export interface FileRoutesByFullPath {
   '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof authRouteRouteWithChildren
+  '/': typeof onboardingRouteRouteWithChildren
   '/$workspaceSlug/layout': typeof WorkspaceSlugLayoutRoute
   '/$workspaceSlug': typeof WorkspaceSlugIndexRoute
   '/sign-in': typeof authSignInIndexRoute
@@ -66,6 +71,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(auth)': typeof authRouteRouteWithChildren
+  '/(onboarding)': typeof onboardingRouteRouteWithChildren
   '/$workspaceSlug/layout': typeof WorkspaceSlugLayoutRoute
   '/$workspaceSlug/': typeof WorkspaceSlugIndexRoute
   '/(auth)/sign-in/': typeof authSignInIndexRoute
@@ -92,6 +98,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/(auth)'
+    | '/(onboarding)'
     | '/$workspaceSlug/layout'
     | '/$workspaceSlug/'
     | '/(auth)/sign-in/'
@@ -101,13 +108,20 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   authRouteRoute: typeof authRouteRouteWithChildren
+  onboardingRouteRoute: typeof onboardingRouteRouteWithChildren
   WorkspaceSlugLayoutRoute: typeof WorkspaceSlugLayoutRoute
   WorkspaceSlugIndexRoute: typeof WorkspaceSlugIndexRoute
-  onboardingCreateWorkspaceIndexRoute: typeof onboardingCreateWorkspaceIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/(onboarding)': {
+      id: '/(onboarding)'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof onboardingRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)': {
       id: '/(auth)'
       path: '/'
@@ -134,7 +148,7 @@ declare module '@tanstack/react-router' {
       path: '/create-workspace'
       fullPath: '/create-workspace'
       preLoaderRoute: typeof onboardingCreateWorkspaceIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof onboardingRouteRoute
     }
     '/(auth)/sign-up/': {
       id: '/(auth)/sign-up/'
@@ -167,11 +181,23 @@ const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
   authRouteRouteChildren,
 )
 
+interface onboardingRouteRouteChildren {
+  onboardingCreateWorkspaceIndexRoute: typeof onboardingCreateWorkspaceIndexRoute
+}
+
+const onboardingRouteRouteChildren: onboardingRouteRouteChildren = {
+  onboardingCreateWorkspaceIndexRoute: onboardingCreateWorkspaceIndexRoute,
+}
+
+const onboardingRouteRouteWithChildren = onboardingRouteRoute._addFileChildren(
+  onboardingRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   authRouteRoute: authRouteRouteWithChildren,
+  onboardingRouteRoute: onboardingRouteRouteWithChildren,
   WorkspaceSlugLayoutRoute: WorkspaceSlugLayoutRoute,
   WorkspaceSlugIndexRoute: WorkspaceSlugIndexRoute,
-  onboardingCreateWorkspaceIndexRoute: onboardingCreateWorkspaceIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

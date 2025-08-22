@@ -9,17 +9,21 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
+    "@effect-atom/atom-react": "^0.1.14",
+    "@effect/platform": "workspace:^",
+    "@electric-sql/pglite": "^0.3.7",
     "@hookform/resolvers": "^5.2.1",
-    "@mason/sdk": "workspace:*",
+    "@mason/api-contract": "workspace:*",
     "@mason/ui": "workspace:*",
-    "@tanstack/react-query": "^5.84.1",
     "@tanstack/react-router": "^1.130.12",
     "@tanstack/react-router-devtools": "^1.130.13",
     "@tanstack/react-start": "^1.130.15",
+    "effect": "workspace:^",
     "motion": "^12.23.12",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "workspace:^",
+    "react-dom": "workspace:^",
     "react-hook-form": "^7.62.0",
+    "slug": "^11.0.0",
     "zod": "^4.0.17"
   },
   "devDependencies": {
@@ -28,6 +32,7 @@
     "@mason/config": "workspace:*",
     "@types/react": "workspace:^",
     "@types/react-dom": "workspace:^",
+    "@types/slug": "^5.0.9",
     "typescript": "workspace:^"
   },
   "exports": {

@@ -13,7 +13,7 @@
   "dependencies": {
     "@effect/platform": "workspace:^",
     "@effect/platform-bun": "workspace:^",
-    "@effect/rpc": "^0.68.2",
+    "@mason/core": "workspace:*",
     "@mason/db": "workspace:*",
     "better-auth": "^1.3.4",
     "effect": "workspace:^"

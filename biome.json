@@ -1,15 +1,25 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
   "extends": ["ultracite"],
   "linter": {
     "rules": {
-      "nursery": {
-        "useConsistentObjectDefinition": {
+      "complexity": {
+        "noExcessiveLinesPerFunction": {
           "options": {
-            "syntax": "explicit"
+            "maxLines": 100
+          }
+        },
+        "noExcessiveCognitiveComplexity": {
+          "options": {
+            "maxAllowedComplexity": 50
           }
         }
-      }
+      },
+      "style": {
+        "useConsistentObjectDefinitions": "off",
+        "noMagicNumbers": "off"
+      },
+      "nursery": {}
     }
   }
 }

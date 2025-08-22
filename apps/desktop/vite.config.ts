@@ -7,6 +7,8 @@ const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig({
   root: 'src',
+  // Use a relative base so assets work when loaded from the app bundle (file://)
+  base: './',
   // Prevent Vite from obscuring rust errors
   clearScreen: false,
   // Tauri expects a fixed port, fail if that port is not available

@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import {
   boolean,
   json,
@@ -23,6 +24,12 @@ export const usersTable = pgTable('users', {
   // Metadata
   ...tableMetadata,
 });
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  sessions: many(sessionsTable),
+  accounts: many(accountsTable),
+  memberships: many(membersTable),
+}));
+
 export const createUserSchema = createInsertSchema(usersTable);
 export const selectUserSchema = createSelectSchema(usersTable);
 export const updateUserSchema = createUpdateSchema(usersTable);
@@ -46,6 +53,13 @@ export const sessionsTable = pgTable('sessions', {
   // Metadata
   ...tableMetadata,
 });
+export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [sessionsTable.userId],
+    references: [usersTable.id],
+  }),
+}));
+
 export const createSessionSchema = createInsertSchema(sessionsTable);
 export const selectSessionSchema = createSelectSchema(sessionsTable);
 export const updateSessionSchema = createUpdateSchema(sessionsTable);
@@ -76,6 +90,13 @@ export const accountsTable = pgTable('accounts', {
   // Metadata
   ...tableMetadata,
 });
+export const accountsRelations = relations(accountsTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [accountsTable.userId],
+    references: [usersTable.id],
+  }),
+}));
+
 export const createAccountSchema = createInsertSchema(accountsTable);
 export const selectAccountSchema = createSelectSchema(accountsTable);
 export const updateAccountSchema = createUpdateSchema(accountsTable);
@@ -93,6 +114,8 @@ export const verificationsTable = pgTable('verifications', {
   // Metadata
   ...tableMetadata,
 });
+export const verificationsRelations = relations(verificationsTable, () => ({}));
+
 export const createVerificationSchema = createInsertSchema(verificationsTable);
 export const selectVerificationSchema = createSelectSchema(verificationsTable);
 export const updateVerificationSchema = createUpdateSchema(verificationsTable);
@@ -108,6 +131,12 @@ export const workspacesTable = pgTable('workspaces', {
   // Metadata
   ...tableMetadata,
 });
+export const workspacesRelations = relations(workspacesTable, ({ many }) => ({
+  members: many(membersTable),
+  invitations: many(invitationsTable),
+  projects: many(projectsTable),
+}));
+
 export const createWorkspaceSchema = createInsertSchema(workspacesTable);
 export const selectWorkspaceSchema = createSelectSchema(workspacesTable);
 export const updateWorkspaceSchema = createUpdateSchema(workspacesTable);
@@ -127,6 +156,19 @@ export const membersTable = pgTable('members', {
   // Metadata
   ...tableMetadata,
 });
+export const membersRelations = relations(membersTable, ({ one, many }) => ({
+  user: one(usersTable, {
+    fields: [membersTable.userId],
+    references: [usersTable.id],
+  }),
+  workspace: one(workspacesTable, {
+    fields: [membersTable.workspaceId],
+    references: [workspacesTable.id],
+  }),
+  sentInvitations: many(invitationsTable),
+  timeEntries: many(timeEntriesTable),
+}));
+
 export const createMemberSchema = createInsertSchema(membersTable);
 export const selectMemberSchema = createSelectSchema(membersTable);
 export const updateMemberSchema = createUpdateSchema(membersTable);
@@ -136,7 +178,7 @@ export const invitationsTable = pgTable('invitations', {
   id: tableId,
   // References
   inviterId: uuid('inviter_id')
-    .references(() => usersTable.id, { onDelete: 'cascade' })
+    .references(() => membersTable.id, { onDelete: 'cascade' })
     .notNull(),
   workspaceId: uuid('workspace_id')
     .references(() => workspacesTable.id, { onDelete: 'cascade' })
@@ -152,6 +194,17 @@ export const invitationsTable = pgTable('invitations', {
   // Metadata
   ...tableMetadata,
 });
+export const invitationsRelations = relations(invitationsTable, ({ one }) => ({
+  inviter: one(usersTable, {
+    fields: [invitationsTable.inviterId],
+    references: [usersTable.id],
+  }),
+  workspace: one(workspacesTable, {
+    fields: [invitationsTable.workspaceId],
+    references: [workspacesTable.id],
+  }),
+}));
+
 export const createInvitationSchema = createInsertSchema(invitationsTable);
 export const selectInvitationSchema = createSelectSchema(invitationsTable);
 export const updateInvitationSchema = createUpdateSchema(invitationsTable);
@@ -163,12 +216,6 @@ export const projectsTable = pgTable('projects', {
   workspaceId: uuid('workspace_id')
     .references(() => workspacesTable.id, { onDelete: 'cascade' })
     .notNull(),
-  creatorId: uuid('creator_id').references(() => usersTable.id, {
-    onDelete: 'set null',
-  }),
-  leadId: uuid('lead_id').references(() => usersTable.id, {
-    onDelete: 'set null',
-  }),
   // General
   name: varchar('name').notNull(),
   hexColor: varchar('hex_color').notNull(),
@@ -180,6 +227,14 @@ export const projectsTable = pgTable('projects', {
   // Metadata
   ...tableMetadata,
 });
+export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
+  workspace: one(workspacesTable, {
+    fields: [projectsTable.workspaceId],
+    references: [workspacesTable.id],
+  }),
+  activities: many(activitiesTable),
+}));
+
 export const createProjectSchema = createInsertSchema(projectsTable);
 export const selectProjectSchema = createSelectSchema(projectsTable);
 export const updateProjectSchema = createUpdateSchema(projectsTable);
@@ -196,6 +251,17 @@ export const activitiesTable = pgTable('activities', {
   // Metadata
   ...tableMetadata,
 });
+export const activitiesRelations = relations(
+  activitiesTable,
+  ({ one, many }) => ({
+    project: one(projectsTable, {
+      fields: [activitiesTable.projectId],
+      references: [projectsTable.id],
+    }),
+    timeEntries: many(timeEntriesTable),
+  })
+);
+
 export const createActivitySchema = createInsertSchema(activitiesTable);
 export const selectActivitySchema = createSelectSchema(activitiesTable);
 export const updateActivitySchema = createUpdateSchema(activitiesTable);
@@ -204,8 +270,8 @@ export type Activity = z.infer<typeof selectActivitySchema>;
 export const timeEntriesTable = pgTable('time_entries', {
   id: tableId,
   // References
-  userId: uuid('user_id')
-    .references(() => usersTable.id, { onDelete: 'cascade' })
+  memberId: uuid('member_id')
+    .references(() => membersTable.id, { onDelete: 'cascade' })
     .notNull(),
   activityId: uuid('activity_id')
     .references(() => activitiesTable.id, { onDelete: 'cascade' })
@@ -222,6 +288,17 @@ export const timeEntriesTable = pgTable('time_entries', {
   // Metadata
   ...tableMetadata,
 });
+export const timeEntriesRelations = relations(timeEntriesTable, ({ one }) => ({
+  member: one(membersTable, {
+    fields: [timeEntriesTable.memberId],
+    references: [membersTable.userId],
+  }),
+  activity: one(activitiesTable, {
+    fields: [timeEntriesTable.activityId],
+    references: [activitiesTable.id],
+  }),
+}));
+
 export const createTimeEntrySchema = createInsertSchema(timeEntriesTable);
 export const selectTimeEntrySchema = createSelectSchema(timeEntriesTable);
 export const updateTimeEntrySchema = createUpdateSchema(timeEntriesTable);
