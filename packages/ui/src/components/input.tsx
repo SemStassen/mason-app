@@ -1,5 +1,3 @@
-'use client';
-
 import { Input as BaseInput } from '@base-ui-components/react/input';
 import type * as React from 'react';
 import { useEffect, useRef } from 'react';

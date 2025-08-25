@@ -3,6 +3,7 @@ import { Duration, Effect, Fiber, Schedule } from 'effect';
 import { useEffect } from 'react';
 import { createMasonClient } from '~/client';
 import { usePlatform } from '~/utils/Platform';
+import { Calendar } from './-components/calendar';
 
 function WindowActivityPoller() {
   const platform = usePlatform();
@@ -25,7 +26,7 @@ function WindowActivityPoller() {
   return null;
 }
 
-export const Route = createFileRoute('/$workspaceSlug/')({
+export const Route = createFileRoute('/$workspaceSlug/(with-sidebar)/')({
   beforeLoad: async ({ params, context }) => {
     const MasonClient = createMasonClient(context.platform);
 
@@ -46,14 +47,11 @@ export const Route = createFileRoute('/$workspaceSlug/')({
     return context;
   },
   component: () => {
-    const data = Route.useLoaderData();
     return (
-      <>
-        <WindowActivityPoller />
-        <div className="text-red-500">
-          Dashboard actually for: {data.workspace.name}
-        </div>
-      </>
+      <div className="flex-1">
+        {/* <WindowActivityPoller /> */}
+        <Calendar />
+      </div>
     );
   },
 });

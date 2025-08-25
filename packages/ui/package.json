@@ -49,6 +49,7 @@
     "./label": "./src/components/label.tsx",
     "./popover": "./src/components/popover.tsx",
     "./rich-editor": "./src/components/rich-editor.tsx",
+    "./scroll-area": "./src/components/scroll-area.tsx",
     "./select": "./src/components/select.tsx",
     "./separator": "./src/components/separator.tsx",
     "./sheet": "./src/components/sheet.tsx",
@@ -56,6 +57,7 @@
     "./switch": "./src/components/switch.tsx",
     "./table": "./src/components/table.tsx",
     "./tabs": "./src/components/tabs.tsx",
+    "./theme-provider": "./src/components/theme-provider.tsx",
     "./toggle-group": "./src/components/toggle-group.tsx",
     "./toggle": "./src/components/toggle.tsx",
     "./tooltip": "./src/components/tooltip.tsx"

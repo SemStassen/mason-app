@@ -21,6 +21,9 @@ export default defineConfig({
     outDir: '../dist',
     assetsDir: '.',
   },
+  optimizeDeps: {
+    exclude: ['@electric-sql/pglite'],
+  },
   worker: {
     format: 'es',
   },

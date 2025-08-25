@@ -12,12 +12,15 @@
     "@effect-atom/atom-react": "^0.1.14",
     "@effect/platform": "workspace:^",
     "@electric-sql/pglite": "^0.3.7",
+    "@electric-sql/pglite-repl": "^0.2.25",
     "@hookform/resolvers": "^5.2.1",
     "@mason/api-contract": "workspace:*",
     "@mason/ui": "workspace:*",
     "@tanstack/react-router": "^1.130.12",
     "@tanstack/react-router-devtools": "^1.130.13",
     "@tanstack/react-start": "^1.130.15",
+    "date-fns": "^4.1.0",
+    "drizzle-orm": "workspace:^",
     "effect": "workspace:^",
     "motion": "^12.23.12",
     "react": "workspace:^",
@@ -33,6 +36,7 @@
     "@types/react": "workspace:^",
     "@types/react-dom": "workspace:^",
     "@types/slug": "^5.0.9",
+    "drizzle-kit": "workspace:^",
     "typescript": "workspace:^"
   },
   "exports": {

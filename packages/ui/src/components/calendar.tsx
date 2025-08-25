@@ -70,7 +70,7 @@ function Calendar({
         month_grid: cn('', classNames?.month_grid),
       }}
       components={{
-        // biome-ignore lint/nursery/noNestedComponentDefinitions: Fine for calendar
+        // biome-ignore lint/correctness/noNestedComponentDefinitions: Fine for calendar
         // biome-ignore lint/nursery/noShadow: Fine for calendar
         NextMonthButton: (props) => (
           <button
@@ -84,7 +84,7 @@ function Calendar({
             <Icons.ChevronRight className="size-4" />
           </button>
         ),
-        // biome-ignore lint/nursery/noNestedComponentDefinitions: Fine for calendar
+        // biome-ignore lint/correctness/noNestedComponentDefinitions: Fine for calendar
         // biome-ignore lint/nursery/noShadow: Fine for calendar
         PreviousMonthButton: (props) => (
           <button
