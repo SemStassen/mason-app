@@ -11,11 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as onboardingRouteRouteImport } from './routes/(onboarding)/route'
 import { Route as authRouteRouteImport } from './routes/(auth)/route'
-import { Route as WorkspaceSlugIndexRouteImport } from './routes/$workspaceSlug/index'
-import { Route as WorkspaceSlugLayoutRouteImport } from './routes/$workspaceSlug/layout'
+import { Route as WorkspaceSlugRouteRouteImport } from './routes/$workspaceSlug/route'
+import { Route as WorkspaceSlugSettingsRouteRouteImport } from './routes/$workspaceSlug/settings/route'
+import { Route as WorkspaceSlugwithSidebarRouteRouteImport } from './routes/$workspaceSlug/(with-sidebar)/route'
 import { Route as onboardingCreateWorkspaceIndexRouteImport } from './routes/(onboarding)/create-workspace/index'
 import { Route as authSignUpIndexRouteImport } from './routes/(auth)/sign-up/index'
 import { Route as authSignInIndexRouteImport } from './routes/(auth)/sign-in/index'
+import { Route as WorkspaceSlugSettingsIndexRouteImport } from './routes/$workspaceSlug/settings/index'
+import { Route as WorkspaceSlugwithSidebarIndexRouteImport } from './routes/$workspaceSlug/(with-sidebar)/index'
 
 const onboardingRouteRoute = onboardingRouteRouteImport.update({
   id: '/(onboarding)',
@@ -25,16 +28,22 @@ const authRouteRoute = authRouteRouteImport.update({
   id: '/(auth)',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkspaceSlugIndexRoute = WorkspaceSlugIndexRouteImport.update({
-  id: '/$workspaceSlug/',
-  path: '/$workspaceSlug/',
+const WorkspaceSlugRouteRoute = WorkspaceSlugRouteRouteImport.update({
+  id: '/$workspaceSlug',
+  path: '/$workspaceSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkspaceSlugLayoutRoute = WorkspaceSlugLayoutRouteImport.update({
-  id: '/$workspaceSlug/layout',
-  path: '/$workspaceSlug/layout',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const WorkspaceSlugSettingsRouteRoute =
+  WorkspaceSlugSettingsRouteRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => WorkspaceSlugRouteRoute,
+  } as any)
+const WorkspaceSlugwithSidebarRouteRoute =
+  WorkspaceSlugwithSidebarRouteRouteImport.update({
+    id: '/(with-sidebar)',
+    getParentRoute: () => WorkspaceSlugRouteRoute,
+  } as any)
 const onboardingCreateWorkspaceIndexRoute =
   onboardingCreateWorkspaceIndexRouteImport.update({
     id: '/create-workspace/',
@@ -51,29 +60,46 @@ const authSignInIndexRoute = authSignInIndexRouteImport.update({
   path: '/sign-in/',
   getParentRoute: () => authRouteRoute,
 } as any)
+const WorkspaceSlugSettingsIndexRoute =
+  WorkspaceSlugSettingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => WorkspaceSlugSettingsRouteRoute,
+  } as any)
+const WorkspaceSlugwithSidebarIndexRoute =
+  WorkspaceSlugwithSidebarIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => WorkspaceSlugwithSidebarRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
+  '/$workspaceSlug': typeof WorkspaceSlugRouteRouteWithChildren
   '/': typeof onboardingRouteRouteWithChildren
-  '/$workspaceSlug/layout': typeof WorkspaceSlugLayoutRoute
-  '/$workspaceSlug': typeof WorkspaceSlugIndexRoute
+  '/$workspaceSlug/': typeof WorkspaceSlugwithSidebarIndexRoute
+  '/$workspaceSlug/settings': typeof WorkspaceSlugSettingsRouteRouteWithChildren
+  '/$workspaceSlug/settings/': typeof WorkspaceSlugSettingsIndexRoute
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
   '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof onboardingRouteRouteWithChildren
-  '/$workspaceSlug/layout': typeof WorkspaceSlugLayoutRoute
-  '/$workspaceSlug': typeof WorkspaceSlugIndexRoute
+  '/$workspaceSlug': typeof WorkspaceSlugwithSidebarIndexRoute
+  '/$workspaceSlug/settings': typeof WorkspaceSlugSettingsIndexRoute
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
   '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/$workspaceSlug': typeof WorkspaceSlugRouteRouteWithChildren
   '/(auth)': typeof authRouteRouteWithChildren
   '/(onboarding)': typeof onboardingRouteRouteWithChildren
-  '/$workspaceSlug/layout': typeof WorkspaceSlugLayoutRoute
-  '/$workspaceSlug/': typeof WorkspaceSlugIndexRoute
+  '/$workspaceSlug/(with-sidebar)': typeof WorkspaceSlugwithSidebarRouteRouteWithChildren
+  '/$workspaceSlug/settings': typeof WorkspaceSlugSettingsRouteRouteWithChildren
+  '/$workspaceSlug/(with-sidebar)/': typeof WorkspaceSlugwithSidebarIndexRoute
+  '/$workspaceSlug/settings/': typeof WorkspaceSlugSettingsIndexRoute
   '/(auth)/sign-in/': typeof authSignInIndexRoute
   '/(auth)/sign-up/': typeof authSignUpIndexRoute
   '/(onboarding)/create-workspace/': typeof onboardingCreateWorkspaceIndexRoute
@@ -81,36 +107,40 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/$workspaceSlug/layout'
     | '/$workspaceSlug'
+    | '/'
+    | '/$workspaceSlug/'
+    | '/$workspaceSlug/settings'
+    | '/$workspaceSlug/settings/'
     | '/sign-in'
     | '/sign-up'
     | '/create-workspace'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/$workspaceSlug/layout'
     | '/$workspaceSlug'
+    | '/$workspaceSlug/settings'
     | '/sign-in'
     | '/sign-up'
     | '/create-workspace'
   id:
     | '__root__'
+    | '/$workspaceSlug'
     | '/(auth)'
     | '/(onboarding)'
-    | '/$workspaceSlug/layout'
-    | '/$workspaceSlug/'
+    | '/$workspaceSlug/(with-sidebar)'
+    | '/$workspaceSlug/settings'
+    | '/$workspaceSlug/(with-sidebar)/'
+    | '/$workspaceSlug/settings/'
     | '/(auth)/sign-in/'
     | '/(auth)/sign-up/'
     | '/(onboarding)/create-workspace/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  WorkspaceSlugRouteRoute: typeof WorkspaceSlugRouteRouteWithChildren
   authRouteRoute: typeof authRouteRouteWithChildren
   onboardingRouteRoute: typeof onboardingRouteRouteWithChildren
-  WorkspaceSlugLayoutRoute: typeof WorkspaceSlugLayoutRoute
-  WorkspaceSlugIndexRoute: typeof WorkspaceSlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -129,19 +159,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$workspaceSlug/': {
-      id: '/$workspaceSlug/'
+    '/$workspaceSlug': {
+      id: '/$workspaceSlug'
       path: '/$workspaceSlug'
       fullPath: '/$workspaceSlug'
-      preLoaderRoute: typeof WorkspaceSlugIndexRouteImport
+      preLoaderRoute: typeof WorkspaceSlugRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$workspaceSlug/layout': {
-      id: '/$workspaceSlug/layout'
-      path: '/$workspaceSlug/layout'
-      fullPath: '/$workspaceSlug/layout'
-      preLoaderRoute: typeof WorkspaceSlugLayoutRouteImport
-      parentRoute: typeof rootRouteImport
+    '/$workspaceSlug/settings': {
+      id: '/$workspaceSlug/settings'
+      path: '/settings'
+      fullPath: '/$workspaceSlug/settings'
+      preLoaderRoute: typeof WorkspaceSlugSettingsRouteRouteImport
+      parentRoute: typeof WorkspaceSlugRouteRoute
+    }
+    '/$workspaceSlug/(with-sidebar)': {
+      id: '/$workspaceSlug/(with-sidebar)'
+      path: '/'
+      fullPath: '/$workspaceSlug/'
+      preLoaderRoute: typeof WorkspaceSlugwithSidebarRouteRouteImport
+      parentRoute: typeof WorkspaceSlugRouteRoute
     }
     '/(onboarding)/create-workspace/': {
       id: '/(onboarding)/create-workspace/'
@@ -164,8 +201,64 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSignInIndexRouteImport
       parentRoute: typeof authRouteRoute
     }
+    '/$workspaceSlug/settings/': {
+      id: '/$workspaceSlug/settings/'
+      path: '/'
+      fullPath: '/$workspaceSlug/settings/'
+      preLoaderRoute: typeof WorkspaceSlugSettingsIndexRouteImport
+      parentRoute: typeof WorkspaceSlugSettingsRouteRoute
+    }
+    '/$workspaceSlug/(with-sidebar)/': {
+      id: '/$workspaceSlug/(with-sidebar)/'
+      path: '/'
+      fullPath: '/$workspaceSlug/'
+      preLoaderRoute: typeof WorkspaceSlugwithSidebarIndexRouteImport
+      parentRoute: typeof WorkspaceSlugwithSidebarRouteRoute
+    }
   }
 }
+
+interface WorkspaceSlugwithSidebarRouteRouteChildren {
+  WorkspaceSlugwithSidebarIndexRoute: typeof WorkspaceSlugwithSidebarIndexRoute
+}
+
+const WorkspaceSlugwithSidebarRouteRouteChildren: WorkspaceSlugwithSidebarRouteRouteChildren =
+  {
+    WorkspaceSlugwithSidebarIndexRoute: WorkspaceSlugwithSidebarIndexRoute,
+  }
+
+const WorkspaceSlugwithSidebarRouteRouteWithChildren =
+  WorkspaceSlugwithSidebarRouteRoute._addFileChildren(
+    WorkspaceSlugwithSidebarRouteRouteChildren,
+  )
+
+interface WorkspaceSlugSettingsRouteRouteChildren {
+  WorkspaceSlugSettingsIndexRoute: typeof WorkspaceSlugSettingsIndexRoute
+}
+
+const WorkspaceSlugSettingsRouteRouteChildren: WorkspaceSlugSettingsRouteRouteChildren =
+  {
+    WorkspaceSlugSettingsIndexRoute: WorkspaceSlugSettingsIndexRoute,
+  }
+
+const WorkspaceSlugSettingsRouteRouteWithChildren =
+  WorkspaceSlugSettingsRouteRoute._addFileChildren(
+    WorkspaceSlugSettingsRouteRouteChildren,
+  )
+
+interface WorkspaceSlugRouteRouteChildren {
+  WorkspaceSlugwithSidebarRouteRoute: typeof WorkspaceSlugwithSidebarRouteRouteWithChildren
+  WorkspaceSlugSettingsRouteRoute: typeof WorkspaceSlugSettingsRouteRouteWithChildren
+}
+
+const WorkspaceSlugRouteRouteChildren: WorkspaceSlugRouteRouteChildren = {
+  WorkspaceSlugwithSidebarRouteRoute:
+    WorkspaceSlugwithSidebarRouteRouteWithChildren,
+  WorkspaceSlugSettingsRouteRoute: WorkspaceSlugSettingsRouteRouteWithChildren,
+}
+
+const WorkspaceSlugRouteRouteWithChildren =
+  WorkspaceSlugRouteRoute._addFileChildren(WorkspaceSlugRouteRouteChildren)
 
 interface authRouteRouteChildren {
   authSignInIndexRoute: typeof authSignInIndexRoute
@@ -194,10 +287,9 @@ const onboardingRouteRouteWithChildren = onboardingRouteRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  WorkspaceSlugRouteRoute: WorkspaceSlugRouteRouteWithChildren,
   authRouteRoute: authRouteRouteWithChildren,
   onboardingRouteRoute: onboardingRouteRouteWithChildren,
-  WorkspaceSlugLayoutRoute: WorkspaceSlugLayoutRoute,
-  WorkspaceSlugIndexRoute: WorkspaceSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

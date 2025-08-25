@@ -11,7 +11,13 @@ export default defineConfig({
   base: './',
   // Prevent Vite from obscuring rust errors
   clearScreen: false,
-  // Tauri expects a fixed port, fail if that port is not available
+  // Tauri expects a fixed port, fail if that port is not availablue,
+  optimizeDeps: {
+    exclude: ['@electric-sql/pglite'],
+  },
+  worker: {
+    format: 'es',
+  },
   server: {
     port: 1420,
     strictPort: true,

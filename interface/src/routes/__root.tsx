@@ -7,6 +7,7 @@ import {
 import { Effect } from 'effect';
 import { createMasonClient } from '~/client';
 import type { Platform } from '~/utils/Platform';
+import { AppProviders } from './-app-providers';
 
 export const Route = createRootRouteWithContext<{
   platform: Platform;
@@ -56,9 +57,9 @@ export const Route = createRootRouteWithContext<{
 
 function RootLayout() {
   return (
-    <>
+    <AppProviders>
       <Outlet />
       <Toaster />
-    </>
+    </AppProviders>
   );
 }

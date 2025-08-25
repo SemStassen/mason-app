@@ -23,6 +23,8 @@
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
+    "drizzle-kit": "^0.31.4",
+    "drizzle-orm": "^0.44.4",
     "effect": "^3.17.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
