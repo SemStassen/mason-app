@@ -17,34 +17,31 @@ services:
       - pg:/var/lib/postgresql/data
     networks:
       - internal
+    command:
+      - -c
+      - listen_addresses=*
+      - -c
+      - wal_level=logical
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U postgres -d mason -c 'SELECT uuidv7_generate();'",
-        ]
+      test: ["CMD-SHELL", "pg_isready -U mason"]
       interval: 10s
       timeout: 5s
       retries: 5
-    command: |
-      postgres
-      -c wal_level=logical
-      -c max_wal_senders=10
-      -c max_replication_slots=5
-      -c hot_standby=on
-      -c hot_standby_feedback=on
 
-  # electric:
-  #   image: electricsql/electric:1.0.1
-  #   environment:
-  #     DATABASE_URL: postgresql://mason:password@pg:5432/mason?sslmode=disable
-  #     ELECTRIC_INSECURE: true
-  #   ports:
-  #     - "4027:3000"
-  #   depends_on:
-  #     - pg
-  #   networks:
-  #     - internal
+  electric:
+    image: docker.io/electricsql/electric:latest
+    environment:
+      DATABASE_URL: postgresql://mason:password@pg:5432/mason?sslmode=disable
+      # Not suitable for production. Only use insecure mode in development or if you've otherwise secured the Electric API.
+      # See https://electric-sql.com/docs/guides/security
+      ELECTRIC_INSECURE: true
+    ports:
+      - "5133:5133"
+    networks:
+      - internal
+    depends_on:
+      pg:
+        condition: service_healthy
 
 volumes:
   pg:

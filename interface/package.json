@@ -3,13 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "clean": "git clean -xdf node_modules",
     "format": "biome format --write .",
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@effect-atom/atom-react": "^0.1.14",
+    "@dnd-kit/react": "^0.1.21",
+    "@effect-atom/atom-react": "^0.1.15",
     "@effect/platform": "workspace:^",
     "@electric-sql/pglite": "^0.3.7",
     "@electric-sql/pglite-repl": "^0.2.25",

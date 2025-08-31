@@ -1,4 +1,4 @@
-import { useAtomSet, useAtomValue } from '@effect-atom/atom-react';
+import { useAtomRef } from '@effect-atom/atom-react';
 import { Button } from '@mason/ui/button';
 import {
   DropdownMenu,
@@ -11,12 +11,13 @@ import {
   DropdownMenuTrigger,
 } from '@mason/ui/dropdown-menu';
 import { Icons } from '@mason/ui/icons';
-import { calendarAtom } from '~/atoms/calendar-atoms';
+import {
+  calendarDaysInViewAtom,
+  setCalendarDaysInView,
+} from '~/atoms/calendar-atom';
 
 function OptionsDropdown() {
-  const { daysInView } = useAtomValue(calendarAtom);
-  const setCalendar = useAtomSet(calendarAtom);
-
+  const daysInView = useAtomRef(calendarDaysInViewAtom);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -30,17 +31,13 @@ function OptionsDropdown() {
         <DropdownMenuGroup>
           <DropdownMenuCheckboxItem
             checked={daysInView === 1}
-            onCheckedChange={() =>
-              setCalendar((value) => ({ ...value, daysInView: 1 }))
-            }
+            onCheckedChange={() => setCalendarDaysInView(1)}
           >
             Day view
           </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem
             checked={daysInView === 7}
-            onCheckedChange={() =>
-              setCalendar((value) => ({ ...value, daysInView: 7 }))
-            }
+            onCheckedChange={() => setCalendarDaysInView(7)}
           >
             Week view
           </DropdownMenuCheckboxItem>
@@ -49,41 +46,31 @@ function OptionsDropdown() {
             <DropdownMenuSubContent>
               <DropdownMenuCheckboxItem
                 checked={daysInView === 2}
-                onCheckedChange={() =>
-                  setCalendar((value) => ({ ...value, daysInView: 2 }))
-                }
+                onCheckedChange={() => setCalendarDaysInView(2)}
               >
                 2 Days
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={daysInView === 3}
-                onCheckedChange={() =>
-                  setCalendar((value) => ({ ...value, daysInView: 3 }))
-                }
+                onCheckedChange={() => setCalendarDaysInView(3)}
               >
                 3 Days
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={daysInView === 4}
-                onCheckedChange={() =>
-                  setCalendar((value) => ({ ...value, daysInView: 4 }))
-                }
+                onCheckedChange={() => setCalendarDaysInView(4)}
               >
                 4 Days
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={daysInView === 5}
-                onCheckedChange={() =>
-                  setCalendar((value) => ({ ...value, daysInView: 5 }))
-                }
+                onCheckedChange={() => setCalendarDaysInView(5)}
               >
                 5 Days
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={daysInView === 6}
-                onCheckedChange={() =>
-                  setCalendar((value) => ({ ...value, daysInView: 6 }))
-                }
+                onCheckedChange={() => setCalendarDaysInView(6)}
               >
                 6 Days
               </DropdownMenuCheckboxItem>

@@ -1,24 +1,34 @@
-import { useAtomValue } from '@effect-atom/atom-react';
-import { calendarAtom } from '~/atoms/calendar-atoms';
+import { useAtomRef } from '@effect-atom/atom-react';
+import { calendarViewAtom } from '~/atoms/calendar-atom';
 import { CalendarHeader } from './components/calendar-header';
-import { CalendarMultiDayView } from './components/week-and-day-view/calendar-multi-day-view';
+import { DndProvider } from './components/dnd/dnd-provider';
+import { CalendarMultiDayView } from './components/views/calendar-multi-day-view';
+
+export const CALENDAR_HEADER_HEIGHT_VAR = '--calendar-header-height';
+export const CALENDAR_DAY_HEADER_HEIGHT_VAR = '--calendar-day-header-height';
+export const CALENDAR_HOUR_COLUMN_WIDTH_VAR = '--calendar-hour-column-width';
+export const CALENDAR_HOUR_HEIGHT_VAR = '--calendar-hour-height';
+
+export const FIRST_VISIBLE_HOUR = 0;
+export const LAST_VISIBLE_HOUR = 24;
 
 function Calendar() {
-  const { view } = useAtomValue(calendarAtom);
+  const view = useAtomRef(calendarViewAtom);
 
   return (
     <div
       className="overflow-hidden"
       style={
         {
-          '--calendar-header-height': '48px',
-          '--calendar-day-header-height': '40px',
-          '--calendar-hour-column-width': '72px',
+          [CALENDAR_HEADER_HEIGHT_VAR]: '48px',
+          [CALENDAR_DAY_HEADER_HEIGHT_VAR]: '40px',
+          [CALENDAR_HOUR_COLUMN_WIDTH_VAR]: '72px',
+          [CALENDAR_HOUR_HEIGHT_VAR]: '96px',
         } as React.CSSProperties
       }
     >
       <CalendarHeader />
-      {view === 'days' && <CalendarMultiDayView />}
+      <DndProvider>{view === 'days' && <CalendarMultiDayView />}</DndProvider>
     </div>
   );
 }

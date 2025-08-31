@@ -1,4 +1,4 @@
-import { useAtomSet, useAtomValue } from '@effect-atom/atom-react';
+import { useAtomRef } from '@effect-atom/atom-react';
 import { Repl } from '@electric-sql/pglite-repl';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@mason/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@mason/ui/tabs';
@@ -9,12 +9,15 @@ import { usePlatform } from '~/utils/Platform';
 function DebugSheet() {
   const { platform } = usePlatform();
   const db = usePGlite();
-  const { isOpen } = useAtomValue(debugSheetAtom);
-  const setDebugSheet = useAtomSet(debugSheetAtom);
+  const { isOpen } = useAtomRef(debugSheetAtom);
 
   return (
     <Sheet
-      onOpenChange={(open) => setDebugSheet({ isOpen: open })}
+      onOpenChange={(open) =>
+        debugSheetAtom.update(() => ({
+          isOpen: open,
+        }))
+      }
       open={isOpen}
     >
       <SheetContent side="right">

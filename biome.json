@@ -16,10 +16,21 @@
         }
       },
       "style": {
+        "useConsistentArrayType": {
+          "options": {
+            "syntax": "generic"
+          }
+        },
         "useConsistentObjectDefinitions": "off",
         "noMagicNumbers": "off"
       },
-      "nursery": {}
+      "nursery": {
+        "useMaxParams": {
+          "options": {
+            "max": 4
+          }
+        }
+      }
     }
   }
 }
