@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "clean": "git clean -xdf node_modules",
-    "db:migrate": "drizzle-kit generate",
-    "db:push": " bun --env-file=.env drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx seed.ts",
     "format": "biome format --write .",
     "lint": "biome check .",

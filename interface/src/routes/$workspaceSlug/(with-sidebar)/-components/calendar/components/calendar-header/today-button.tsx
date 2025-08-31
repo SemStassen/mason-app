@@ -1,18 +1,20 @@
-import { useAtomSet, useAtomValue } from '@effect-atom/atom-react';
+import { useAtomRef } from '@effect-atom/atom-react';
 import { Button } from '@mason/ui/button';
 import { isToday } from 'date-fns';
-import { calendarAtom } from '~/atoms/calendar-atoms';
+import {
+  calendarSelectedDateAtom,
+  setCalendarSelectedDate,
+} from '~/atoms/calendar-atom';
 
 function TodayButton() {
-  const { selectedDate } = useAtomValue(calendarAtom);
-  const setCalendar = useAtomSet(calendarAtom);
+  const selectedDate = useAtomRef(calendarSelectedDateAtom);
 
   return (
     <>
       {!isToday(selectedDate) && (
         <Button
           onClick={() => {
-            setCalendar((value) => ({ ...value, selectedDate: new Date() }));
+            setCalendarSelectedDate(new Date());
           }}
           variant="ghost"
         >

@@ -13,7 +13,7 @@ function RouteComponent() {
         <Button
           render={(props) => (
             <Link
-              from="/$workspaceSlug/settings/"
+              from="/$workspaceSlug/settings"
               to="/$workspaceSlug"
               {...props}
             >

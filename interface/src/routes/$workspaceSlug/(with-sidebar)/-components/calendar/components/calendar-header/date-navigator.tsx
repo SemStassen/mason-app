@@ -1,16 +1,18 @@
-import { useAtomSet, useAtomValue } from '@effect-atom/atom-react';
+import { useAtomRef } from '@effect-atom/atom-react';
 import { Button } from '@mason/ui/button';
 import { Calendar } from '@mason/ui/calendar';
 import { Icons } from '@mason/ui/icons';
 import { Popover, PopoverContent, PopoverTrigger } from '@mason/ui/popover';
-import { addDays, subDays } from 'date-fns';
-import { calendarAtom } from '~/atoms/calendar-atoms';
+import {
+  calendarSelectedDateAtom,
+  goToNextPeriod,
+  goToPreviousPeriod,
+  setCalendarSelectedDate,
+} from '~/atoms/calendar-atom';
 import { formatter } from '~/utils/date-time';
 
 function DateNavigator() {
-  const { selectedDate, daysInView } = useAtomValue(calendarAtom);
-  const setCalendar = useAtomSet(calendarAtom);
-
+  const selectedDate = useAtomRef(calendarSelectedDateAtom);
   return (
     <>
       <Popover>
@@ -24,36 +26,16 @@ function DateNavigator() {
         <PopoverContent>
           <Calendar
             mode="single"
-            onSelect={(date) =>
-              date && setCalendar((value) => ({ ...value, selectedDate: date }))
-            }
+            onSelect={(date) => date && setCalendarSelectedDate(date)}
             selected={selectedDate}
           />
         </PopoverContent>
       </Popover>
       <div>
-        <Button
-          onClick={() =>
-            setCalendar((value) => ({
-              ...value,
-              selectedDate: subDays(value.selectedDate, daysInView),
-            }))
-          }
-          size="icon"
-          variant="ghost"
-        >
+        <Button onClick={goToPreviousPeriod} size="icon" variant="ghost">
           <Icons.ChevronLeft />
         </Button>
-        <Button
-          onClick={() =>
-            setCalendar((value) => ({
-              ...value,
-              selectedDate: addDays(value.selectedDate, daysInView),
-            }))
-          }
-          size="icon"
-          variant="ghost"
-        >
+        <Button onClick={goToNextPeriod} size="icon" variant="ghost">
           <Icons.ChevronRight />
         </Button>
       </div>
