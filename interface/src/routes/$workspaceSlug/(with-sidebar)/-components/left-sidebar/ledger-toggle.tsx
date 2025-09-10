@@ -1,29 +1,24 @@
-import { useAtomRef } from '@effect-atom/atom-react';
-import { Button } from '@mason/ui/button';
-import { Icons } from '@mason/ui/icons';
-import { cn } from '@mason/ui/utils';
-import { ledgerAtom } from '~/atoms/ledger-atom';
+import { Result, useAtomSet, useAtomValue } from "@effect-atom/atom-react";
+import { Button } from "@mason/ui/button";
+import { Icons } from "@mason/ui/icons";
+import { ledgerIsActiveAtom, toggleLedgerAtom } from "~/atoms/ledger-atom";
 
 function LedgerToggle() {
-  const { isActive: ledgerIsActive } = useAtomRef(ledgerAtom);
+  const ledgerIsActive = useAtomValue(ledgerIsActiveAtom.subscriptionRef);
+  const toggleLedger = useAtomSet(toggleLedgerAtom.fn);
 
-  return (
-    <Button
-      className="w-full"
-      onClick={() =>
-        ledgerAtom.update(({ isActive, ...props }) => ({
-          ...props,
-          isActive: !isActive,
-        }))
-      }
-      variant="secondary"
-    >
-      <Icons.Circle
-        className={cn(ledgerIsActive ? 'text-green-500' : 'text-red-500')}
-      />
-      Toggle ledger
-    </Button>
-  );
+  return Result.builder(ledgerIsActive)
+    .onSuccess((isActive: boolean) => (
+      <Button
+        className="w-full justify-start"
+        onClick={() => toggleLedger()}
+        variant="ghost"
+      >
+        {isActive ? <Icons.EyeOpen /> : <Icons.EyeClosed />}
+        {isActive ? "Disable tracking" : "activate tracking"}
+      </Button>
+    ))
+    .render();
 }
 
 export { LedgerToggle };

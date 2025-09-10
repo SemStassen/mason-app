@@ -34,7 +34,13 @@ function PopoverArrow({
 function PopoverPositioner({
   ...props
 }: React.ComponentProps<typeof BasePopover.Positioner>) {
-  return <BasePopover.Positioner data-slot="popover-positioner" {...props} />;
+  return (
+    <BasePopover.Positioner
+      className="z-50"
+      data-slot="popover-positioner"
+      {...props}
+    />
+  );
 }
 
 function PopoverHeader({ className, ...props }: React.ComponentProps<'div'>) {
@@ -90,7 +96,7 @@ function PopoverContent({
       <PopoverPositioner align={align} sideOffset={sideOffset}>
         <BasePopover.Popup
           className={cn(
-            '-outline-offset-1 z-50 w-72 origin-[var(--transform-origin)] rounded-md bg-popover p-4 text-popover-foreground shadow-md outline outline-border transition-[transform,scale,opacity] data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
+            '-outline-offset-1 w-72 origin-[var(--transform-origin)] rounded-md bg-popover p-4 text-popover-foreground shadow-md outline outline-border transition-[transform,scale,opacity] data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
             className
           )}
           data-slot="popover-content"

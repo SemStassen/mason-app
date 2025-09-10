@@ -18,7 +18,7 @@ export const OAuthGroup = HttpApiGroup.make('OAuth')
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.get('GoogleCallback')`/google/callback`
-      .addSuccess(Schema.Struct({}))
-      .addError(HttpApiError.InternalServerError)
+    HttpApiEndpoint.get('GoogleCallback')`/google/callback`.addError(
+      HttpApiError.InternalServerError
+    )
   );

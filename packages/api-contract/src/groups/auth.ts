@@ -1,5 +1,6 @@
 import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from '@effect/platform';
 import { UserResponse } from '@mason/core/models/user.model';
+import { WorkspaceResponse } from '@mason/core/models/workspace.model';
 import { regex } from '@mason/core/utils/regex';
 import { Schema } from 'effect';
 
@@ -17,8 +18,12 @@ export const AuthGroup = HttpApiGroup.make('Auth')
               'imageUrl'
             ),
             Schema.Struct({
-              activeWorkspaceId: Schema.NullOr(Schema.String),
-              activeWorkspaceSlug: Schema.NullOr(Schema.String),
+              workspaces: Schema.Array(
+                WorkspaceResponse.pick('id', 'slug', 'name')
+              ),
+              activeWorkspace: Schema.NullOr(
+                WorkspaceResponse.pick('id', 'slug', 'name')
+              ),
             })
           ),
         })
@@ -38,7 +43,6 @@ export const AuthGroup = HttpApiGroup.make('Auth')
           ),
         })
       )
-      .addSuccess(Schema.Struct({}))
       .addError(HttpApiError.InternalServerError)
   )
   .add(
@@ -49,7 +53,11 @@ export const AuthGroup = HttpApiGroup.make('Auth')
           otp: Schema.String,
         })
       )
-      .addSuccess(Schema.Struct({}))
       .addError(HttpApiError.BadRequest)
       .addError(HttpApiError.InternalServerError)
+  )
+  .add(
+    HttpApiEndpoint.post('SignOut')`/sign-out`.addError(
+      HttpApiError.InternalServerError
+    )
   );

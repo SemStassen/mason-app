@@ -3,7 +3,12 @@ import { eq } from '@mason/db/operators';
 import * as schema from '@mason/db/schema';
 import { type BetterAuthOptions, betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { customSession, emailOTP, organization } from 'better-auth/plugins';
+import {
+  bearer,
+  customSession,
+  emailOTP,
+  organization,
+} from 'better-auth/plugins';
 import { Config, Data, Effect } from 'effect';
 import { DatabaseService } from './db';
 
@@ -24,7 +29,7 @@ export class AuthService extends Effect.Service<AuthService>()(
 
       const db = yield* DatabaseService;
 
-      // This is required for the type inference to work in the customSession plugin
+      // This is required to be separate for the type inference to work in the customSession plugin
       const betterAuthOptions = {
         appName: 'Mason',
         database: drizzleAdapter(db._drizzle, {
@@ -79,6 +84,7 @@ export class AuthService extends Effect.Service<AuthService>()(
           modelName: 'verificationsTable',
         },
         plugins: [
+          bearer(),
           emailOTP({
             async sendVerificationOTP({ email, otp, type }) {
               return await Effect.runPromise(

@@ -26,6 +26,22 @@ export const AuthGroupLive = HttpApiBuilder.group(
               return yield* Effect.fail(new HttpApiError.Unauthorized());
             }
 
+            const activeMembership = response.session.activeOrganizationId
+              ? response.user.memberships.find(
+                  (membership) =>
+                    String(membership.workspaceId) ===
+                    String(response.session.activeOrganizationId)
+                )
+              : undefined;
+
+            const activeWorkspace = activeMembership
+              ? {
+                  id: activeMembership.workspace.id,
+                  slug: activeMembership.workspace.slug,
+                  name: activeMembership.workspace.name,
+                }
+              : null;
+
             return {
               user: {
                 id: response.user.id,
@@ -33,9 +49,12 @@ export const AuthGroupLive = HttpApiBuilder.group(
                 emailVerified: response.user.emailVerified,
                 displayName: response.user.displayName,
                 imageUrl: response.user.imageUrl,
-                activeWorkspaceId:
-                  response.session.activeOrganizationId || null,
-                activeWorkspaceSlug: response.activeWorkspaceSlug || null,
+                workspaces: response.user.memberships.map((membership) => ({
+                  id: membership.workspace.id,
+                  slug: membership.workspace.slug,
+                  name: membership.workspace.name,
+                })),
+                activeWorkspace: activeWorkspace,
               },
             };
           }).pipe(
@@ -53,7 +72,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
               })
             );
 
-            return yield* HttpServerResponse.empty({ status: 200 });
+            return yield* HttpServerResponse.empty();
           }).pipe(
             Effect.catchTags({
               BetterAuthError: () => new HttpApiError.InternalServerError(),
@@ -71,9 +90,8 @@ export const AuthGroupLive = HttpApiBuilder.group(
             );
 
             return yield* HttpServerResponse.json(
-              { success: true, user: result.response.user },
+              { user: result.response.user },
               {
-                status: 200,
                 headers: {
                   'set-cookie': result.headers.get('set-cookie') || '',
                 },
@@ -83,6 +101,27 @@ export const AuthGroupLive = HttpApiBuilder.group(
             Effect.catchTags({
               BetterAuthError: () => new HttpApiError.InternalServerError(),
               HttpBodyError: () => new HttpApiError.BadRequest(),
+            })
+          )
+        )
+        .handle('SignOut', ({ request }) =>
+          Effect.gen(function* () {
+            const result = yield* auth.use((client) =>
+              client.api.signOut({
+                headers: request.headers,
+                returnHeaders: true,
+              })
+            );
+
+            return yield* HttpServerResponse.empty({
+              headers: {
+                'set-cookie': result.headers.get('set-cookie') || '', // clears session cookie(s)
+                'cache-control': 'no-store',
+              },
+            });
+          }).pipe(
+            Effect.catchTags({
+              BetterAuthError: () => new HttpApiError.InternalServerError(),
             })
           )
         );

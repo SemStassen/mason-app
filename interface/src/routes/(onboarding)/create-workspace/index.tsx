@@ -1,5 +1,5 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@mason/ui/button';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@mason/ui/button";
 import {
   Form,
   FormControl,
@@ -7,17 +7,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@mason/ui/form';
-import { Input } from '@mason/ui/input';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Effect } from 'effect';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import z from 'zod';
-import { useMasonClient } from '~/client';
-import { slugify } from '~/utils/slugify';
+} from "@mason/ui/form";
+import { Input } from "@mason/ui/input";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Effect } from "effect";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { useMasonClient } from "~/client";
+import { slugify } from "~/utils/slugify";
 
-export const Route = createFileRoute('/(onboarding)/create-workspace/')({
+export const Route = createFileRoute("/(onboarding)/create-workspace/")({
   component: RouteComponent,
 });
 
@@ -32,16 +32,16 @@ function RouteComponent() {
   const form = useForm<FormValues>({
     resolver: zodResolver(createWorkspaceSchema),
     defaultValues: {
-      name: '',
-      slug: '',
+      name: "",
+      slug: "",
     },
   });
 
-  const name = form.watch('name');
+  const name = form.watch("name");
 
   useEffect(() => {
-    if (!form.getFieldState('slug').isDirty) {
-      form.setValue('slug', slugify(name));
+    if (!form.getFieldState("slug").isDirty) {
+      form.setValue("slug", slugify(name));
     }
   }, [form, name]);
 
@@ -54,7 +54,7 @@ function RouteComponent() {
         payload: data,
       }).pipe(
         Effect.matchEffect({
-          onFailure: () => Effect.fail(''),
+          onFailure: () => Effect.fail(""),
           onSuccess: (workspace) =>
             Effect.sync(() => navigate({ to: `/${workspace.slug}` })),
         })
@@ -93,7 +93,6 @@ function RouteComponent() {
                   <Input
                     affixGapPx={0}
                     autoComplete="off"
-                    autoFocus={true}
                     prefix="mason.app/"
                     {...field}
                   />

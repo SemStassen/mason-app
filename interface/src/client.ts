@@ -1,15 +1,19 @@
-import { FetchHttpClient, HttpApiClient } from '@effect/platform';
-import { MasonApi } from '@mason/api-contract';
-import { Effect } from 'effect';
-import { useMemo } from 'react';
-import { router } from '.';
-import { type Platform, usePlatform } from './utils/Platform';
+import { FetchHttpClient, HttpApiClient } from "@effect/platform";
+import { MasonApi } from "@mason/api-contract";
+import { useRouter } from "@tanstack/react-router";
+import { Effect } from "effect";
+import { useMemo } from "react";
+import { router } from ".";
+import type { Platform } from "./utils/platform";
 
 export function createMasonClient(platform: Platform) {
   const client = Effect.runSync(
-    HttpApiClient.make(MasonApi, { baseUrl: 'http://localhost:8002' }).pipe(
+    HttpApiClient.make(MasonApi, {
+      baseUrl: "http://localhost:8002",
+    }).pipe(
       Effect.provide(FetchHttpClient.layer),
-      platform.platform === 'desktop'
+      // Use tauri custom fetch method for desktop apps
+      platform.platform === "desktop"
         ? Effect.provideService(
             FetchHttpClient.Fetch,
             platform.fetch as typeof fetch
@@ -27,7 +31,7 @@ export function createMasonClient(platform: Platform) {
           payload: { platform: platform.platform },
         }).pipe(
           Effect.flatMap(({ url }) =>
-            platform.platform === 'web'
+            platform.platform === "web"
               ? Effect.sync(() => router.navigate({ href: url }))
               : Effect.promise(() => platform.openUrl(url))
           )
@@ -37,6 +41,6 @@ export function createMasonClient(platform: Platform) {
 }
 
 export function useMasonClient(): ReturnType<typeof createMasonClient> {
-  const platform = usePlatform();
+  const platform = useRouter().options.context.platform;
   return useMemo(() => createMasonClient(platform), [platform]);
 }

@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "drizzle-orm": "workspace:^",
-    "drizzle-zod": "^0.8.2",
+    "drizzle-zod": "^0.8.3",
     "pg": "^8.16.3",
     "zod": "^4.0.14"
   },

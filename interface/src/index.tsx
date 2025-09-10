@@ -1,14 +1,24 @@
-import { createRouter, RouterProvider } from '@tanstack/react-router';
-import { useEffect } from 'react';
-import { ErrorPage } from './routes/-error';
-import { NotFoundPage } from './routes/-not-found';
-import { routeTree } from './routeTree.gen';
+import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { StrictMode, useEffect } from "react";
+import ReactDOM from "react-dom/client";
+import { ErrorPage } from "./routes/-error";
+import { NotFoundPage } from "./routes/-not-found";
+import { routeTree } from "./routeTree.gen";
 
-import './globals.css';
+import "./globals.css";
 
-export { PlatformProvider } from './utils/Platform';
+import { Layer } from "effect";
+import { LedgerService } from "./core/services/ledger";
+import { PlatformService } from "./core/services/platform";
+import type { Platform } from "./utils/platform";
 
-import { usePlatform } from './utils/Platform';
+// This is required for Tanstack router to work properly
+declare module "@tanstack/react-router" {
+  // biome-ignore lint/nursery/useConsistentTypeDefinitions: Needed here
+  interface Register {
+    router: typeof router;
+  }
+}
 
 export const router = createRouter({
   routeTree,
@@ -20,35 +30,37 @@ export const router = createRouter({
   },
 });
 
-// This is required for Tanstack router to work properly
-declare module '@tanstack/react-router' {
-  // biome-ignore lint/nursery/useConsistentTypeDefinitions: Needed here
-  interface Register {
-    router: typeof router;
+export let appLayer: Layer.Layer<LedgerService, never, never>;
+
+export function renderMasonInterface({ platform }: { platform: Platform }) {
+  appLayer = LedgerService.Default.pipe(
+    Layer.provide(PlatformService.live(platform))
+  );
+
+  // const appRuntime = Effect.runSync(Effect.scoped(Layer.toRuntime(appLayer)));
+
+  // biome-ignore lint/style/noNonNullAssertion: Fine for root
+  const rootElement = document.getElementById("root")!;
+
+  if (!rootElement.innerHTML) {
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(
+      <StrictMode>
+        <DeepLinkBridge platform={platform} />
+        <RouterProvider
+          context={{
+            platform: platform,
+          }}
+          router={router}
+        />
+      </StrictMode>
+    );
   }
 }
 
-export function MasonInterfaceRoot() {
-  const platform = usePlatform();
-
-  return (
-    <>
-      <DeepLinkBridge />
-      <RouterProvider
-        context={{
-          platform: platform,
-        }}
-        router={router}
-      />
-    </>
-  );
-}
-
-function DeepLinkBridge() {
-  const platform = usePlatform();
-
+function DeepLinkBridge({ platform }: { platform: Platform }) {
   useEffect(() => {
-    if (platform.platform !== 'desktop') {
+    if (platform.platform !== "desktop") {
       return;
     }
 
@@ -57,7 +69,7 @@ function DeepLinkBridge() {
 
     function handleUrls(urls: string[]) {
       // Re-emit as a browser CustomEvent so any part of the app can listen
-      window.dispatchEvent(new CustomEvent('deep-link', { detail: urls }));
+      window.dispatchEvent(new CustomEvent("deep-link", { detail: urls }));
     }
 
     // IIFE
@@ -68,7 +80,7 @@ function DeepLinkBridge() {
       }
 
       unlisten = await platform.onOpenUrl(handleUrls);
-      ac.signal.addEventListener('abort', () => unlisten?.());
+      ac.signal.addEventListener("abort", () => unlisten?.());
     })();
 
     return () => ac.abort();

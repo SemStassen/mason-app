@@ -8,7 +8,7 @@ import { Schema } from 'effect';
 
 export const WorkspaceGroup = HttpApiGroup.make('Workspace')
   .add(
-    HttpApiEndpoint.post('CheckSlugAvailability')`/check-slug`
+    HttpApiEndpoint.post('CheckWorkspaceSlugAvailability')`/check-slug`
       .setPayload(
         Schema.Struct({
           slug: Schema.NonEmptyString,
@@ -17,6 +17,16 @@ export const WorkspaceGroup = HttpApiGroup.make('Workspace')
       .addSuccess(
         Schema.Struct({
           status: Schema.Boolean,
+        })
+      )
+      .addError(HttpApiError.InternalServerError)
+  )
+  .add(
+    HttpApiEndpoint.post('SetActiveWorkspace')`/set-active`
+      .setPayload(
+        Schema.Struct({
+          workspaceId: Schema.optional(Schema.NonEmptyString),
+          workspaceSlug: Schema.optional(Schema.NonEmptyString),
         })
       )
       .addError(HttpApiError.InternalServerError)
