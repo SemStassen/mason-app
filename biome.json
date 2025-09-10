@@ -1,37 +1,39 @@
 {
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
+  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
+  "extends": ["ultracite"],
   "linter": {
-    "ignore": [".wrangler", "node_modules"],
-    "enabled": true,
     "rules": {
-      "recommended": true,
-      "a11y": {
-        "noSvgWithoutTitle": "off",
-        "useKeyWithClickEvents": "off"
+      "correctness": {
+        "noNestedComponentDefinitions": "off"
+      },
+      "complexity": {
+        "noExcessiveLinesPerFunction": {
+          "options": {
+            "maxLines": 100
+          }
+        },
+        "noExcessiveCognitiveComplexity": {
+          "options": {
+            "maxAllowedComplexity": 50
+          }
+        }
       },
       "style": {
-        "noNonNullAssertion": "off"
-      },
-      "correctness": {
-        "useExhaustiveDependencies": "off",
-        "noUnusedImports": "warn"
+        "useConsistentArrayType": {
+          "options": {
+            "syntax": "generic"
+          }
+        },
+        "useConsistentObjectDefinitions": "off",
+        "noMagicNumbers": "off"
       },
       "nursery": {
-        "useSortedClasses": {
-          "level": "error",
-          "fix": "safe",
+        "useMaxParams": {
           "options": {
-            "attributes": ["className", "classNames"],
-            "functions": ["cn", "cva"]
+            "max": 4
           }
         }
       }
     }
-  },
-  "formatter": {
-    "indentStyle": "space"
   }
 }

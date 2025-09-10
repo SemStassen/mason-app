@@ -13,15 +13,10 @@
       crossorigin="anonymous"
       src="//unpkg.com/react-scan/dist/auto.global.js"
     ></script>
-
-    <script>
-      // Some libs depend on webpack specific stuff
-      var global = globalThis || window;
-    </script>
   </head>
 
-  <body style="overflow: hidden">
+  <body>
     <div id="root"></div>
-    <script type="module" src="./index.tsx"></script>
+    <script type="module" src="./main.ts"></script>
   </body>
 </html>

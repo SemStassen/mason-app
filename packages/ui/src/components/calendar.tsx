@@ -1,112 +1,107 @@
-import { DayPicker } from "react-day-picker";
-
-import { cn } from "../utils";
-import { Button, buttonVariants } from "./button";
-import { Icons } from "./icons";
-
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+import type * as React from 'react';
+import { DayPicker } from 'react-day-picker';
+import { cn } from '../utils';
+import { buttonVariants } from './button';
+import { Icons } from './icons';
 
 function Calendar({
-  className,
   classNames,
-  showOutsideDays = true,
-  showWeekNumber = true,
   ...props
-}: CalendarProps) {
+}: React.ComponentProps<typeof DayPicker>) {
   return (
     <DayPicker
-      showOutsideDays={showOutsideDays}
-      showWeekNumber={showWeekNumber}
-      className={cn("p-3", className)}
       classNames={{
-        months: "relative flex flex-col",
-        nav: "absolute top-0 right-0 flex items-center gap-1",
-        button_previous: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+        root: cn(
+          'relative size-fit select-none rounded-md border p-3 shadow-xs',
+          props.className
         ),
-        button_next: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+        month: cn('m-0 space-y-1 text-center', classNames?.month),
+        month_caption: cn(
+          'flex h-8 items-center justify-center font-medium text-sm',
+          classNames?.month_caption
         ),
-        month: "space-y-4",
-        month_caption: "flex items-center justify-start pt-1",
-        caption_label: "text-sm",
-        weekdays: "flex",
-        weekday: "w-8 font-normal text-contrast-30 text-xs",
-        week: "mt-px flex w-full",
-        week_number_header: "w-8",
-        week_number:
-          "inline-flex w-8 items-center justify-center font-normal text-contrast-30 text-xs",
+        today: cn('bg-accent', classNames?.today),
+        week: cn('flex justify-center py-0.5', classNames?.week),
         day: cn(
-          // props.mode === "range"
-          //   ? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
-          //   : "[&:has([aria-selected])]:rounded-md",
+          'flex size-8 items-center justify-center rounded-md font-normal text-sm hover:[&:has(>button)]:bg-accent hover:[&:has(>button)]:text-accent-foreground',
+          classNames?.day
         ),
-        range_start: "day-range-start",
-        range_end: "day-range-end",
-        range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        ...classNames,
+        day_button: cn(
+          'size-8 rounded-md focus:outline-hidden focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1',
+          classNames?.day_button
+        ),
+        weekdays: cn('flex justify-center', classNames?.weekdays),
+        weekday: cn(
+          'size-8 font-normal text-muted-foreground text-sm',
+          classNames?.weekday
+        ),
+        outside: cn(
+          'text-muted-foreground/80 hover:text-muted-foreground/80!',
+          classNames?.outside
+        ),
+        selected: cn(
+          'bg-primary! text-primary-foreground! hover:text-primary-foreground!',
+          classNames?.selected
+        ),
+        range_middle: cn(
+          'rounded-none bg-secondary! text-secondary-foreground! first:rounded-l-md last:rounded-r-md hover:bg-secondary! hover:text-secondary-foreground!',
+          classNames?.range_middle
+        ),
+        range_start: cn(
+          props.mode === 'range' &&
+            props.selected?.from?.getTime() !== props.selected?.to?.getTime()
+            ? 'not-last:rounded-r-none bg-secondary! [&>button]:bg-primary!'
+            : '',
+          classNames?.range_start
+        ),
+        range_end: cn(
+          props.mode === 'range' &&
+            props.selected?.from?.getTime() !== props.selected?.to?.getTime()
+            ? 'not-first:rounded-l-none bg-secondary! [&>button]:bg-primary!'
+            : '',
+          classNames?.range_end
+        ),
+        disabled: cn(
+          'pointer-events-none text-muted-foreground opacity-50',
+          classNames?.disabled
+        ),
+        hidden: cn('pointer-events-none', classNames?.hidden),
+        nav: cn('', classNames?.nav),
+        month_grid: cn('', classNames?.month_grid),
       }}
       components={{
-        PreviousMonthButton: ({ className, ...props }) => {
-          return (
-            <Button variant="ghost" size="icon" {...props}>
-              <Icons.ChevronUp className="h-4 w-4" />
-            </Button>
-          );
-        },
-        NextMonthButton: ({ className, ...props }) => {
-          return (
-            <Button variant="ghost" size="icon" {...props}>
-              <Icons.ChevronDown className="h-4 w-4" />
-            </Button>
-          );
-        },
-        DayButton: ({ className, children, modifiers, day, ...props }) => {
-          return (
-            <button
-              className={cn(
-                "group inline-flex h-full w-full items-center justify-center",
-                className,
-              )}
-              {...props}
-            >
-              <span
-                className={cn(
-                  modifiers.today &&
-                    "h-5 w-6 rounded-sm bg-primary text-white group-hover:bg-primary/80",
-                )}
-              >
-                {children}
-              </span>
-            </button>
-          );
-        },
-        Day: ({ className, modifiers, day, ...props }) => {
-          return (
-            <td
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "sm" }),
-                "w-8 cursor-pointer px-0 text-contrast-75 text-sm",
-                modifiers.selected &&
-                  "bg-contrast-10 text-foreground hover:bg-contrast-20",
-                modifiers.outside &&
-                  "text-contrast-30 aria-selected:bg-contrast-10 aria-selected:text-contrast-75",
-                modifiers.invisible && "invisible",
-                modifiers.disabled && "text-contrast-50",
-                className,
-              )}
-              {...props}
-            />
-          );
-        },
+        // biome-ignore lint/correctness/noNestedComponentDefinitions: Fine for calendar
+        // biome-ignore lint/nursery/noShadow: Fine for calendar
+        NextMonthButton: (props) => (
+          <button
+            {...props}
+            className={cn(
+              buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
+              'absolute right-3',
+              classNames?.button_next
+            )}
+          >
+            <Icons.ChevronRight className="size-4" />
+          </button>
+        ),
+        // biome-ignore lint/correctness/noNestedComponentDefinitions: Fine for calendar
+        // biome-ignore lint/nursery/noShadow: Fine for calendar
+        PreviousMonthButton: (props) => (
+          <button
+            {...props}
+            className={cn(
+              buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
+              'absolute left-3',
+              classNames?.button_previous
+            )}
+          >
+            <Icons.ChevronLeft className="size-4" />
+          </button>
+        ),
       }}
       {...props}
     />
   );
 }
-Calendar.displayName = "Calendar";
 
 export { Calendar };

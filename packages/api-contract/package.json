@@ -1,0 +1,23 @@
+{
+  "name": "@mason/api-contract",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf node_modules",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
+  },
+  "dependencies": {
+    "@effect/platform": "workspace:^",
+    "@mason/core": "workspace:*",
+    "effect": "workspace:^"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "typescript": "workspace:^"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}
