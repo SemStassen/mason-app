@@ -4,34 +4,30 @@
   "type": "module",
   "scripts": {
     "clean": "git clean -xdf node_modules",
-    "db:migrate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx seed.ts",
     "format": "biome format --write .",
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.3.0",
-    "@electric-sql/pglite-react": "^0.2.18",
-    "@electric-sql/pglite-repl": "^0.2.18",
-    "@electric-sql/pglite-sync": "^0.3.2",
-    "@mason/env": "workspace:*",
-    "drizzle-orm": "^0.39.3",
-    "pg": "^8.14.1",
-    "postgres": "^3.4.5"
+    "drizzle-orm": "workspace:^",
+    "drizzle-zod": "^0.8.3",
+    "pg": "^8.16.3",
+    "zod": "^4.0.14"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.6.0",
+    "@faker-js/faker": "^9.9.0",
     "@mason/config": "workspace:*",
-    "@types/pg": "^8.11.13",
-    "drizzle-kit": "^0.30.4",
+    "@types/pg": "^8.15.5",
+    "drizzle-kit": "workspace:^",
     "drizzle-seed": "^0.3.1",
-    "typescript": "^5.0.0"
+    "typescript": "workspace:^"
   },
   "exports": {
-    "./client": "./src/client/index.ts",
-    "./server": "./src/server/index.ts",
+    "./db": "./src/db.ts",
+    "./operators": "./src/operators.ts",
     "./schema": "./src/schema.ts"
   }
 }

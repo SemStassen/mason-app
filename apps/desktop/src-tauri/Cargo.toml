@@ -1,0 +1,53 @@
+[package]
+name = "mason-app"
+version = "0.1.0"
+description = "Mason"
+authors = ["Sem Stassen"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "tauri_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0", features = [] }
+tauri-plugin-opener = "2"
+tauri-plugin-os = "2"
+tauri-plugin-deep-link = "2"
+tauri-plugin-http = "2"
+tauri-plugin-fs = "2"
+block2 = "0.6.1"
+objc2-foundation = "0.3.1"
+
+
+[target."cfg(any(target_os = \"macos\", windows, target_os = \"linux\"))".dependencies]
+tauri-plugin-single-instance = { version = "2.0.0", features = ["deep-link"] }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+specta = "=2.0.0-rc.22"
+specta-typescript = "0.0.9"
+tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
+
+# Mostly MACOS specific stuff
+objc2 = "0.6.2"
+objc2-app-kit = "0.3.1"
+objc2-foundation = "0.3.1"
+objc2-core-foundation = "0.3.1"
+objc2-core-graphics = { version = "0.3.1", features = ["CGEventSource", "CGEventTypes"] }
+objc2-screen-capture-kit = "0.3.1"
+objc2-ui-kit = "0.3.1"
+objc2-core-location = "0.3.1"
+
+
+
+
+

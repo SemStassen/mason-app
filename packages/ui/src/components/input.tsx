@@ -1,89 +1,145 @@
-import { type VariantProps, cva } from "class-variance-authority";
-import { useRef } from "react";
-import { cn } from "../utils";
+import { Input as BaseInput } from '@base-ui-components/react/input';
+import type * as React from 'react';
+import { useEffect, useRef } from 'react';
+import { cn } from '../utils';
 
-const inputVariants = cva(
-  "relative flex w-full rounded-md bg-transparent text-contrast-50 text-sm disabled:cursor-not-allowed disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default:
-          "bg-transparent focus-within:bg-contrast-5 hover:bg-contrast-5",
-        outline:
-          "border border-input focus-within:ring focus-within:ring-primary focus-visible:outline-none",
-      },
-      size: {
-        default: "h-9",
-        sm: "h-8",
-        lg: "h-11 font-semibold text-2xl",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  },
-);
-
-export interface InputProps
-  extends Omit<React.ComponentProps<"input">, "size" | "prefix">,
-    VariantProps<typeof inputVariants> {
+interface InputProps
+  extends Omit<React.ComponentProps<typeof BaseInput>, 'prefix'> {
+  inputContainerClassName?: string;
   prefix?: React.ReactNode;
-  iconLeft?: React.ReactNode;
-  iconRight?: React.ReactNode;
+  suffix?: React.ReactNode;
+  affixGapPx?: number;
 }
 
-const Input = ({
+function useDynamicAffixPadding(gapPx: number) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const prefixRef = useRef<HTMLSpanElement | null>(null);
+  const suffixRef = useRef<HTMLSpanElement | null>(null);
+
+  useEffect(() => {
+    let rafId: number | null = null;
+
+    function recalc() {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      rafId = requestAnimationFrame(() => {
+        const containerEl = containerRef.current;
+        const inputEl = containerEl?.querySelector('input');
+        if (!containerEl) {
+          return;
+        }
+        if (!inputEl) {
+          return;
+        }
+
+        const containerRect = containerEl.getBoundingClientRect();
+        const pre = prefixRef.current;
+        const suf = suffixRef.current;
+
+        const left = pre
+          ? Math.max(
+              0,
+              pre.getBoundingClientRect().right - containerRect.left
+            ) + gapPx
+          : null;
+        const right = suf
+          ? Math.max(
+              0,
+              containerRect.right - suf.getBoundingClientRect().left
+            ) + gapPx
+          : null;
+
+        if (left !== null) {
+          inputEl.style.paddingLeft = `${left}px`;
+        } else {
+          inputEl.style.paddingLeft = '';
+        }
+        if (right !== null) {
+          inputEl.style.paddingRight = `${right}px`;
+        } else {
+          inputEl.style.paddingRight = '';
+        }
+      });
+    }
+
+    recalc();
+
+    const ro = new ResizeObserver(() => {
+      recalc();
+    });
+    if (containerRef.current) {
+      ro.observe(containerRef.current);
+    }
+    if (prefixRef.current) {
+      ro.observe(prefixRef.current);
+    }
+    if (suffixRef.current) {
+      ro.observe(suffixRef.current);
+    }
+    window.addEventListener('resize', recalc);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', recalc);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+    };
+  }, [gapPx]);
+
+  return { containerRef, prefixRef, suffixRef } as const;
+}
+
+function Input({
+  inputContainerClassName,
   className,
   type,
-  variant,
-  size,
   prefix,
-  iconLeft,
-  iconRight,
+  suffix,
+  affixGapPx = 8,
   ...props
-}: InputProps) => {
-  const prefixRef = useRef<HTMLSpanElement>(null);
-
+}: InputProps) {
+  const { containerRef, prefixRef, suffixRef } =
+    useDynamicAffixPadding(affixGapPx);
   return (
-    <div className={cn(inputVariants({ variant, size, className }))}>
-      {iconLeft && (
-        <div
-          className="absolute inset-y-0 left-0 flex items-center pl-3"
-          aria-hidden={true}
-        >
-          {iconLeft}
-        </div>
-      )}
+    <div
+      className={cn('relative w-full', inputContainerClassName)}
+      data-slot="input-container"
+      ref={containerRef}
+    >
       {prefix && (
-        <div className="-translate-y-1/2 absolute top-1/2 left-3">
-          <span ref={prefixRef}>{prefix}</span>
-        </div>
+        <span
+          className="-translate-y-1/2 absolute top-1/2 left-3 shrink-0 text-muted-foreground [&_svg:not([class*='pointer-events-'])]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0"
+          data-slot="input-leading-icon"
+          ref={prefixRef}
+        >
+          {prefix}
+        </span>
       )}
-      <input
-        type={type}
+      <BaseInput
         className={cn(
-          "w-full cursor-default px-3 text-foreground placeholder:text-contrast-50 focus:cursor-text focus:outline-none",
-          iconLeft && "pl-9",
-          iconRight && "pr-9",
+          'flex h-9 w-full min-w-0 rounded-md border bg-input px-3 py-1 text-base shadow-xs outline-none transition-[color,box-shadow] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+          'file:inline-flex file:h-7 file:border-0 file:bg-transparent file:font-medium file:text-foreground file:text-sm',
+          'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+          'aria-invalid:border-destructive aria-invalid:ring-destructive/50',
+          className
         )}
-        style={{
-          paddingLeft: prefixRef.current
-            ? prefixRef.current.offsetWidth + 12
-            : undefined,
-        }}
+        data-slot="input"
+        type={type}
         {...props}
       />
-      {iconRight && (
-        <div
-          className="absolute inset-y-0 right-0 flex items-center pr-3"
-          aria-hidden={true}
+      {suffix && (
+        <span
+          className="-translate-y-1/2 absolute top-1/2 right-3 shrink-0 text-muted-foreground [&_svg:not([class*='pointer-events-'])]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0"
+          data-slot="input-trailing-icon"
+          ref={suffixRef}
         >
-          {iconRight}
-        </div>
+          {suffix}
+        </span>
       )}
     </div>
   );
-};
+}
 
 export { Input };

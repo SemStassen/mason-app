@@ -1,32 +1,39 @@
-import { type VariantProps, cva } from "class-variance-authority";
+import { cva, type VariantProps } from 'class-variance-authority';
+import type * as React from 'react';
 
-import { cn } from "../utils";
+import { cn } from '../utils';
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md px-1.5 py-0.5 font-semibold text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  'inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-md border px-2 py-0.5 font-medium text-xs transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3',
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-        outline: "text-foreground",
-        contrast: "bg-contrast-10 text-contrast-60",
-        ghost: "text-contrast-75 hover:bg-contrast-10",
+        default: 'border-transparent bg-primary text-primary-foreground',
+        outline: 'text-foreground',
+        secondary: 'border-secondary bg-secondary text-secondary-foreground',
+        success: 'border-transparent bg-success text-success-foreground',
+        warning: 'border-transparent bg-warning text-warning-foreground',
+        info: 'border-transparent bg-info text-info-foreground',
+        danger: 'border-transparent bg-danger text-danger-foreground',
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: 'default',
     },
-  },
+  }
 );
 
-export interface BadgeProps
-  extends React.ComponentProps<"div">,
-    VariantProps<typeof badgeVariants> {}
-
-function Badge({ className, variant, ...props }: BadgeProps) {
+function Badge({
+  className,
+  variant,
+  ...props
+}: React.ComponentProps<'span'> & VariantProps<typeof badgeVariants>) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <span
+      className={cn(badgeVariants({ variant }), className)}
+      data-slot="badge"
+      {...props}
+    />
   );
 }
 
