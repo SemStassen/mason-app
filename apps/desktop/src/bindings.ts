@@ -39,7 +39,11 @@ window_title: string;
 /**
  * Number of seconds since last user input (keyboard/mouse)
  */
-idle_time_seconds: number }
+idle_time_seconds: number; 
+/**
+ * Absolute file paths to screenshots for each display
+ */
+screenshot_paths: string[] }
 
 /** tauri-specta globals **/
 

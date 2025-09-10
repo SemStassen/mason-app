@@ -1,23 +1,23 @@
-import { useAtomRef } from '@effect-atom/atom-react';
-import { ScrollArea } from '@mason/ui/scroll-area';
-import { cn } from '@mason/ui/utils';
-import { addDays, areIntervalsOverlapping, isSameDay, isToday } from 'date-fns';
+import { useAtomRef } from "@effect-atom/atom-react";
+import { ScrollArea } from "@mason/ui/scroll-area";
+import { cn } from "@mason/ui/utils";
+import { addDays, areIntervalsOverlapping, isSameDay, isToday } from "date-fns";
 import {
   calendarDaysInViewAtom,
   calendarSelectedDateAtom,
-} from '~/atoms/calendar-atom';
-import { formatter } from '~/utils/date-time';
+} from "~/atoms/calendar-atom";
+import { formatter } from "~/utils/date-time";
 import {
   CALENDAR_DAY_HEADER_HEIGHT_VAR,
   CALENDAR_HEADER_HEIGHT_VAR,
   CALENDAR_HOUR_COLUMN_WIDTH_VAR,
   CALENDAR_HOUR_HEIGHT_VAR,
-} from '../..';
-import { DUMMY_TIME_ENTRIES } from '../../dummy-time-entries';
-import { getTimeEntryBlockStyle, groupTimeEntries } from '../../helpers';
-import { DroppableTimeEntry } from '../dnd/droppable-time-entry';
-import { CurrentTimeLine } from './current-time-line';
-import { TimeEntry } from './time-entry';
+} from "../..";
+import { DUMMY_TIME_ENTRIES } from "../../dummy-time-entries";
+import { getTimeEntryBlockStyle, groupTimeEntries } from "../../helpers";
+import { DroppableTimeEntry } from "../dnd/droppable-time-entry";
+import { CurrentTimeLine } from "./current-time-line";
+import { TimeEntry } from "./time-entry";
 
 const hours = Array.from({ length: 24 }).map((_, hourIndex) => hourIndex);
 const timeSlotsPerHour = Array.from({ length: 4 }).map(
@@ -50,16 +50,16 @@ function CalendarMultiDayView() {
           {weekDays.map((day) => (
             <div
               className={cn(
-                'flex items-center justify-center gap-1',
-                isToday(day) ? 'text-foreground' : 'text-muted-foreground'
+                "flex items-center justify-center gap-1",
+                isToday(day) ? "text-foreground" : "text-muted-foreground"
               )}
               key={day.toString()}
             >
               <span>{formatter.weekdayShort(day)}</span>
               <span
                 className={cn(
-                  'rounded-md px-1',
-                  isToday(day) && 'bg-primary text-primary-foreground'
+                  "rounded-md px-1",
+                  isToday(day) && "bg-primary text-primary-foreground"
                 )}
               >
                 {formatter.day(day)}
@@ -84,7 +84,13 @@ function CalendarMultiDayView() {
             }}
           >
             {hours.map((hour) => (
-              <div className="relative h-24" key={hour}>
+              <div
+                className="relative"
+                key={hour}
+                style={{
+                  height: `var(${CALENDAR_HOUR_HEIGHT_VAR})`,
+                }}
+              >
                 {hour !== 0 && (
                   <span className="-translate-y-1/2 -translate-x-1/2 absolute left-1/2">
                     {formatter.time(new Date(0, 0, 0, hour))}
@@ -160,7 +166,7 @@ function CalendarMultiDayView() {
                       );
 
                       if (!hasOverlap) {
-                        style = { ...style, width: '100%', left: '0%' };
+                        style = { ...style, width: "100%", left: "0%" };
                       }
 
                       return (

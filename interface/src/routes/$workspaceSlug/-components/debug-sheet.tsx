@@ -1,13 +1,13 @@
-import { useAtomRef } from '@effect-atom/atom-react';
-import { Repl } from '@electric-sql/pglite-repl';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@mason/ui/sheet';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@mason/ui/tabs';
-import { debugSheetAtom } from '~/atoms/ui-atoms';
-import { usePGlite } from '~/core/db';
-import { usePlatform } from '~/utils/Platform';
+import { useAtomRef } from "@effect-atom/atom-react";
+import { Repl } from "@electric-sql/pglite-repl";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@mason/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mason/ui/tabs";
+import { useRouter } from "@tanstack/react-router";
+import { debugSheetAtom } from "~/atoms/ui-atoms";
+import { usePGlite } from "~/core/db";
 
 function DebugSheet() {
-  const { platform } = usePlatform();
+  const { platform } = useRouter().options.context.platform;
   const db = usePGlite();
   const { isOpen } = useAtomRef(debugSheetAtom);
 

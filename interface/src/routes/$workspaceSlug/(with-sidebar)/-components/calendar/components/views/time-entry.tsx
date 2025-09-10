@@ -1,7 +1,8 @@
-import { differenceInMinutes } from 'date-fns';
-import { CALENDAR_HOUR_HEIGHT_VAR } from '../..';
-import type { ITimeEntry } from '../../types';
-import { DraggableTimeEntry } from '../dnd/draggable-time-entry';
+import { differenceInMinutes } from "date-fns";
+import { formatter } from "~/utils/date-time";
+import { CALENDAR_HOUR_HEIGHT_VAR } from "../..";
+import type { ITimeEntry } from "../../types";
+import { DraggableTimeEntry } from "../dnd/draggable-time-entry";
 
 function TimeEntry({ timeEntry }: { timeEntry: ITimeEntry }) {
   const { project, startedAt, stoppedAt, id } = timeEntry;
@@ -18,6 +19,10 @@ function TimeEntry({ timeEntry }: { timeEntry: ITimeEntry }) {
         }}
       >
         <div className="text-sm">{project.name}</div>
+        <div className="whitespace-nowrap text-xs">
+          <span>{formatter.time(timeEntry.startedAt)}</span> -{" "}
+          <span>{formatter.time(timeEntry.stoppedAt)}</span>
+        </div>
       </div>
     </DraggableTimeEntry>
   );

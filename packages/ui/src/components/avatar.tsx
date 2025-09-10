@@ -4,31 +4,34 @@ import type * as React from 'react';
 
 import { cn } from '../utils';
 
-const avatarVariants = cva(
-  'relative flex shrink-0 overflow-hidden rounded-full',
-  {
-    variants: {
-      size: {
-        sm: 'size-8 text-sm',
-        md: 'size-10',
-        lg: 'size-12 text-lg',
-      },
+const avatarVariants = cva('relative flex shrink-0 overflow-hidden', {
+  variants: {
+    radius: {
+      lg: 'rounded-lg',
+      full: 'rounded-full',
     },
-    defaultVariants: {
-      size: 'md',
+    size: {
+      sm: 'size-6 text-xs',
+      md: 'size-10',
+      lg: 'size-12 text-lg',
     },
-  }
-);
+  },
+  defaultVariants: {
+    radius: 'full',
+    size: 'md',
+  },
+});
 
 function Avatar({
   className,
+  radius,
   size,
   ...props
 }: React.ComponentProps<typeof AvatarBase.Root> &
   VariantProps<typeof avatarVariants>) {
   return (
     <AvatarBase.Root
-      className={cn(avatarVariants({ size }), className)}
+      className={cn(avatarVariants({ radius, size }), className)}
       data-slot="avatar"
       {...props}
     />
@@ -55,7 +58,7 @@ function AvatarFallback({
   return (
     <AvatarBase.Fallback
       className={cn(
-        'flex size-full select-none items-center justify-center rounded-full bg-muted',
+        'flex size-full select-none items-center justify-center bg-muted',
         className
       )}
       data-slot="avatar-fallback"

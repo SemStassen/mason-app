@@ -18,7 +18,7 @@ function CurrentTimeLine() {
 
   return (
     <div
-      className="pointer-events-none absolute inset-x-0 z-50 border-primary border-t"
+      className="pointer-events-none absolute inset-x-0 z-1 border-primary border-t"
       style={{ top: `${getCurrentTimePosition()}%` }}
     >
       <div className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 size-3 rounded-full bg-primary" />

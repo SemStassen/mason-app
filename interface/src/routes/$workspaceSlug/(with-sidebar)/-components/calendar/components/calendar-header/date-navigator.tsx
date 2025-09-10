@@ -23,7 +23,7 @@ function DateNavigator() {
             </Button>
           )}
         />
-        <PopoverContent>
+        <PopoverContent className="w-fit p-0">
           <Calendar
             mode="single"
             onSelect={(date) => date && setCalendarSelectedDate(date)}

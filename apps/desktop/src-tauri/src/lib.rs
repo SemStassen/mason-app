@@ -19,9 +19,12 @@ pub fn run() {
     // Build and run Tauri app
     tauri::Builder::default()
         // The single_instance plugin should always be first
-        .plugin(tauri_plugin_single_instance::init(|_app, _argv, _cwd| {}))
-        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_single_instance::init(|_app, argv, _cwd| {
+            println!("a new app instance was opened with {argv:?} and the deep link event was already triggered");
+        }))
         .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_os::init())
         .invoke_handler(specta_builder.invoke_handler())

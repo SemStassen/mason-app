@@ -3,6 +3,9 @@
   "extends": ["ultracite"],
   "linter": {
     "rules": {
+      "correctness": {
+        "noNestedComponentDefinitions": "off"
+      },
       "complexity": {
         "noExcessiveLinesPerFunction": {
           "options": {

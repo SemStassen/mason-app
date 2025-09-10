@@ -32,11 +32,13 @@ function DropdownMenuPositioner({
 
 function DropdownMenuContent({
   className,
-  sideOffset = 4,
   align = 'center',
+  side = 'bottom',
+  sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
   align?: BaseMenu.Positioner.Props['align'];
+  side?: BaseMenu.Positioner.Props['side'];
   sideOffset?: BaseMenu.Positioner.Props['sideOffset'];
 }) {
   return (
@@ -44,6 +46,7 @@ function DropdownMenuContent({
       <DropdownMenuPositioner
         align={align}
         className="max-h-[var(--available-height)]"
+        side={side}
         sideOffset={sideOffset}
       >
         <BaseMenu.Popup
@@ -77,7 +80,7 @@ function DropdownMenuItem({
   return (
     <BaseMenu.Item
       className={cn(
-        "data-[variant=destructive]:*:[svg]:!text-destructive focus:data-[variant=destructive]:*:[svg]:!text-destructive-foreground relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden transition-all focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-[disabled]:opacity-50 data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:transition-all",
+        "data-[variant=destructive]:*:[svg]:!text-destructive focus:data-[variant=destructive]:*:[svg]:!text-destructive-foreground relative flex w-full cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden transition-all focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-[disabled]:opacity-50 data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:transition-all",
         className
       )}
       data-inset={inset}
