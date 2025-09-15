@@ -10,7 +10,6 @@ pub trait WindowActivityCapture {
     fn capture_screenshots(app: &tauri::AppHandle, timestamp: u32) -> Vec<String>;
 }
 
-// Platform-specific implementations
 #[cfg(target_os = "macos")]
 mod macos;
 #[cfg(target_os = "macos")]

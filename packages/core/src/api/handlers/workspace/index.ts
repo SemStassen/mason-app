@@ -5,6 +5,8 @@ import {
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
 import { Effect } from "effect";
+import { WorkspaceId } from "~/models/shared";
+import { Workspace } from "~/models/workspace.model";
 import { AuthService } from "~/services/auth";
 
 export const WorkspaceGroupLive = HttpApiBuilder.group(
@@ -28,7 +30,7 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
         )
         .handle("SetActiveWorkspace", ({ request, payload }) =>
           Effect.gen(function* () {
-            const result = yield* auth.use((client) =>
+            yield* auth.use((client) =>
               client.api.setActiveOrganization({
                 body: {
                   organizationId: payload.workspaceId,
@@ -54,13 +56,12 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
               return yield* Effect.fail(new HttpApiError.InternalServerError());
             }
 
-            return {
-              id: workspace.id,
-              name: workspace.name,
-              slug: workspace.slug,
+            return Workspace.make({
+              ...workspace,
+              id: WorkspaceId.make(workspace.id),
               logoUrl: workspace.logo || null,
               metadata: workspace.metadata || null,
-            };
+            });
           }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         )
         .handle("RetrieveWorkspace", ({ request, payload }) =>
@@ -80,13 +81,12 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
               return yield* Effect.fail(new HttpApiError.InternalServerError());
             }
 
-            return {
-              id: workspace.id,
-              name: workspace.name,
-              slug: workspace.slug,
+            return Workspace.make({
+              ...workspace,
+              id: WorkspaceId.make(workspace.id),
               logoUrl: workspace.logo || null,
               metadata: workspace.metadata || null,
-            };
+            });
           }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         )
         .handle("ListWorkspaces", ({ request }) =>
@@ -101,13 +101,14 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
               return yield* Effect.fail(new HttpApiError.InternalServerError());
             }
 
-            return workspaces.map((workspace) => ({
-              id: workspace.id,
-              name: workspace.name,
-              slug: workspace.slug,
-              logoUrl: workspace.logo || null,
-              metadata: workspace.metadata || null,
-            }));
+            return workspaces.map((workspace) =>
+              Workspace.make({
+                ...workspace,
+                id: WorkspaceId.make(workspace.id),
+                logoUrl: workspace.logo || null,
+                metadata: workspace.metadata || null,
+              })
+            );
           }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         )
         .handle("UpdateWorkspace", ({ request, payload, path }) =>
@@ -136,13 +137,12 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
               return yield* Effect.fail(new HttpApiError.InternalServerError());
             }
 
-            return {
-              id: updatedWorkspace.id,
-              name: updatedWorkspace.name,
-              slug: updatedWorkspace.slug,
+            return Workspace.make({
+              ...updatedWorkspace,
+              id: WorkspaceId.make(updatedWorkspace.id),
               logoUrl: updatedWorkspace.logo || null,
               metadata: updatedWorkspace.metadata || null,
-            };
+            });
           }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         );
     })

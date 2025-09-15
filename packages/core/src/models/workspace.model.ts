@@ -1,7 +1,12 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
+import { generateUUID } from "~/utils/uuid";
+import { WorkspaceId } from "./shared";
 
 export class Workspace extends Schema.Struct({
-  id: Schema.String.pipe(Schema.brand('WorkspaceId')),
+  id: Schema.optionalWith(WorkspaceId, {
+    default: () => WorkspaceId.make(generateUUID()),
+  }),
+  // General
   name: Schema.NonEmptyString.pipe(Schema.maxLength(100)),
   slug: Schema.NonEmptyString.pipe(Schema.maxLength(100)),
   logoUrl: Schema.NullOr(Schema.String),
@@ -28,7 +33,4 @@ export const UpdateWorkspaceRequest = Schema.Struct({
   }),
 });
 
-export const WorkspaceResponse = Schema.Struct({
-  ...Workspace.fields,
-  id: Schema.String,
-});
+export const WorkspaceResponse = Schema.Struct(Workspace.fields);

@@ -1,28 +1,28 @@
-import { eq } from '@mason/db/operators';
+import { eq } from "@mason/db/operators";
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
-import * as schema from '@mason/db/schema';
-import { type BetterAuthOptions, betterAuth } from 'better-auth';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import * as schema from "@mason/db/schema";
+import { type BetterAuthOptions, betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
   bearer,
   customSession,
   emailOTP,
   organization,
-} from 'better-auth/plugins';
-import { Config, Data, Effect } from 'effect';
-import { DatabaseService } from './db';
+} from "better-auth/plugins";
+import { Config, Data, Effect } from "effect";
+import { DatabaseService } from "./db";
 
-export class BetterAuthError extends Data.TaggedError('BetterAuthError')<{
+export class BetterAuthError extends Data.TaggedError("BetterAuthError")<{
   readonly cause: unknown;
 }> {}
 
 export class AuthService extends Effect.Service<AuthService>()(
-  '@mason/AuthService',
+  "@mason/AuthService",
   {
     effect: Effect.gen(function* () {
       const AuthConfig = Config.all({
-        googleClientId: Config.string('GOOGLE_CLIENT_ID'),
-        googleClientSecret: Config.string('GOOGLE_CLIENT_SECRET'),
+        googleClientId: Config.string("GOOGLE_CLIENT_ID"),
+        googleClientSecret: Config.string("GOOGLE_CLIENT_SECRET"),
       });
 
       const authConfig = yield* AuthConfig;
@@ -31,21 +31,21 @@ export class AuthService extends Effect.Service<AuthService>()(
 
       // This is required to be separate for the type inference to work in the customSession plugin
       const betterAuthOptions = {
-        appName: 'Mason',
+        appName: "Mason",
         database: drizzleAdapter(db._drizzle, {
-          provider: 'pg',
+          provider: "pg",
           schema: schema,
         }),
         trustedOrigins: [
-          'http://localhost:8001',
-          'http://localhost:8002',
-          'http://localhost:1420',
+          "http://localhost:8001",
+          "http://localhost:8002",
+          "http://localhost:1420",
         ],
         advanced: {
           database: {
             generateId: false,
           },
-          cookiePrefix: 'mason',
+          cookiePrefix: "mason",
         },
         // Auth methods
         emailAndPassword: {
@@ -53,35 +53,35 @@ export class AuthService extends Effect.Service<AuthService>()(
         },
         socialProviders: {
           google: {
-            redirectURI: 'http://localhost:8002/api/oauth/google/callback',
+            redirectURI: "http://localhost:8002/api/oauth/google/callback",
             clientId: authConfig.googleClientId,
             clientSecret: authConfig.googleClientSecret,
-            accessType: 'offline',
-            prompt: 'select_account+consent',
+            accessType: "offline",
+            prompt: "select_account+consent",
           },
         },
         // Schema
         user: {
-          modelName: 'usersTable',
+          modelName: "usersTable",
           fields: {
-            image: 'imageUrl',
-            name: 'displayName',
+            image: "imageUrl",
+            name: "displayName",
           },
         },
         // We don't actually use sessions. We use bearer tokens (acces tokens)
         session: {
           storeSessionInDatabase: false,
           preserveSessionInDatabase: false,
-          modelName: 'sessionsTable',
+          modelName: "sessionsTable",
           fields: {
-            token: 'sessionToken',
+            token: "sessionToken",
           },
         },
         account: {
-          modelName: 'accountsTable',
+          modelName: "accountsTable",
         },
         verification: {
-          modelName: 'verificationsTable',
+          modelName: "verificationsTable",
         },
         plugins: [
           bearer(),
@@ -97,26 +97,26 @@ export class AuthService extends Effect.Service<AuthService>()(
           organization({
             schema: {
               organization: {
-                modelName: 'workspacesTable',
+                modelName: "workspacesTable",
                 fields: {
-                  logo: 'logoUrl',
+                  logo: "logoUrl",
                 },
               },
               member: {
-                modelName: 'membersTable',
+                modelName: "membersTable",
                 fields: {
-                  organizationId: 'workspaceId',
+                  organizationId: "workspaceId",
                 },
               },
               invitation: {
-                modelName: 'invitationsTable',
+                modelName: "invitationsTable",
                 fields: {
-                  organizationId: 'workspaceId',
+                  organizationId: "workspaceId",
                 },
               },
               session: {
                 fields: {
-                  activeOrganizationId: 'activeWorkspaceId',
+                  activeOrganizationId: "activeWorkspaceId",
                 },
               },
             },
@@ -131,19 +131,15 @@ export class AuthService extends Effect.Service<AuthService>()(
           customSession(async ({ session }) => {
             const user = await Effect.runPromise(
               db.use((conn) =>
-                Effect.tryPromise({
-                  try: () =>
-                    conn.query.usersTable.findFirst({
-                      where: eq(schema.usersTable.id, session.userId),
+                conn.query.usersTable.findFirst({
+                  where: eq(schema.usersTable.id, session.userId),
+                  with: {
+                    memberships: {
                       with: {
-                        memberships: {
-                          with: {
-                            workspace: true,
-                          },
-                        },
+                        workspace: true,
                       },
-                    }),
-                  catch: () => null,
+                    },
+                  },
                 })
               )
             );
@@ -156,7 +152,7 @@ export class AuthService extends Effect.Service<AuthService>()(
         ],
       });
 
-      const use = Effect.fn('AuthService.use')(
+      const use = Effect.fn("AuthService.use")(
         <A>(
           fn: (
             client: typeof betterAuthClient,

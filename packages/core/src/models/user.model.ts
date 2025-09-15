@@ -1,8 +1,13 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
+import { generateUUID } from "~/utils/uuid";
+import { UserId } from "./shared";
 
 export class User extends Schema.Struct({
-  id: Schema.String.pipe(Schema.brand('UserId')),
-  displayName: Schema.String.pipe(Schema.maxLength(100)),
+  id: Schema.optionalWith(UserId, {
+    default: () => UserId.make(generateUUID()),
+  }),
+  // General
+  displayName: Schema.NonEmptyString.pipe(Schema.maxLength(100)),
   email: Schema.NonEmptyString,
   emailVerified: Schema.Boolean,
   imageUrl: Schema.NullOr(Schema.String),
@@ -14,7 +19,4 @@ export const CreateUserRequest = Schema.Struct({
   emailVerified: User.fields.emailVerified,
 });
 
-export const UserResponse = Schema.Struct({
-  ...User.fields,
-  id: Schema.String,
-});
+export const UserResponse = Schema.Struct(User.fields);

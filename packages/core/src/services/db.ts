@@ -1,25 +1,25 @@
-import { drizzle, Pool } from '@mason/db/db';
+import { drizzle, Pool } from "@mason/db/db";
 // biome-ignore lint/performance/noNamespaceImport: We have to here
-import * as schema from '@mason/db/schema';
-import { Config, Data, Effect, FiberRef } from 'effect';
+import * as schema from "@mason/db/schema";
+import { Config, Data, Effect, FiberRef } from "effect";
 
 type Drizzle = ReturnType<typeof drizzle<typeof schema>>;
-type Transaction = Parameters<Parameters<Drizzle['transaction']>[0]>[0];
+type Transaction = Parameters<Parameters<Drizzle["transaction"]>[0]>[0];
 
-export class DatabaseError extends Data.TaggedError('DatabaseError')<{
+export class DatabaseError extends Data.TaggedError("DatabaseError")<{
   readonly cause: unknown;
 }> {}
 
 export class DatabaseService extends Effect.Service<DatabaseService>()(
-  '@mason/DatabaseService',
+  "@mason/DatabaseService",
   {
     scoped: Effect.gen(function* () {
       const DbConfig = Config.all({
-        host: Config.string('DB_HOST').pipe(Config.withDefault('localhost')),
-        port: Config.number('DB_PORT').pipe(Config.withDefault(5442)),
-        user: Config.string('DB_USER').pipe(Config.withDefault('postgres')),
-        password: Config.string('DB_PASSWORD'),
-        database: Config.string('DB_NAME').pipe(Config.withDefault('multa')),
+        host: Config.string("DB_HOST").pipe(Config.withDefault("localhost")),
+        port: Config.number("DB_PORT").pipe(Config.withDefault(5442)),
+        user: Config.string("DB_USER").pipe(Config.withDefault("postgres")),
+        password: Config.string("DB_PASSWORD"),
+        database: Config.string("DB_NAME").pipe(Config.withDefault("multa")),
       });
 
       const dbConfig = yield* DbConfig;
@@ -43,7 +43,7 @@ export class DatabaseService extends Effect.Service<DatabaseService>()(
 
       const currentTransaction = yield* FiberRef.make<Transaction | null>(null);
 
-      yield* Effect.logInfo('✅ Database connected successfully');
+      yield* Effect.logInfo("✅ Database connected successfully");
 
       return {
         _drizzle: db,
@@ -70,13 +70,14 @@ export class DatabaseService extends Effect.Service<DatabaseService>()(
               catch: (cause) => new DatabaseError({ cause }),
             });
           }),
-        use: <A, E, R>(
-          fn: (conn: Drizzle | Transaction) => Effect.Effect<A, E, R>
-        ) =>
+        use: <A>(fn: (conn: Drizzle | Transaction) => Promise<A>) =>
           Effect.gen(function* () {
             const tx = yield* FiberRef.get(currentTransaction);
             const conn = tx || db;
-            return yield* fn(conn);
+            return yield* Effect.tryPromise({
+              try: () => fn(conn),
+              catch: (cause) => new DatabaseError({ cause }),
+            });
           }),
       };
     }),

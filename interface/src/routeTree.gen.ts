@@ -20,6 +20,7 @@ import { Route as authSignInIndexRouteImport } from './routes/(auth)/sign-in/ind
 import { Route as WorkspaceSlugSettingsIndexRouteImport } from './routes/$workspaceSlug/settings/index'
 import { Route as WorkspaceSlugwithSidebarIndexRouteImport } from './routes/$workspaceSlug/(with-sidebar)/index'
 import { Route as WorkspaceSlugSettingsProfileIndexRouteImport } from './routes/$workspaceSlug/settings/profile/index'
+import { Route as WorkspaceSlugSettingsIntegrationsIndexRouteImport } from './routes/$workspaceSlug/settings/integrations/index'
 
 const onboardingRouteRoute = onboardingRouteRouteImport.update({
   id: '/(onboarding)',
@@ -79,6 +80,12 @@ const WorkspaceSlugSettingsProfileIndexRoute =
     path: '/profile/',
     getParentRoute: () => WorkspaceSlugSettingsRouteRoute,
   } as any)
+const WorkspaceSlugSettingsIntegrationsIndexRoute =
+  WorkspaceSlugSettingsIntegrationsIndexRouteImport.update({
+    id: '/integrations/',
+    path: '/integrations/',
+    getParentRoute: () => WorkspaceSlugSettingsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/$workspaceSlug': typeof WorkspaceSlugRouteRouteWithChildren
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
   '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
+  '/$workspaceSlug/settings/integrations': typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   '/$workspaceSlug/settings/profile': typeof WorkspaceSlugSettingsProfileIndexRoute
 }
 export interface FileRoutesByTo {
@@ -98,6 +106,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
   '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
+  '/$workspaceSlug/settings/integrations': typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   '/$workspaceSlug/settings/profile': typeof WorkspaceSlugSettingsProfileIndexRoute
 }
 export interface FileRoutesById {
@@ -112,6 +121,7 @@ export interface FileRoutesById {
   '/(auth)/sign-in/': typeof authSignInIndexRoute
   '/(auth)/sign-up/': typeof authSignUpIndexRoute
   '/(onboarding)/create-workspace/': typeof onboardingCreateWorkspaceIndexRoute
+  '/$workspaceSlug/settings/integrations/': typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   '/$workspaceSlug/settings/profile/': typeof WorkspaceSlugSettingsProfileIndexRoute
 }
 export interface FileRouteTypes {
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/create-workspace'
+    | '/$workspaceSlug/settings/integrations'
     | '/$workspaceSlug/settings/profile'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/create-workspace'
+    | '/$workspaceSlug/settings/integrations'
     | '/$workspaceSlug/settings/profile'
   id:
     | '__root__'
@@ -147,6 +159,7 @@ export interface FileRouteTypes {
     | '/(auth)/sign-in/'
     | '/(auth)/sign-up/'
     | '/(onboarding)/create-workspace/'
+    | '/$workspaceSlug/settings/integrations/'
     | '/$workspaceSlug/settings/profile/'
   fileRoutesById: FileRoutesById
 }
@@ -235,6 +248,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceSlugSettingsProfileIndexRouteImport
       parentRoute: typeof WorkspaceSlugSettingsRouteRoute
     }
+    '/$workspaceSlug/settings/integrations/': {
+      id: '/$workspaceSlug/settings/integrations/'
+      path: '/integrations'
+      fullPath: '/$workspaceSlug/settings/integrations'
+      preLoaderRoute: typeof WorkspaceSlugSettingsIntegrationsIndexRouteImport
+      parentRoute: typeof WorkspaceSlugSettingsRouteRoute
+    }
   }
 }
 
@@ -254,12 +274,15 @@ const WorkspaceSlugwithSidebarRouteRouteWithChildren =
 
 interface WorkspaceSlugSettingsRouteRouteChildren {
   WorkspaceSlugSettingsIndexRoute: typeof WorkspaceSlugSettingsIndexRoute
+  WorkspaceSlugSettingsIntegrationsIndexRoute: typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   WorkspaceSlugSettingsProfileIndexRoute: typeof WorkspaceSlugSettingsProfileIndexRoute
 }
 
 const WorkspaceSlugSettingsRouteRouteChildren: WorkspaceSlugSettingsRouteRouteChildren =
   {
     WorkspaceSlugSettingsIndexRoute: WorkspaceSlugSettingsIndexRoute,
+    WorkspaceSlugSettingsIntegrationsIndexRoute:
+      WorkspaceSlugSettingsIntegrationsIndexRoute,
     WorkspaceSlugSettingsProfileIndexRoute:
       WorkspaceSlugSettingsProfileIndexRoute,
   }

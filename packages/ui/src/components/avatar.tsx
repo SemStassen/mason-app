@@ -1,37 +1,36 @@
-import { Avatar as AvatarBase } from '@base-ui-components/react/avatar';
-import { cva, type VariantProps } from 'class-variance-authority';
-import type * as React from 'react';
+import { Avatar as AvatarBase } from "@base-ui-components/react/avatar";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from '../utils';
+import { cn } from "../utils";
 
-const avatarVariants = cva('relative flex shrink-0 overflow-hidden', {
+const avatarVariants = cva("relative flex shrink-0 overflow-hidden", {
   variants: {
-    radius: {
-      lg: 'rounded-lg',
-      full: 'rounded-full',
+    rounded: {
+      lg: "rounded-lg",
+      full: "rounded-full",
     },
     size: {
-      sm: 'size-6 text-xs',
-      md: 'size-10',
-      lg: 'size-12 text-lg',
+      sm: "size-6 text-xs",
+      md: "size-10",
+      lg: "size-12 text-lg",
     },
   },
   defaultVariants: {
-    radius: 'full',
-    size: 'md',
+    rounded: "full",
+    size: "md",
   },
 });
 
 function Avatar({
   className,
-  radius,
+  rounded,
   size,
   ...props
 }: React.ComponentProps<typeof AvatarBase.Root> &
   VariantProps<typeof avatarVariants>) {
   return (
     <AvatarBase.Root
-      className={cn(avatarVariants({ radius, size }), className)}
+      className={cn(avatarVariants({ rounded, size }), className)}
       data-slot="avatar"
       {...props}
     />
@@ -44,7 +43,7 @@ function AvatarImage({
 }: React.ComponentProps<typeof AvatarBase.Image>) {
   return (
     <AvatarBase.Image
-      className={cn('size-full object-cover', className)}
+      className={cn("size-full object-cover", className)}
       data-slot="avatar-image"
       {...props}
     />
@@ -58,7 +57,7 @@ function AvatarFallback({
   return (
     <AvatarBase.Fallback
       className={cn(
-        'flex size-full select-none items-center justify-center bg-muted',
+        "flex size-full select-none items-center justify-center bg-white",
         className
       )}
       data-slot="avatar-fallback"

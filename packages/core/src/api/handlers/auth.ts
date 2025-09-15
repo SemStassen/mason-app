@@ -2,19 +2,20 @@ import {
   HttpApiBuilder,
   HttpApiError,
   HttpServerResponse,
-} from '@effect/platform';
-import { MasonApi } from '@mason/api-contract';
-import { Effect } from 'effect';
-import { AuthService } from '~/services/auth';
+} from "@effect/platform";
+import { MasonApi } from "@mason/api-contract";
+import { Effect } from "effect";
+import { UserId, WorkspaceId } from "~/models/shared";
+import { AuthService } from "~/services/auth";
 
 export const AuthGroupLive = HttpApiBuilder.group(
   MasonApi,
-  'Auth',
+  "Auth",
   (handlers) =>
     Effect.gen(function* () {
       const auth = yield* AuthService;
       return handlers
-        .handle('GetSession', ({ request }) =>
+        .handle("GetSession", ({ request }) =>
           Effect.gen(function* () {
             const response = yield* auth.use((client) =>
               client.api.getSession({
@@ -36,7 +37,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
 
             const activeWorkspace = activeMembership
               ? {
-                  id: activeMembership.workspace.id,
+                  id: WorkspaceId.make(activeMembership.workspace.id),
                   slug: activeMembership.workspace.slug,
                   name: activeMembership.workspace.name,
                 }
@@ -44,13 +45,13 @@ export const AuthGroupLive = HttpApiBuilder.group(
 
             return {
               user: {
-                id: response.user.id,
+                id: UserId.make(response.user.id),
                 email: response.user.email,
                 emailVerified: response.user.emailVerified,
                 displayName: response.user.displayName,
                 imageUrl: response.user.imageUrl,
                 workspaces: response.user.memberships.map((membership) => ({
-                  id: membership.workspace.id,
+                  id: WorkspaceId.make(membership.workspace.id),
                   slug: membership.workspace.slug,
                   name: membership.workspace.name,
                 })),
@@ -63,7 +64,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
             })
           )
         )
-        .handle('SendEmailVerificationOTP', ({ payload, request }) =>
+        .handle("SendEmailVerificationOTP", ({ payload, request }) =>
           Effect.gen(function* () {
             yield* auth.use((client) =>
               client.api.sendVerificationOTP({
@@ -79,7 +80,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
             })
           )
         )
-        .handle('SignInWithEmailOTP', ({ payload, request }) =>
+        .handle("SignInWithEmailOTP", ({ payload, request }) =>
           Effect.gen(function* () {
             const result = yield* auth.use((client) =>
               client.api.signInEmailOTP({
@@ -93,7 +94,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
               { user: result.response.user },
               {
                 headers: {
-                  'set-cookie': result.headers.get('set-cookie') || '',
+                  "set-cookie": result.headers.get("set-cookie") || "",
                 },
               }
             );
@@ -104,7 +105,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
             })
           )
         )
-        .handle('SignOut', ({ request }) =>
+        .handle("SignOut", ({ request }) =>
           Effect.gen(function* () {
             const result = yield* auth.use((client) =>
               client.api.signOut({
@@ -115,8 +116,8 @@ export const AuthGroupLive = HttpApiBuilder.group(
 
             return yield* HttpServerResponse.empty({
               headers: {
-                'set-cookie': result.headers.get('set-cookie') || '', // clears session cookie(s)
-                'cache-control': 'no-store',
+                "set-cookie": result.headers.get("set-cookie") || "", // clears session cookie(s)
+                "cache-control": "no-store",
               },
             });
           }).pipe(

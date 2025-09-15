@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@mason/ui/avatar';
-import { Button } from '@mason/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from "@mason/ui/avatar";
+import { Button } from "@mason/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,12 +7,12 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@mason/ui/dropdown-menu';
-import { Icons } from '@mason/ui/icons';
-import { Link } from '@tanstack/react-router';
-import { Effect } from 'effect';
-import { useMasonClient } from '~/client';
-import { Route } from '../..';
+} from "@mason/ui/dropdown-menu";
+import { Icons } from "@mason/ui/icons";
+import { Link } from "@tanstack/react-router";
+import { Effect } from "effect";
+import { useMasonClient } from "~/client";
+import { Route } from "../..";
 
 function UserDropdownMenu() {
   const { user } = Route.useRouteContext();
@@ -32,7 +32,7 @@ function UserDropdownMenu() {
       <DropdownMenuTrigger
         render={
           <Button className="h-fit w-full py-4" variant="ghost">
-            <Avatar radius="lg">
+            <Avatar rounded="lg">
               <AvatarImage />
               <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
             </Avatar>

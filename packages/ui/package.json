@@ -32,11 +32,13 @@
   "exports": {
     "./globals.css": "./src/globals.css",
     "./utils": "./src/utils.ts",
+    "./accordion": "./src/components/accordion.tsx",
     "./avatar": "./src/components/avatar.tsx",
     "./badge": "./src/components/badge.tsx",
     "./breadcrumb": "./src/components/breadcrumb.tsx",
     "./button": "./src/components/button.tsx",
     "./calendar": "./src/components/calendar.tsx",
+    "./card": "./src/components/card.tsx",
     "./collapsible": "./src/components/collapsible.tsx",
     "./command": "./src/components/command.tsx",
     "./dialog": "./src/components/dialog.tsx",

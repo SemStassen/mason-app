@@ -6,6 +6,7 @@
     "clean": "git clean -xdf node_modules",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
     "db:seed": "tsx seed.ts",
     "format": "biome format --write .",
     "lint": "biome check .",

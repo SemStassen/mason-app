@@ -1,9 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/$workspaceSlug/settings/profile/')({
+export const Route = createFileRoute("/$workspaceSlug/settings/profile/")({
+  beforeLoad: () => {
+    return {
+      getTitle: () => "Profile",
+    };
+  },
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <div>Hello "/$workspaceSlug/settings/profile/"!</div>
+  return <div />;
 }
