@@ -30,11 +30,13 @@ export const router = createRouter({
   },
 });
 
-export let appLayer: Layer.Layer<LedgerService, never, never>;
+export let appLayer: Layer.Layer<LedgerService | PlatformService, never, never>;
 
+// TODO: What if I return applayer from the renderMasonInteface function???
+// Maybe???
 export function renderMasonInterface({ platform }: { platform: Platform }) {
   appLayer = LedgerService.Default.pipe(
-    Layer.provide(PlatformService.live(platform))
+    Layer.provideMerge(PlatformService.live(platform))
   );
 
   // const appRuntime = Effect.runSync(Effect.scoped(Layer.toRuntime(appLayer)));

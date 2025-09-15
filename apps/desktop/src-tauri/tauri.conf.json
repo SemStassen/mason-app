@@ -13,8 +13,18 @@
     "windows": [
       {
         "title": "Mason",
-        "width": 800,
-        "height": 600
+        "hiddenTitle": true,
+        "width": 1400,
+        "height": 750,
+        "minWidth": 768,
+        "minHeight": 500,
+        "resizable": true,
+        "fullscreen": false,
+        "alwaysOnTop": false,
+        "focus": true,
+        "dragDropEnabled": true,
+        "decorations": true,
+        "center": true
       }
     ],
     "security": {

@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@mason/ui/avatar';
-import { Button } from '@mason/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from "@mason/ui/avatar";
+import { Button } from "@mason/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,12 +12,12 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@mason/ui/dropdown-menu';
-import { Icons } from '@mason/ui/icons';
-import { Link, useRouter } from '@tanstack/react-router';
-import { Effect } from 'effect';
-import { useMasonClient } from '~/client';
-import { Route } from '../..';
+} from "@mason/ui/dropdown-menu";
+import { Icons } from "@mason/ui/icons";
+import { Link, useRouter } from "@tanstack/react-router";
+import { Effect } from "effect";
+import { useMasonClient } from "~/client";
+import { Route } from "../..";
 
 function WorkspaceDropdownMenu() {
   const router = useRouter();
@@ -43,7 +43,7 @@ function WorkspaceDropdownMenu() {
       <DropdownMenuTrigger
         render={
           <Button className="max-w-full" size="sm" variant="ghost">
-            <Avatar radius="lg" size="sm">
+            <Avatar rounded="lg" size="sm">
               <AvatarImage />
               <AvatarFallback>
                 {user.activeWorkspace?.name.charAt(0)}

@@ -1,10 +1,35 @@
 import { FetchHttpClient, HttpApiClient } from "@effect/platform";
+import { AtomHttpApi } from "@effect-atom/atom-react";
 import { MasonApi } from "@mason/api-contract";
 import { useRouter } from "@tanstack/react-router";
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 import { useMemo } from "react";
-import { router } from ".";
+import { appLayer, router } from ".";
+import { PlatformService } from "./core/services/platform";
 import type { Platform } from "./utils/platform";
+
+// const MasonHttpClient = FetchHttpClient.layer.pipe(
+//   Layer.provide(
+//     Layer.effect(
+//       FetchHttpClient.Fetch,
+//       Effect.gen(function* () {
+//         const platform = yield* PlatformService;
+//         return platform.platform === "desktop"
+//           ? (platform.fetch as typeof fetch)
+//           : fetch;
+//       })
+//     ).pipe(Layer.provide(appLayer))
+//   )
+// );
+
+// class MasonAtomClient extends AtomHttpApi.Tag<MasonAtomClient>()(
+//   "MasonAtomClient",
+//   {
+//     api: MasonApi,
+//     baseUrl: "http://localhost:8002",
+//     httpClient: MasonHttpClient,
+//   }
+// ) {}
 
 export function createMasonClient(platform: Platform) {
   const client = Effect.runSync(

@@ -9,17 +9,18 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
+    "@effect/platform": "workspace:^",
     "effect": "workspace:^",
-    "@effect/platform": "workspace:^"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
     "typescript": "workspace:^"
   },
   "exports": {
-    "./api/middleware/*": "./src/api/middleware/*.ts",
-    "./instrumentation": "./src/instrumentation.ts",
+    "./api": "./src/api/index.ts",
     "./models/*": "./src/models/*.ts",
-    "./utils/*": "./src/utils/*.ts"
+    "./utils/*": "./src/utils/*.ts",
+    "./instrumentation": "./src/instrumentation.ts"
   }
 }

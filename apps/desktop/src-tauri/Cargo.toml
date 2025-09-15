@@ -24,8 +24,6 @@ tauri-plugin-os = "2"
 tauri-plugin-deep-link = "2"
 tauri-plugin-http = "2"
 tauri-plugin-fs = "2"
-block2 = "0.6.1"
-objc2-foundation = "0.3.1"
 
 
 [target."cfg(any(target_os = \"macos\", windows, target_os = \"linux\"))".dependencies]
@@ -37,15 +35,16 @@ specta = "=2.0.0-rc.22"
 specta-typescript = "0.0.9"
 tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
 
-# Mostly MACOS specific stuff
+# MACOS specific stuff
+block2 = "0.6.1"
 objc2 = "0.6.2"
 objc2-app-kit = "0.3.1"
-objc2-foundation = "0.3.1"
 objc2-core-foundation = "0.3.1"
 objc2-core-graphics = { version = "0.3.1", features = ["CGEventSource", "CGEventTypes"] }
+objc2-core-location = "0.3.1"
+objc2-foundation = "0.3.1"
 objc2-screen-capture-kit = "0.3.1"
 objc2-ui-kit = "0.3.1"
-objc2-core-location = "0.3.1"
 
 
 

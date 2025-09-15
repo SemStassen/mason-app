@@ -1,14 +1,14 @@
-import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from '@effect/platform';
+import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from "@effect/platform";
 import {
   CreateWorkspaceRequest,
   UpdateWorkspaceRequest,
   WorkspaceResponse,
-} from '@mason/core/models/workspace.model';
-import { Schema } from 'effect';
+} from "@mason/core/models/workspace.model";
+import { Schema } from "effect";
 
-export const WorkspaceGroup = HttpApiGroup.make('Workspace')
+export const WorkspaceGroup = HttpApiGroup.make("Workspace")
   .add(
-    HttpApiEndpoint.post('CheckWorkspaceSlugAvailability')`/check-slug`
+    HttpApiEndpoint.post("CheckWorkspaceSlugAvailability")`/check-slug`
       .setPayload(
         Schema.Struct({
           slug: Schema.NonEmptyString,
@@ -22,7 +22,7 @@ export const WorkspaceGroup = HttpApiGroup.make('Workspace')
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.post('SetActiveWorkspace')`/set-active`
+    HttpApiEndpoint.post("SetActiveWorkspace")`/set-active`
       .setPayload(
         Schema.Struct({
           workspaceId: Schema.optional(Schema.NonEmptyString),
@@ -32,13 +32,13 @@ export const WorkspaceGroup = HttpApiGroup.make('Workspace')
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.post('CreateWorkspace')`/create`
+    HttpApiEndpoint.post("CreateWorkspace")`/create`
       .setPayload(CreateWorkspaceRequest)
       .addSuccess(WorkspaceResponse)
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.get('RetrieveWorkspace')`/retrieve`
+    HttpApiEndpoint.get("RetrieveWorkspace")`/retrieve`
       .setPayload(
         Schema.Struct({
           workspaceId: Schema.optional(Schema.NonEmptyString),
@@ -52,12 +52,12 @@ export const WorkspaceGroup = HttpApiGroup.make('Workspace')
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.get('ListWorkspaces')`/list`
+    HttpApiEndpoint.get("ListWorkspaces")`/list`
       .addSuccess(Schema.Array(WorkspaceResponse))
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.post('UpdateWorkspace')`/:workspaceId`
+    HttpApiEndpoint.post("UpdateWorkspace")`/:workspaceId`
       .setPath(
         Schema.Struct({
           workspaceId: Schema.String,

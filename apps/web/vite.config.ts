@@ -29,7 +29,10 @@ export default defineConfig({
   },
   plugins: [
     tsConfigPaths({
-      projects: ["./../../../interface/tsconfig.json"],
+      projects: [
+        "./../../../interface/tsconfig.json",
+        "./../../../packages/core/tsconfig.json",
+      ],
     }),
     paraglideVitePlugin({
       project: "./../../interface/project.inlang",

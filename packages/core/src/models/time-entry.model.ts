@@ -1,8 +1,9 @@
-import { Schema } from 'effect';
+import { Schema } from "effect";
+import { generateUUID } from "~/utils/uuid";
+import { TimeEntryId } from "./shared";
 
 export class TimeEntry extends Schema.Struct({
-  id: Schema.String.pipe(Schema.brand('TimeEntryId')),
-  // Extend further
+  id: Schema.optionalWith(TimeEntryId, {
+    default: () => TimeEntryId.make(generateUUID()),
+  }),
 }) {}
-
-export const CreateTimeEntryRequest = Schema.Struct({});
