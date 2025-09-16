@@ -56,9 +56,9 @@ export function createMasonClient(platform: Platform) {
           payload: { platform: platform.platform },
         }).pipe(
           Effect.flatMap(({ url }) =>
-            platform.platform === "web"
-              ? Effect.sync(() => router.navigate({ href: url }))
-              : Effect.promise(() => platform.openUrl(url))
+            platform.platform === "desktop"
+              ? Effect.promise(() => platform.openUrl(url))
+              : Effect.sync(() => router.navigate({ href: url }))
           )
         ),
     },

@@ -10,6 +10,7 @@
     "frontendDist": "./../src/dist"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "title": "Mason",

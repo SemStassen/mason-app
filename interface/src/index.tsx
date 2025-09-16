@@ -1,5 +1,5 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { StrictMode, useEffect } from "react";
+import { StrictMode, Suspense, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { ErrorPage } from "./routes/-error";
 import { NotFoundPage } from "./routes/-not-found";
@@ -30,7 +30,7 @@ export const router = createRouter({
   },
 });
 
-export let appLayer: Layer.Layer<LedgerService | PlatformService, never, never>;
+export let appLayer: Layer.Layer<LedgerService | PlatformService, never, never>
 
 export function renderMasonInterface({ platform }: { platform: Platform }) {
   appLayer = LedgerService.Default.pipe(
@@ -46,13 +46,15 @@ export function renderMasonInterface({ platform }: { platform: Platform }) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
       <StrictMode>
-        <DeepLinkBridge platform={platform} />
-        <RouterProvider
-          context={{
-            platform: platform,
-          }}
-          router={router}
-        />
+        <Suspense>
+          <DeepLinkBridge platform={platform} />
+          <RouterProvider
+            context={{
+              platform: platform,
+            }}
+            router={router}
+          />
+        </Suspense>
       </StrictMode>
     );
   }
