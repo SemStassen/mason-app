@@ -32,8 +32,6 @@ export const router = createRouter({
 
 export let appLayer: Layer.Layer<LedgerService | PlatformService, never, never>;
 
-// TODO: What if I return applayer from the renderMasonInteface function???
-// Maybe???
 export function renderMasonInterface({ platform }: { platform: Platform }) {
   appLayer = LedgerService.Default.pipe(
     Layer.provideMerge(PlatformService.live(platform))
