@@ -8,28 +8,28 @@ import { appLayer, router } from ".";
 import { PlatformService } from "./core/services/platform";
 import type { Platform } from "./utils/platform";
 
-// const MasonHttpClient = FetchHttpClient.layer.pipe(
-//   Layer.provide(
-//     Layer.effect(
-//       FetchHttpClient.Fetch,
-//       Effect.gen(function* () {
-//         const platform = yield* PlatformService;
-//         return platform.platform === "desktop"
-//           ? (platform.fetch as typeof fetch)
-//           : fetch;
-//       })
-//     ).pipe(Layer.provide(appLayer))
-//   )
-// );
+const MasonHttpClient = FetchHttpClient.layer.pipe(
+  Layer.provide(
+    Layer.effect(
+      FetchHttpClient.Fetch,
+      Effect.gen(function* () {
+        const platform = yield* PlatformService;
+        return platform.platform === "desktop"
+          ? (platform.fetch as typeof fetch)
+          : fetch;
+      })
+    ).pipe(Layer.provide(appLayer))
+  )
+);
 
-// class MasonAtomClient extends AtomHttpApi.Tag<MasonAtomClient>()(
-//   "MasonAtomClient",
-//   {
-//     api: MasonApi,
-//     baseUrl: "http://localhost:8002",
-//     httpClient: MasonHttpClient,
-//   }
-// ) {}
+class MasonAtomClient extends AtomHttpApi.Tag<MasonAtomClient>()(
+  "MasonAtomClient",
+  {
+    api: MasonApi,
+    baseUrl: "http://localhost:8002",
+    httpClient: MasonHttpClient,
+  }
+) {}
 
 export function createMasonClient(platform: Platform) {
   const client = Effect.runSync(
