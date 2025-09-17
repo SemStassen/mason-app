@@ -110,8 +110,8 @@
       "name": "@mason/api-contract",
       "dependencies": {
         "@effect/platform": "workspace:^",
-        "@mason/core": "workspace:*",
         "effect": "workspace:^",
+        "uuid": "^13.0.0",
       },
       "devDependencies": {
         "@mason/config": "workspace:*",
@@ -125,8 +125,8 @@
       "name": "@mason/core",
       "dependencies": {
         "@effect/platform": "workspace:^",
+        "@mason/api-contract": "workspace:*",
         "effect": "workspace:^",
-        "uuid": "^13.0.0",
       },
       "devDependencies": {
         "@mason/config": "workspace:*",

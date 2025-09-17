@@ -33,9 +33,15 @@ export default defineConfig({
       ignored: ["**/src-tauri/**"],
     },
   },
+  define: {
+    __PLATFORM__: JSON.stringify("desktop"),
+  },
   plugins: [
     tsConfigPaths({
-      projects: ["./../../../interface/tsconfig.json"],
+      projects: [
+        "./../../../interface/tsconfig.json",
+        "./../../../packages/api-contract/tsconfig.json",
+      ],
     }),
     tailwindcss(),
     viteReact(),

@@ -11,7 +11,7 @@ export const MasonApi = HttpApi.make("MasonApi")
   .add(AuthGroup.prefix("/auth"))
   .add(OAuthGroup.prefix("/oauth"))
   .add(WorkspaceGroup.prefix("/workspace"))
-  // Integrations
+  // // Integrations
   .add(WorkspaceIntegrationsGroup.prefix("/integrations"))
   .add(FloatWorkspaceIntegrationGroup.prefix("/integrations/float"))
   .prefix("/api");

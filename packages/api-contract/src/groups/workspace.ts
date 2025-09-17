@@ -1,10 +1,10 @@
 import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from "@effect/platform";
+import { Schema } from "effect";
 import {
   CreateWorkspaceRequest,
   UpdateWorkspaceRequest,
   WorkspaceResponse,
-} from "@mason/core/models/workspace.model";
-import { Schema } from "effect";
+} from "~/models/workspace.model";
 
 export const WorkspaceGroup = HttpApiGroup.make("Workspace")
   .add(

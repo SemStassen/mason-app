@@ -1,10 +1,11 @@
 {
   "extends": "@mason/config/base.tsconfig.json",
-  "include": ["src"],
+  "include": ["src", "src/globals.d.ts", "../apps/desktop/src/globals.d.ts"],
   "exclude": ["dist"],
   "compilerOptions": {
     "paths": {
       "~/*": ["./src/*"]
     }
-  }
+  },
+  "references": [{ "path": "../packages/api-contract" }]
 }

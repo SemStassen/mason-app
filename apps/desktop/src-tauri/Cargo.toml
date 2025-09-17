@@ -41,10 +41,10 @@ objc2 = "0.6.2"
 objc2-app-kit = "0.3.1"
 objc2-core-foundation = "0.3.1"
 objc2-core-graphics = { version = "0.3.1", features = ["CGEventSource", "CGEventTypes"] }
+objc2-core-image = "0.3.1"
 objc2-core-location = "0.3.1"
 objc2-foundation = "0.3.1"
 objc2-screen-capture-kit = "0.3.1"
-objc2-ui-kit = "0.3.1"
 
 
 

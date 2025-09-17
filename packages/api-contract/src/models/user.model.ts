@@ -19,4 +19,7 @@ export const CreateUserRequest = Schema.Struct({
   emailVerified: User.fields.emailVerified,
 });
 
-export const UserResponse = Schema.Struct(User.fields);
+export const UserResponse = Schema.Struct({
+  ...User.fields,
+  id: Schema.String,
+});

@@ -2127,10 +2127,10 @@ dependencies = [
  "objc2-app-kit",
  "objc2-core-foundation",
  "objc2-core-graphics",
+ "objc2-core-image",
  "objc2-core-location",
  "objc2-foundation 0.3.1",
  "objc2-screen-capture-kit",
- "objc2-ui-kit",
  "serde",
  "serde_json",
  "specta",
@@ -2462,8 +2462,13 @@ version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79b3dc0cc4386b6ccf21c157591b34a7f44c8e75b064f85502901ab2188c007e"
 dependencies = [
+ "block2 0.6.1",
  "objc2 0.6.2",
+ "objc2-core-foundation",
+ "objc2-core-graphics",
+ "objc2-core-video",
  "objc2-foundation 0.3.1",
+ "objc2-metal 0.3.1",
 ]
 
 [[package]]
@@ -2602,7 +2607,6 @@ checksum = "90ffb6a0cd5f182dc964334388560b12a57f7b74b3e2dec5e2722aa2dfb2ccd5"
 dependencies = [
  "bitflags 2.9.1",
  "objc2 0.6.2",
- "objc2-core-foundation",
  "objc2-foundation 0.3.1",
 ]
 
@@ -2631,26 +2635,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25b1312ad7bc8a0e92adae17aa10f90aae1fb618832f9b993b022b591027daed"
 dependencies = [
  "bitflags 2.9.1",
- "block2 0.6.1",
  "objc2 0.6.2",
- "objc2-cloud-kit",
- "objc2-core-data",
  "objc2-core-foundation",
- "objc2-core-graphics",
- "objc2-core-image",
- "objc2-core-location",
- "objc2-foundation 0.3.1",
- "objc2-quartz-core 0.3.1",
- "objc2-user-notifications",
-]
-
-[[package]]
-name = "objc2-user-notifications"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a3f5ec77a81d9e0c5a0b32159b0cb143d7086165e79708351e02bf37dfc65cd"
-dependencies = [
- "objc2 0.6.2",
  "objc2-foundation 0.3.1",
 ]
 

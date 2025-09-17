@@ -1,13 +1,13 @@
-import { and, eq, inArray } from "@mason/db/operators";
-import { type DbProject, projectsTable } from "@mason/db/schema";
-import { Effect, Match } from "effect";
 import {
   type CreateProjectRequest,
   Project,
   type UpdateProjectRequest,
   type UpsertProjectRequest,
-} from "~/models/project.model";
-import { ProjectId, WorkspaceId } from "~/models/shared";
+} from "@mason/api-contract/models/project.model";
+import { ProjectId, WorkspaceId } from "@mason/api-contract/models/shared";
+import { and, eq, inArray } from "@mason/db/operators";
+import { type DbProject, projectsTable } from "@mason/db/schema";
+import { Effect, Match } from "effect";
 import { DatabaseService } from "./db";
 import { RequestContextService } from "./request-context";
 

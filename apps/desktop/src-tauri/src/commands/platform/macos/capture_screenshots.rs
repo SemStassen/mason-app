@@ -1,8 +1,8 @@
 use block2::StackBlock;
 use objc2::AnyThread;
 use objc2_core_graphics::CGImage;
-use objc2_ui_kit::UIImage;
-use objc2_foundation::{NSArray, NSError, NSString, NSFileHandle, NSURL};
+use objc2_core_image::{CIContext, CIImage};
+use objc2_foundation::{NSArray, NSError, NSString, NSURL};
 use objc2_screen_capture_kit::{
     SCContentFilter, SCScreenshotManager, SCShareableContent, SCStreamConfiguration,
 };
@@ -89,15 +89,22 @@ fn capture_screen_with_sck(base_dir: &PathBuf, timestamp: u32) -> Result<Vec<Str
                                 let sender = sender.clone();
                                 
                                 move |image: *mut CGImage, error: *mut NSError| {
-                                    // Try to save screenshot
+                                    // Try to save screenshot using Core Image
                                     if error.is_null() && !image.is_null() {
-                                        if let Some(jpeg_data) = UIImage::jpeg_representation(&UIImage::imageWithCGImage(&*image), 0.5) {
-                                            let file_url = NSURL::fileURLWithPath(&NSString::from_str(&screenshot_path.to_string_lossy()));
-                                            if let Ok(handle) = NSFileHandle::fileHandleForWritingToURL_error(&file_url) {
-                                                if handle.writeData_error(&jpeg_data).is_ok() && handle.closeAndReturnError().is_ok() {
-                                                    if let Ok(mut p) = paths.lock() {
-                                                        p.push(screenshot_path.to_string_lossy().to_string());
-                                                    }
+                                        let ci_image = CIImage::imageWithCGImage(&*image);
+                                        let ci_context = CIContext::context();
+                                        let file_url = NSURL::fileURLWithPath(&NSString::from_str(&screenshot_path.to_string_lossy()));
+                                        
+                                        // Write JPEG representation using Core Image
+                                        if let Some(color_space) = ci_image.colorSpace() {
+                                            if ci_context.writeJPEGRepresentationOfImage_toURL_colorSpace_options_error(
+                                                &ci_image,
+                                                &file_url,
+                                                &color_space,
+                                                &objc2_foundation::NSDictionary::new()
+                                            ).is_ok() {
+                                                if let Ok(mut p) = paths.lock() {
+                                                    p.push(screenshot_path.to_string_lossy().to_string());
                                                 }
                                             }
                                         }

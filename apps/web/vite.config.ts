@@ -17,21 +17,21 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    outDir: "../dist",
-    assetsDir: ".",
-  },
+
   optimizeDeps: {
     exclude: ["@electric-sql/pglite"],
   },
   worker: {
     format: "es",
   },
+  define: {
+    __PLATFORM__: JSON.stringify("web"),
+  },
   plugins: [
     tsConfigPaths({
       projects: [
         "./../../../interface/tsconfig.json",
-        "./../../../packages/core/tsconfig.json",
+        "./../../../packages/api-contract/tsconfig.json",
       ],
     }),
     paraglideVitePlugin({
@@ -49,4 +49,8 @@ export default defineConfig({
     tailwindcss(),
     viteReact(),
   ],
+  build: {
+    outDir: "../dist",
+    assetsDir: ".",
+  },
 });
