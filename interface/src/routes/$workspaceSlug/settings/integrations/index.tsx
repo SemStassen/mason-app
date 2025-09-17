@@ -33,7 +33,6 @@ export const Route = createFileRoute("/$workspaceSlug/settings/integrations/")({
 
 function RouteComponent() {
   const { workspaceIntegrations } = Route.useLoaderData();
-  console.log(workspaceIntegrations);
   return (
     <Card>
       <CardContent>

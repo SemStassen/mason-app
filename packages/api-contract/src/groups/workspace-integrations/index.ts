@@ -1,6 +1,6 @@
 import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from "@effect/platform";
-import { WorkspaceIntegrationResponse } from "@mason/core/models/workspace-integration.model";
 import { Schema } from "effect";
+import { WorkspaceIntegrationResponse } from "~/models/workspace-integration.model";
 
 export const WorkspaceIntegrationsGroup = HttpApiGroup.make(
   "WorkspaceIntegrations"

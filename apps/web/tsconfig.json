@@ -1,6 +1,6 @@
 {
   "extends": "@mason/config/base.tsconfig.json",
-  "include": ["src"],
+  "include": ["src", "../../interface/src/globals.d.ts"],
   "exclude": ["dist"],
   "compilerOptions": {
     "paths": {

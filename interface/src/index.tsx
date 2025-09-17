@@ -6,11 +6,7 @@ import { NotFoundPage } from "./routes/-not-found";
 import { routeTree } from "./routeTree.gen";
 
 import "./globals.css";
-
-import { Layer } from "effect";
-import { LedgerService } from "./core/services/ledger";
-import { PlatformService } from "./core/services/platform";
-import type { Platform } from "./utils/platform";
+import { PLATFORM } from "./utils/constants";
 
 // This is required for Tanstack router to work properly
 declare module "@tanstack/react-router" {
@@ -24,21 +20,9 @@ export const router = createRouter({
   routeTree,
   defaultNotFoundComponent: NotFoundPage,
   defaultErrorComponent: ErrorPage,
-  context: {
-    // biome-ignore lint/style/noNonNullAssertion: Actually safe
-    platform: undefined!,
-  },
 });
 
-export let appLayer: Layer.Layer<LedgerService | PlatformService, never, never>
-
-export function renderMasonInterface({ platform }: { platform: Platform }) {
-  appLayer = LedgerService.Default.pipe(
-    Layer.provideMerge(PlatformService.live(platform))
-  );
-
-  // const appRuntime = Effect.runSync(Effect.scoped(Layer.toRuntime(appLayer)));
-
+export function renderMasonInterface() {
   // biome-ignore lint/style/noNonNullAssertion: Fine for root
   const rootElement = document.getElementById("root")!;
 
@@ -47,22 +31,17 @@ export function renderMasonInterface({ platform }: { platform: Platform }) {
     root.render(
       <StrictMode>
         <Suspense>
-          <DeepLinkBridge platform={platform} />
-          <RouterProvider
-            context={{
-              platform: platform,
-            }}
-            router={router}
-          />
+          <DeepLinkBridge />
+          <RouterProvider router={router} />
         </Suspense>
       </StrictMode>
     );
   }
 }
 
-function DeepLinkBridge({ platform }: { platform: Platform }) {
+function DeepLinkBridge() {
   useEffect(() => {
-    if (platform.platform !== "desktop") {
+    if (PLATFORM.platform !== "desktop") {
       return;
     }
 
@@ -76,17 +55,17 @@ function DeepLinkBridge({ platform }: { platform: Platform }) {
 
     // IIFE
     (async () => {
-      const current = await platform.getCurrent();
+      const current = await PLATFORM.getCurrent();
       if (current?.length) {
         handleUrls(current);
       }
 
-      unlisten = await platform.onOpenUrl(handleUrls);
+      unlisten = await PLATFORM.onOpenUrl(handleUrls);
       ac.signal.addEventListener("abort", () => unlisten?.());
     })();
 
     return () => ac.abort();
-  }, [platform]);
+  }, []);
 
   return null;
 }

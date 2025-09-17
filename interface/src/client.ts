@@ -1,24 +1,19 @@
 import { FetchHttpClient, HttpApiClient } from "@effect/platform";
 import { AtomHttpApi } from "@effect-atom/atom-react";
 import { MasonApi } from "@mason/api-contract";
-import { useRouter } from "@tanstack/react-router";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Match } from "effect";
 import { useMemo } from "react";
-import { appLayer, router } from ".";
-import { PlatformService } from "./core/services/platform";
-import type { Platform } from "./utils/platform";
+import { router } from ".";
+import { PLATFORM } from "./utils/constants";
 
 const MasonHttpClient = FetchHttpClient.layer.pipe(
   Layer.provide(
     Layer.effect(
       FetchHttpClient.Fetch,
-      Effect.gen(function* () {
-        const platform = yield* PlatformService;
-        return platform.platform === "desktop"
-          ? (platform.fetch as typeof fetch)
-          : fetch;
-      })
-    ).pipe(Layer.provide(appLayer))
+      Effect.sync(() =>
+        PLATFORM.platform === "desktop" ? PLATFORM.fetch : fetch
+      )
+    )
   )
 );
 
@@ -31,20 +26,11 @@ class MasonAtomClient extends AtomHttpApi.Tag<MasonAtomClient>()(
   }
 ) {}
 
-export function createMasonClient(platform: Platform) {
+export function createMasonClient() {
   const client = Effect.runSync(
     HttpApiClient.make(MasonApi, {
       baseUrl: "http://localhost:8002",
-    }).pipe(
-      Effect.provide(FetchHttpClient.layer),
-      // Use tauri custom fetch method for desktop apps
-      platform.platform === "desktop"
-        ? Effect.provideService(
-            FetchHttpClient.Fetch,
-            platform.fetch as typeof fetch
-          )
-        : (eff) => eff
-    )
+    }).pipe(Effect.provide(FetchHttpClient.layer))
   );
 
   return {
@@ -53,12 +39,17 @@ export function createMasonClient(platform: Platform) {
       ...client.OAuth,
       SignInWithGoogle: () =>
         client.OAuth.SignInWithGoogle({
-          payload: { platform: platform.platform },
+          payload: { platform: PLATFORM.platform },
         }).pipe(
           Effect.flatMap(({ url }) =>
-            platform.platform === "desktop"
-              ? Effect.promise(() => platform.openUrl(url))
-              : Effect.sync(() => router.navigate({ href: url }))
+            Match.value(PLATFORM).pipe(
+              Match.when({ platform: "desktop" }, (platform) =>
+                Effect.promise(() => platform.openUrl(url))
+              ),
+              Match.orElse(() =>
+                Effect.sync(() => router.navigate({ href: url }))
+              )
+            )
           )
         ),
     },
@@ -66,6 +57,5 @@ export function createMasonClient(platform: Platform) {
 }
 
 export function useMasonClient(): ReturnType<typeof createMasonClient> {
-  const platform = useRouter().options.context.platform;
-  return useMemo(() => createMasonClient(platform), [platform]);
+  return useMemo(() => createMasonClient(), []);
 }

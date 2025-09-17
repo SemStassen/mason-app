@@ -1,10 +1,13 @@
 import { HttpApiBuilder, HttpApiError } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
+import {
+  WorkspaceId,
+  WorkspaceIntegrationId,
+} from "@mason/api-contract/models/shared";
+import { WorkspaceIntegration } from "@mason/api-contract/models/workspace-integration.model";
 import { workspaceIntegrationsTable } from "@mason/db/schema";
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
-import { WorkspaceId, WorkspaceIntegrationId } from "~/models/shared";
-import { WorkspaceIntegration } from "~/models/workspace-integration.model";
 import { DatabaseService } from "~/services/db";
 import { RequestContextService } from "~/services/request-context";
 

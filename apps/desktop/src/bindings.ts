@@ -20,30 +20,7 @@ async captureWindowActivity() : Promise<WindowActivitySnapshot> {
 
 /** user-defined types **/
 
-/**
- * Struct that represents a single snapshot of the user's current activity
- */
-export type WindowActivitySnapshot = { 
-/**
- * Unix timestamp (seconds since 1970-01-01 UTC)
- */
-timestamp: number; 
-/**
- * Name of the active application (e.g., "Slack", "Google Chrome")
- */
-application_name: string; 
-/**
- * Title of the frontmost window (e.g., "Inbox — Gmail")
- */
-window_title: string; 
-/**
- * Number of seconds since last user input (keyboard/mouse)
- */
-idle_time_seconds: number; 
-/**
- * Absolute file paths to screenshots for each display
- */
-screenshot_paths: string[] }
+export type WindowActivitySnapshot = { timestamp: number; application_name: string; window_title: string; idle_time_seconds: number; screenshot_paths: string[] }
 
 /** tauri-specta globals **/
 

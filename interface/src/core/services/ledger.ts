@@ -3,12 +3,13 @@ import {
   Duration,
   Effect,
   Fiber,
+  Match,
   Ref,
   Schedule,
   Stream,
   SubscriptionRef,
 } from "effect";
-import { PlatformService } from "./platform";
+import { PLATFORM } from "~/utils/constants";
 
 export class LedgerError extends Data.TaggedError("LedgerError")<{
   readonly cause: unknown;
@@ -18,19 +19,18 @@ export class LedgerService extends Effect.Service<LedgerService>()(
   "@mason/interface/LedgerService",
   {
     scoped: Effect.gen(function* () {
-      const platform = yield* PlatformService;
       const isActiveRef = yield* SubscriptionRef.make(false);
 
-      const pollSnapshot = (
-        platform.platform === "desktop"
-          ? Effect.promise(() => platform.captureWindowActivity()).pipe(
-              Effect.tap((snapshot) => Effect.log("Logging Ledger", snapshot))
-            )
-          : Effect.logDebug("Desktop platform not detected, skipping polling")
-      ).pipe(
+      const pollSnapshot = Match.value(PLATFORM).pipe(
+        Match.when({ platform: "desktop" }, (platform) => 
+          Effect.promise(() => platform.captureWindowActivity()).pipe(
+            Effect.tap((snapshot) => Effect.log("Logging Ledger", snapshot))
+          )
+        ),
+        Match.orElse(() => Effect.logDebug("Desktop platform not detected, skipping polling")),
         Effect.catchAll(() => Effect.void),
         Effect.repeat(Schedule.spaced(Duration.seconds(10)))
-      );
+      )
 
       const pollingFiberRef = yield* Ref.make<Fiber.RuntimeFiber<
         number,
@@ -65,16 +65,11 @@ export class LedgerService extends Effect.Service<LedgerService>()(
 
       return {
         // expose the SubscriptionRef so UI can subscribe reactively
-        isActiveRef,
-        // controls
-        start: SubscriptionRef.set(isActiveRef, true),
-        stop: SubscriptionRef.set(isActiveRef, false),
+        isActiveRef: isActiveRef,
         toggleIsActive: SubscriptionRef.update(
           isActiveRef,
           (isActive) => !isActive
         ),
-        // convenience getter (still available)
-        getIsActive: SubscriptionRef.get(isActiveRef),
       } as const;
     }),
   }

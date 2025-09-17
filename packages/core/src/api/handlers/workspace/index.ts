@@ -4,9 +4,9 @@ import {
   HttpServerResponse,
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
+import { WorkspaceId } from "@mason/api-contract/models/shared";
+import { Workspace } from "@mason/api-contract/models/workspace.model";
 import { Effect } from "effect";
-import { WorkspaceId } from "~/models/shared";
-import { Workspace } from "~/models/workspace.model";
 import { AuthService } from "~/services/auth";
 
 export const WorkspaceGroupLive = HttpApiBuilder.group(

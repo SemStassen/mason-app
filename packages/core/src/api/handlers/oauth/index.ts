@@ -2,28 +2,28 @@ import {
   HttpApiBuilder,
   HttpApiError,
   HttpServerResponse,
-} from '@effect/platform';
-import { MasonApi } from '@mason/api-contract';
-import { Effect } from 'effect';
-import { AuthService } from '~/services/auth';
+} from "@effect/platform";
+import { MasonApi } from "@mason/api-contract";
+import { Effect } from "effect";
+import { AuthService } from "~/services/auth";
 
 export const OAuthGroupLive = HttpApiBuilder.group(
   MasonApi,
-  'OAuth',
+  "OAuth",
   (handlers) =>
     Effect.gen(function* () {
       const auth = yield* AuthService;
       return handlers
-        .handle('SignInWithGoogle', ({ payload, request }) =>
+        .handle("SignInWithGoogle", ({ payload, request }) =>
           Effect.gen(function* () {
             const response = yield* auth.use((client) =>
               client.api.signInSocial({
                 body: {
-                  provider: 'google',
+                  provider: "google",
                   callbackURL:
-                    payload.platform === 'web'
-                      ? 'http://localhost:8002'
-                      : 'mason://',
+                    payload.platform === "web"
+                      ? "http://localhost:8002"
+                      : "mason://",
                 },
                 headers: new Headers(request.headers),
               })
@@ -36,28 +36,28 @@ export const OAuthGroupLive = HttpApiBuilder.group(
             })
           )
         )
-        .handle('GoogleCallback', ({ request }) =>
+        .handle("GoogleCallback", ({ request }) =>
           Effect.gen(function* () {
             // This is a silly thing we have to do because the better auth handler only matches/
             // /api/auth/callback/${provider_id}
             const betterAuthUrl = request.url.replace(
-              '/api/oauth/google/callback',
-              'http://localhost:8002/api/auth/callback/google'
+              "/api/oauth/google/callback",
+              "http://localhost:8002/api/auth/callback/google"
             );
 
             const response = yield* auth.use((client) =>
               client.handler(
                 new Request(betterAuthUrl, {
-                  method: 'GET',
+                  method: "GET",
                   headers: new Headers(request.headers),
                 })
               )
             );
 
-            const location = response.headers.get('Location');
+            const location = response.headers.get("Location");
             const setCookie =
-              response.headers.get('set-cookie') ||
-              response.headers.get('Set-Cookie');
+              response.headers.get("set-cookie") ||
+              response.headers.get("Set-Cookie");
 
             if (!location) {
               return yield* Effect.fail(new HttpApiError.InternalServerError());
@@ -67,12 +67,12 @@ export const OAuthGroupLive = HttpApiBuilder.group(
               status: 302,
               headers: {
                 Location: location,
-                ...(setCookie ? { 'set-cookie': setCookie } : {}),
+                ...(setCookie ? { "set-cookie": setCookie } : {}),
               },
             });
           }).pipe(
             Effect.tapError((error) =>
-              Effect.logError({ message: 'GoogleCallback failed', error })
+              Effect.logError({ message: "GoogleCallback failed", error })
             ),
             Effect.catchTags({
               BetterAuthError: () => new HttpApiError.InternalServerError(),
