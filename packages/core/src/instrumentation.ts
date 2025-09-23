@@ -1,12 +1,13 @@
-import type { Api } from "@effect/platform/HttpApi";
 import { Layer } from "effect";
-import type { ConfigError } from "effect/ConfigError";
-import { MasonApiLive } from "./api";
 import { AuthService } from "./services/auth";
 import { DatabaseService } from "./services/db";
+import { ProjectsService } from "./services/projects";
+import { WorkspaceIntegrationsService } from "./services/workspace-integrations";
 
-export const MasonLive: Layer.Layer<Api, ConfigError, never> =
-  MasonApiLive.pipe(
-    Layer.provide(AuthService.Default),
-    Layer.provide(DatabaseService.Default)
-  );
+export const ServerLayer = Layer.mergeAll(
+  AuthService.Default,
+  WorkspaceIntegrationsService.Default.pipe(
+    Layer.provideMerge(ProjectsService.Default)
+  ),
+  DatabaseService.Default
+).pipe(Layer.provide(DatabaseService.Default));

@@ -57,7 +57,6 @@ function NavItem({ item }: { item: NavItemProps }) {
       <TooltipTrigger asChild>
         <li>
           <Link
-            to={item.to}
             activeOptions={{
               exact: item.exact,
             }}
@@ -66,6 +65,7 @@ function NavItem({ item }: { item: NavItemProps }) {
                 "bg-primary-900/15 text-primary/75 hover:bg-primary-900/25 hover:text-primary",
             }}
             className="flex w-full items-center justify-start gap-2 rounded-md px-2 py-1 text-contrast-50 text-sm hover:bg-contrast-5 hover:text-foreground"
+            to={item.to}
           >
             <item.Icon />
             {item.label}
@@ -86,14 +86,14 @@ const Sidebar = observer(() => {
     <AnimatePresence initial={false}>
       {uiStore.isSidebarOpen && (
         <motion.aside
+          animate={{ width: 292 }}
           className="flex-none overflow-hidden border-r bg-sidebar"
+          exit={{ width: 0 }}
+          initial={{ width: 0 }}
           transition={{
             ease: "linear",
             duration: 0.1,
           }}
-          initial={{ width: 0 }}
-          animate={{ width: 292 }}
-          exit={{ width: 0 }}
         >
           <div className="flex h-full w-[292px] flex-none flex-col justify-between px-4 pt-4 pb-2">
             {/* Logo and navigation */}
@@ -103,7 +103,7 @@ const Sidebar = observer(() => {
                 <nav className="flex flex-col">
                   <ul className="space-y-0.5">
                     {NAV_ITEMS.map((item) => {
-                      return <NavItem key={item.to} item={item} />;
+                      return <NavItem item={item} key={item.to} />;
                     })}
                   </ul>
                 </nav>
@@ -114,9 +114,9 @@ const Sidebar = observer(() => {
                 Mason - Alpha v0.1
               </small>
               <Button
-                variant="ghost"
-                size="sm"
                 onClick={() => uiStore.toggleInspector()}
+                size="sm"
+                variant="ghost"
               >
                 Inspector
               </Button>
@@ -138,14 +138,14 @@ const SidebarToggle = observer(() => {
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
           onClick={() => uiStore.toggleSidebar()}
+          size="icon"
+          variant="ghost"
         >
           <Icons.Sidebar />
         </Button>
       </TooltipTrigger>
-      <TooltipContent className="flex items-center gap-1" align="start">
+      <TooltipContent align="start" className="flex items-center gap-1">
         {uiStore.isSidebarOpen ? "close sidebar" : "open sidebar"}
         <Hotkey>{hotkey}</Hotkey>
       </TooltipContent>

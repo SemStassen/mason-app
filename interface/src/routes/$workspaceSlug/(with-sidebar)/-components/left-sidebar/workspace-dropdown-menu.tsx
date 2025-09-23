@@ -16,18 +16,17 @@ import {
 import { Icons } from "@mason/ui/icons";
 import { Link, useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { useMasonClient } from "~/client";
+import { MasonClient } from "~/client";
 import { Route } from "../..";
 
 function WorkspaceDropdownMenu() {
   const router = useRouter();
   const { user } = Route.useRouteContext();
-  const masonClient = useMasonClient();
 
   const handleSetActiveWorkspace = async (workspaceId: string) => {
     await Effect.runPromise(
       Effect.gen(function* () {
-        yield* masonClient.Workspace.SetActiveWorkspace({
+        yield* MasonClient.Workspace.SetActiveWorkspace({
           payload: {
             workspaceId: workspaceId,
           },

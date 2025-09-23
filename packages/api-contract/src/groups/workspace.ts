@@ -4,7 +4,7 @@ import {
   CreateWorkspaceRequest,
   UpdateWorkspaceRequest,
   WorkspaceResponse,
-} from "~/models/workspace.model";
+} from "../dto/workspace.dto";
 
 export const WorkspaceGroup = HttpApiGroup.make("Workspace")
   .add(

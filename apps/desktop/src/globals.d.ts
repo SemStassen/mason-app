@@ -6,12 +6,12 @@ import type * as opener from "@tauri-apps/plugin-opener";
 import type * as os from "@tauri-apps/plugin-os";
 
 declare global {
-  // biome-ignore lint/nursery/useConsistentTypeDefinitions: Needed for global augmentation
+  // biome-ignore lint/nursery/useConsistentTypeDefinitions: Needed for global
   interface Window {
     __TAURI__: typeof app & {
       deepLink: typeof deeplink;
       fs: typeof fs;
-      http: typeof http; // <-- Is this correct? Not in docs
+      http: typeof http; // <-- Is this correct? Not in Tauri docs
       opener: typeof opener;
       os: typeof os;
     };

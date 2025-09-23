@@ -4,8 +4,8 @@ import { Icons } from "@mason/ui/icons";
 import { ledgerIsActiveAtom, toggleLedgerAtom } from "~/atoms/ledger-atom";
 
 function LedgerToggle() {
-  const ledgerIsActive = useAtomValue(ledgerIsActiveAtom.subscriptionRef);
-  const toggleLedger = useAtomSet(toggleLedgerAtom.fn);
+  const ledgerIsActive = useAtomValue(ledgerIsActiveAtom);
+  const toggleLedger = useAtomSet(toggleLedgerAtom);
 
   return Result.builder(ledgerIsActive)
     .onSuccess((isActive: boolean) => (

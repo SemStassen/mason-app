@@ -1,9 +1,13 @@
-import { HttpApiBuilder, HttpMiddleware, HttpServer } from "@effect/platform";
+import { HttpApiBuilder, HttpApiSwagger, HttpMiddleware, HttpServer } from "@effect/platform";
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
-import { MasonLive } from "@mason/core/instrumentation";
+import { ServerLayer } from "@mason/core/instrumentation";
 import { Layer } from "effect";
+import { MasonApiLive } from "./api";
 
 const HttpLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
+  Layer.provide(HttpApiSwagger.layer({
+    path: "/docs",
+  })),
   Layer.provide(
     HttpApiBuilder.middlewareCors({
       allowedOrigins: [
@@ -12,9 +16,9 @@ const HttpLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
         "http://localhost:1420",
         "tauri://localhost",
       ],
-    })
+    }),
   ),
-  Layer.provide(MasonLive),
+  Layer.provide(MasonApiLive.pipe(Layer.provide(ServerLayer))),
   HttpServer.withLogAddress,
   Layer.provide(BunHttpServer.layer({ port: 8001 }))
 );

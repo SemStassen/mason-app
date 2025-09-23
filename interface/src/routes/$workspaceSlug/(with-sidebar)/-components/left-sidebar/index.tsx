@@ -3,7 +3,8 @@ import { Button } from "@mason/ui/button";
 import { Icons } from "@mason/ui/icons";
 import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
-import { leftSidebarAtom, toggleDebugSheet } from "~/atoms/ui-atoms";
+import { leftSidebarAtom } from "~/atoms/ui-atoms";
+
 import { LedgerToggle } from "./ledger-toggle";
 import { UserDropdownMenu } from "./user-dropdown-menu";
 import { WorkspaceDropdownMenu } from "./workspace-dropdown-menu";
@@ -50,15 +51,10 @@ function LeftSidebar() {
                 variant="ghost"
               />
               <LedgerToggle />
-              <Button
-                className="w-full justify-start"
-                onClick={toggleDebugSheet}
-                variant="ghost"
-              >
-                <Icons.Bug />
-                Inspector
-              </Button>
-              <UserDropdownMenu />
+              {/* Wrap in a div to avoid layout shift when the dropdown menu is open */}
+              <div>
+                <UserDropdownMenu />
+              </div>
             </div>
           </div>
         </motion.aside>

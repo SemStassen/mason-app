@@ -1,4 +1,4 @@
-import type { CreateProjectRequest } from "@mason/core/models/project.model";
+import type { CreateProjectRequest } from "@mason/api-contract/dto/project.dto";
 import { Context, type Effect, Layer } from "effect";
 import { type FloatIntegrationError, floatLive } from "./float";
 

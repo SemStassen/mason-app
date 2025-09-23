@@ -1,8 +1,7 @@
 import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from "@effect/platform";
 import { Schema } from "effect";
-import { UserResponse } from "~/models/user.model";
-import { WorkspaceResponse } from "~/models/workspace.model";
-import { regex } from "~/utils/regex";
+import { UserResponse } from "../dto/user.dto";
+import { WorkspaceResponse } from "../dto/workspace.dto";
 
 export const AuthGroup = HttpApiGroup.make("Auth")
   .add(
@@ -35,7 +34,7 @@ export const AuthGroup = HttpApiGroup.make("Auth")
     HttpApiEndpoint.post("SendEmailVerificationOTP")`/email-otp`
       .setPayload(
         Schema.Struct({
-          email: Schema.String.pipe(Schema.pattern(regex.email)),
+          email: Schema.NonEmptyString,
           type: Schema.Literal(
             "sign-in",
             "email-verification",
@@ -49,7 +48,7 @@ export const AuthGroup = HttpApiGroup.make("Auth")
     HttpApiEndpoint.post("SignInWithEmailOTP")`/verify-email`
       .setPayload(
         Schema.Struct({
-          email: Schema.String.pipe(Schema.pattern(regex.email)),
+          email: Schema.NonEmptyString,
           otp: Schema.String,
         })
       )

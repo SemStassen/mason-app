@@ -1,13 +1,11 @@
 import { Toaster } from "@mason/ui/sonner";
 import { createRootRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { createMasonClient } from "~/client";
+import { MasonClient } from "~/client";
 import { AppProviders } from "./-app-providers";
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
-    const MasonClient = createMasonClient();
-
     const sessionResult = await Effect.runPromise(
       MasonClient.Auth.GetSession().pipe(
         Effect.catchTags({

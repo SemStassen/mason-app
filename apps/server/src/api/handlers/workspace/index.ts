@@ -4,10 +4,9 @@ import {
   HttpServerResponse,
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
-import { WorkspaceId } from "@mason/api-contract/models/shared";
-import { Workspace } from "@mason/api-contract/models/workspace.model";
+import { WorkspaceResponse } from "@mason/api-contract/dto/workspace.dto";
+import { AuthService } from "@mason/core/services/auth";
 import { Effect } from "effect";
-import { AuthService } from "~/services/auth";
 
 export const WorkspaceGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -56,9 +55,9 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
               return yield* Effect.fail(new HttpApiError.InternalServerError());
             }
 
-            return Workspace.make({
+            return WorkspaceResponse.make({
               ...workspace,
-              id: WorkspaceId.make(workspace.id),
+              id: workspace.id,
               logoUrl: workspace.logo || null,
               metadata: workspace.metadata || null,
             });
@@ -81,9 +80,9 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
               return yield* Effect.fail(new HttpApiError.InternalServerError());
             }
 
-            return Workspace.make({
+            return WorkspaceResponse.make({
               ...workspace,
-              id: WorkspaceId.make(workspace.id),
+              id: workspace.id,
               logoUrl: workspace.logo || null,
               metadata: workspace.metadata || null,
             });
@@ -102,9 +101,9 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
             }
 
             return workspaces.map((workspace) =>
-              Workspace.make({
+              WorkspaceResponse.make({
                 ...workspace,
-                id: WorkspaceId.make(workspace.id),
+                id: workspace.id,
                 logoUrl: workspace.logo || null,
                 metadata: workspace.metadata || null,
               })
@@ -137,9 +136,9 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
               return yield* Effect.fail(new HttpApiError.InternalServerError());
             }
 
-            return Workspace.make({
+            return WorkspaceResponse.make({
               ...updatedWorkspace,
-              id: WorkspaceId.make(updatedWorkspace.id),
+              id: updatedWorkspace.id,
               logoUrl: updatedWorkspace.logo || null,
               metadata: updatedWorkspace.metadata || null,
             });

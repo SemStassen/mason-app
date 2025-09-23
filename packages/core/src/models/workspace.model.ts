@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { generateUUID } from "~/utils/uuid";
+import { generateUUID } from "../utils/uuid";
 import { WorkspaceId } from "./shared";
 
 export class Workspace extends Schema.Struct({
@@ -13,12 +13,12 @@ export class Workspace extends Schema.Struct({
   metadata: Schema.NullOr(Schema.String),
 }) {}
 
-export const CreateWorkspaceRequest = Schema.Struct({
+export const WorkspaceToCreate = Schema.Struct({
   name: Workspace.fields.name,
   slug: Workspace.fields.slug,
 });
 
-export const UpdateWorkspaceRequest = Schema.Struct({
+export const WorkspaceToUpdate = Schema.Struct({
   name: Schema.optionalWith(Workspace.fields.name, {
     exact: true,
   }),
@@ -32,5 +32,3 @@ export const UpdateWorkspaceRequest = Schema.Struct({
     exact: true,
   }),
 });
-
-export const WorkspaceResponse = Schema.Struct(Workspace.fields);

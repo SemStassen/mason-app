@@ -1,8 +1,8 @@
-import { Menu as BaseMenu } from '@base-ui-components/react/menu';
-import type * as React from 'react';
+import { Menu as BaseMenu } from "@base-ui-components/react/menu";
+import type * as React from "react";
 
-import { cn } from '../utils';
-import { Icons } from './icons';
+import { cn } from "../utils";
+import { Icons } from "./icons";
 
 function DropdownMenu({
   ...props
@@ -32,14 +32,14 @@ function DropdownMenuPositioner({
 
 function DropdownMenuContent({
   className,
-  align = 'center',
-  side = 'bottom',
+  align = "center",
+  side = "bottom",
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
-  align?: BaseMenu.Positioner.Props['align'];
-  side?: BaseMenu.Positioner.Props['side'];
-  sideOffset?: BaseMenu.Positioner.Props['sideOffset'];
+  align?: BaseMenu.Positioner.Props["align"];
+  side?: BaseMenu.Positioner.Props["side"];
+  sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
 }) {
   return (
     <DropdownMenuPortal>
@@ -51,7 +51,7 @@ function DropdownMenuContent({
       >
         <BaseMenu.Popup
           className={cn(
-            'data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[12rem] origin-[var(--transform-origin)] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-closed:animate-out data-open:animate-in',
+            "data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[12rem] origin-[var(--transform-origin)] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-closed:animate-out data-open:animate-in",
             className
           )}
           data-slot="dropdown-menu-content"
@@ -71,11 +71,11 @@ function DropdownMenuGroup({
 function DropdownMenuItem({
   className,
   inset,
-  variant = 'default',
+  variant = "default",
   ...props
 }: React.ComponentProps<typeof BaseMenu.Item> & {
   inset?: boolean;
-  variant?: 'default' | 'destructive';
+  variant?: "default" | "destructive";
 }) {
   return (
     <BaseMenu.Item
@@ -94,11 +94,11 @@ function DropdownMenuItem({
 function DropdownMenuShortcut({
   className,
   ...props
-}: React.ComponentProps<'span'>) {
+}: React.ComponentProps<"span">) {
   return (
     <span
       className={cn(
-        'ml-auto text-muted-foreground text-xs tracking-widest',
+        "ml-auto text-muted-foreground text-xs tracking-widest",
         className
       )}
       data-slot="dropdown-menu-shortcut"
@@ -113,7 +113,7 @@ function DropdownMenuSeparator({
 }: React.ComponentProps<typeof BaseMenu.Separator>) {
   return (
     <BaseMenu.Separator
-      className={cn('-mx-1 my-1 h-px bg-border', className)}
+      className={cn("-mx-1 my-1 h-px bg-border", className)}
       data-slot="dropdown-menu-separator"
       {...props}
     />
@@ -130,7 +130,7 @@ function DropdownMenuLabel({
   return (
     <BaseMenu.GroupLabel
       className={cn(
-        'px-2 py-1.5 font-medium text-xs data-[inset]:pl-8',
+        "px-2 py-1.5 font-medium text-xs data-[inset]:pl-8",
         className
       )}
       data-inset={inset}
@@ -223,7 +223,7 @@ function DropdownMenuSubTrigger({
   return (
     <BaseMenu.SubmenuTrigger
       className={cn(
-        'flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground data-popup-open:bg-accent data-[inset]:pl-8 data-popup-open:text-accent-foreground',
+        "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground data-popup-open:bg-accent data-[inset]:pl-8 data-popup-open:text-accent-foreground",
         className
       )}
       data-inset={inset}
@@ -239,11 +239,11 @@ function DropdownMenuSubTrigger({
 function DropdownMenuSubContent({
   className,
   sideOffset = 0,
-  align = 'start',
+  align = "start",
   ...props
 }: React.ComponentProps<typeof BaseMenu.Popup> & {
-  align?: BaseMenu.Positioner.Props['align'];
-  sideOffset?: BaseMenu.Positioner.Props['sideOffset'];
+  align?: BaseMenu.Positioner.Props["align"];
+  sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
 }) {
   return (
     <DropdownMenuPortal>
@@ -254,7 +254,7 @@ function DropdownMenuSubContent({
       >
         <BaseMenu.Popup
           className={cn(
-            'data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[12rem] origin-[var(--transform-origin)] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-closed:animate-out data-open:animate-in',
+            "data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[12rem] origin-[var(--transform-origin)] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-closed:animate-out data-open:animate-in",
             className
           )}
           data-slot="dropdown-menu-content"

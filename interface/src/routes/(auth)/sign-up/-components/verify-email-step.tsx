@@ -1,21 +1,21 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@mason/ui/button';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@mason/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-} from '@mason/ui/form';
-import { Icons } from '@mason/ui/icons';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@mason/ui/input-otp';
-import { useNavigate } from '@tanstack/react-router';
-import { Effect } from 'effect';
-import type { Dispatch, SetStateAction } from 'react';
-import { useForm } from 'react-hook-form';
-import z from 'zod';
-import { useMasonClient } from '~/client';
-import type { SignUpStep } from '..';
+} from "@mason/ui/form";
+import { Icons } from "@mason/ui/icons";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@mason/ui/input-otp";
+import { useNavigate } from "@tanstack/react-router";
+import { Effect } from "effect";
+import type { Dispatch, SetStateAction } from "react";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { MasonClient } from "~/client";
+import type { SignUpStep } from "..";
 
 const verifyEmailSchema = z.object({
   email: z.email(),
@@ -31,13 +31,12 @@ function VerifyEmailStep({
   setCurrentStep: Dispatch<SetStateAction<SignUpStep>>;
   email: string;
 }) {
-  const MasonClient = useMasonClient();
   const navigate = useNavigate();
   const form = useForm<FormValues>({
     resolver: zodResolver(verifyEmailSchema),
     defaultValues: {
       email: email,
-      otp: '',
+      otp: "",
     },
   });
 
@@ -49,12 +48,12 @@ function VerifyEmailStep({
         },
         withResponse: true,
       }).pipe(
-        Effect.catchAll(() => Effect.succeed({ error: 'Unexpected error' }))
+        Effect.catchAll(() => Effect.succeed({ error: "Unexpected error" }))
       )
     );
 
     navigate({
-      to: '/',
+      to: "/",
     });
   };
 
@@ -98,7 +97,7 @@ function VerifyEmailStep({
       </div>
       <Button
         className="text-muted-foreground text-sm"
-        onClick={() => setCurrentStep('chooseMethod')}
+        onClick={() => setCurrentStep("chooseMethod")}
         variant="link"
       >
         Back to login

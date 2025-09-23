@@ -1,5 +1,5 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@mason/ui/button';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@mason/ui/button";
 import {
   Form,
   FormControl,
@@ -7,15 +7,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@mason/ui/form';
-import { Icons } from '@mason/ui/icons';
-import { Input } from '@mason/ui/input';
-import { Effect } from 'effect';
-import type { Dispatch, SetStateAction } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { useMasonClient } from '~/client';
-import type { SignUpStep } from '..';
+} from "@mason/ui/form";
+import { Icons } from "@mason/ui/icons";
+import { Input } from "@mason/ui/input";
+import { Effect } from "effect";
+import type { Dispatch, SetStateAction } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { MasonClient } from "~/client";
+import type { SignUpStep } from "..";
 
 const enterEmailSchema = z.object({
   email: z.email(),
@@ -30,11 +30,10 @@ function EnterEmailStep({
   setCurrentStep: Dispatch<SetStateAction<SignUpStep>>;
   setEmail: Dispatch<SetStateAction<string>>;
 }) {
-  const MasonClient = useMasonClient();
   const form = useForm<FormValues>({
     resolver: zodResolver(enterEmailSchema),
     defaultValues: {
-      email: '',
+      email: "",
     },
   });
 
@@ -43,13 +42,13 @@ function EnterEmailStep({
       MasonClient.Auth.SendEmailVerificationOTP({
         payload: {
           ...data,
-          type: 'sign-in',
+          type: "sign-in",
         },
       }).pipe(
-        Effect.catchAll(() => Effect.succeed({ error: 'Unexpected error' }))
+        Effect.catchAll(() => Effect.succeed({ error: "Unexpected error" }))
       )
     );
-    setCurrentStep('verifyEmail');
+    setCurrentStep("verifyEmail");
   };
 
   return (
@@ -96,7 +95,7 @@ function EnterEmailStep({
       </div>
       <Button
         className="text-muted-foreground text-sm"
-        onClick={() => setCurrentStep('chooseMethod')}
+        onClick={() => setCurrentStep("chooseMethod")}
         variant="link"
       >
         Back to login

@@ -14,7 +14,7 @@ import { Effect } from "effect";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { useMasonClient } from "~/client";
+import { MasonClient } from "~/client";
 import { slugify } from "~/utils/slugify";
 
 export const Route = createFileRoute("/(onboarding)/create-workspace/")({
@@ -46,7 +46,6 @@ function RouteComponent() {
   }, [form, name]);
 
   const navigate = useNavigate();
-  const MasonClient = useMasonClient();
 
   const onSubmit = async (data: FormValues) => {
     await Effect.runPromise(

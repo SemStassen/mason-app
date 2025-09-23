@@ -1,7 +1,7 @@
-import { CreateProjectRequest } from "@mason/core/models/project.model";
-import { stringToTiptapJSON } from "@mason/core/utils/tiptap";
+import { CreateProjectRequest } from "@mason/api-contract/dto/project.dto";
 import { Data, Effect } from "effect";
-import { TimeTrackingIntegrationService } from "../index.js";
+import { TimeTrackingIntegrationService } from "../index";
+import { stringToTiptapJSON } from "../utils";
 
 /**
  * Represents a project from the Float API

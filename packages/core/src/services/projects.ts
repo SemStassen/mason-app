@@ -1,13 +1,13 @@
-import {
-  type CreateProjectRequest,
-  Project,
-  type UpdateProjectRequest,
-  type UpsertProjectRequest,
-} from "@mason/api-contract/models/project.model";
-import { ProjectId, WorkspaceId } from "@mason/api-contract/models/shared";
 import { and, eq, inArray } from "@mason/db/operators";
 import { type DbProject, projectsTable } from "@mason/db/schema";
 import { Effect, Match } from "effect";
+import {
+  Project,
+  type ProjectToCreate,
+  type ProjectToUpdate,
+  type ProjectToUpsert,
+} from "../models/project.model";
+import { ProjectId, WorkspaceId } from "../models/shared";
 import { DatabaseService } from "./db";
 import { RequestContextService } from "./request-context";
 
@@ -18,7 +18,7 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
       const db = yield* DatabaseService;
 
       const createProjects = (
-        projectsToCreate: Array<typeof CreateProjectRequest.Type>
+        projectsToCreate: Array<typeof ProjectToCreate.Type>
       ) =>
         Effect.gen(function* () {
           const ctx = yield* RequestContextService;
@@ -42,7 +42,7 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
         });
 
       const updateProjects = (
-        projectsToUpdate: Array<typeof UpdateProjectRequest.Type>
+        projectsToUpdate: Array<typeof ProjectToUpdate.Type>
       ) =>
         Effect.gen(function* () {
           const ctx = yield* RequestContextService;
@@ -116,7 +116,7 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
       return {
         createProjects: createProjects,
         updateProjects: updateProjects,
-        upsertProjects: (projects: Array<typeof UpsertProjectRequest.Type>) =>
+        upsertProjects: (projects: Array<typeof ProjectToUpsert.Type>) =>
           Effect.gen(function* () {
             const results: Array<typeof Project.Type> = [];
 
@@ -133,6 +133,23 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
             }
 
             return results;
+          }),
+        softDeleteProjects: (projectIds: Array<typeof ProjectId.Type>) =>
+          Effect.gen(function* () {
+            const ctx = yield* RequestContextService;
+
+            yield* db.use((conn) =>
+              conn
+                .update(projectsTable)
+                .set({ deletedAt: new Date() })
+                .where(
+                  and(
+                    eq(projectsTable.workspaceId, ctx.workspaceId),
+                    inArray(projectsTable.id, projectIds)
+                  )
+                )
+                .returning()
+            );
           }),
       };
     }),
