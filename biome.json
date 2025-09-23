@@ -25,7 +25,8 @@
           }
         },
         "useConsistentObjectDefinitions": "off",
-        "noMagicNumbers": "off"
+        "noMagicNumbers": "off",
+        "useNodejsImportProtocol": "off"
       },
       "nursery": {
         "useMaxParams": {

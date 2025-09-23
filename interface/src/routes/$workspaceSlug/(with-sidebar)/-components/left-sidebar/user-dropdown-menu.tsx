@@ -11,17 +11,15 @@ import {
 import { Icons } from "@mason/ui/icons";
 import { Link } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { useMasonClient } from "~/client";
+import { MasonClient } from "~/client";
 import { Route } from "../..";
 
 function UserDropdownMenu() {
   const { user } = Route.useRouteContext();
 
-  const masonClient = useMasonClient();
-
   const handleSignOut = async () => {
     await Effect.runPromise(
-      masonClient.Auth.SignOut().pipe(
+      MasonClient.Auth.SignOut().pipe(
         Effect.catchAll(() => Effect.succeed(null))
       )
     );

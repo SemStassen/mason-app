@@ -14,9 +14,7 @@
   },
   "dependencies": {
     "drizzle-orm": "workspace:^",
-    "drizzle-zod": "^0.8.3",
-    "pg": "^8.16.3",
-    "zod": "^4.0.14"
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.9.0",

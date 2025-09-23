@@ -4,8 +4,8 @@ import {
   HttpServerResponse,
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
+import { AuthService } from "@mason/core/services/auth";
 import { Effect } from "effect";
-import { AuthService } from "~/services/auth";
 
 export const OAuthGroupLive = HttpApiBuilder.group(
   MasonApi,

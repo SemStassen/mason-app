@@ -1,5 +1,6 @@
 {
   "name": "@mason/config",
+  "type": "module",
   "exports": {
     "./*": "./src/*"
   },

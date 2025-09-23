@@ -1,7 +1,7 @@
-import { useAtomRef } from '@effect-atom/atom-react';
-import { calendarCurrentTimeAtom } from '~/atoms/calendar-atom';
-import { formatter } from '~/utils/date-time';
-import { FIRST_VISIBLE_HOUR, LAST_VISIBLE_HOUR } from '../..';
+import { useAtomRef } from "@effect-atom/atom-react";
+import { calendarCurrentTimeAtom } from "~/atoms/calendar-atom";
+import { formatter } from "~/utils/date-time";
+import { FIRST_VISIBLE_HOUR, LAST_VISIBLE_HOUR } from "../..";
 
 function CurrentTimeLine() {
   const currentTime = useAtomRef(calendarCurrentTimeAtom);

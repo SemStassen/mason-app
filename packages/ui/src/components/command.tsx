@@ -1,14 +1,14 @@
-import { Command as CommandBase } from 'cmdk-base';
-import type * as React from 'react';
-import { cn } from '../utils';
+import { Command as CommandBase } from "cmdk-base";
+import type * as React from "react";
+import { cn } from "../utils";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from './dialog';
-import { Icons } from './icons';
+} from "./dialog";
+import { Icons } from "./icons";
 
 function Command({
   className,
@@ -17,7 +17,7 @@ function Command({
   return (
     <CommandBase
       className={cn(
-        'flex h-full w-full flex-col overflow-hidden rounded-md border bg-popover text-popover-foreground outline-none',
+        "flex h-full w-full flex-col overflow-hidden rounded-md border bg-popover text-popover-foreground outline-none",
         className
       )}
       data-slot="command"
@@ -27,8 +27,8 @@ function Command({
 }
 
 function CommandDialog({
-  title = 'Command Palette',
-  description = 'Search for a command to run...',
+  title = "Command Palette",
+  description = "Search for a command to run...",
   children,
   ...props
 }: React.ComponentProps<typeof Dialog> & {
@@ -41,7 +41,10 @@ function CommandDialog({
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription>{description}</DialogDescription>
       </DialogHeader>
-      <DialogContent className="overflow-hidden p-0 [&_[data-dialog-close]]:hidden">
+      <DialogContent
+        className="overflow-hidden p-0 [&_[data-dialog-close]]:hidden"
+        withCloseButton={false}
+      >
         <Command className="border-none">{children}</Command>
       </DialogContent>
     </Dialog>
@@ -60,7 +63,7 @@ function CommandInput({
       <Icons.Search className="size-4 shrink-0 opacity-50" />
       <CommandBase.Input
         className={cn(
-          'flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
+          "flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}
         data-slot="command-input"
@@ -77,7 +80,7 @@ function CommandList({
   return (
     <CommandBase.List
       className={cn(
-        'max-h-[300px] overflow-y-auto overflow-x-hidden outline-hidden',
+        "max-h-[300px] overflow-y-auto overflow-x-hidden outline-hidden",
         className
       )}
       data-slot="command-list"
@@ -105,7 +108,7 @@ function CommandGroup({
   return (
     <CommandBase.Group
       className={cn(
-        'overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:text-xs',
+        "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:text-xs",
         className
       )}
       data-slot="command-group"
@@ -120,7 +123,7 @@ function CommandSeparator({
 }: React.ComponentProps<typeof CommandBase.Separator>) {
   return (
     <CommandBase.Separator
-      className={cn('-mx-1 h-px bg-border', className)}
+      className={cn("-mx-1 h-px bg-border", className)}
       data-slot="command-separator"
       {...props}
     />
@@ -146,11 +149,11 @@ function CommandItem({
 function CommandShortcut({
   className,
   ...props
-}: React.ComponentProps<'span'>) {
+}: React.ComponentProps<"span">) {
   return (
     <span
       className={cn(
-        'ml-auto flex items-center gap-1 text-muted-foreground text-xs tracking-widest',
+        "ml-auto flex items-center gap-1 text-muted-foreground text-xs tracking-widest",
         className
       )}
       data-slot="command-shortcut"

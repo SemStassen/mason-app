@@ -10,15 +10,16 @@
   },
   "dependencies": {
     "@effect/platform": "workspace:^",
-    "@mason/api-contract": "workspace:*",
-    "effect": "workspace:^"
+    "@mason/db": "workspace:*",
+    "effect": "workspace:^",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
     "typescript": "workspace:^"
   },
   "exports": {
-    "./api": "./src/api/index.ts",
+    "./services/*": "./src/services/*.ts",
     "./utils/*": "./src/utils/*.ts",
     "./instrumentation": "./src/instrumentation.ts"
   }

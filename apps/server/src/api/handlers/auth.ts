@@ -4,9 +4,8 @@ import {
   HttpServerResponse,
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
-import { UserId, WorkspaceId } from "@mason/api-contract/models/shared";
+import { AuthService } from "@mason/core/services/auth";
 import { Effect } from "effect";
-import { AuthService } from "~/services/auth";
 
 export const AuthGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -37,7 +36,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
 
             const activeWorkspace = activeMembership
               ? {
-                  id: WorkspaceId.make(activeMembership.workspace.id),
+                  id: activeMembership.workspace.id,
                   slug: activeMembership.workspace.slug,
                   name: activeMembership.workspace.name,
                 }
@@ -45,13 +44,13 @@ export const AuthGroupLive = HttpApiBuilder.group(
 
             return {
               user: {
-                id: UserId.make(response.user.id),
+                id: response.user.id,
                 email: response.user.email,
                 emailVerified: response.user.emailVerified,
                 displayName: response.user.displayName,
                 imageUrl: response.user.imageUrl,
                 workspaces: response.user.memberships.map((membership) => ({
-                  id: WorkspaceId.make(membership.workspace.id),
+                  id: membership.workspace.id,
                   slug: membership.workspace.slug,
                   name: membership.workspace.name,
                 })),

@@ -7,12 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createSchemaFactory } from "drizzle-zod";
-import z from "zod";
-import { tableId, tableMetadata } from "./snippets";
-
-const { createInsertSchema, createSelectSchema, createUpdateSchema } =
-  createSchemaFactory({ zodInstance: z });
+import { tableId, tableMetadata, tableSoftDelete } from "./snippets";
 
 export const usersTable = pgTable("users", {
   id: tableId,
@@ -30,10 +25,7 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
   memberships: many(membersTable),
 }));
 
-export const createUserSchema = createInsertSchema(usersTable);
-export const selectUserSchema = createSelectSchema(usersTable);
-export const updateUserSchema = createUpdateSchema(usersTable);
-export type DbUser = z.infer<typeof selectUserSchema>;
+export type DbUser = typeof usersTable.$inferSelect;
 
 export const sessionsTable = pgTable("sessions", {
   id: tableId,
@@ -60,10 +52,7 @@ export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
   }),
 }));
 
-export const createSessionSchema = createInsertSchema(sessionsTable);
-export const selectSessionSchema = createSelectSchema(sessionsTable);
-export const updateSessionSchema = createUpdateSchema(sessionsTable);
-export type DbSession = z.infer<typeof selectSessionSchema>;
+export type DbSession = typeof sessionsTable.$inferSelect;
 
 export const accountsTable = pgTable("accounts", {
   id: tableId,
@@ -97,10 +86,7 @@ export const accountsRelations = relations(accountsTable, ({ one }) => ({
   }),
 }));
 
-export const createAccountSchema = createInsertSchema(accountsTable);
-export const selectAccountSchema = createSelectSchema(accountsTable);
-export const updateAccountSchema = createUpdateSchema(accountsTable);
-export type DbAccount = z.infer<typeof selectAccountSchema>;
+export type DbAccount = typeof accountsTable.$inferSelect;
 
 export const verificationsTable = pgTable("verifications", {
   id: tableId,
@@ -116,10 +102,7 @@ export const verificationsTable = pgTable("verifications", {
 });
 export const verificationsRelations = relations(verificationsTable, () => ({}));
 
-export const createVerificationSchema = createInsertSchema(verificationsTable);
-export const selectVerificationSchema = createSelectSchema(verificationsTable);
-export const updateVerificationSchema = createUpdateSchema(verificationsTable);
-export type DbVerification = z.infer<typeof selectVerificationSchema>;
+export type DbVerification = typeof verificationsTable.$inferSelect;
 
 export const workspacesTable = pgTable("workspaces", {
   id: tableId,
@@ -138,10 +121,7 @@ export const workspacesRelations = relations(workspacesTable, ({ many }) => ({
   projects: many(projectsTable),
 }));
 
-export const createWorkspaceSchema = createInsertSchema(workspacesTable);
-export const selectWorkspaceSchema = createSelectSchema(workspacesTable);
-export const updateWorkspaceSchema = createUpdateSchema(workspacesTable);
-export type DbWorkspace = z.infer<typeof selectWorkspaceSchema>;
+export type DbWorkspace = typeof workspacesTable.$inferSelect;
 
 export const membersTable = pgTable("members", {
   id: tableId,
@@ -170,10 +150,7 @@ export const membersRelations = relations(membersTable, ({ one, many }) => ({
   timeEntries: many(timeEntriesTable),
 }));
 
-export const createMemberSchema = createInsertSchema(membersTable);
-export const selectMemberSchema = createSelectSchema(membersTable);
-export const updateMemberSchema = createUpdateSchema(membersTable);
-export type DbMember = z.infer<typeof selectMemberSchema>;
+export type DbMember = typeof membersTable.$inferSelect;
 
 export const invitationsTable = pgTable("invitations", {
   id: tableId,
@@ -206,10 +183,7 @@ export const invitationsRelations = relations(invitationsTable, ({ one }) => ({
   }),
 }));
 
-export const createInvitationSchema = createInsertSchema(invitationsTable);
-export const selectInvitationSchema = createSelectSchema(invitationsTable);
-export const updateInvitationSchema = createUpdateSchema(invitationsTable);
-export type DbInvitation = z.infer<typeof selectInvitationSchema>;
+export type DbInvitation = typeof invitationsTable.$inferSelect;
 
 /**
  * Application
@@ -222,7 +196,7 @@ export const workspaceIntegrationsTable = pgTable("workspace_integrations", {
     .notNull(),
   // General
   kind: varchar({ enum: ["float"] }).notNull(),
-  apiKeyEncrypted: varchar("api_key_encrypted"),
+  apiKeyEncrypted: varchar("api_key_encrypted").notNull(),
   // Metadata
   ...tableMetadata,
 });
@@ -236,18 +210,8 @@ export const workspaceIntegrationsRelations = relations(
   })
 );
 
-export const createWorkspaceIntegrationSchema = createInsertSchema(
-  workspaceIntegrationsTable
-);
-export const selectWorkspaceIntegrationSchema = createSelectSchema(
-  workspaceIntegrationsTable
-);
-export const updateWorkspaceIntegrationSchema = createUpdateSchema(
-  workspaceIntegrationsTable
-);
-export type DbWorkspaceIntegration = z.infer<
-  typeof selectWorkspaceIntegrationSchema
->;
+export type DbWorkspaceIntegration =
+  typeof workspaceIntegrationsTable.$inferSelect;
 
 export const projectsTable = pgTable("projects", {
   id: tableId,
@@ -267,6 +231,7 @@ export const projectsTable = pgTable("projects", {
   metadata: jsonb("metadata").$type<{
     floatId?: number;
   }>(),
+  ...tableSoftDelete,
   ...tableMetadata,
 });
 export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
@@ -277,10 +242,7 @@ export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
   activities: many(activitiesTable),
 }));
 
-export const createProjectSchema = createInsertSchema(projectsTable);
-export const selectProjectSchema = createSelectSchema(projectsTable);
-export const updateProjectSchema = createUpdateSchema(projectsTable);
-export type DbProject = z.infer<typeof selectProjectSchema>;
+export type DbProject = typeof projectsTable.$inferSelect;
 
 export const activitiesTable = pgTable("activities", {
   id: tableId,
@@ -304,10 +266,7 @@ export const activitiesRelations = relations(
   })
 );
 
-export const createActivitySchema = createInsertSchema(activitiesTable);
-export const selectActivitySchema = createSelectSchema(activitiesTable);
-export const updateActivitySchema = createUpdateSchema(activitiesTable);
-export type DbActivity = z.infer<typeof selectActivitySchema>;
+export type DbActivity = typeof activitiesTable.$inferSelect;
 
 export const timeEntriesTable = pgTable("time_entries", {
   id: tableId,
@@ -341,7 +300,4 @@ export const timeEntriesRelations = relations(timeEntriesTable, ({ one }) => ({
   }),
 }));
 
-export const createTimeEntrySchema = createInsertSchema(timeEntriesTable);
-export const selectTimeEntrySchema = createSelectSchema(timeEntriesTable);
-export const updateTimeEntrySchema = createUpdateSchema(timeEntriesTable);
-export type DbTimeEntry = z.infer<typeof selectTimeEntrySchema>;
+export type DbTimeEntry = typeof timeEntriesTable.$inferSelect;

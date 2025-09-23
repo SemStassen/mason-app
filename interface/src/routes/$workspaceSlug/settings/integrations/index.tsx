@@ -10,7 +10,7 @@ import { Card, CardContent } from "@mason/ui/card";
 import { Icons } from "@mason/ui/icons";
 import { createFileRoute } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { createMasonClient } from "~/client";
+import { MasonClient } from "~/client";
 import { SetApiKeyForm } from "./-components/set-api-key-form";
 
 export const Route = createFileRoute("/$workspaceSlug/settings/integrations/")({
@@ -19,9 +19,7 @@ export const Route = createFileRoute("/$workspaceSlug/settings/integrations/")({
       getTitle: () => "Integrations",
     };
   },
-  loader: async ({ context }) => {
-    const MasonClient = createMasonClient(context.platform);
-
+  loader: async () => {
     const workspaceIntegrations = await Effect.runPromise(
       MasonClient.WorkspaceIntegrations.ListIntegrations()
     );

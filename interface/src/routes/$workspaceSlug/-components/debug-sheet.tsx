@@ -2,7 +2,8 @@ import { useAtomRef } from "@effect-atom/atom-react";
 import { Repl } from "@electric-sql/pglite-repl";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@mason/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mason/ui/tabs";
-import { debugSheetAtom } from "~/atoms/ui-atoms";
+import { debugSheetAtom, toggleDebugSheet } from "~/atoms/ui-atoms";
+import { useRegisterCommands } from "~/components/app-commands-dialog";
 import { usePGlite } from "~/core/db";
 import { PLATFORM } from "~/utils/constants";
 
@@ -10,15 +11,21 @@ function DebugSheet() {
   const db = usePGlite();
   const { isOpen } = useAtomRef(debugSheetAtom);
 
+  useRegisterCommands(() => [
+    {
+      title: isOpen ? "Close inspector" : "Open inspector",
+      value: isOpen ? "close-inspector" : "open-inspector",
+      hotkey: "o>i",
+      category: "developer",
+      onSelect: (dialog) => {
+        toggleDebugSheet();
+        dialog.close();
+      },
+    },
+  ]);
+
   return (
-    <Sheet
-      onOpenChange={(open) =>
-        debugSheetAtom.update(() => ({
-          isOpen: open,
-        }))
-      }
-      open={isOpen}
-    >
+    <Sheet onOpenChange={toggleDebugSheet} open={isOpen}>
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Mason Inspector</SheetTitle>

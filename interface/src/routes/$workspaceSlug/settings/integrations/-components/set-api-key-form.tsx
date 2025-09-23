@@ -12,7 +12,7 @@ import { Input } from "@mason/ui/input";
 import { Effect } from "effect";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { useMasonClient } from "~/client";
+import { MasonClient } from "~/client";
 
 const setApiKeySchema = z.object({
   apiKey: z.string(),
@@ -21,15 +21,14 @@ const setApiKeySchema = z.object({
 type FormValues = z.infer<typeof setApiKeySchema>;
 
 function SetApiKeyForm() {
-  const MasonClient = useMasonClient();
   const form = useForm<FormValues>({
     resolver: zodResolver(setApiKeySchema),
   });
 
   const onSubmit = async (data: FormValues) => {
     await Effect.runPromise(
-      MasonClient.FloatWorkspaceIntegration.SetApiKey({
-        payload: data,
+      MasonClient.WorkspaceIntegrations.SetApiKey({
+        payload: { kind: "float", ...data },
       }).pipe(
         Effect.catchAll(() => Effect.succeed({ error: "Unexpected error" }))
       )
