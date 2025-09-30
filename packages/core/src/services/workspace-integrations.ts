@@ -1,19 +1,21 @@
-import { and, eq, sql } from "@mason/db/operators";
-import { projectsTable, workspaceIntegrationsTable } from "@mason/db/schema";
-import { Effect } from "effect";
-import type { ProjectToCreate } from "../models/project.model";
-import { ProjectId, WorkspaceId, WorkspaceIntegrationId } from "../models/shared";
+import { and, eq, } from "@mason/db/operators";
+import {  Effect, Schema } from "effect";
+import {  WorkspaceId, WorkspaceIntegrationId } from "../models/ids";
 import {
   WorkspaceIntegration,
   type WorkspaceIntegrationToUpsert,
 } from "../models/workspace-integration.model";
-import { encrypt } from "../utils/encryption";
+import { decrypt, encrypt } from "../utils/encryption";
 import { DatabaseService } from "./db";
 import { ProjectsService } from "./projects";
-import { RequestContextService } from "./request-context";
+import { workspaceIntegrationsTable } from "@mason/db/schema";
+
+export class WorkspaceIntegrationNotFoundError extends Schema.TaggedError<WorkspaceIntegrationNotFoundError>()(
+  "@mason/core/workspaceIntegrationNotFoundError", {}
+) {}
 
 export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegrationsService>()(
-  "@mason/WorkspaceIntegrationsService",
+  "@mason/core/workspaceIntegrationsService",
   {
     effect: Effect.gen(function* () {
       const db = yield* DatabaseService;
@@ -21,58 +23,74 @@ export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegr
 
       return {
         upsertWorkspaceIntegration: ({
+          workspaceId,
           workspaceIntegration,
         }: {
+          workspaceId: typeof WorkspaceId.Type;
           workspaceIntegration: typeof WorkspaceIntegrationToUpsert.Type;
         }) =>
           Effect.gen(function* () {
-            const ctx = yield* RequestContextService;
-
-            const encryptedApiKey = yield* encrypt(workspaceIntegration.apiKey);
-
-            const existingWorkspaceIntegration = yield* db.use((conn) =>
-              conn.query.workspaceIntegrationsTable.findFirst({
-                where: and(
-                  eq(workspaceIntegrationsTable.workspaceId, ctx.workspaceId),
-                  eq(workspaceIntegrationsTable.kind, workspaceIntegration.kind)
-                ),
-              })
+            const apiKeyEncrypted = yield* encrypt(
+              workspaceIntegration.apiKeyUnencrypted
             );
 
-            if (existingWorkspaceIntegration) {
-              yield* db.use((conn) =>
-                conn
-                  .update(workspaceIntegrationsTable)
-                  .set({ apiKeyEncrypted: encryptedApiKey })
-                  .where(
-                    eq(
-                      workspaceIntegrationsTable.id,
-                      existingWorkspaceIntegration.id
-                    )
-                  )
-              );
-            } else {
-              yield* db.use((conn) =>
-                conn
-                  .insert(workspaceIntegrationsTable)
-                  .values({
-                    workspaceId: ctx.workspaceId,
-                    apiKeyEncrypted: encryptedApiKey,
-                    ...workspaceIntegration,
-                  })
-                  .returning()
-              );
-            }
-          }),
-        listWorkspaceIntegrations: () =>
-          Effect.gen(function* () {
-            const ctx = yield* RequestContextService;
+            const [upsertedWorkspaceIntegration] = yield* db.use((conn) =>
+              conn
+                .insert(workspaceIntegrationsTable)
+                .values({
+                  workspaceId: workspaceId,
+                  apiKeyEncrypted: apiKeyEncrypted,
+                  ...workspaceIntegration,
+                })
+                .onConflictDoUpdate({
+                  target: [
+                    workspaceIntegrationsTable.workspaceId,
+                    workspaceIntegrationsTable.kind,
+                  ],
+                  set: {
+                    apiKeyEncrypted: apiKeyEncrypted,
+                  },
+                })
+                .returning()
+            );
 
+            return WorkspaceIntegration.make({
+              ...upsertedWorkspaceIntegration,
+              id: WorkspaceIntegrationId.make(upsertedWorkspaceIntegration.id),
+              workspaceId: WorkspaceId.make(
+                upsertedWorkspaceIntegration.workspaceId
+              ),
+            });
+          }),
+        deleteWorkspaceIntegration: ({
+          workspaceId,
+          id,
+        }: {
+          workspaceId: typeof WorkspaceId.Type;
+          id: typeof WorkspaceIntegrationId.Type;
+        }) =>
+          Effect.gen(function* () {
+            yield* db.use((conn) =>
+              conn
+                .delete(workspaceIntegrationsTable)
+                .where(
+                  and(
+                    eq(workspaceIntegrationsTable.id, id),
+                    eq(workspaceIntegrationsTable.workspaceId, workspaceId)
+                  )
+                )
+            );
+          }),
+        listWorkspaceIntegrations: ({
+          workspaceId,
+        }: {
+          workspaceId: typeof WorkspaceId.Type;
+        }) =>
+          Effect.gen(function* () {
             const workspaceIntegrations = yield* db.use((conn) =>
               conn.query.workspaceIntegrationsTable.findMany({
-                where: eq(
-                  workspaceIntegrationsTable.workspaceId,
-                  ctx.workspaceId
+                where: and(
+                  eq(workspaceIntegrationsTable.workspaceId, workspaceId),
                 ),
               })
             );
@@ -85,52 +103,34 @@ export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegr
               })
             );
           }),
-        syncFloatProjects: ({
-          projects,
+        retrieveUnencryptedApiKey: ({
+          workspaceId,
+          kind,
         }: {
-          projects: Array<typeof ProjectToCreate.Type>;
+          workspaceId: typeof WorkspaceId.Type;
+          kind: typeof WorkspaceIntegration.fields.kind.Type;
         }) =>
           Effect.gen(function* () {
-            const ctx = yield* RequestContextService;
-            const existingProjects = yield* db.use((conn) =>
-              conn.query.projectsTable.findMany({
+            const workspaceIntegration = yield* db.use((conn) =>
+              conn.query.workspaceIntegrationsTable.findFirst({
                 where: and(
-                  eq(projectsTable.workspaceId, ctx.workspaceId),
-                  sql`${projectsTable.metadata}->>'floatId' IS NOT NULL`
+                  eq(workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(workspaceIntegrationsTable.kind, kind)
                 ),
               })
             );
 
-            const projectsToCreate = projects.filter(
-              (p) =>
-                !existingProjects.some(
-                  (existing) =>
-                    existing.metadata?.floatId === p.metadata?.floatId
-                )
+            if (!workspaceIntegration) {
+              return yield* Effect.fail(
+                new WorkspaceIntegrationNotFoundError()
+              );
+            }
+
+            const unencryptedApiKey = yield* decrypt(
+              workspaceIntegration.apiKeyEncrypted
             );
 
-            const projectsToUpdate = projects.filter((p) =>
-              existingProjects.some(
-                (existing) => existing.metadata?.floatId === p.metadata?.floatId
-              )
-            );
-
-            const projectsToDelete = existingProjects.filter(
-              (p) =>
-                !projects.some(
-                  (existing) =>
-                    existing.metadata?.floatId === p.metadata?.floatId
-                )
-            );
-            yield* db.withTransaction(
-              Effect.all([
-                projectsService.upsertProjects(projectsToCreate),
-                projectsService.upsertProjects(projectsToUpdate),
-                projectsService.softDeleteProjects(
-                  projectsToDelete.map((p) => ProjectId.make(p.id))
-                ),
-              ])
-            );
+            return unencryptedApiKey;
           }),
       };
     }),

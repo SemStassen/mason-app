@@ -5,8 +5,8 @@ import {
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
 import { WorkspaceResponse } from "@mason/api-contract/dto/workspace.dto";
-import { AuthService } from "@mason/core/services/auth";
 import { Effect } from "effect";
+import { AuthService } from "~/auth-service";
 
 export const WorkspaceGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -15,7 +15,7 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
     Effect.gen(function* () {
       const auth = yield* AuthService;
       return handlers
-        .handle("CheckWorkspaceSlugAvailability", ({ request, payload }) =>
+        .handle("CheckSlugAvailability", ({ request, payload }) =>
           Effect.gen(function* () {
             const isAvailable = yield* auth.use((client) =>
               client.api.checkOrganizationSlug({
@@ -27,7 +27,7 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
             return isAvailable;
           }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         )
-        .handle("SetActiveWorkspace", ({ request, payload }) =>
+        .handle("SetActive", ({ request, payload }) =>
           Effect.gen(function* () {
             yield* auth.use((client) =>
               client.api.setActiveOrganization({
@@ -42,7 +42,7 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
             return HttpServerResponse.empty();
           }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         )
-        .handle("CreateWorkspace", ({ request, payload }) =>
+        .handle("Create", ({ request, payload }) =>
           Effect.gen(function* () {
             const workspace = yield* auth.use((client) =>
               client.api.createOrganization({
@@ -63,7 +63,7 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
             });
           }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         )
-        .handle("RetrieveWorkspace", ({ request, payload }) =>
+        .handle("Retrieve", ({ request, payload }) =>
           Effect.gen(function* () {
             const workspace = yield* auth.use((client) =>
               client.api.getFullOrganization({
@@ -88,7 +88,7 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
             });
           }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         )
-        .handle("ListWorkspaces", ({ request }) =>
+        .handle("List", ({ request }) =>
           Effect.gen(function* () {
             const workspaces = yield* auth.use((client) =>
               client.api.listOrganizations({
@@ -110,7 +110,7 @@ export const WorkspaceGroupLive = HttpApiBuilder.group(
             );
           }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         )
-        .handle("UpdateWorkspace", ({ request, payload, path }) =>
+        .handle("Update", ({ request, payload, path }) =>
           Effect.gen(function* () {
             const updatedWorkspace = yield* auth.use((client) =>
               client.api.updateOrganization({

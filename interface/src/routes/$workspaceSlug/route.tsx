@@ -66,7 +66,7 @@ function Layout() {
 
   return (
     <WorkspaceProviders>
-      <div className="h-screen w-screen bg-background text-foreground">
+      <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
         <main className="flex h-full">
           <Outlet />
         </main>

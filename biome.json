@@ -4,6 +4,7 @@
   "linter": {
     "rules": {
       "correctness": {
+        "noChildrenProp": "off",
         "noNestedComponentDefinitions": "off"
       },
       "complexity": {

@@ -1,3 +1,4 @@
+import { DatabaseService } from "@mason/core/services/db";
 import { eq } from "@mason/db/operators";
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "@mason/db/schema";
@@ -9,15 +10,17 @@ import {
   emailOTP,
   organization,
 } from "better-auth/plugins";
-import { Config, Data, Effect } from "effect";
-import { DatabaseService } from "./db";
+import { Config, Effect, Schema } from "effect";
 
-export class BetterAuthError extends Data.TaggedError("BetterAuthError")<{
-  readonly cause: unknown;
-}> {}
+export class BetterAuthError extends Schema.TaggedError<BetterAuthError>()(
+  "@mason/server/betterAuthError",
+  {
+    cause: Schema.Unknown,
+  }
+) {}
 
 export class AuthService extends Effect.Service<AuthService>()(
-  "@mason/AuthService",
+  "@mason/server/authService",
   {
     effect: Effect.gen(function* () {
       const AuthConfig = Config.all({
@@ -167,6 +170,6 @@ export class AuthService extends Effect.Service<AuthService>()(
       return {
         use,
       } as const;
-    }),
+    }).pipe(Effect.catchTags({ ConfigError: (error) => Effect.die(error) })),
   }
 ) {}

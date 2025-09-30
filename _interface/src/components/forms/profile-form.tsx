@@ -7,7 +7,7 @@ import {
   FormItem,
   FormLabel,
   FormSection,
-} from "@mason/ui/form";
+} from "@mason/ui/form2";
 import { Input } from "@mason/ui/input";
 import { toast } from "@mason/ui/sonner";
 import { useForm } from "react-hook-form";
@@ -47,7 +47,7 @@ function ProfileForm() {
                         field.onBlur();
                         await db.query(
                           "UPDATE users SET name = $1 WHERE id = $2",
-                          [field.value, appStore.userId],
+                          [field.value, appStore.userId]
                         );
                         toast("updated");
                       }}
@@ -77,7 +77,7 @@ function ProfileForm() {
                         field.onBlur();
                         await db.query(
                           "UPDATE users SET display_name = $1 WHERE id = $2",
-                          [field.value, appStore.userId],
+                          [field.value, appStore.userId]
                         );
                         toast("Updated");
                       }}

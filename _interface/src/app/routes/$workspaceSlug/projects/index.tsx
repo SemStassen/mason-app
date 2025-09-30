@@ -22,7 +22,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from "@mason/ui/form";
+} from "@mason/ui/form2";
 import { Icons } from "@mason/ui/icons";
 import { Input } from "@mason/ui/input";
 import { Label } from "@mason/ui/label";
@@ -38,8 +38,8 @@ import { toast } from "@mason/ui/sonner";
 import { Toggle } from "@mason/ui/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mason/ui/tooltip";
 import {
-  Link,
   createFileRoute,
+  Link,
   stripSearchParams,
 } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
@@ -124,7 +124,7 @@ function DisplayOptions() {
         <span>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button size="sm" variant="outline">
                 <Icons.Slider />
                 Display
               </Button>
@@ -136,7 +136,6 @@ function DisplayOptions() {
               <Label>Order by</Label>
               <div className="flex gap-2">
                 <Select
-                  value={sortBy}
                   onValueChange={(val: z.infer<typeof sortBySchema>) =>
                     navigate({
                       search: (prev) => ({
@@ -145,6 +144,7 @@ function DisplayOptions() {
                       }),
                     })
                   }
+                  value={sortBy}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -155,8 +155,6 @@ function DisplayOptions() {
                   </SelectContent>
                 </Select>
                 <Toggle
-                  variant="outline"
-                  pressed={sortOrder === "ASC"}
                   onPressedChange={(val) =>
                     navigate({
                       search: (prev) => ({
@@ -165,6 +163,8 @@ function DisplayOptions() {
                       }),
                     })
                   }
+                  pressed={sortOrder === "ASC"}
+                  variant="outline"
                 >
                   {sortOrder === "ASC" ? (
                     <Icons.SortAscending />
@@ -204,7 +204,7 @@ function CreateProject() {
     try {
       await pg.query(
         "INSERT INTO projects (name, workspace_id, hex_color) VALUES ($1, $2, $3)",
-        [values.name, values.workspace_id, values.hex_color],
+        [values.name, values.workspace_id, values.hex_color]
       );
       form.reset();
     } catch (e) {
@@ -218,7 +218,7 @@ function CreateProject() {
         <span>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button size="sm" variant="outline">
                 <Icons.Plus />
                 Create project
               </Button>
@@ -255,9 +255,9 @@ function CreateProject() {
               </DialogClose>
               <DialogClose asChild>
                 <Button
+                  disabled={form.formState.isSubmitting}
                   type="submit"
                   variant="default"
-                  disabled={form.formState.isSubmitting}
                 >
                   Create project
                 </Button>
@@ -283,8 +283,6 @@ function ProjectsSearch() {
   return (
     <Input
       className="w-60"
-      variant="outline"
-      size="sm"
       iconLeft={<Icons.Search />}
       iconRight={
         search && (
@@ -294,9 +292,11 @@ function ProjectsSearch() {
           />
         )
       }
-      placeholder="Search by name..."
-      value={search}
       onChange={(e) => updateSearch(e.target.value)}
+      placeholder="Search by name..."
+      size="sm"
+      value={search}
+      variant="outline"
     />
   );
 }
@@ -342,13 +342,13 @@ function Projects() {
             return (
               <ListItem key={project.id}>
                 <Link
-                  type="button"
-                  className="inset-0.5 flex w-full items-center gap-2 border-contrast-5 not-last:border-b text-sm hover:bg-contrast-5 "
+                  className="inset-0.5 flex w-full items-center gap-2 border-contrast-5 not-last:border-b text-sm hover:bg-contrast-5"
                   from="/$workspaceSlug/projects"
-                  to="/$workspaceSlug/projects/$projectId"
                   params={{
                     projectId: project.id,
                   }}
+                  to="/$workspaceSlug/projects/$projectId"
+                  type="button"
                 >
                   <Icons.Folder />
                   {displayName(project.name, "project")}

@@ -1,18 +1,8 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@mason/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@mason/ui/form";
+import { useAppForm } from "@mason/ui/form";
 import { Icons } from "@mason/ui/icons";
-import { Input } from "@mason/ui/input";
 import { Effect } from "effect";
 import type { Dispatch, SetStateAction } from "react";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { MasonClient } from "~/client";
 import type { SignUpStep } from "..";
@@ -21,7 +11,9 @@ const enterEmailSchema = z.object({
   email: z.email(),
 });
 
-type FormValues = z.infer<typeof enterEmailSchema>;
+const defaultValues: z.input<typeof enterEmailSchema> = {
+  email: "",
+};
 
 function EnterEmailStep({
   setCurrentStep,
@@ -30,26 +22,26 @@ function EnterEmailStep({
   setCurrentStep: Dispatch<SetStateAction<SignUpStep>>;
   setEmail: Dispatch<SetStateAction<string>>;
 }) {
-  const form = useForm<FormValues>({
-    resolver: zodResolver(enterEmailSchema),
-    defaultValues: {
-      email: "",
+  const form = useAppForm({
+    defaultValues: defaultValues,
+    validators: {
+      onChange: enterEmailSchema,
+    },
+    onSubmit: async ({ value }) => {
+      const result = enterEmailSchema.parse(value);
+      await Effect.runPromise(
+        MasonClient.Auth.SendEmailVerificationOTP({
+          payload: {
+            ...result,
+            type: "sign-in",
+          },
+        }).pipe(
+          Effect.catchAll(() => Effect.succeed({ error: "Unexpected error" }))
+        )
+      );
+      setCurrentStep("verifyEmail");
     },
   });
-
-  const onSubmit = async (data: FormValues) => {
-    await Effect.runPromise(
-      MasonClient.Auth.SendEmailVerificationOTP({
-        payload: {
-          ...data,
-          type: "sign-in",
-        },
-      }).pipe(
-        Effect.catchAll(() => Effect.succeed({ error: "Unexpected error" }))
-      )
-    );
-    setCurrentStep("verifyEmail");
-  };
 
   return (
     <>
@@ -57,41 +49,41 @@ function EnterEmailStep({
         <h1 className="text-center font-medium text-2xl">
           What's your email address?
         </h1>
-        <Form {...form}>
-          <form className="space-y-2" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="sr-only">Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      autoComplete="off"
-                      autoFocus={true}
-                      placeholder="Enter your email address..."
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        setEmail(e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              className="w-full"
-              size="lg"
-              type="submit"
-              variant="outline"
-            >
+        <form
+          className="space-y-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+        >
+          <form.AppField
+            children={(field) => (
+              <field.TextField
+                input={{
+                  autoComplete: "off",
+                  autoFocus: true,
+                  placeholder: "Enter your email address...",
+                }}
+                label={{
+                  className: "sr-only",
+                  children: "Email",
+                }}
+              />
+            )}
+            listeners={{
+              onChange: ({ value }) => {
+                setEmail(value);
+              },
+            }}
+            name="email"
+          />
+          <form.AppForm>
+            <form.SubmitButton className="w-full" size="lg">
               <Icons.Mail />
               Continue with Email
-            </Button>
-          </form>
-        </Form>
+            </form.SubmitButton>
+          </form.AppForm>
+        </form>
       </div>
       <Button
         className="text-muted-foreground text-sm"

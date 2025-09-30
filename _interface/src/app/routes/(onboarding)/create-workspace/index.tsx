@@ -8,7 +8,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@mason/ui/form";
+} from "@mason/ui/form2";
 import { Input } from "@mason/ui/input";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
@@ -81,7 +81,7 @@ function CreateWorkspacePage() {
                 <FormItem direction="vertical">
                   <FormLabel>Workspace name</FormLabel>
                   <FormControl>
-                    <Input variant="outline" autoComplete="off" {...field} />
+                    <Input autoComplete="off" variant="outline" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,10 +94,10 @@ function CreateWorkspacePage() {
                   <FormLabel>Workspace URL</FormLabel>
                   <FormControl>
                     <Input
-                      variant="outline"
                       autoComplete="off"
-                      spellCheck="false"
                       prefix="https://mason.com/"
+                      spellCheck="false"
+                      variant="outline"
                       {...field}
                     />
                   </FormControl>
@@ -109,8 +109,8 @@ function CreateWorkspacePage() {
         </Form>
       </div>
       <Button
-        onClick={form.handleSubmit(onSubmit)}
         className="w-full max-w-[340px]"
+        onClick={form.handleSubmit(onSubmit)}
       >
         Create workspace
       </Button>

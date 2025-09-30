@@ -26,7 +26,7 @@ function WorkspaceDropdownMenu() {
   const handleSetActiveWorkspace = async (workspaceId: string) => {
     await Effect.runPromise(
       Effect.gen(function* () {
-        yield* MasonClient.Workspace.SetActiveWorkspace({
+        yield* MasonClient.Workspace.SetActive({
           payload: {
             workspaceId: workspaceId,
           },

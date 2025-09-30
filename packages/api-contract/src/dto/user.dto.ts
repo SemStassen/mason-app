@@ -16,7 +16,7 @@ export const CreateUserRequest = Schema.Struct({
   emailVerified: User.fields.emailVerified,
 });
 
-export const UserResponse = Schema.Struct({
+export const UserResponse = Schema.TaggedStruct("UserResponse", {
   ...User.fields,
   // Optional
   imageUrl: Schema.NullOr(User.fields.imageUrl),

@@ -33,7 +33,7 @@ export const UpdateWorkspaceRequest = Schema.Struct({
   }),
 });
 
-export const WorkspaceResponse = Schema.Struct({
+export const WorkspaceResponse = Schema.TaggedStruct("WorkspaceResponse", {
   ...Workspace.fields,
   // Optional
   logoUrl: Schema.NullOr(Workspace.fields.logoUrl),

@@ -1,13 +1,16 @@
 import crypto from "crypto";
-import { Config, Data, Effect } from "effect";
+import { Config, Effect, Schema } from "effect";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 16;
 const AUTH_TAG_LENGTH = 16;
 
-export class EncryptionError extends Data.TaggedError("EncryptionError")<{
-  readonly cause: unknown;
-}> {}
+export class EncryptionError extends Schema.TaggedError<EncryptionError>()(
+  "@mason/core/EncryptionError",
+  {
+    cause: Schema.Unknown,
+  }
+) {}
 
 export const getKey = () =>
   Effect.gen(function* () {
@@ -22,7 +25,12 @@ export const getKey = () =>
     }
 
     return Buffer.from(key, "hex");
-  });
+  }).pipe(
+    Effect.catchTags({
+      ConfigError: (error) => Effect.die(error),
+      "@mason/core/EncryptionError": (error) => Effect.die(error),
+    })
+  );
 
 /**
  * Encrypts a plaintext string using AES-256-GCM.

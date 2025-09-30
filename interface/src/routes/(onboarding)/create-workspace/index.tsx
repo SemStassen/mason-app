@@ -1,18 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@mason/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@mason/ui/form";
-import { Input } from "@mason/ui/input";
+import { useAppForm } from "@mason/ui/form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 import z from "zod";
 import { MasonClient } from "~/client";
 import { slugify } from "~/utils/slugify";
@@ -26,85 +14,87 @@ const createWorkspaceSchema = z.object({
   slug: z.string(),
 });
 
-type FormValues = z.infer<typeof createWorkspaceSchema>;
+const defaultValues: z.input<typeof createWorkspaceSchema> = {
+  name: "",
+  slug: "",
+};
 
 function RouteComponent() {
-  const form = useForm<FormValues>({
-    resolver: zodResolver(createWorkspaceSchema),
-    defaultValues: {
-      name: "",
-      slug: "",
+  const navigate = useNavigate();
+  const form = useAppForm({
+    defaultValues: defaultValues,
+    validators: {
+      onChange: createWorkspaceSchema,
+    },
+    onSubmit: async ({ value }) => {
+      const result = createWorkspaceSchema.parse(value);
+
+      await Effect.runPromise(
+        MasonClient.Workspace.Create({
+          payload: result,
+        }).pipe(
+          Effect.matchEffect({
+            onFailure: () => Effect.fail(""),
+            onSuccess: (workspace) =>
+              Effect.sync(() => navigate({ to: `/${workspace.slug}` })),
+          })
+        )
+      );
     },
   });
-
-  const name = form.watch("name");
-
-  useEffect(() => {
-    if (!form.getFieldState("slug").isDirty) {
-      form.setValue("slug", slugify(name));
-    }
-  }, [form, name]);
-
-  const navigate = useNavigate();
-
-  const onSubmit = async (data: FormValues) => {
-    await Effect.runPromise(
-      MasonClient.Workspace.CreateWorkspace({
-        payload: data,
-      }).pipe(
-        Effect.matchEffect({
-          onFailure: () => Effect.fail(""),
-          onSuccess: (workspace) =>
-            Effect.sync(() => navigate({ to: `/${workspace.slug}` })),
-        })
-      )
-    );
-  };
 
   return (
     <div className="flex w-[320px] flex-col items-center gap-8">
       <h1 className="text-center font-medium text-2xl">Create workspace</h1>
-      <Form {...form}>
-        <form
-          className="w-full space-y-8"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Workspace name</FormLabel>
-                <FormControl>
-                  <Input autoComplete="off" autoFocus={true} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="slug"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Workspace URL</FormLabel>
-                <FormControl>
-                  <Input
-                    affixGapPx={0}
-                    autoComplete="off"
-                    prefix="mason.app/"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button className="w-full" size="lg" type="submit">
+      <form
+        className="w-full space-y-8"
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
+        <form.AppField
+          children={(field) => (
+            <field.TextField
+              input={{
+                autoComplete: "off",
+                autoFocus: true,
+              }}
+              label={{
+                children: "Workspace URL",
+              }}
+            />
+          )}
+          listeners={{
+            onChange: ({ value, fieldApi }) => {
+              if (!fieldApi.form.getFieldMeta("slug")?.isDirty) {
+                fieldApi.form.setFieldValue("slug", slugify(value));
+              }
+            },
+          }}
+          name="slug"
+        />
+        <form.AppField
+          children={(field) => (
+            <field.TextField
+              input={{
+                autoComplete: "off",
+                prefix: "mason.app/",
+                affixGapPx: 0,
+              }}
+              label={{
+                children: "Workspace URL",
+              }}
+            />
+          )}
+          name="slug"
+        />
+        <form.AppForm>
+          <form.SubmitButton className="w-full" size="lg">
             Create Workspace
-          </Button>
-        </form>
-      </Form>
+          </form.SubmitButton>
+        </form.AppForm>
+      </form>
     </div>
   );
 }

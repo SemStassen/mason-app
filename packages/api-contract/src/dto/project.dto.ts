@@ -20,7 +20,7 @@ class Project extends Schema.Struct({
   }),
 }) {}
 
-export const CreateProjectRequest = Schema.TaggedStruct("CreateProject", {
+export const CreateProjectRequest = Schema.Struct({
   // General
   name: Project.fields.name,
   hexColor: Schema.optionalWith(Project.fields.hexColor, {
@@ -38,7 +38,7 @@ export const CreateProjectRequest = Schema.TaggedStruct("CreateProject", {
   }),
 });
 
-export const UpdateProjectRequest = Schema.TaggedStruct("UpdateProject", {
+export const UpdateProjectRequest = Schema.Struct({
   id: Project.fields.id,
   // General
   name: Schema.optionalWith(Project.fields.name, { exact: true }),
@@ -52,8 +52,6 @@ export const UpdateProjectRequest = Schema.TaggedStruct("UpdateProject", {
     exact: true,
   }),
 });
-
-export type UpdateProjectRequest = typeof UpdateProjectRequest.Type;
 
 export const UpsertProjectRequest = Schema.Union(
   CreateProjectRequest,

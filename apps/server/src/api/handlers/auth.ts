@@ -4,8 +4,8 @@ import {
   HttpServerResponse,
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
-import { AuthService } from "@mason/core/services/auth";
 import { Effect } from "effect";
+import { AuthService } from "~/auth-service";
 
 export const AuthGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -59,7 +59,8 @@ export const AuthGroupLive = HttpApiBuilder.group(
             };
           }).pipe(
             Effect.catchTags({
-              BetterAuthError: () => new HttpApiError.InternalServerError(),
+              "@mason/server/betterAuthError": () =>
+                new HttpApiError.InternalServerError(),
             })
           )
         )
@@ -75,7 +76,8 @@ export const AuthGroupLive = HttpApiBuilder.group(
             return yield* HttpServerResponse.empty();
           }).pipe(
             Effect.catchTags({
-              BetterAuthError: () => new HttpApiError.InternalServerError(),
+              "@mason/server/betterAuthError": () =>
+                new HttpApiError.InternalServerError(),
             })
           )
         )
@@ -99,7 +101,8 @@ export const AuthGroupLive = HttpApiBuilder.group(
             );
           }).pipe(
             Effect.catchTags({
-              BetterAuthError: () => new HttpApiError.InternalServerError(),
+              "@mason/server/betterAuthError": () =>
+                new HttpApiError.InternalServerError(),
               HttpBodyError: () => new HttpApiError.BadRequest(),
             })
           )
@@ -121,7 +124,8 @@ export const AuthGroupLive = HttpApiBuilder.group(
             });
           }).pipe(
             Effect.catchTags({
-              BetterAuthError: () => new HttpApiError.InternalServerError(),
+              "@mason/server/betterAuthError": () =>
+                new HttpApiError.InternalServerError(),
             })
           )
         );

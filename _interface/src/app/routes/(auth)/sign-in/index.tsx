@@ -1,10 +1,10 @@
-import { signInWithGithub } from '@mason/auth/client';
-import { Button } from '@mason/ui/button';
-import {} from '@mason/ui/form';
-import { Icons } from '@mason/ui/icons';
-import { createFileRoute } from '@tanstack/react-router';
+import { signInWithGithub } from "@mason/auth/client";
+import { Button } from "@mason/ui/button";
+import {} from "@mason/ui/form2";
+import { Icons } from "@mason/ui/icons";
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/_auth-layout/sign-in')({
+export const Route = createFileRoute("/_auth-layout/sign-in")({
   component: SignInPage,
 });
 

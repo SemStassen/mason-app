@@ -8,7 +8,7 @@ import {
 
 export const WorkspaceGroup = HttpApiGroup.make("Workspace")
   .add(
-    HttpApiEndpoint.post("CheckWorkspaceSlugAvailability")`/check-slug`
+    HttpApiEndpoint.get("CheckSlugAvailability")`/check-slug`
       .setPayload(
         Schema.Struct({
           slug: Schema.NonEmptyString,
@@ -22,7 +22,7 @@ export const WorkspaceGroup = HttpApiGroup.make("Workspace")
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.post("SetActiveWorkspace")`/set-active`
+    HttpApiEndpoint.post("SetActive")`/set-active`
       .setPayload(
         Schema.Struct({
           workspaceId: Schema.optional(Schema.NonEmptyString),
@@ -32,13 +32,25 @@ export const WorkspaceGroup = HttpApiGroup.make("Workspace")
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.post("CreateWorkspace")`/create`
+    HttpApiEndpoint.post("Create")`/`
       .setPayload(CreateWorkspaceRequest)
       .addSuccess(WorkspaceResponse)
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.get("RetrieveWorkspace")`/retrieve`
+    HttpApiEndpoint.post("Update")`/:workspaceId`
+      .setPath(
+        Schema.Struct({
+          workspaceId: Schema.String,
+        })
+      )
+      .setPayload(UpdateWorkspaceRequest)
+      .addSuccess(WorkspaceResponse)
+      .addError(HttpApiError.NotFound)
+      .addError(HttpApiError.InternalServerError)
+  )
+  .add(
+    HttpApiEndpoint.get("Retrieve")`/retrieve`
       .setPayload(
         Schema.Struct({
           workspaceId: Schema.optional(Schema.NonEmptyString),
@@ -52,19 +64,7 @@ export const WorkspaceGroup = HttpApiGroup.make("Workspace")
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.get("ListWorkspaces")`/list`
+    HttpApiEndpoint.get("List")`/`
       .addSuccess(Schema.Array(WorkspaceResponse))
-      .addError(HttpApiError.InternalServerError)
-  )
-  .add(
-    HttpApiEndpoint.post("UpdateWorkspace")`/:workspaceId`
-      .setPath(
-        Schema.Struct({
-          workspaceId: Schema.String,
-        })
-      )
-      .setPayload(UpdateWorkspaceRequest)
-      .addSuccess(WorkspaceResponse)
-      .addError(HttpApiError.NotFound)
       .addError(HttpApiError.InternalServerError)
   );

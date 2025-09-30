@@ -4,6 +4,7 @@ import {
   jsonb,
   pgTable,
   timestamp,
+  unique,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -188,18 +189,27 @@ export type DbInvitation = typeof invitationsTable.$inferSelect;
 /**
  * Application
  */
-export const workspaceIntegrationsTable = pgTable("workspace_integrations", {
-  id: tableId,
-  // References
-  workspaceId: uuid("workspace_id")
-    .references(() => workspacesTable.id, { onDelete: "cascade" })
-    .notNull(),
-  // General
-  kind: varchar({ enum: ["float"] }).notNull(),
-  apiKeyEncrypted: varchar("api_key_encrypted").notNull(),
-  // Metadata
-  ...tableMetadata,
-});
+export const workspaceIntegrationsTable = pgTable(
+  "workspace_integrations",
+  {
+    id: tableId,
+    // References
+    workspaceId: uuid("workspace_id")
+      .references(() => workspacesTable.id, { onDelete: "cascade" })
+      .notNull(),
+    // General
+    kind: varchar({ enum: ["float"] }).notNull(),
+    apiKeyEncrypted: varchar("api_key_encrypted").notNull(),
+    // Metadata
+    ...tableMetadata,
+  },
+  (table) => ({
+    unique: unique("unique_workspace_id_kind").on(
+      table.workspaceId,
+      table.kind
+    ),
+  })
+);
 export const workspaceIntegrationsRelations = relations(
   workspaceIntegrationsTable,
   ({ one }) => ({

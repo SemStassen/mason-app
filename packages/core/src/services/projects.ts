@@ -1,29 +1,29 @@
-import { and, eq, inArray } from "@mason/db/operators";
+import { and, eq, inArray, sql } from "@mason/db/operators";
 import { type DbProject, projectsTable } from "@mason/db/schema";
 import { Effect, Match } from "effect";
+import { ProjectId, type WorkspaceId } from "../models/ids";
 import {
   Project,
   type ProjectToCreate,
   type ProjectToUpdate,
   type ProjectToUpsert,
 } from "../models/project.model";
-import { ProjectId, WorkspaceId } from "../models/shared";
 import { DatabaseService } from "./db";
-import { RequestContextService } from "./request-context";
 
 export class ProjectsService extends Effect.Service<ProjectsService>()(
-  "@mason/ProjectsService",
+  "@mason/core/projectsService",
   {
     effect: Effect.gen(function* () {
       const db = yield* DatabaseService;
 
-      const createProjects = (
-        projectsToCreate: Array<typeof ProjectToCreate.Type>
-      ) =>
+      const createProjects = ({
+        workspaceId,
+        projectsToCreate,
+      }: {
+        workspaceId: typeof WorkspaceId.Type;
+        projectsToCreate: Array<typeof ProjectToCreate.Type>;
+      }) =>
         Effect.gen(function* () {
-          const ctx = yield* RequestContextService;
-          const workspaceId = WorkspaceId.make(ctx.workspaceId);
-
           const projects = projectsToCreate.map((p) =>
             Project.make({ workspaceId: workspaceId, ...p })
           );
@@ -41,13 +41,14 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
           );
         });
 
-      const updateProjects = (
-        projectsToUpdate: Array<typeof ProjectToUpdate.Type>
-      ) =>
+      const updateProjects = ({
+        workspaceId,
+        projectsToUpdate,
+      }: {
+        workspaceId: typeof WorkspaceId.Type;
+        projectsToUpdate: Array<typeof ProjectToUpdate.Type>;
+      }) =>
         Effect.gen(function* () {
-          const ctx = yield* RequestContextService;
-          const workspaceId = WorkspaceId.make(ctx.workspaceId);
-
           const projectIds = projectsToUpdate.map((p) => p.id);
 
           // Find existing projects
@@ -116,7 +117,13 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
       return {
         createProjects: createProjects,
         updateProjects: updateProjects,
-        upsertProjects: (projects: Array<typeof ProjectToUpsert.Type>) =>
+        upsertProjects: ({
+          workspaceId,
+          projects,
+        }: {
+          workspaceId: typeof WorkspaceId.Type;
+          projects: Array<typeof ProjectToUpsert.Type>;
+        }) =>
           Effect.gen(function* () {
             const results: Array<typeof Project.Type> = [];
 
@@ -124,8 +131,18 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
             // This should be optimized with a proper upsert later
             for (const project of projects) {
               const res = yield* Match.value(project).pipe(
-                Match.tag("CreateProject", (p) => createProjects([p])),
-                Match.tag("UpdateProject", (p) => updateProjects([p])),
+                Match.tag("ProjectToCreate", (p) =>
+                  createProjects({
+                    workspaceId: workspaceId,
+                    projectsToCreate: [p],
+                  })
+                ),
+                Match.tag("ProjectToUpdate", (p) =>
+                  updateProjects({
+                    workspaceId: workspaceId,
+                    projectsToUpdate: [p],
+                  })
+                ),
                 Match.exhaustive
               );
 
@@ -134,21 +151,62 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
 
             return results;
           }),
-        softDeleteProjects: (projectIds: Array<typeof ProjectId.Type>) =>
+        softDeleteProjects: ({
+          workspaceId,
+          projectIds,
+        }: {
+          workspaceId: typeof WorkspaceId.Type;
+          projectIds: Array<typeof ProjectId.Type>;
+        }) =>
           Effect.gen(function* () {
-            const ctx = yield* RequestContextService;
-
             yield* db.use((conn) =>
               conn
                 .update(projectsTable)
                 .set({ deletedAt: new Date() })
                 .where(
                   and(
-                    eq(projectsTable.workspaceId, ctx.workspaceId),
+                    eq(projectsTable.workspaceId, workspaceId),
                     inArray(projectsTable.id, projectIds)
                   )
                 )
-                .returning()
+            );
+          }),
+        hardDeleteProjects: ({
+          workspaceId,
+          projectIds,
+        }: {
+          workspaceId: typeof WorkspaceId.Type;
+          projectIds: Array<typeof ProjectId.Type>;
+        }) =>
+          Effect.gen(function* () {
+            yield* db.use((conn) =>
+              conn
+                .delete(projectsTable)
+                .where(
+                  and(
+                    eq(projectsTable.workspaceId, workspaceId),
+                    inArray(projectsTable.id, projectIds)
+                  )
+                )
+            );
+          }),
+        listProjects: ({
+          workspaceId,
+          query,
+        }: {
+          workspaceId: typeof WorkspaceId.Type;
+          query?: {
+            integrationKind?: "float"
+          };
+        }) =>
+          Effect.gen(function* () {
+            return yield* db.use((conn) =>
+              conn.query.projectsTable.findMany({
+                where: and(
+                  eq(projectsTable.workspaceId, workspaceId),
+                  query?.integrationKind ? sql`${projectsTable.metadata}->>'${query.integrationKind}Id' IS NOT NULL` : undefined,
+                ),
+              })
             );
           }),
       };

@@ -1,0 +1,24 @@
+{
+  "name": "@mason/use-cases",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf node_modules",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
+  },
+  "dependencies": {
+    "@mason/api-contract": "workspace:*",
+    "@mason/core": "workspace:*",
+    "@mason/integrations": "workspace:*",
+    "effect": "workspace:^"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "typescript": "workspace:^"
+  },
+  "exports": {
+    "./workspace-integrations": "./src/workspace-integrations.ts"
+  }
+}

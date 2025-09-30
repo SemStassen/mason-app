@@ -1,10 +1,10 @@
-import { Input as BaseInput } from '@base-ui-components/react/input';
-import type * as React from 'react';
-import { useEffect, useRef } from 'react';
-import { cn } from '../utils';
+import { Input as BaseInput } from "@base-ui-components/react/input";
+import type * as React from "react";
+import { useEffect, useRef } from "react";
+import { cn } from "../utils";
 
-interface InputProps
-  extends Omit<React.ComponentProps<typeof BaseInput>, 'prefix'> {
+export interface InputProps
+  extends Omit<React.ComponentProps<typeof BaseInput>, "prefix"> {
   inputContainerClassName?: string;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
@@ -25,7 +25,7 @@ function useDynamicAffixPadding(gapPx: number) {
       }
       rafId = requestAnimationFrame(() => {
         const containerEl = containerRef.current;
-        const inputEl = containerEl?.querySelector('input');
+        const inputEl = containerEl?.querySelector("input");
         if (!containerEl) {
           return;
         }
@@ -53,12 +53,12 @@ function useDynamicAffixPadding(gapPx: number) {
         if (left !== null) {
           inputEl.style.paddingLeft = `${left}px`;
         } else {
-          inputEl.style.paddingLeft = '';
+          inputEl.style.paddingLeft = "";
         }
         if (right !== null) {
           inputEl.style.paddingRight = `${right}px`;
         } else {
-          inputEl.style.paddingRight = '';
+          inputEl.style.paddingRight = "";
         }
       });
     }
@@ -77,11 +77,11 @@ function useDynamicAffixPadding(gapPx: number) {
     if (suffixRef.current) {
       ro.observe(suffixRef.current);
     }
-    window.addEventListener('resize', recalc);
+    window.addEventListener("resize", recalc);
 
     return () => {
       ro.disconnect();
-      window.removeEventListener('resize', recalc);
+      window.removeEventListener("resize", recalc);
       if (rafId !== null) {
         cancelAnimationFrame(rafId);
       }
@@ -104,7 +104,7 @@ function Input({
     useDynamicAffixPadding(affixGapPx);
   return (
     <div
-      className={cn('relative w-full', inputContainerClassName)}
+      className={cn("relative w-full", inputContainerClassName)}
       data-slot="input-container"
       ref={containerRef}
     >
@@ -119,10 +119,10 @@ function Input({
       )}
       <BaseInput
         className={cn(
-          'flex h-9 w-full min-w-0 rounded-md border bg-input px-3 py-1 text-base shadow-xs outline-none transition-[color,box-shadow] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-          'file:inline-flex file:h-7 file:border-0 file:bg-transparent file:font-medium file:text-foreground file:text-sm',
-          'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
-          'aria-invalid:border-destructive aria-invalid:ring-destructive/50',
+          "flex h-9 w-full min-w-0 rounded-md border bg-input px-3 py-1 text-base shadow-xs outline-none transition-[color,box-shadow] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          "file:inline-flex file:h-7 file:border-0 file:bg-transparent file:font-medium file:text-foreground file:text-sm",
+          "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+          "aria-invalid:border-destructive aria-invalid:ring-destructive/50",
           className
         )}
         data-slot="input"
