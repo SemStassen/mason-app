@@ -19,6 +19,7 @@
     "typescript": "workspace:^"
   },
   "exports": {
+    "./models/*": "./src/models/*.ts",
     "./services/*": "./src/services/*.ts",
     "./utils/*": "./src/utils/*.ts",
     "./instrumentation": "./src/instrumentation.ts"

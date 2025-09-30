@@ -18,6 +18,7 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./dto/*": "./src/dto/*.ts"
+    "./dto/*": "./src/dto/*.ts",
+    "./middleware/*": "./src/middleware/*.ts"
   }
 }

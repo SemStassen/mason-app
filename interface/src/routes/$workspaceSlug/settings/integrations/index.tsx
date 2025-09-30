@@ -1,17 +1,10 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@mason/ui/accordion";
+import { useAtomValue } from "@effect-atom/atom-react";
 import { Avatar, AvatarFallback } from "@mason/ui/avatar";
 import { Badge } from "@mason/ui/badge";
-import { Card, CardContent } from "@mason/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@mason/ui/card";
 import { Icons } from "@mason/ui/icons";
-import { createFileRoute } from "@tanstack/react-router";
-import { Effect } from "effect";
-import { MasonClient } from "~/client";
-import { SetApiKeyForm } from "./-components/set-api-key-form";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { workspaceIntegrationsAtom } from "~/atoms/api";
 
 export const Route = createFileRoute("/$workspaceSlug/settings/integrations/")({
   beforeLoad: () => {
@@ -19,88 +12,75 @@ export const Route = createFileRoute("/$workspaceSlug/settings/integrations/")({
       getTitle: () => "Integrations",
     };
   },
-  loader: async () => {
-    const workspaceIntegrations = await Effect.runPromise(
-      MasonClient.WorkspaceIntegrations.ListIntegrations()
-    );
-
-    return { workspaceIntegrations };
-  },
   component: RouteComponent,
 });
 
+const defaultDescription =
+  "Connect your external time tracking tool to sync time entries, projects, and team data automatically.";
+
 function RouteComponent() {
-  const { workspaceIntegrations } = Route.useLoaderData();
   return (
-    <Card>
-      <CardContent>
-        <Accordion defaultValue={["float"]} openMultiple={false}>
-          <AccordionItem value="float">
-            <AccordionTrigger>
-              <div className="flex items-center gap-3">
-                <Avatar rounded="lg">
-                  <AvatarFallback>
-                    <Icons.Company.Float />
-                  </AvatarFallback>
-                </Avatar>
-                Float
-                {workspaceIntegrations.some((i) => i.kind === "float") && (
-                  <Badge variant="success">Activated</Badge>
-                )}
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              Sync your current float project and time entries
-              <SetApiKeyForm />
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem disabled={true} value="early">
-            <AccordionTrigger>
-              <div className="flex w-full items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar rounded="lg">
-                    <AvatarFallback>
-                      <Icons.Company.Early />
-                    </AvatarFallback>
-                  </Avatar>
-                  Early
-                </div>
-                <Badge variant="info">Coming soon</Badge>
-              </div>
-            </AccordionTrigger>
-          </AccordionItem>
-          <AccordionItem disabled={true} value="simplicate">
-            <AccordionTrigger>
-              <div className="flex w-full items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar rounded="lg">
-                    <AvatarFallback>
-                      <Icons.Company.Simplicate />
-                    </AvatarFallback>
-                  </Avatar>
-                  Simplicate
-                </div>
-                <Badge variant="info">Coming soon</Badge>
-              </div>
-            </AccordionTrigger>
-          </AccordionItem>
-          <AccordionItem disabled={true} value="toggl">
-            <AccordionTrigger>
-              <div className="flex w-full items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar rounded="lg">
-                    <AvatarFallback>
-                      <Icons.Company.Toggl />
-                    </AvatarFallback>
-                  </Avatar>
-                  Toggl
-                </div>
-                <Badge variant="info">Coming soon</Badge>
-              </div>
-            </AccordionTrigger>
-          </AccordionItem>
-        </Accordion>
-      </CardContent>
-    </Card>
+    <div className="grid grid-cols-2 gap-4">
+      <IntegrationCard
+        description={defaultDescription}
+        icon={<Icons.Company.Float />}
+        kind="float"
+      />
+      <IntegrationCard
+        description={defaultDescription}
+        disabled={true}
+        icon={<Icons.Company.Early />}
+        kind="early"
+      />
+      <IntegrationCard
+        description={defaultDescription}
+        disabled={true}
+        icon={<Icons.Company.Simplicate />}
+        kind="simplicate"
+      />
+      <IntegrationCard
+        description={defaultDescription}
+        disabled={true}
+        icon={<Icons.Company.Toggl />}
+        kind="toggl"
+      />
+    </div>
+  );
+}
+
+function IntegrationCard({
+  kind,
+  description,
+  icon,
+  disabled = false,
+}: {
+  kind: "float" | "early" | "simplicate" | "toggl";
+  description: string;
+  icon: React.ReactNode;
+  disabled?: boolean;
+}) {
+  const workspaceIntegrations = useAtomValue(workspaceIntegrationsAtom);
+  const integration = workspaceIntegrations.find((i) => i.kind === kind);
+
+  return (
+    <Link
+      disabled={disabled}
+      from="/$workspaceSlug/settings/integrations"
+      to={`/$workspaceSlug/settings/integrations/${kind as "float"}`}
+    >
+      <Card>
+        <CardHeader className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Avatar rounded="lg">
+              <AvatarFallback>{icon}</AvatarFallback>
+            </Avatar>
+            <CardTitle>{kind}</CardTitle>
+          </div>
+          {disabled && <Badge variant="info">Coming soon</Badge>}
+          {integration && <Badge variant="success">Connected</Badge>}
+        </CardHeader>
+        <CardContent>{description}</CardContent>
+      </Card>
+    </Link>
   );
 }

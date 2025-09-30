@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 import { generateUUID } from "../utils/uuid";
-import { UserId } from "./shared";
+import { UserId } from "./ids";
 
 export class User extends Schema.Struct({
   id: Schema.optionalWith(UserId, {
@@ -10,6 +10,7 @@ export class User extends Schema.Struct({
   displayName: Schema.NonEmptyString.pipe(Schema.maxLength(100)),
   email: Schema.NonEmptyString,
   emailVerified: Schema.Boolean,
+  // Optional
   imageUrl: Schema.NullOr(Schema.String),
 }) {}
 

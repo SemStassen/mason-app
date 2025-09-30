@@ -4,8 +4,8 @@ import {
   HttpServerResponse,
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
-import { AuthService } from "@mason/core/services/auth";
 import { Effect } from "effect";
+import { AuthService } from "~/auth-service";
 
 export const OAuthGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -32,7 +32,8 @@ export const OAuthGroupLive = HttpApiBuilder.group(
             return { url: response.url as string };
           }).pipe(
             Effect.catchTags({
-              BetterAuthError: () => new HttpApiError.InternalServerError(),
+              "@mason/server/betterAuthError": () =>
+                new HttpApiError.InternalServerError(),
             })
           )
         )
@@ -75,7 +76,8 @@ export const OAuthGroupLive = HttpApiBuilder.group(
               Effect.logError({ message: "GoogleCallback failed", error })
             ),
             Effect.catchTags({
-              BetterAuthError: () => new HttpApiError.InternalServerError(),
+              "@mason/server/betterAuthError": () =>
+                new HttpApiError.InternalServerError(),
             })
           )
         );

@@ -1,12 +1,11 @@
 import { HttpApiBuilder, HttpApiError } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
 import { WorkspaceIntegrationResponse } from "@mason/api-contract/dto/workspace-integration.dto";
-import { DatabaseService } from "@mason/core/services/db";
-import { RequestContextService } from "@mason/core/services/request-context";
+import { WorkspaceIntegrationId } from "@mason/core/models/ids";
 import { WorkspaceIntegrationsService } from "@mason/core/services/workspace-integrations";
-import { workspaceIntegrationsTable } from "@mason/db/schema";
-import { eq } from "drizzle-orm";
 import { Effect } from "effect";
+import { RequestContext } from "~/middleware";
+import { upsertWorkspaceIntegrationUseCase } from "@mason/use-cases/workspace-integrations";
 
 export const WorkspaceIntegrationsGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -14,46 +13,43 @@ export const WorkspaceIntegrationsGroupLive = HttpApiBuilder.group(
   (handlers) =>
     Effect.gen(function* () {
       const workspaceIntegrationsService = yield* WorkspaceIntegrationsService;
-      const db = yield* DatabaseService;
 
       return handlers
-        .handle("SetApiKey", ({ payload }) =>
-          workspaceIntegrationsService
-            .upsertWorkspaceIntegration({
-              workspaceIntegration: {
-                kind: "float",
-                apiKey: payload.apiKey,
-              },
-            })
-            .pipe(
-              Effect.provide(RequestContextService.Default),
-              Effect.mapError(() => new HttpApiError.InternalServerError())
-            )
-        )
-        .handle("ListIntegrations", () =>
+        .handle("Upsert", ({ payload }) =>
           Effect.gen(function* () {
-            const ctx = yield* RequestContextService;
+            const ctx = yield* RequestContext;
+            
+            const upsertedWorkspaceIntegration = yield* upsertWorkspaceIntegrationUseCase({
+              workspaceId: ctx.workspaceId,
+              request: payload,
+            });
 
-            const workspaceIntegrations = yield* db.use((conn) =>
-              conn.query.workspaceIntegrationsTable.findMany({
-                where: eq(
-                  workspaceIntegrationsTable.workspaceId,
-                  ctx.workspaceId
-                ),
-              })
-            );
+            return WorkspaceIntegrationResponse.make(upsertedWorkspaceIntegration);
+          }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
+        )
+        .handle("Delete", ({ path }) =>
+          Effect.gen(function* () {
+            const ctx = yield* RequestContext;
+
+            yield* workspaceIntegrationsService.deleteWorkspaceIntegration({
+              workspaceId: ctx.workspaceId,
+              id: WorkspaceIntegrationId.make(path.id),
+            });
+            
+          }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
+        )
+        .handle("List", () =>
+          Effect.gen(function* () {
+            const ctx = yield* RequestContext;
+
+            const workspaceIntegrations = yield* workspaceIntegrationsService.listWorkspaceIntegrations({
+              workspaceId: ctx.workspaceId,
+            });
 
             return workspaceIntegrations.map((integration) =>
-              WorkspaceIntegrationResponse.make({
-                ...integration,
-                id: integration.id,
-                workspaceId: integration.workspaceId,
-              })
+              WorkspaceIntegrationResponse.make(integration)
             );
-          }).pipe(
-            Effect.provide(RequestContextService.Default),
-            Effect.mapError(() => new HttpApiError.InternalServerError())
-          )
+          }).pipe(Effect.mapError(() => new HttpApiError.InternalServerError()))
         );
     })
 );

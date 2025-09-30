@@ -8,6 +8,15 @@ class WorkspaceIntegration extends Schema.Struct({
   kind: Schema.Literal("float"),
 }) {}
 
-export const WorkspaceIntegrationResponse = Schema.Struct(
+export const UpsertWorkspaceIntegrationRequest = Schema.Struct({
+  kind: WorkspaceIntegration.fields.kind,
+  apiKeyUnencrypted: Schema.NonEmptyString,
+});
+
+export const DeleteWorkspaceIntegrationRequest = Schema.Struct({
+  id: WorkspaceIntegration.fields.id,
+});
+
+export const WorkspaceIntegrationResponse = Schema.TaggedStruct("WorkspaceIntegrationResponse",
   WorkspaceIntegration.fields
 );

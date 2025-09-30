@@ -19,8 +19,10 @@ import { Route as authSignUpIndexRouteImport } from './routes/(auth)/sign-up/ind
 import { Route as authSignInIndexRouteImport } from './routes/(auth)/sign-in/index'
 import { Route as WorkspaceSlugSettingsIndexRouteImport } from './routes/$workspaceSlug/settings/index'
 import { Route as WorkspaceSlugwithSidebarIndexRouteImport } from './routes/$workspaceSlug/(with-sidebar)/index'
+import { Route as WorkspaceSlugSettingsIntegrationsRouteRouteImport } from './routes/$workspaceSlug/settings/integrations_/route'
 import { Route as WorkspaceSlugSettingsProfileIndexRouteImport } from './routes/$workspaceSlug/settings/profile/index'
 import { Route as WorkspaceSlugSettingsIntegrationsIndexRouteImport } from './routes/$workspaceSlug/settings/integrations/index'
+import { Route as WorkspaceSlugSettingsIntegrationsFloatIndexRouteImport } from './routes/$workspaceSlug/settings/integrations_/float/index'
 
 const onboardingRouteRoute = onboardingRouteRouteImport.update({
   id: '/(onboarding)',
@@ -74,6 +76,12 @@ const WorkspaceSlugwithSidebarIndexRoute =
     path: '/',
     getParentRoute: () => WorkspaceSlugwithSidebarRouteRoute,
   } as any)
+const WorkspaceSlugSettingsIntegrationsRouteRoute =
+  WorkspaceSlugSettingsIntegrationsRouteRouteImport.update({
+    id: '/integrations_',
+    path: '/integrations',
+    getParentRoute: () => WorkspaceSlugSettingsRouteRoute,
+  } as any)
 const WorkspaceSlugSettingsProfileIndexRoute =
   WorkspaceSlugSettingsProfileIndexRouteImport.update({
     id: '/profile/',
@@ -86,28 +94,36 @@ const WorkspaceSlugSettingsIntegrationsIndexRoute =
     path: '/integrations/',
     getParentRoute: () => WorkspaceSlugSettingsRouteRoute,
   } as any)
+const WorkspaceSlugSettingsIntegrationsFloatIndexRoute =
+  WorkspaceSlugSettingsIntegrationsFloatIndexRouteImport.update({
+    id: '/float/',
+    path: '/float/',
+    getParentRoute: () => WorkspaceSlugSettingsIntegrationsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/$workspaceSlug': typeof WorkspaceSlugRouteRouteWithChildren
   '/': typeof onboardingRouteRouteWithChildren
   '/$workspaceSlug/': typeof WorkspaceSlugwithSidebarIndexRoute
   '/$workspaceSlug/settings': typeof WorkspaceSlugSettingsRouteRouteWithChildren
+  '/$workspaceSlug/settings/integrations': typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   '/$workspaceSlug/settings/': typeof WorkspaceSlugSettingsIndexRoute
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
   '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
-  '/$workspaceSlug/settings/integrations': typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   '/$workspaceSlug/settings/profile': typeof WorkspaceSlugSettingsProfileIndexRoute
+  '/$workspaceSlug/settings/integrations/float': typeof WorkspaceSlugSettingsIntegrationsFloatIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof onboardingRouteRouteWithChildren
+  '/$workspaceSlug/settings/integrations': typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   '/$workspaceSlug': typeof WorkspaceSlugwithSidebarIndexRoute
   '/$workspaceSlug/settings': typeof WorkspaceSlugSettingsIndexRoute
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
   '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
-  '/$workspaceSlug/settings/integrations': typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   '/$workspaceSlug/settings/profile': typeof WorkspaceSlugSettingsProfileIndexRoute
+  '/$workspaceSlug/settings/integrations/float': typeof WorkspaceSlugSettingsIntegrationsFloatIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +132,7 @@ export interface FileRoutesById {
   '/(onboarding)': typeof onboardingRouteRouteWithChildren
   '/$workspaceSlug/(with-sidebar)': typeof WorkspaceSlugwithSidebarRouteRouteWithChildren
   '/$workspaceSlug/settings': typeof WorkspaceSlugSettingsRouteRouteWithChildren
+  '/$workspaceSlug/settings/integrations_': typeof WorkspaceSlugSettingsIntegrationsRouteRouteWithChildren
   '/$workspaceSlug/(with-sidebar)/': typeof WorkspaceSlugwithSidebarIndexRoute
   '/$workspaceSlug/settings/': typeof WorkspaceSlugSettingsIndexRoute
   '/(auth)/sign-in/': typeof authSignInIndexRoute
@@ -123,6 +140,7 @@ export interface FileRoutesById {
   '/(onboarding)/create-workspace/': typeof onboardingCreateWorkspaceIndexRoute
   '/$workspaceSlug/settings/integrations/': typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   '/$workspaceSlug/settings/profile/': typeof WorkspaceSlugSettingsProfileIndexRoute
+  '/$workspaceSlug/settings/integrations_/float/': typeof WorkspaceSlugSettingsIntegrationsFloatIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,22 +149,24 @@ export interface FileRouteTypes {
     | '/'
     | '/$workspaceSlug/'
     | '/$workspaceSlug/settings'
+    | '/$workspaceSlug/settings/integrations'
     | '/$workspaceSlug/settings/'
     | '/sign-in'
     | '/sign-up'
     | '/create-workspace'
-    | '/$workspaceSlug/settings/integrations'
     | '/$workspaceSlug/settings/profile'
+    | '/$workspaceSlug/settings/integrations/float'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$workspaceSlug/settings/integrations'
     | '/$workspaceSlug'
     | '/$workspaceSlug/settings'
     | '/sign-in'
     | '/sign-up'
     | '/create-workspace'
-    | '/$workspaceSlug/settings/integrations'
     | '/$workspaceSlug/settings/profile'
+    | '/$workspaceSlug/settings/integrations/float'
   id:
     | '__root__'
     | '/$workspaceSlug'
@@ -154,6 +174,7 @@ export interface FileRouteTypes {
     | '/(onboarding)'
     | '/$workspaceSlug/(with-sidebar)'
     | '/$workspaceSlug/settings'
+    | '/$workspaceSlug/settings/integrations_'
     | '/$workspaceSlug/(with-sidebar)/'
     | '/$workspaceSlug/settings/'
     | '/(auth)/sign-in/'
@@ -161,6 +182,7 @@ export interface FileRouteTypes {
     | '/(onboarding)/create-workspace/'
     | '/$workspaceSlug/settings/integrations/'
     | '/$workspaceSlug/settings/profile/'
+    | '/$workspaceSlug/settings/integrations_/float/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -241,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceSlugwithSidebarIndexRouteImport
       parentRoute: typeof WorkspaceSlugwithSidebarRouteRoute
     }
+    '/$workspaceSlug/settings/integrations_': {
+      id: '/$workspaceSlug/settings/integrations_'
+      path: '/integrations'
+      fullPath: '/$workspaceSlug/settings/integrations'
+      preLoaderRoute: typeof WorkspaceSlugSettingsIntegrationsRouteRouteImport
+      parentRoute: typeof WorkspaceSlugSettingsRouteRoute
+    }
     '/$workspaceSlug/settings/profile/': {
       id: '/$workspaceSlug/settings/profile/'
       path: '/profile'
@@ -254,6 +283,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$workspaceSlug/settings/integrations'
       preLoaderRoute: typeof WorkspaceSlugSettingsIntegrationsIndexRouteImport
       parentRoute: typeof WorkspaceSlugSettingsRouteRoute
+    }
+    '/$workspaceSlug/settings/integrations_/float/': {
+      id: '/$workspaceSlug/settings/integrations_/float/'
+      path: '/float'
+      fullPath: '/$workspaceSlug/settings/integrations/float'
+      preLoaderRoute: typeof WorkspaceSlugSettingsIntegrationsFloatIndexRouteImport
+      parentRoute: typeof WorkspaceSlugSettingsIntegrationsRouteRoute
     }
   }
 }
@@ -272,7 +308,23 @@ const WorkspaceSlugwithSidebarRouteRouteWithChildren =
     WorkspaceSlugwithSidebarRouteRouteChildren,
   )
 
+interface WorkspaceSlugSettingsIntegrationsRouteRouteChildren {
+  WorkspaceSlugSettingsIntegrationsFloatIndexRoute: typeof WorkspaceSlugSettingsIntegrationsFloatIndexRoute
+}
+
+const WorkspaceSlugSettingsIntegrationsRouteRouteChildren: WorkspaceSlugSettingsIntegrationsRouteRouteChildren =
+  {
+    WorkspaceSlugSettingsIntegrationsFloatIndexRoute:
+      WorkspaceSlugSettingsIntegrationsFloatIndexRoute,
+  }
+
+const WorkspaceSlugSettingsIntegrationsRouteRouteWithChildren =
+  WorkspaceSlugSettingsIntegrationsRouteRoute._addFileChildren(
+    WorkspaceSlugSettingsIntegrationsRouteRouteChildren,
+  )
+
 interface WorkspaceSlugSettingsRouteRouteChildren {
+  WorkspaceSlugSettingsIntegrationsRouteRoute: typeof WorkspaceSlugSettingsIntegrationsRouteRouteWithChildren
   WorkspaceSlugSettingsIndexRoute: typeof WorkspaceSlugSettingsIndexRoute
   WorkspaceSlugSettingsIntegrationsIndexRoute: typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   WorkspaceSlugSettingsProfileIndexRoute: typeof WorkspaceSlugSettingsProfileIndexRoute
@@ -280,6 +332,8 @@ interface WorkspaceSlugSettingsRouteRouteChildren {
 
 const WorkspaceSlugSettingsRouteRouteChildren: WorkspaceSlugSettingsRouteRouteChildren =
   {
+    WorkspaceSlugSettingsIntegrationsRouteRoute:
+      WorkspaceSlugSettingsIntegrationsRouteRouteWithChildren,
     WorkspaceSlugSettingsIndexRoute: WorkspaceSlugSettingsIndexRoute,
     WorkspaceSlugSettingsIntegrationsIndexRoute:
       WorkspaceSlugSettingsIntegrationsIndexRoute,

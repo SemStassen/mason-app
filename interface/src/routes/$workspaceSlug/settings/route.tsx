@@ -81,7 +81,7 @@ function RouteComponent() {
           />
         </div>
       </aside>
-      <div className="m-1 flex-1 rounded-lg border bg-card p-4">
+      <div className="relative m-1 flex-1 overflow-y-scroll rounded-lg border bg-card p-4">
         <div className="mx-auto mt-16 max-w-2xl space-y-8">
           <h1 className="font-medium text-2xl">{title}</h1>
           <Outlet />

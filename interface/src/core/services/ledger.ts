@@ -1,19 +1,22 @@
 import {
-  Data,
   Duration,
   Effect,
   Fiber,
   Match,
   Ref,
   Schedule,
+  Schema,
   Stream,
   SubscriptionRef,
 } from "effect";
 import { PLATFORM } from "~/utils/constants";
 
-export class LedgerError extends Data.TaggedError("LedgerError")<{
-  readonly cause: unknown;
-}> {}
+export class LedgerError extends Schema.TaggedError<LedgerError>()(
+  "@mason/interface/LedgerError",
+  {
+    cause: Schema.Unknown,
+  }
+) {}
 
 export class LedgerService extends Effect.Service<LedgerService>()(
   "@mason/interface/LedgerService",
@@ -22,15 +25,17 @@ export class LedgerService extends Effect.Service<LedgerService>()(
       const isActiveRef = yield* SubscriptionRef.make(false);
 
       const pollSnapshot = Match.value(PLATFORM).pipe(
-        Match.when({ platform: "desktop" }, (platform) => 
+        Match.when({ platform: "desktop" }, (platform) =>
           Effect.promise(() => platform.captureWindowActivity()).pipe(
             Effect.tap((snapshot) => Effect.log("Logging Ledger", snapshot))
           )
         ),
-        Match.orElse(() => Effect.logDebug("Desktop platform not detected, skipping polling")),
+        Match.orElse(() =>
+          Effect.logDebug("Desktop platform not detected, skipping polling")
+        ),
         Effect.catchAll(() => Effect.void),
         Effect.repeat(Schedule.spaced(Duration.seconds(10)))
-      )
+      );
 
       const pollingFiberRef = yield* Ref.make<Fiber.RuntimeFiber<
         number,

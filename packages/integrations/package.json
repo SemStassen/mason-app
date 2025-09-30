@@ -10,11 +10,14 @@
   },
   "dependencies": {
     "@mason/api-contract": "workspace:*",
+    "@mason/core": "workspace:*",
     "effect": "workspace:^"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
     "typescript": "workspace:^"
   },
-  "exports": {}
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }

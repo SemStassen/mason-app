@@ -1,17 +1,27 @@
 import { drizzle, Pool } from "@mason/db/db";
 // biome-ignore lint/performance/noNamespaceImport: We have to here
 import * as schema from "@mason/db/schema";
-import { Config, Data, Effect, FiberRef } from "effect";
+import { Config, Effect, FiberRef, Schema } from "effect";
 
 type Drizzle = ReturnType<typeof drizzle<typeof schema>>;
 type Transaction = Parameters<Parameters<Drizzle["transaction"]>[0]>[0];
 
-export class DatabaseError extends Data.TaggedError("DatabaseError")<{
-  readonly cause: unknown;
-}> {}
+export class DatabaseError extends Schema.TaggedError<DatabaseError>()(
+  "@mason/core/databaseError",
+  {
+    cause: Schema.Unknown,
+  }
+) {}
+
+export class DatabaseConnectionError extends Schema.TaggedError<DatabaseConnectionError>()(
+  "@mason/core/databaseConnectionError",
+  {
+    cause: Schema.Unknown,
+  }
+) {}
 
 export class DatabaseService extends Effect.Service<DatabaseService>()(
-  "@mason/DatabaseService",
+  "@mason/core/databaseService",
   {
     scoped: Effect.gen(function* () {
       const DbConfig = Config.all({
@@ -80,6 +90,10 @@ export class DatabaseService extends Effect.Service<DatabaseService>()(
             });
           }),
       };
-    }),
+    }).pipe(
+      Effect.catchTags({
+        ConfigError: (error) => Effect.die(error),
+      })
+    ),
   }
 ) {}

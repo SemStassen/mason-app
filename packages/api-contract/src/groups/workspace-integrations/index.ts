@@ -1,22 +1,28 @@
 import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from "@effect/platform";
 import { Schema } from "effect";
-import { WorkspaceIntegrationResponse } from "../..//dto/workspace-integration.dto";
+import {
+  DeleteWorkspaceIntegrationRequest,
+  UpsertWorkspaceIntegrationRequest,
+  WorkspaceIntegrationResponse,
+} from "../../dto/workspace-integration.dto";
+import { idParam } from "../../utils";
 
 export const WorkspaceIntegrationsGroup = HttpApiGroup.make(
   "WorkspaceIntegrations"
 )
   .add(
-    HttpApiEndpoint.post("SetApiKey")`/create`
-      .setPayload(
-        Schema.Struct({
-          kind: Schema.Literal("float"),
-          apiKey: Schema.NonEmptyString,
-        })
-      )
+    HttpApiEndpoint.put("Upsert")`/`
+      .setPayload(UpsertWorkspaceIntegrationRequest)
+      .addError(HttpApiError.InternalServerError)
+      .addSuccess(WorkspaceIntegrationResponse)
+  )
+  .add(
+    HttpApiEndpoint.post("Delete")`/${idParam}`
+      .setPath(DeleteWorkspaceIntegrationRequest)
       .addError(HttpApiError.InternalServerError)
   )
   .add(
-    HttpApiEndpoint.get("ListIntegrations")`/`
-      .addSuccess(Schema.Array(WorkspaceIntegrationResponse))
+    HttpApiEndpoint.get("List")`/`
+      .addSuccess(Schema.mutable(Schema.Array(WorkspaceIntegrationResponse)))
       .addError(HttpApiError.InternalServerError)
   );

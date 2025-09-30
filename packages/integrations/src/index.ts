@@ -1,19 +1,25 @@
-import type { CreateProjectRequest } from "@mason/api-contract/dto/project.dto";
-import { Context, type Effect, Layer } from "effect";
-import { type FloatIntegrationError, floatLive } from "./float";
+import { Schema, Layer } from "effect";
+import { InternalTimeTrackingIntegrationAdapter } from "./adapter";
+import { floatLive } from "./float";
 
-type IntegrationError = FloatIntegrationError;
+export * from "./errors";
 
-export class TimeTrackingIntegrationService extends Context.Tag(
-  "@mason/integrations/TimeTracking"
-)<
-  TimeTrackingIntegrationService,
+export class MissingIntegrationAdapterError extends Schema.TaggedError<MissingIntegrationAdapterError>()(
+  "@mason/integrations/missingIntegrationAdapterError",
   {
-    readonly listProjects: Effect.Effect<
-      Array<typeof CreateProjectRequest.Type>,
-      IntegrationError
-    >;
+    cause: Schema.Unknown,
   }
->() {
-  static floatLive = Layer.succeed(TimeTrackingIntegrationService, floatLive);
+) {}
+
+export class TimeTrackingIntegrationAdapter extends InternalTimeTrackingIntegrationAdapter {
+  static getLayer(kind: "float") {
+    switch (kind) {
+      case "float":
+        return floatLive;
+      default:
+        return Layer.fail(new MissingIntegrationAdapterError({
+          cause: `Integration adapter for kind "${kind}" is not supported`,
+        }));
+    }
+  }
 }

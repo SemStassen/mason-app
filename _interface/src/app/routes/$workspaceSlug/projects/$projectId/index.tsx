@@ -26,15 +26,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@mason/ui/dropdown";
-import { Form, FormControl, FormField, FormItem } from "@mason/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@mason/ui/form2";
 import { Icons } from "@mason/ui/icons";
 import { Input } from "@mason/ui/input";
 import { toast } from "@mason/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mason/ui/tooltip";
 import { cn } from "@mason/ui/utils";
 import {
-  Link,
   createFileRoute,
+  Link,
   stripSearchParams,
 } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
@@ -59,7 +59,7 @@ const activitiesSearchSchema = z.object({
 });
 
 export const Route = createFileRoute(
-  "/$workspaceSlug/_app-layout/projects/$projectId",
+  "/$workspaceSlug/_app-layout/projects/$projectId"
 )({
   validateSearch: zodValidator(activitiesSearchSchema),
   search: {
@@ -152,10 +152,10 @@ const OpenInfoPanel = observer(() => {
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
           className={cn(projectPageStore.isInfoPanelOpen && "text-primary")}
           onClick={() => projectPageStore.toggleInfoPanel()}
+          size="icon"
+          variant="ghost"
         >
           <Icons.Sidebar className="rotate-180" />
         </Button>
@@ -182,7 +182,6 @@ function ActivitiesSearch() {
   return (
     <Input
       className="w-60"
-      variant="outline"
       iconLeft={<Icons.Search />}
       iconRight={
         search && (
@@ -192,9 +191,10 @@ function ActivitiesSearch() {
           />
         )
       }
+      onChange={(e) => updateSearch(e.target.value)}
       placeholder="Search by name..."
       value={search}
-      onChange={(e) => updateSearch(e.target.value)}
+      variant="outline"
     />
   );
 }
@@ -223,7 +223,7 @@ function CreateActivity() {
         `
           INSERT INTO activities (name, project_id) VALUES ($1, $2)
         `,
-        [values.name, values.project_id],
+        [values.name, values.project_id]
       );
       form.reset();
     } catch (e) {
@@ -237,7 +237,7 @@ function CreateActivity() {
         <span>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button size="icon" variant="ghost">
                 <Icons.Plus />
               </Button>
             </TooltipTrigger>
@@ -272,9 +272,9 @@ function CreateActivity() {
               </DialogClose>
               <DialogClose asChild>
                 <Button
+                  disabled={form.formState.isSubmitting}
                   type="submit"
                   variant="default"
-                  disabled={form.formState.isSubmitting}
                 >
                   Create activity
                 </Button>
@@ -333,8 +333,6 @@ function ProjectPage() {
         <div className="flex w-full flex-col">
           <div className="px-4 py-8">
             <Input
-              size="lg"
-              placeholder="Add project name..."
               defaultValue={project.name}
               onBlur={(e) => {
                 // MUTATION
@@ -343,6 +341,8 @@ function ProjectPage() {
                   project.id,
                 ]);
               }}
+              placeholder="Add project name..."
+              size="lg"
             />
             <div>
               <h3>Project details</h3>
