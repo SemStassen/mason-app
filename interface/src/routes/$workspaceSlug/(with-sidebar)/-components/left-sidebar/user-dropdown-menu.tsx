@@ -9,13 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@mason/ui/dropdown-menu";
 import { Icons } from "@mason/ui/icons";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { MasonClient } from "~/client";
-import { Route } from "../..";
 
 function UserDropdownMenu() {
-  const { user } = Route.useRouteContext();
+  const { user } = useRouteContext({
+    from: "/$workspaceSlug",
+  });
 
   const handleSignOut = async () => {
     await Effect.runPromise(

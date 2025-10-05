@@ -1,5 +1,8 @@
 import { Atom, Result } from "@effect-atom/atom-react";
-import type { UpsertWorkspaceIntegrationRequest } from "@mason/api-contract/dto/workspace-integration.dto";
+import {
+  type UpsertWorkspaceIntegrationRequest,
+  WorkspaceIntegrationResponse,
+} from "@mason/api-contract/dto/workspace-integration.dto";
 import { Effect } from "effect";
 import { MasonAtomClient, MasonClient } from "~/client";
 
@@ -18,11 +21,11 @@ export const upsertWorkspaceIntegrationAtom = Atom.optimisticFn(
       current,
       update: typeof UpsertWorkspaceIntegrationRequest.Type
     ) => {
-      const optimisticResponse = {
+      const optimisticResponse = WorkspaceIntegrationResponse.make({
         id: crypto.randomUUID(),
         workspaceId: "temp",
         kind: update.kind,
-      };
+      });
 
       return [...current, optimisticResponse];
     },

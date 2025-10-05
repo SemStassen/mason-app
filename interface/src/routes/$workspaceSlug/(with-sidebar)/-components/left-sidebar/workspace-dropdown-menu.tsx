@@ -14,14 +14,15 @@ import {
   DropdownMenuTrigger,
 } from "@mason/ui/dropdown-menu";
 import { Icons } from "@mason/ui/icons";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useRouteContext, useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { MasonClient } from "~/client";
-import { Route } from "../..";
 
 function WorkspaceDropdownMenu() {
   const router = useRouter();
-  const { user } = Route.useRouteContext();
+  const { user } = useRouteContext({
+    from: "/$workspaceSlug",
+  });
 
   const handleSetActiveWorkspace = async (workspaceId: string) => {
     await Effect.runPromise(
@@ -58,8 +59,8 @@ function WorkspaceDropdownMenu() {
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Switch workspace</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
-              <DropdownMenuRadioGroup value={user.activeWorkspace?.id}>
-                {user.workspaces.map((workspace) => (
+              <DropdownMenuRadioGroup value={user.activeWorkspace.id}>
+                {user.memberships.map(({ workspace }) => (
                   <DropdownMenuRadioItem
                     key={workspace.id}
                     onClick={() => handleSetActiveWorkspace(workspace.id)}

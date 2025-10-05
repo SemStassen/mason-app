@@ -1,9 +1,11 @@
+import { HttpServerRequest } from "@effect/platform";
 import {
   AuthMiddleware,
   RequestContextData,
 } from "@mason/api-contract/middleware/auth";
 import { UserId, WorkspaceId } from "@mason/core/models/ids";
 import { Effect, Layer, Redacted } from "effect";
+import { AuthService } from "./auth-service";
 
 // biome-ignore lint/performance/noBarrelFile: This is for cleanliness
 export { RequestContext } from "@mason/api-contract/middleware/auth";
@@ -11,13 +13,21 @@ export { RequestContext } from "@mason/api-contract/middleware/auth";
 export const AuthMiddlewareLive = Layer.effect(
   AuthMiddleware,
   Effect.gen(function* () {
+    const authService = yield* AuthService;
     return {
       bearer: (bearerToken) =>
         Effect.gen(function* () {
-          yield* Effect.log(
-            "checking bearer token",
-            Redacted.value(bearerToken)
-          );
+          const request = yield* HttpServerRequest.HttpServerRequest;
+
+          const session = yield* authService
+            .use((client) =>
+              client.api.getSession({
+                headers: new Headers(request.headers),
+              })
+            )
+            .pipe(Effect.catchAll(() => Effect.succeed(null)));
+
+          yield* Effect.log({ session, request });
 
           return new RequestContextData({
             userId: UserId.make("0199196e-9662-7fcd-8a57-5080915b3851"),

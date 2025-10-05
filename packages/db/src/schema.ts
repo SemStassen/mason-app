@@ -8,7 +8,12 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { tableId, tableMetadata, tableSoftDelete } from "./snippets";
+import {
+  tableId,
+  tableMetadata,
+  tableSoftDelete,
+  workspaceIsolationPolicy,
+} from "./snippets";
 
 export const usersTable = pgTable("users", {
   id: tableId,
@@ -54,6 +59,14 @@ export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
 }));
 
 export type DbSession = typeof sessionsTable.$inferSelect;
+
+export const jwksTable = pgTable("jwks", {
+  id: tableId,
+  publicKey: varchar("public_key").notNull(),
+  privateKey: varchar("private_key").notNull(),
+  // Metadata
+  createdAt: tableMetadata.createdAt,
+});
 
 export const accountsTable = pgTable("accounts", {
   id: tableId,
@@ -105,16 +118,20 @@ export const verificationsRelations = relations(verificationsTable, () => ({}));
 
 export type DbVerification = typeof verificationsTable.$inferSelect;
 
-export const workspacesTable = pgTable("workspaces", {
-  id: tableId,
-  // General
-  name: varchar("name").notNull(),
-  slug: varchar("slug").notNull(),
-  logoUrl: varchar("logo_url"),
-  metadata: varchar("metadata"),
-  // Metadata
-  ...tableMetadata,
-});
+export const workspacesTable = pgTable(
+  "workspaces",
+  {
+    id: tableId,
+    // General
+    name: varchar("name").notNull(),
+    slug: varchar("slug").notNull(),
+    logoUrl: varchar("logo_url"),
+    metadata: varchar("metadata"),
+    // Metadata
+    ...tableMetadata,
+  },
+  () => [workspaceIsolationPolicy("workspaces")]
+);
 export const workspacesRelations = relations(workspacesTable, ({ many }) => ({
   members: many(membersTable),
   invitations: many(invitationsTable),
@@ -153,26 +170,30 @@ export const membersRelations = relations(membersTable, ({ one, many }) => ({
 
 export type DbMember = typeof membersTable.$inferSelect;
 
-export const invitationsTable = pgTable("invitations", {
-  id: tableId,
-  // References
-  inviterId: uuid("inviter_id")
-    .references(() => membersTable.id, { onDelete: "cascade" })
-    .notNull(),
-  workspaceId: uuid("workspace_id")
-    .references(() => workspacesTable.id, { onDelete: "cascade" })
-    .notNull(),
-  // General
-  email: varchar("email").notNull(),
-  role: varchar("role").notNull(),
-  status: varchar("status").notNull(),
-  expiresAt: timestamp("expires_at", {
-    withTimezone: true,
-    precision: 0,
-  }).notNull(),
-  // Metadata
-  ...tableMetadata,
-});
+export const invitationsTable = pgTable(
+  "invitations",
+  {
+    id: tableId,
+    // References
+    inviterId: uuid("inviter_id")
+      .references(() => membersTable.id, { onDelete: "cascade" })
+      .notNull(),
+    workspaceId: uuid("workspace_id")
+      .references(() => workspacesTable.id, { onDelete: "cascade" })
+      .notNull(),
+    // General
+    email: varchar("email").notNull(),
+    role: varchar("role").notNull(),
+    status: varchar("status").notNull(),
+    expiresAt: timestamp("expires_at", {
+      withTimezone: true,
+      precision: 0,
+    }).notNull(),
+    // Metadata
+    ...tableMetadata,
+  },
+  () => [workspaceIsolationPolicy("invitations")]
+);
 export const invitationsRelations = relations(invitationsTable, ({ one }) => ({
   inviter: one(usersTable, {
     fields: [invitationsTable.inviterId],
@@ -203,12 +224,10 @@ export const workspaceIntegrationsTable = pgTable(
     // Metadata
     ...tableMetadata,
   },
-  (table) => ({
-    unique: unique("unique_workspace_id_kind").on(
-      table.workspaceId,
-      table.kind
-    ),
-  })
+  (table) => [
+    workspaceIsolationPolicy("workspace_integrations"),
+    unique("unique_workspace_id_kind").on(table.workspaceId, table.kind),
+  ]
 );
 export const workspaceIntegrationsRelations = relations(
   workspaceIntegrationsTable,
@@ -223,27 +242,31 @@ export const workspaceIntegrationsRelations = relations(
 export type DbWorkspaceIntegration =
   typeof workspaceIntegrationsTable.$inferSelect;
 
-export const projectsTable = pgTable("projects", {
-  id: tableId,
-  // References
-  workspaceId: uuid("workspace_id")
-    .references(() => workspacesTable.id, { onDelete: "cascade" })
-    .notNull(),
-  // General
-  name: varchar("name").notNull(),
-  hexColor: varchar("hex_color").notNull(),
-  isBillable: boolean("is_billable").default(true).notNull(),
-  notes: jsonb("notes").$type<{
-    // Generic object type
-    [key: string]: unknown;
-  }>(),
-  // Metadata
-  metadata: jsonb("metadata").$type<{
-    floatId?: number;
-  }>(),
-  ...tableSoftDelete,
-  ...tableMetadata,
-});
+export const projectsTable = pgTable(
+  "projects",
+  {
+    id: tableId,
+    // References
+    workspaceId: uuid("workspace_id")
+      .references(() => workspacesTable.id, { onDelete: "cascade" })
+      .notNull(),
+    // General
+    name: varchar("name").notNull(),
+    hexColor: varchar("hex_color").notNull(),
+    isBillable: boolean("is_billable").default(true).notNull(),
+    notes: jsonb("notes").$type<{
+      // Generic object type
+      [key: string]: unknown;
+    }>(),
+    // Metadata
+    metadata: jsonb("metadata").$type<{
+      floatId?: number;
+    }>(),
+    ...tableSoftDelete,
+    ...tableMetadata,
+  },
+  () => [workspaceIsolationPolicy("projects")]
+);
 export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
   workspace: one(workspacesTable, {
     fields: [projectsTable.workspaceId],
@@ -254,17 +277,24 @@ export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
 
 export type DbProject = typeof projectsTable.$inferSelect;
 
-export const activitiesTable = pgTable("activities", {
-  id: tableId,
-  // References
-  projectId: uuid("project_id")
-    .references(() => projectsTable.id, { onDelete: "cascade" })
-    .notNull(),
-  // General
-  name: varchar("name").notNull(),
-  // Metadata
-  ...tableMetadata,
-});
+export const activitiesTable = pgTable(
+  "activities",
+  {
+    id: tableId,
+    // References
+    workspaceId: uuid("workspace_id")
+      .references(() => workspacesTable.id, { onDelete: "cascade" })
+      .notNull(),
+    projectId: uuid("project_id")
+      .references(() => projectsTable.id, { onDelete: "cascade" })
+      .notNull(),
+    // General
+    name: varchar("name").notNull(),
+    // Metadata
+    ...tableMetadata,
+  },
+  () => [workspaceIsolationPolicy("activities")]
+);
 export const activitiesRelations = relations(
   activitiesTable,
   ({ one, many }) => ({
@@ -278,27 +308,34 @@ export const activitiesRelations = relations(
 
 export type DbActivity = typeof activitiesTable.$inferSelect;
 
-export const timeEntriesTable = pgTable("time_entries", {
-  id: tableId,
-  // References
-  memberId: uuid("member_id")
-    .references(() => membersTable.id, { onDelete: "cascade" })
-    .notNull(),
-  activityId: uuid("activity_id")
-    .references(() => activitiesTable.id, { onDelete: "cascade" })
-    .notNull(),
-  // General
-  startedAt: timestamp("started_at", {
-    withTimezone: true,
-    precision: 0,
-  }).notNull(),
-  stoppedAt: timestamp("stopped_at", {
-    withTimezone: true,
-    precision: 0,
-  }),
-  // Metadata
-  ...tableMetadata,
-});
+export const timeEntriesTable = pgTable(
+  "time_entries",
+  {
+    id: tableId,
+    // References
+    workspaceId: uuid("workspace_id")
+      .references(() => workspacesTable.id, { onDelete: "cascade" })
+      .notNull(),
+    memberId: uuid("member_id")
+      .references(() => membersTable.id, { onDelete: "cascade" })
+      .notNull(),
+    activityId: uuid("activity_id")
+      .references(() => activitiesTable.id, { onDelete: "cascade" })
+      .notNull(),
+    // General
+    startedAt: timestamp("started_at", {
+      withTimezone: true,
+      precision: 0,
+    }).notNull(),
+    stoppedAt: timestamp("stopped_at", {
+      withTimezone: true,
+      precision: 0,
+    }),
+    // Metadata
+    ...tableMetadata,
+  },
+  () => [workspaceIsolationPolicy("time_entries")]
+);
 export const timeEntriesRelations = relations(timeEntriesTable, ({ one }) => ({
   member: one(membersTable, {
     fields: [timeEntriesTable.memberId],

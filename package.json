@@ -20,6 +20,7 @@
     "@effect/platform": "^0.90.3",
     "@effect/platform-bun": "^0.79.0",
     "@tailwindcss/vite": "^4.1.11",
+    "@tanstack/react-form": "^1.23.0",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",

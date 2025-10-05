@@ -9,9 +9,23 @@ const MasonHttpClient = FetchHttpClient.layer.pipe(
   Layer.provide(
     Layer.effect(
       FetchHttpClient.Fetch,
-      Effect.sync(() =>
-        PLATFORM.platform === "desktop" ? PLATFORM.fetch : fetch
-      )
+      Effect.sync(() => {
+        const baseFetch = PLATFORM.platform === "desktop" ? PLATFORM.fetch : fetch;
+
+        return (input: RequestInfo | URL, init?: RequestInit) => {
+          const token = localStorage.getItem("mason-bearer-token");
+          const headers = new Headers(init?.headers);
+          
+          if (token) {
+            headers.set("Authorization", `Bearer ${token}`);
+          }
+          
+          return baseFetch(input, {
+            ...init,
+            headers,
+          });
+        };
+      })
     )
   )
 );
@@ -29,7 +43,7 @@ export const MasonClient = Effect.runSync(
   HttpApiClient.make(MasonApi, {
     baseUrl: "http://localhost:8002",
   }).pipe(
-    Effect.provide(FetchHttpClient.layer),
+    Effect.provide(MasonHttpClient),
     Effect.map((client) => ({
       ...client,
       OAuth: {

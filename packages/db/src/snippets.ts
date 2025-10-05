@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgPolicy, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const tableId = uuid("id").primaryKey().default(sql`uuid_generate_v7()`);
 
@@ -25,3 +25,13 @@ export const tableSoftDelete = {
     precision: 0,
   }),
 };
+
+export function workspaceIsolationPolicy(tableName: string) {
+  return pgPolicy(`${tableName}_workspace_isolation`, {
+    as: "permissive",
+    to: "public",
+    for: "all",
+    using: sql`${sql.identifier(tableName)}.workspace_id = current_setting('app.current_workspace_id')::uuid`,
+    withCheck: sql`${sql.identifier(tableName)}.workspace_id = current_setting('app.current_workspace_id')::uuid`,
+  });
+}

@@ -22,6 +22,7 @@ import { Route as WorkspaceSlugwithSidebarIndexRouteImport } from './routes/$wor
 import { Route as WorkspaceSlugSettingsIntegrationsRouteRouteImport } from './routes/$workspaceSlug/settings/integrations_/route'
 import { Route as WorkspaceSlugSettingsProfileIndexRouteImport } from './routes/$workspaceSlug/settings/profile/index'
 import { Route as WorkspaceSlugSettingsIntegrationsIndexRouteImport } from './routes/$workspaceSlug/settings/integrations/index'
+import { Route as WorkspaceSlugwithSidebarProjectsIndexRouteImport } from './routes/$workspaceSlug/(with-sidebar)/projects/index'
 import { Route as WorkspaceSlugSettingsIntegrationsFloatIndexRouteImport } from './routes/$workspaceSlug/settings/integrations_/float/index'
 
 const onboardingRouteRoute = onboardingRouteRouteImport.update({
@@ -94,6 +95,12 @@ const WorkspaceSlugSettingsIntegrationsIndexRoute =
     path: '/integrations/',
     getParentRoute: () => WorkspaceSlugSettingsRouteRoute,
   } as any)
+const WorkspaceSlugwithSidebarProjectsIndexRoute =
+  WorkspaceSlugwithSidebarProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => WorkspaceSlugwithSidebarRouteRoute,
+  } as any)
 const WorkspaceSlugSettingsIntegrationsFloatIndexRoute =
   WorkspaceSlugSettingsIntegrationsFloatIndexRouteImport.update({
     id: '/float/',
@@ -111,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
   '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
+  '/$workspaceSlug/projects': typeof WorkspaceSlugwithSidebarProjectsIndexRoute
   '/$workspaceSlug/settings/profile': typeof WorkspaceSlugSettingsProfileIndexRoute
   '/$workspaceSlug/settings/integrations/float': typeof WorkspaceSlugSettingsIntegrationsFloatIndexRoute
 }
@@ -122,6 +130,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof authSignInIndexRoute
   '/sign-up': typeof authSignUpIndexRoute
   '/create-workspace': typeof onboardingCreateWorkspaceIndexRoute
+  '/$workspaceSlug/projects': typeof WorkspaceSlugwithSidebarProjectsIndexRoute
   '/$workspaceSlug/settings/profile': typeof WorkspaceSlugSettingsProfileIndexRoute
   '/$workspaceSlug/settings/integrations/float': typeof WorkspaceSlugSettingsIntegrationsFloatIndexRoute
 }
@@ -138,6 +147,7 @@ export interface FileRoutesById {
   '/(auth)/sign-in/': typeof authSignInIndexRoute
   '/(auth)/sign-up/': typeof authSignUpIndexRoute
   '/(onboarding)/create-workspace/': typeof onboardingCreateWorkspaceIndexRoute
+  '/$workspaceSlug/(with-sidebar)/projects/': typeof WorkspaceSlugwithSidebarProjectsIndexRoute
   '/$workspaceSlug/settings/integrations/': typeof WorkspaceSlugSettingsIntegrationsIndexRoute
   '/$workspaceSlug/settings/profile/': typeof WorkspaceSlugSettingsProfileIndexRoute
   '/$workspaceSlug/settings/integrations_/float/': typeof WorkspaceSlugSettingsIntegrationsFloatIndexRoute
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/create-workspace'
+    | '/$workspaceSlug/projects'
     | '/$workspaceSlug/settings/profile'
     | '/$workspaceSlug/settings/integrations/float'
   fileRoutesByTo: FileRoutesByTo
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/create-workspace'
+    | '/$workspaceSlug/projects'
     | '/$workspaceSlug/settings/profile'
     | '/$workspaceSlug/settings/integrations/float'
   id:
@@ -180,6 +192,7 @@ export interface FileRouteTypes {
     | '/(auth)/sign-in/'
     | '/(auth)/sign-up/'
     | '/(onboarding)/create-workspace/'
+    | '/$workspaceSlug/(with-sidebar)/projects/'
     | '/$workspaceSlug/settings/integrations/'
     | '/$workspaceSlug/settings/profile/'
     | '/$workspaceSlug/settings/integrations_/float/'
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceSlugSettingsIntegrationsIndexRouteImport
       parentRoute: typeof WorkspaceSlugSettingsRouteRoute
     }
+    '/$workspaceSlug/(with-sidebar)/projects/': {
+      id: '/$workspaceSlug/(with-sidebar)/projects/'
+      path: '/projects'
+      fullPath: '/$workspaceSlug/projects'
+      preLoaderRoute: typeof WorkspaceSlugwithSidebarProjectsIndexRouteImport
+      parentRoute: typeof WorkspaceSlugwithSidebarRouteRoute
+    }
     '/$workspaceSlug/settings/integrations_/float/': {
       id: '/$workspaceSlug/settings/integrations_/float/'
       path: '/float'
@@ -296,11 +316,14 @@ declare module '@tanstack/react-router' {
 
 interface WorkspaceSlugwithSidebarRouteRouteChildren {
   WorkspaceSlugwithSidebarIndexRoute: typeof WorkspaceSlugwithSidebarIndexRoute
+  WorkspaceSlugwithSidebarProjectsIndexRoute: typeof WorkspaceSlugwithSidebarProjectsIndexRoute
 }
 
 const WorkspaceSlugwithSidebarRouteRouteChildren: WorkspaceSlugwithSidebarRouteRouteChildren =
   {
     WorkspaceSlugwithSidebarIndexRoute: WorkspaceSlugwithSidebarIndexRoute,
+    WorkspaceSlugwithSidebarProjectsIndexRoute:
+      WorkspaceSlugwithSidebarProjectsIndexRoute,
   }
 
 const WorkspaceSlugwithSidebarRouteRouteWithChildren =

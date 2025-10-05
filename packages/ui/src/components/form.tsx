@@ -46,12 +46,30 @@ function FormDescription(props: React.ComponentProps<"p"> & { id: string }) {
   return <p className="text-muted-foreground text-sm" {...props} />;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: errors are from tanstack form
+function getErrorMessage(error: any): string {
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (error && typeof error === "object") {
+    if (Array.isArray(error.issues) && error.issues.length > 0) {
+      return error.issues[0].message;
+    }
+    if (typeof error.message === "string") {
+      return error.message;
+    }
+  }
+
+  return String(error);
+}
+
 function FormMessage({
   errors,
   ...props
   // biome-ignore lint/suspicious/noExplicitAny: errors are from tanstack form
 }: React.ComponentProps<"p"> & { id: string; errors: Array<any> }) {
-  const body = errors.length > 0 ? errors[0] : props.children;
+  const body = errors.length > 0 ? getErrorMessage(errors[0]) : props.children;
 
   if (!body) {
     return null;

@@ -1,5 +1,5 @@
+import { WorkspaceId } from "@mason/core/models/ids";
 import { DatabaseService } from "@mason/core/services/db";
-import { eq } from "@mason/db/operators";
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "@mason/db/schema";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
@@ -8,8 +8,10 @@ import {
   bearer,
   customSession,
   emailOTP,
+  jwt,
   organization,
 } from "better-auth/plugins";
+
 import { Config, Effect, Schema } from "effect";
 
 export class BetterAuthError extends Schema.TaggedError<BetterAuthError>()(
@@ -39,6 +41,40 @@ export class AuthService extends Effect.Service<AuthService>()(
           provider: "pg",
           schema: schema,
         }),
+        databaseHooks: {
+          session: {
+            create: {
+              before: async (session) => {
+                const user = await Effect.runPromise(
+                  db.use(null, (conn) =>
+                    conn.query.usersTable.findFirst({
+                      where: (fields, { eq }) => eq(fields.id, session.userId),
+                      with: {
+                        memberships: true,
+                        sessions: {
+                          orderBy: (fields, { desc }) => [
+                            desc(fields.createdAt),
+                          ],
+                          limit: 1,
+                        },
+                      },
+                    })
+                  )
+                );
+
+                return {
+                  data: {
+                    ...session,
+                    activeOrganizationId:
+                      user?.sessions?.[0]?.activeWorkspaceId ||
+                      user?.memberships?.[0]?.workspaceId ||
+                      null,
+                  },
+                };
+              },
+            },
+          },
+        },
         trustedOrigins: [
           "http://localhost:8001",
           "http://localhost:8002",
@@ -71,7 +107,7 @@ export class AuthService extends Effect.Service<AuthService>()(
             name: "displayName",
           },
         },
-        // We don't actually use sessions. We use bearer tokens (acces tokens)
+        // We don't actually use sessions. We use bearer tokens (access tokens)
         session: {
           storeSessionInDatabase: false,
           preserveSessionInDatabase: false,
@@ -87,7 +123,16 @@ export class AuthService extends Effect.Service<AuthService>()(
           modelName: "verificationsTable",
         },
         plugins: [
-          bearer(),
+          bearer({
+            requireSignature: true,
+          }),
+          jwt({
+            schema: {
+              jwks: {
+                modelName: "jwksTable",
+              },
+            },
+          }),
           emailOTP({
             async sendVerificationOTP({ email, otp, type }) {
               return await Effect.runPromise(
@@ -131,29 +176,75 @@ export class AuthService extends Effect.Service<AuthService>()(
         ...betterAuthOptions,
         plugins: [
           ...betterAuthOptions.plugins,
-          customSession(async ({ session }) => {
-            const user = await Effect.runPromise(
-              db.use((conn) =>
-                conn.query.usersTable.findFirst({
-                  where: eq(schema.usersTable.id, session.userId),
-                  with: {
-                    memberships: {
-                      with: {
-                        workspace: true,
-                      },
-                    },
-                  },
+          customSession(
+            ({ session }) =>
+              Effect.runPromise(
+                Effect.gen(function* () {
+                  // Always fetch user baseline without tenant RLS
+                  const baseUser = yield* db.use(null, (conn) =>
+                    conn.query.usersTable.findFirst({
+                      where: (userFields, { eq }) =>
+                        eq(userFields.id, session.userId),
+                      with: { memberships: true },
+                    })
+                  );
+
+                  if (!baseUser) {
+                    return yield* Effect.fail(
+                      new BetterAuthError({ cause: "User not found" })
+                    );
+                  }
+
+                  const { activeOrganizationId, ...newSession } = session;
+
+                  // Decide active workspace
+                  const activeWorkspaceId =
+                    activeOrganizationId ??
+                    baseUser.memberships[0]?.workspaceId ??
+                    null;
+
+                  if (!activeWorkspaceId) {
+                    // No workspace memberships at all → onboarding case
+                    return {
+                      // Narrow the type for memberships
+                      user: { ...baseUser, memberships: [] },
+                      session: { ...newSession, activeWorkspaceId: null },
+                    };
+                  }
+
+                  // Refetch user with RLS in place
+                  const userWithWorkspaces = yield* db.use(
+                    WorkspaceId.make(activeWorkspaceId),
+                    (conn) =>
+                      conn.query.usersTable.findFirst({
+                        where: (userFields, { eq }) =>
+                          eq(userFields.id, baseUser.id),
+                        with: {
+                          memberships: { with: { workspace: true } },
+                        },
+                      })
+                  );
+
+                  if (!userWithWorkspaces) {
+                    return yield* Effect.fail(
+                      new BetterAuthError({
+                        cause: "User not found in workspace",
+                      })
+                    );
+                  }
+
+                  return {
+                    user: userWithWorkspaces,
+                    session: { ...newSession, activeWorkspaceId },
+                  };
                 })
-              )
-            );
-
-            const activeWorkspaceSlug =
-              user?.memberships?.[0]?.workspace?.slug || null;
-
-            return { user, session, activeWorkspaceSlug };
-          }, betterAuthOptions),
+              ),
+            betterAuthOptions
+          ),
         ],
       });
+
+      betterAuthClient.api.getSession({});
 
       const use = Effect.fn("AuthService.use")(
         <A>(
@@ -169,6 +260,13 @@ export class AuthService extends Effect.Service<AuthService>()(
       );
       return {
         use,
+        headersToObject: (headers: Headers) => {
+          const headersObject: Record<string, string> = {};
+          headers.forEach((value, key) => {
+            headersObject[key] = value;
+          });
+          return headersObject;
+        },
       } as const;
     }).pipe(Effect.catchTags({ ConfigError: (error) => Effect.die(error) })),
   }

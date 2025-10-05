@@ -22,45 +22,38 @@ export const AuthGroupLive = HttpApiBuilder.group(
               })
             );
 
-            if (!response?.user?.id) {
+            yield* Effect.log({ response });
+
+            if (!response?.user) {
               return yield* Effect.fail(new HttpApiError.Unauthorized());
             }
 
-            const activeMembership = response.session.activeOrganizationId
-              ? response.user.memberships.find(
-                  (membership) =>
-                    String(membership.workspaceId) ===
-                    String(response.session.activeOrganizationId)
-                )
-              : undefined;
-
-            const activeWorkspace = activeMembership
-              ? {
-                  id: activeMembership.workspace.id,
-                  slug: activeMembership.workspace.slug,
-                  name: activeMembership.workspace.name,
-                }
-              : null;
-
             return {
+              session: {
+                id: response.session.id,
+                activeWorkspaceId: response.session.activeWorkspaceId,
+              },
               user: {
                 id: response.user.id,
-                email: response.user.email,
-                emailVerified: response.user.emailVerified,
                 displayName: response.user.displayName,
+                email: response.user.email,
                 imageUrl: response.user.imageUrl,
-                workspaces: response.user.memberships.map((membership) => ({
-                  id: membership.workspace.id,
-                  slug: membership.workspace.slug,
-                  name: membership.workspace.name,
+                memberships: response.user.memberships.map((membership) => ({
+                  role: membership.role,
+                  workspace: {
+                    id: membership.workspace.id,
+                    name: membership.workspace.name,
+                    slug: membership.workspace.slug,
+                  },
                 })),
-                activeWorkspace: activeWorkspace,
               },
             };
           }).pipe(
+            Effect.tapError((e) => Effect.logError({ error: e })),
             Effect.catchTags({
-              "@mason/server/betterAuthError": () =>
-                new HttpApiError.InternalServerError(),
+              "@mason/server/betterAuthError": () => {
+                return new HttpApiError.InternalServerError();
+              },
             })
           )
         )
@@ -87,16 +80,14 @@ export const AuthGroupLive = HttpApiBuilder.group(
               client.api.signInEmailOTP({
                 body: { email: payload.email, otp: payload.otp },
                 headers: request.headers,
-                returnHeaders: true, // This gives you headers without changing response type
+                returnHeaders: true,
               })
             );
 
             return yield* HttpServerResponse.json(
               { user: result.response.user },
               {
-                headers: {
-                  "set-cookie": result.headers.get("set-cookie") || "",
-                },
+                headers: auth.headersToObject(result.headers),
               }
             );
           }).pipe(

@@ -1,13 +1,11 @@
 import type { UpsertWorkspaceIntegrationRequest } from "@mason/api-contract/dto/workspace-integration.dto";
-import { WorkspaceIntegrationsService } from "@mason/core/services/workspace-integrations";
-import {
-  TimeTrackingIntegrationAdapter,
-} from "@mason/integrations";
-import { Effect } from "effect";
-import { WorkspaceId, ProjectId } from "@mason/core/models/ids";
-import { ProjectToCreate } from "@mason/core/models/project.model";
-import { ProjectsService } from "@mason/core/services/projects";
+import { ProjectId, type WorkspaceId } from "@mason/core/models/ids";
+import type { ProjectToCreate } from "@mason/core/models/project.model";
 import { DatabaseService } from "@mason/core/services/db";
+import { ProjectsService } from "@mason/core/services/projects";
+import { WorkspaceIntegrationsService } from "@mason/core/services/workspace-integrations";
+import { TimeTrackingIntegrationAdapter } from "@mason/integrations";
+import { Effect } from "effect";
 
 export const upsertWorkspaceIntegrationUseCase = ({
   workspaceId,
@@ -27,10 +25,10 @@ export const upsertWorkspaceIntegrationUseCase = ({
 
     return yield* workspaceIntegrationsService.upsertWorkspaceIntegration({
       workspaceId: workspaceId,
-      workspaceIntegration: request
+      workspaceIntegration: request,
     });
   }).pipe(
-    Effect.provide(TimeTrackingIntegrationAdapter.getLayer(request.kind)),
+    Effect.provide(TimeTrackingIntegrationAdapter.getLayer(request.kind))
   );
 
 export const syncIntegrationProjectsUseCase = ({
@@ -56,8 +54,7 @@ export const syncIntegrationProjectsUseCase = ({
     const projectsToCreate = projects.filter(
       (p) =>
         !existingProjects.some(
-          (existing) =>
-            existing.metadata?.floatId === p.metadata?.floatId
+          (existing) => existing.metadata?.floatId === p.metadata?.floatId
         )
     );
 
@@ -70,8 +67,7 @@ export const syncIntegrationProjectsUseCase = ({
     const projectsToDelete = existingProjects.filter(
       (p) =>
         !projects.some(
-          (existing) =>
-            existing.metadata?.floatId === p.metadata?.floatId
+          (existing) => existing.metadata?.floatId === p.metadata?.floatId
         )
     );
     yield* db.withTransaction(

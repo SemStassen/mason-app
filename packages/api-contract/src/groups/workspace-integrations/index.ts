@@ -17,7 +17,7 @@ export const WorkspaceIntegrationsGroup = HttpApiGroup.make(
       .addSuccess(WorkspaceIntegrationResponse)
   )
   .add(
-    HttpApiEndpoint.post("Delete")`/${idParam}`
+    HttpApiEndpoint.del("Delete")`/${idParam}`
       .setPath(DeleteWorkspaceIntegrationRequest)
       .addError(HttpApiError.InternalServerError)
   )

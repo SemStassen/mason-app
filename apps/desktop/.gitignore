@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # Python
-venv/
+.venv/

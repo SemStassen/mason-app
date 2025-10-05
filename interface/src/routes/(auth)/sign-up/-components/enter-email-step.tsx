@@ -1,11 +1,12 @@
 import { Button } from "@mason/ui/button";
-import { useAppForm } from "@mason/ui/form";
+import {  useAppForm } from "@mason/ui/form";
 import { Icons } from "@mason/ui/icons";
 import { Effect } from "effect";
 import type { Dispatch, SetStateAction } from "react";
 import { z } from "zod";
 import { MasonClient } from "~/client";
 import type { SignUpStep } from "..";
+import { revalidateLogic } from "@tanstack/react-form";
 
 const enterEmailSchema = z.object({
   email: z.email(),
@@ -24,8 +25,9 @@ function EnterEmailStep({
 }) {
   const form = useAppForm({
     defaultValues: defaultValues,
+    validationLogic: revalidateLogic(),
     validators: {
-      onChange: enterEmailSchema,
+      onDynamic: enterEmailSchema,
     },
     onSubmit: async ({ value }) => {
       const result = enterEmailSchema.parse(value);

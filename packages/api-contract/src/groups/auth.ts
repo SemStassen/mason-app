@@ -8,20 +8,18 @@ export const AuthGroup = HttpApiGroup.make("Auth")
     HttpApiEndpoint.get("GetSession")`/session`
       .addSuccess(
         Schema.Struct({
+          session: Schema.Struct({
+            id: Schema.NonEmptyString,
+            activeWorkspaceId: Schema.NullOr(Schema.NonEmptyString),
+          }),
           user: Schema.extend(
-            UserResponse.pick(
-              "id",
-              "displayName",
-              "email",
-              "emailVerified",
-              "imageUrl"
-            ),
+            UserResponse.pick("id", "displayName", "email", "imageUrl"),
             Schema.Struct({
-              workspaces: Schema.Array(
-                WorkspaceResponse.pick("id", "slug", "name")
-              ),
-              activeWorkspace: Schema.NullOr(
-                WorkspaceResponse.pick("id", "slug", "name")
+              memberships: Schema.Array(
+                Schema.Struct({
+                  role: Schema.NonEmptyString,
+                  workspace: WorkspaceResponse.pick("id", "slug", "name"),
+                })
               ),
             })
           ),

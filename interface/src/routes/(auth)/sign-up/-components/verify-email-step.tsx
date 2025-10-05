@@ -2,6 +2,7 @@ import { Button } from "@mason/ui/button";
 import { useAppForm } from "@mason/ui/form";
 import { Icons } from "@mason/ui/icons";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@mason/ui/input-otp";
+import { revalidateLogic } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { Effect } from "effect";
 import type { Dispatch, SetStateAction } from "react";
@@ -27,8 +28,9 @@ function VerifyEmailStep({
       email: email,
       otp: "",
     } satisfies z.input<typeof verifyEmailSchema>,
+    validationLogic: revalidateLogic(),
     validators: {
-      onChange: verifyEmailSchema,
+      onDynamic: verifyEmailSchema,
     },
     onSubmit: async ({ value }) => {
       const result = verifyEmailSchema.parse(value);

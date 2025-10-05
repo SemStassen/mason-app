@@ -28,7 +28,7 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
             Project.make({ workspaceId: workspaceId, ...p })
           );
 
-          const createdProjects = yield* db.use((conn) =>
+          const createdProjects = yield* db.use(workspaceId, (conn) =>
             conn.insert(projectsTable).values(projects).returning()
           );
 
@@ -52,7 +52,7 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
           const projectIds = projectsToUpdate.map((p) => p.id);
 
           // Find existing projects
-          const existingProjects = yield* db.use((conn) =>
+          const existingProjects = yield* db.use(workspaceId, (conn) =>
             conn.query.projectsTable.findMany({
               where: ({ id }) => inArray(id, projectIds),
             })
@@ -86,7 +86,7 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
                   continue;
                 }
 
-                const [updated] = yield* db.use((conn) =>
+                const [updated] = yield* db.use(workspaceId, (conn) =>
                   conn
                     .update(projectsTable)
                     .set(project)
@@ -159,7 +159,7 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
           projectIds: Array<typeof ProjectId.Type>;
         }) =>
           Effect.gen(function* () {
-            yield* db.use((conn) =>
+            yield* db.use(workspaceId, (conn) =>
               conn
                 .update(projectsTable)
                 .set({ deletedAt: new Date() })
@@ -179,7 +179,7 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
           projectIds: Array<typeof ProjectId.Type>;
         }) =>
           Effect.gen(function* () {
-            yield* db.use((conn) =>
+            yield* db.use(workspaceId, (conn) =>
               conn
                 .delete(projectsTable)
                 .where(
@@ -196,15 +196,17 @@ export class ProjectsService extends Effect.Service<ProjectsService>()(
         }: {
           workspaceId: typeof WorkspaceId.Type;
           query?: {
-            integrationKind?: "float"
+            integrationKind?: "float";
           };
         }) =>
           Effect.gen(function* () {
-            return yield* db.use((conn) =>
+            return yield* db.use(workspaceId, (conn) =>
               conn.query.projectsTable.findMany({
                 where: and(
                   eq(projectsTable.workspaceId, workspaceId),
-                  query?.integrationKind ? sql`${projectsTable.metadata}->>'${query.integrationKind}Id' IS NOT NULL` : undefined,
+                  query?.integrationKind
+                    ? sql`${projectsTable.metadata}->>'${query.integrationKind}Id' IS NOT NULL`
+                    : undefined
                 ),
               })
             );

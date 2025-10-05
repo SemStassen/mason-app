@@ -1,17 +1,17 @@
-import { and, eq, } from "@mason/db/operators";
-import {  Effect, Schema } from "effect";
-import {  WorkspaceId, WorkspaceIntegrationId } from "../models/ids";
+import { and, eq } from "@mason/db/operators";
+import { workspaceIntegrationsTable } from "@mason/db/schema";
+import { Effect, Schema } from "effect";
+import { WorkspaceId, WorkspaceIntegrationId } from "../models/ids";
 import {
   WorkspaceIntegration,
   type WorkspaceIntegrationToUpsert,
 } from "../models/workspace-integration.model";
 import { decrypt, encrypt } from "../utils/encryption";
 import { DatabaseService } from "./db";
-import { ProjectsService } from "./projects";
-import { workspaceIntegrationsTable } from "@mason/db/schema";
 
 export class WorkspaceIntegrationNotFoundError extends Schema.TaggedError<WorkspaceIntegrationNotFoundError>()(
-  "@mason/core/workspaceIntegrationNotFoundError", {}
+  "@mason/core/workspaceIntegrationNotFoundError",
+  {}
 ) {}
 
 export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegrationsService>()(
@@ -19,7 +19,6 @@ export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegr
   {
     effect: Effect.gen(function* () {
       const db = yield* DatabaseService;
-      const projectsService = yield* ProjectsService;
 
       return {
         upsertWorkspaceIntegration: ({
@@ -34,24 +33,26 @@ export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegr
               workspaceIntegration.apiKeyUnencrypted
             );
 
-            const [upsertedWorkspaceIntegration] = yield* db.use((conn) =>
-              conn
-                .insert(workspaceIntegrationsTable)
-                .values({
-                  workspaceId: workspaceId,
-                  apiKeyEncrypted: apiKeyEncrypted,
-                  ...workspaceIntegration,
-                })
-                .onConflictDoUpdate({
-                  target: [
-                    workspaceIntegrationsTable.workspaceId,
-                    workspaceIntegrationsTable.kind,
-                  ],
-                  set: {
+            const [upsertedWorkspaceIntegration] = yield* db.use(
+              workspaceId,
+              (conn) =>
+                conn
+                  .insert(workspaceIntegrationsTable)
+                  .values({
+                    workspaceId: workspaceId,
                     apiKeyEncrypted: apiKeyEncrypted,
-                  },
-                })
-                .returning()
+                    ...workspaceIntegration,
+                  })
+                  .onConflictDoUpdate({
+                    target: [
+                      workspaceIntegrationsTable.workspaceId,
+                      workspaceIntegrationsTable.kind,
+                    ],
+                    set: {
+                      apiKeyEncrypted: apiKeyEncrypted,
+                    },
+                  })
+                  .returning()
             );
 
             return WorkspaceIntegration.make({
@@ -70,7 +71,7 @@ export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegr
           id: typeof WorkspaceIntegrationId.Type;
         }) =>
           Effect.gen(function* () {
-            yield* db.use((conn) =>
+            yield* db.use(workspaceId, (conn) =>
               conn
                 .delete(workspaceIntegrationsTable)
                 .where(
@@ -87,10 +88,10 @@ export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegr
           workspaceId: typeof WorkspaceId.Type;
         }) =>
           Effect.gen(function* () {
-            const workspaceIntegrations = yield* db.use((conn) =>
+            const workspaceIntegrations = yield* db.use(workspaceId, (conn) =>
               conn.query.workspaceIntegrationsTable.findMany({
                 where: and(
-                  eq(workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(workspaceIntegrationsTable.workspaceId, workspaceId)
                 ),
               })
             );
@@ -111,7 +112,7 @@ export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegr
           kind: typeof WorkspaceIntegration.fields.kind.Type;
         }) =>
           Effect.gen(function* () {
-            const workspaceIntegration = yield* db.use((conn) =>
+            const workspaceIntegration = yield* db.use(workspaceId, (conn) =>
               conn.query.workspaceIntegrationsTable.findFirst({
                 where: and(
                   eq(workspaceIntegrationsTable.workspaceId, workspaceId),

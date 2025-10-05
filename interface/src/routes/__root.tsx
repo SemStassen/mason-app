@@ -15,6 +15,7 @@ export const Route = createRootRoute({
         Effect.catchAll(() => Effect.succeed(null))
       )
     );
+
     // If no session or user, redirect to sign-up (unless already there)
     if (!sessionResult?.user) {
       if (!["/sign-up"].includes(location.pathname)) {
@@ -25,12 +26,12 @@ export const Route = createRootRoute({
       return;
     }
 
-    const { user } = sessionResult;
+    const { user, session } = sessionResult;
 
     // If user exists but has no workspaces, redirect to create-workspace
     // At create-workspace we show a return button when workspaces do exist.
     // So no need to check for that here
-    if (user.workspaces.length === 0) {
+    if (user.memberships.length === 0) {
       if (!["/create-workspace"].includes(location.pathname)) {
         throw redirect({
           to: "/create-workspace",
@@ -39,7 +40,28 @@ export const Route = createRootRoute({
       return;
     }
 
-    const activeWorkspace = user.activeWorkspace || user.workspaces[0];
+    const activeWorkspace = user.memberships.find(
+      (membership) => membership.workspace.id === session.activeWorkspaceId
+    )?.workspace;
+
+    // This should never happen.
+    // But if it does, we need to set the active workspace to the first workspace as a fallback
+    if (!activeWorkspace) {
+      await Effect.runPromise(
+        MasonClient.Workspace.SetActive({
+          payload: {
+            workspaceId: user.memberships[0].workspace.id,
+          },
+        }).pipe(
+          Effect.catchTags({
+            Unauthorized: () => Effect.succeed(null),
+            InternalServerError: () => Effect.succeed(null),
+          }),
+          Effect.catchAll(() => Effect.succeed(null))
+        )
+      );
+      return;
+    }
 
     if (
       !(
@@ -55,7 +77,7 @@ export const Route = createRootRoute({
       });
     }
 
-    return { user };
+    return { user: { ...user, activeWorkspace } };
   },
   component: RootLayout,
 });

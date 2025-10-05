@@ -1,7 +1,7 @@
 import { useAtomRef } from "@effect-atom/atom-react";
 import { Button } from "@mason/ui/button";
-import { Icons } from "@mason/ui/icons";
-import { Link } from "@tanstack/react-router";
+import { type IconProps, Icons } from "@mason/ui/icons";
+import { Link, linkOptions } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { leftSidebarAtom } from "~/atoms/ui-atoms";
 
@@ -10,6 +10,26 @@ import { UserDropdownMenu } from "./user-dropdown-menu";
 import { WorkspaceDropdownMenu } from "./workspace-dropdown-menu";
 
 const SIDEBAR_WIDTH = 240;
+
+const NAV_ITEMS = [
+  {
+    groupLabel: "Dashboards",
+    items: [
+      linkOptions({
+        to: "/$workspaceSlug",
+        from: "/$workspaceSlug",
+        label: "Log time",
+        Icon: (props: IconProps) => <Icons.Home {...props} />,
+      }),
+      linkOptions({
+        to: "/$workspaceSlug/projects",
+        from: "/$workspaceSlug",
+        label: "Projects",
+        Icon: (props: IconProps) => <Icons.Home {...props} />,
+      }),
+    ],
+  },
+];
 
 function LeftSidebar() {
   const { isOpen } = useAtomRef(leftSidebarAtom);
@@ -33,8 +53,36 @@ function LeftSidebar() {
               width: SIDEBAR_WIDTH,
             }}
           >
-            <div className="ml-10">
-              <WorkspaceDropdownMenu />
+            <div className="space-y-4">
+              <div className="ml-10">
+                <WorkspaceDropdownMenu />
+              </div>
+              {NAV_ITEMS.map(({ groupLabel, items }) => (
+                <div key={groupLabel}>
+                  <div className="mb-2 font-medium text-xs">{groupLabel}</div>
+                  <ul className="space-y-0.5">
+                    {items.map(({ label, Icon, to, from }) => (
+                      <li key={to}>
+                        <Button
+                          key={to}
+                          render={
+                            <Link
+                              className="w-full justify-start gap-2"
+                              from={from}
+                              to={to}
+                            >
+                              <Icon size={16} />
+                              {label}
+                            </Link>
+                          }
+                          size="sm"
+                          variant="ghost"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
             <div className="space-y-2">
               <Button

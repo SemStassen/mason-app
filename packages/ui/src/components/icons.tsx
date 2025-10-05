@@ -25,6 +25,7 @@ import {
   GithubLogoIcon,
   GoogleLogoIcon,
   HouseIcon,
+  type IconProps,
   LinkSimpleIcon,
   MagnifyingGlassIcon,
   MinusIcon,
@@ -51,9 +52,8 @@ import {
   WallIcon,
   XIcon,
 } from "@phosphor-icons/react";
-import type React from "react";
 
-type IconProps = React.ComponentProps<"svg">;
+export type { IconProps } from "@phosphor-icons/react";
 
 const Icons = {
   ArrowDown: ArrowDownIcon,
