@@ -1,11 +1,9 @@
 import { useAtomRef } from "@effect-atom/atom-react";
 import { ScrollArea } from "@mason/ui/scroll-area";
-import { cn } from "@mason/ui/utils";
 import {
   addDays,
   areIntervalsOverlapping,
   isSameDay,
-  isToday,
   setHours,
   setMinutes,
 } from "date-fns";
@@ -24,13 +22,14 @@ import {
   CALENDAR_HEADER_HEIGHT_VAR,
   CALENDAR_HOUR_COLUMN_WIDTH_VAR,
   CALENDAR_HOUR_HEIGHT_VAR,
-} from "../..";
-import { DUMMY_TIME_ENTRIES } from "../../dummy-time-entries";
-import { getTimeEntryBlockStyle, groupTimeEntries } from "../../helpers";
-import { DroppableTimeEntry } from "../dnd/droppable-time-entry";
-import { CurrentTimeLine } from "./current-time-line";
-import { DragSelectionHighlight } from "./drag-selection-highlight";
-import { TimeEntry } from "./time-entry";
+} from "../../..";
+import { DUMMY_TIME_ENTRIES } from "../../../dummy-time-entries";
+import { getTimeEntryBlockStyle, groupTimeEntries } from "../../../helpers";
+import { DroppableTimeEntry } from "../../dnd/droppable-time-entry";
+import { CurrentTimeLine } from "../../views/current-time-line";
+import { DragSelectionHighlight } from "../../views/drag-selection-highlight";
+import { TimeEntry } from "../../views/time-entry";
+import { Header } from "./header";
 
 const hours = Array.from({ length: 24 }).map((_, hourIndex) => hourIndex);
 const timeSlotsPerHour = Array.from({ length: 4 }).map(
@@ -68,47 +67,14 @@ const handlePointerUp = () => {
 function CalendarMultiDayView() {
   const selectedDate = useAtomRef(calendarSelectedDateAtom);
   const daysInView = useAtomRef(calendarDaysInViewAtom);
-  const weekDays = Array.from({ length: daysInView }).map((_, dayIndex) =>
+  const weekdays = Array.from({ length: daysInView }).map((_, dayIndex) =>
     addDays(selectedDate, dayIndex)
   );
 
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div
-        className="flex items-center justify-center border-b"
-        style={{
-          height: `var(${CALENDAR_DAY_HEADER_HEIGHT_VAR})`,
-          paddingLeft: `var(${CALENDAR_HOUR_COLUMN_WIDTH_VAR})`,
-        }}
-      >
-        <div
-          className="grid flex-1"
-          style={{
-            gridTemplateColumns: `repeat(${weekDays.length}, 1fr)`,
-          }}
-        >
-          {weekDays.map((day) => (
-            <div
-              className={cn(
-                "flex items-center justify-center gap-1",
-                isToday(day) ? "text-foreground" : "text-muted-foreground"
-              )}
-              key={day.toString()}
-            >
-              <span>{formatter.weekdayShort(day)}</span>
-              <span
-                className={cn(
-                  "rounded-md px-1",
-                  isToday(day) && "bg-primary text-primary-foreground"
-                )}
-              >
-                {formatter.day(day)}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Header weekdays={weekdays} />
       <ScrollArea
         className="[&>div]:overscroll-none"
         orientation="vertical"
@@ -144,10 +110,10 @@ function CalendarMultiDayView() {
           <div
             className="relative grid w-full"
             style={{
-              gridTemplateColumns: `repeat(${weekDays.length}, 1fr)`,
+              gridTemplateColumns: `repeat(${weekdays.length}, 1fr)`,
             }}
           >
-            {weekDays.map((day) => {
+            {weekdays.map((day) => {
               const dayTimeEntries = DUMMY_TIME_ENTRIES.filter(
                 (timeEntry) =>
                   isSameDay(timeEntry.startedAt, day) ||

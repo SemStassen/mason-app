@@ -9,7 +9,7 @@ function RightSidebar({
   selectedProject,
   onClose,
 }: {
-  selectedProject: (Project & { tasks: Task[] }) | null;
+  selectedProject: (Project & { tasks: Array<Task> }) | null;
   onClose: () => void;
 }) {
   return (

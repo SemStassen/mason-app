@@ -87,6 +87,16 @@ function Layout() {
       },
     },
     {
+      title: "Go to projects",
+      value: "go-to-projects",
+      hotkey: "g>p",
+      category: "navigation",
+      onSelect: (dialog) => {
+        navigate({ to: "/$workspaceSlug/projects", from: "/$workspaceSlug" });
+        dialog.close();
+      },
+    },
+    {
       title: "Go to settings",
       value: "go-to-settings",
       hotkey: "g>s",

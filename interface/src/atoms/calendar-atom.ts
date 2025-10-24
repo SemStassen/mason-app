@@ -123,6 +123,13 @@ export function setIsDragSelectionActive(isDragSelectionActive: boolean) {
   }));
 }
 
+export function _setCurrentTime(currentTime: Date) {
+  calendarAtom.update((value) => ({
+    ...value,
+    currentTime: currentTime,
+  }));
+}
+
 // IIFE to update the currentTime atom
 (() => {
   const now = new Date();
@@ -132,11 +139,11 @@ export function setIsDragSelectionActive(isDragSelectionActive: boolean) {
 
   // Initial timeout to sync with the next minute
   setTimeout(() => {
-    calendarAtom.update((value) => ({ ...value, currentTime: new Date() }));
+    _setCurrentTime(new Date());
 
     // Then update every minute exactly
     setInterval(() => {
-      calendarAtom.update((value) => ({ ...value, currentTime: new Date() }));
+      _setCurrentTime(new Date());
     }, 60 * 1000);
   }, millisecondsUntilNextMinute);
 })();

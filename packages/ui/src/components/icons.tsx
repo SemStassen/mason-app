@@ -90,6 +90,7 @@ const Icons = {
   Home: HouseIcon,
   Italic: TextItalicIcon,
   Link: LinkSimpleIcon,
+  LookingGlass: MagnifyingGlassIcon,
   Mason: WallIcon,
   Minus: MinusIcon,
   Moon: MoonIcon,
