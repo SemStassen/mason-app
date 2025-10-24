@@ -1,6 +1,6 @@
-import { differenceInMinutes, startOfDay } from 'date-fns';
-import { FIRST_VISIBLE_HOUR, LAST_VISIBLE_HOUR } from '.';
-import type { ITimeEntry } from './types';
+import { differenceInMinutes, endOfDay, startOfDay } from "date-fns";
+import { FIRST_VISIBLE_HOUR, LAST_VISIBLE_HOUR } from ".";
+import type { ITimeEntry } from "./types";
 
 /**
  * Groups overlapping time entries into separate columns for calendar display.
@@ -103,4 +103,43 @@ export function getTimeEntryBlockStyle(
   const left = groupIndex * width;
 
   return { top: `${top}%`, width: `${width}%`, left: `${left}%` };
+}
+
+/**
+ * Calculates the CSS positioning for a drag selection highlight in a calendar grid.
+ *
+ * Similar to getTimeEntryBlockStyle but for drag selection spans that cover
+ * the entire day height from start to end time.
+ *
+ * @param dragSelection - Object with start and end dates for the selection
+ * @param day - The day this selection appears on
+ * @returns CSS style object with top and height properties as percentages
+ */
+export function getDragSelectionStyle(
+  dragSelection: { start: Date; end: Date },
+  day: Date
+) {
+  const dayStart = startOfDay(day);
+  const dayEnd = endOfDay(day);
+
+  // Clamp selection to day boundaries
+  const selectionStart =
+    dragSelection.start < dayStart ? dayStart : dragSelection.start;
+  const selectionEnd = dragSelection.end > dayEnd ? dayEnd : dragSelection.end;
+
+  const startMinutes = differenceInMinutes(selectionStart, dayStart);
+  const endMinutes = differenceInMinutes(selectionEnd, dayStart);
+
+  const visibleStartMinutes = FIRST_VISIBLE_HOUR * 60;
+  const visibleEndMinutes = LAST_VISIBLE_HOUR * 60;
+  const visibleRangeMinutes = visibleEndMinutes - visibleStartMinutes;
+
+  const top =
+    ((startMinutes - visibleStartMinutes) / visibleRangeMinutes) * 100;
+  const height = ((endMinutes - startMinutes) / visibleRangeMinutes) * 100;
+
+  return {
+    top: `${top}%`,
+    height: `${height}%`,
+  };
 }

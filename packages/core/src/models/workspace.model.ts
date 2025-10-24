@@ -2,17 +2,17 @@ import { Schema } from "effect";
 import { generateUUID } from "../utils/uuid";
 import { WorkspaceId } from "./ids";
 
-export class Workspace extends Schema.Struct({
+export const Workspace = Schema.Struct({
   id: Schema.optionalWith(WorkspaceId, {
     default: () => WorkspaceId.make(generateUUID()),
   }),
   // General
   name: Schema.NonEmptyString.pipe(Schema.maxLength(100)),
   slug: Schema.NonEmptyString.pipe(Schema.maxLength(100)),
-  // Optional
+  // Nullable
   logoUrl: Schema.NullOr(Schema.String),
   metadata: Schema.NullOr(Schema.String),
-}) {}
+});
 
 export const WorkspaceToCreate = Schema.Struct({
   // General
@@ -28,7 +28,7 @@ export const WorkspaceToUpdate = Schema.Struct({
   slug: Schema.optionalWith(Workspace.fields.slug, {
     exact: true,
   }),
-  // Optional
+  // Nullable
   logoUrl: Schema.optionalWith(Workspace.fields.logoUrl, {
     exact: true,
   }),

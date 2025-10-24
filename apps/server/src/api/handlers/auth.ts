@@ -4,8 +4,8 @@ import {
   HttpServerResponse,
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
+import { AuthService } from "@mason/core/services/auth.service";
 import { Effect } from "effect";
-import { AuthService } from "~/auth-service";
 
 export const AuthGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -16,44 +16,48 @@ export const AuthGroupLive = HttpApiBuilder.group(
       return handlers
         .handle("GetSession", ({ request }) =>
           Effect.gen(function* () {
-            const response = yield* auth.use((client) =>
+            const { response, headers } = yield* auth.use((client) =>
               client.api.getSession({
                 headers: new Headers(request.headers),
+                returnHeaders: true,
               })
             );
-
-            yield* Effect.log({ response });
 
             if (!response?.user) {
               return yield* Effect.fail(new HttpApiError.Unauthorized());
             }
 
-            return {
-              session: {
-                id: response.session.id,
-                activeWorkspaceId: response.session.activeWorkspaceId,
+            return yield* HttpServerResponse.json(
+              {
+                session: {
+                  id: response.session.id,
+                  activeWorkspaceId: response.session.activeWorkspaceId,
+                },
+                user: {
+                  id: response.user.id,
+                  displayName: response.user.displayName,
+                  email: response.user.email,
+                  imageUrl: response.user.imageUrl,
+                  memberships: response.user.memberships.map((membership) => ({
+                    role: membership.role,
+                    workspace: {
+                      id: membership.workspace.id,
+                      name: membership.workspace.name,
+                      slug: membership.workspace.slug,
+                    },
+                  })),
+                },
               },
-              user: {
-                id: response.user.id,
-                displayName: response.user.displayName,
-                email: response.user.email,
-                imageUrl: response.user.imageUrl,
-                memberships: response.user.memberships.map((membership) => ({
-                  role: membership.role,
-                  workspace: {
-                    id: membership.workspace.id,
-                    name: membership.workspace.name,
-                    slug: membership.workspace.slug,
-                  },
-                })),
-              },
-            };
+              {
+                headers: auth.headersToObject(headers),
+              }
+            );
           }).pipe(
-            Effect.tapError((e) => Effect.logError({ error: e })),
+            Effect.tapError((e) => Effect.logError(e)),
             Effect.catchTags({
-              "@mason/server/betterAuthError": () => {
-                return new HttpApiError.InternalServerError();
-              },
+              "@mason/server/betterAuthError": () =>
+                new HttpApiError.InternalServerError(),
+              HttpBodyError: () => new HttpApiError.InternalServerError(),
             })
           )
         )
@@ -68,6 +72,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
 
             return yield* HttpServerResponse.empty();
           }).pipe(
+            Effect.tapError((e) => Effect.logError(e)),
             Effect.catchTags({
               "@mason/server/betterAuthError": () =>
                 new HttpApiError.InternalServerError(),
@@ -76,7 +81,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
         )
         .handle("SignInWithEmailOTP", ({ payload, request }) =>
           Effect.gen(function* () {
-            const result = yield* auth.use((client) =>
+            const { response, headers } = yield* auth.use((client) =>
               client.api.signInEmailOTP({
                 body: { email: payload.email, otp: payload.otp },
                 headers: request.headers,
@@ -85,16 +90,17 @@ export const AuthGroupLive = HttpApiBuilder.group(
             );
 
             return yield* HttpServerResponse.json(
-              { user: result.response.user },
+              { user: response.user },
               {
-                headers: auth.headersToObject(result.headers),
+                headers: auth.headersToObject(headers),
               }
             );
           }).pipe(
+            Effect.tapError((e) => Effect.logError(e)),
             Effect.catchTags({
               "@mason/server/betterAuthError": () =>
                 new HttpApiError.InternalServerError(),
-              HttpBodyError: () => new HttpApiError.BadRequest(),
+              HttpBodyError: () => new HttpApiError.InternalServerError(),
             })
           )
         )
@@ -114,6 +120,7 @@ export const AuthGroupLive = HttpApiBuilder.group(
               },
             });
           }).pipe(
+            Effect.tapError((e) => Effect.logError(e)),
             Effect.catchTags({
               "@mason/server/betterAuthError": () =>
                 new HttpApiError.InternalServerError(),

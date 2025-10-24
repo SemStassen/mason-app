@@ -1,6 +1,6 @@
-import { integer, pgTable, text, varchar } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, varchar } from "drizzle-orm/pg-core";
 
-export const snapshotsTable = pgTable('snapshots', {
+export const snapshotsTable = pgTable("snapshots", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   timestamp: integer(),
   applicationName: varchar(),
@@ -8,10 +8,10 @@ export const snapshotsTable = pgTable('snapshots', {
   idleTimeSeconds: integer(),
 });
 
-export const snapshotScreenshotsTable = pgTable('snapshot_screenshots', {
+export const snapshotScreenshotsTable = pgTable("snapshot_screenshots", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   snapshotId: integer()
-    .references(() => snapshotsTable.id, { onDelete: 'cascade' })
+    .references(() => snapshotsTable.id, { onDelete: "cascade" })
     .notNull(),
   displayIndex: integer().notNull(),
   relativePath: text().notNull(), // store path relative to AppLocalData

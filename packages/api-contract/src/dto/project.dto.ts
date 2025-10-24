@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-class Project extends Schema.Struct({
+const Project = Schema.Struct({
   id: Schema.NonEmptyString,
   // References
   workspaceId: Schema.NonEmptyString,
@@ -13,12 +13,15 @@ class Project extends Schema.Struct({
   isBillable: Schema.Boolean,
   // Optional
   notes: Schema.Record({ key: Schema.String, value: Schema.Unknown }),
-  metadata: Schema.Struct({
-    floatId: Schema.optionalWith(Schema.Number, {
+  _metadata: Schema.Struct({
+    source: Schema.optionalWith(Schema.Literal("float"), {
+      exact: true,
+    }),
+    externalId: Schema.optionalWith(Schema.String, {
       exact: true,
     }),
   }),
-}) {}
+});
 
 export const CreateProjectRequest = Schema.Struct({
   // General
@@ -33,9 +36,6 @@ export const CreateProjectRequest = Schema.Struct({
   notes: Schema.optionalWith(Project.fields.notes, {
     exact: true,
   }),
-  metadata: Schema.optionalWith(Project.fields.metadata, {
-    exact: true,
-  }),
 });
 
 export const UpdateProjectRequest = Schema.Struct({
@@ -48,12 +48,11 @@ export const UpdateProjectRequest = Schema.Struct({
   notes: Schema.optionalWith(Schema.NullOr(Project.fields.notes), {
     exact: true,
   }),
-  metadata: Schema.optionalWith(Schema.NullOr(Project.fields.metadata), {
-    exact: true,
-  }),
 });
 
-export const UpsertProjectRequest = Schema.Union(
-  CreateProjectRequest,
-  UpdateProjectRequest
-);
+export const ProjectResponse = Schema.TaggedStruct("ProjectResponse", {
+  ...Project.fields,
+  // Optional
+  notes: Schema.NullOr(Project.fields.notes),
+  _metadata: Schema.NullOr(Project.fields._metadata),
+});

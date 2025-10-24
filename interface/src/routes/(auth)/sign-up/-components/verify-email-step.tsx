@@ -1,4 +1,5 @@
 import { Button } from "@mason/ui/button";
+import { Field } from "@mason/ui/field";
 import { useAppForm } from "@mason/ui/form";
 import { Icons } from "@mason/ui/icons";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@mason/ui/input-otp";
@@ -65,7 +66,7 @@ function VerifyEmailStep({
         >
           <form.Field
             children={(field) => (
-              <>
+              <Field>
                 <label className="sr-only" htmlFor="otp">
                   One time password
                 </label>
@@ -84,7 +85,7 @@ function VerifyEmailStep({
                     <InputOTPSlot index={5} />
                   </InputOTPGroup>
                 </InputOTP>
-              </>
+              </Field>
             )}
             name="otp"
           />

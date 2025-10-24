@@ -31,6 +31,9 @@
     "**/node_modules": true,
     "**/routeTree.gen.ts": true
   },
+  "files.associations": {
+    "*.service.ts": "typescript"
+  },
   "[javascriptreact]": {
     "editor.defaultFormatter": "biomejs.biome"
   },

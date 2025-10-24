@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-class User extends Schema.Struct({
+const User = Schema.Struct({
   id: Schema.NonEmptyString,
   // General
   displayName: Schema.NonEmptyString,
@@ -8,7 +8,7 @@ class User extends Schema.Struct({
   emailVerified: Schema.Boolean,
   // Optional
   imageUrl: Schema.String,
-}) {}
+});
 
 export const CreateUserRequest = Schema.Struct({
   displayName: User.fields.displayName,

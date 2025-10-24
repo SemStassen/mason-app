@@ -12,13 +12,13 @@
     "@mason/api-contract": "workspace:*",
     "@mason/core": "workspace:*",
     "@mason/integrations": "workspace:*",
-    "effect": "workspace:^"
+    "effect": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
-    "typescript": "workspace:^"
+    "typescript": "catalog:"
   },
   "exports": {
-    "./workspace-integrations": "./src/workspace-integrations.ts"
+    "./*": "./src/*.ts"
   }
 }

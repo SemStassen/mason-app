@@ -1,18 +1,26 @@
 import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from "@effect/platform";
 import { Schema } from "effect";
 import {
+  CreateWorkspaceIntegrationRequest,
   DeleteWorkspaceIntegrationRequest,
-  UpsertWorkspaceIntegrationRequest,
+  UpdateWorkspaceIntegrationRequest,
   WorkspaceIntegrationResponse,
 } from "../../dto/workspace-integration.dto";
 import { idParam } from "../../utils";
 
-export const WorkspaceIntegrationsGroup = HttpApiGroup.make(
-  "WorkspaceIntegrations"
+export const WorkspaceIntegrationGroup = HttpApiGroup.make(
+  "WorkspaceIntegration"
 )
   .add(
-    HttpApiEndpoint.put("Upsert")`/`
-      .setPayload(UpsertWorkspaceIntegrationRequest)
+    HttpApiEndpoint.post("Create")`/`
+      .setPayload(CreateWorkspaceIntegrationRequest)
+      .addError(HttpApiError.InternalServerError)
+      .addSuccess(WorkspaceIntegrationResponse)
+  )
+  .add(
+    HttpApiEndpoint.put("Update")`/${idParam}`
+      .setPath(UpdateWorkspaceIntegrationRequest.pick("id"))
+      .setPayload(UpdateWorkspaceIntegrationRequest.omit("id"))
       .addError(HttpApiError.InternalServerError)
       .addSuccess(WorkspaceIntegrationResponse)
   )

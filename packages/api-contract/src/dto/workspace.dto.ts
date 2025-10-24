@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-class Workspace extends Schema.Struct({
+const Workspace = Schema.Struct({
   id: Schema.NonEmptyString,
   // General
   name: Schema.NonEmptyString,
@@ -8,7 +8,7 @@ class Workspace extends Schema.Struct({
   // Optional
   logoUrl: Schema.String,
   metadata: Schema.String,
-}) {}
+});
 
 export const CreateWorkspaceRequest = Schema.Struct({
   // General

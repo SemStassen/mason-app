@@ -34,6 +34,49 @@ function Layout() {
 
   useRegisterCommands(() => [
     {
+      title: "Open settings…",
+      value: "open-settings",
+      category: "navigation",
+      subCommands: () => [
+        {
+          title: "Preferences",
+          value: "preferences",
+          category: "navigation",
+          onSelect: (dialog) => {
+            navigate({
+              to: "/$workspaceSlug/settings",
+              from: "/$workspaceSlug",
+            });
+            dialog.close();
+          },
+        },
+        {
+          title: "Profile",
+          value: "profile",
+          category: "navigation",
+          onSelect: (dialog) => {
+            navigate({
+              to: "/$workspaceSlug/settings/profile",
+              from: "/$workspaceSlug",
+            });
+            dialog.close();
+          },
+        },
+        {
+          title: "Integrations",
+          value: "integrations",
+          category: "navigation",
+          onSelect: (dialog) => {
+            navigate({
+              to: "/$workspaceSlug/settings/integrations",
+              from: "/$workspaceSlug",
+            });
+            dialog.close();
+          },
+        },
+      ],
+    },
+    {
       title: "Go to tracker",
       value: "go-to-tracker",
       hotkey: "g>t",

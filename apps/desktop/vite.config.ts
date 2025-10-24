@@ -1,9 +1,12 @@
 import tailwindcss from "@tailwindcss/vite";
 import viteReact from "@vitejs/plugin-react";
+import path from "path";
+import { fileURLToPath } from "url";
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 const host = process.env.TAURI_DEV_HOST;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: "src",
@@ -39,8 +42,8 @@ export default defineConfig({
   plugins: [
     tsConfigPaths({
       projects: [
-        "./../../../interface/tsconfig.json",
-        "./../../../packages/api-contract/tsconfig.json",
+        path.resolve(__dirname, "../../interface/tsconfig.json"),
+        path.resolve(__dirname, "../../packages/api-contract/tsconfig.json"),
       ],
     }),
     tailwindcss(),

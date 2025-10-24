@@ -11,16 +11,15 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@effect/platform": "workspace:^",
-    "@effect/platform-bun": "workspace:^",
+    "@effect/platform": "catalog:",
+    "@effect/platform-bun": "^0.81.1",
     "@mason/api-contract": "workspace:*",
     "@mason/core": "workspace:*",
     "@mason/use-cases": "workspace:*",
-    "better-auth": "workspace:^",
-    "effect": "workspace:^"
+    "effect": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
-    "typescript": "workspace:^"
+    "typescript": "catalog:"
   }
 }

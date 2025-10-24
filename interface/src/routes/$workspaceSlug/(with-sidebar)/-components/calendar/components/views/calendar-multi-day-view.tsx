@@ -1,10 +1,22 @@
 import { useAtomRef } from "@effect-atom/atom-react";
 import { ScrollArea } from "@mason/ui/scroll-area";
 import { cn } from "@mason/ui/utils";
-import { addDays, areIntervalsOverlapping, isSameDay, isToday } from "date-fns";
+import {
+  addDays,
+  areIntervalsOverlapping,
+  isSameDay,
+  isToday,
+  setHours,
+  setMinutes,
+} from "date-fns";
 import {
   calendarDaysInViewAtom,
+  calendarDragSelectionAtom,
   calendarSelectedDateAtom,
+  resetDragSelection,
+  setDragSelectionFirst,
+  setDragSelectionSecond,
+  setIsDragSelectionActive,
 } from "~/atoms/calendar-atom";
 import { formatter } from "~/utils/date-time";
 import {
@@ -17,12 +29,41 @@ import { DUMMY_TIME_ENTRIES } from "../../dummy-time-entries";
 import { getTimeEntryBlockStyle, groupTimeEntries } from "../../helpers";
 import { DroppableTimeEntry } from "../dnd/droppable-time-entry";
 import { CurrentTimeLine } from "./current-time-line";
+import { DragSelectionHighlight } from "./drag-selection-highlight";
 import { TimeEntry } from "./time-entry";
 
 const hours = Array.from({ length: 24 }).map((_, hourIndex) => hourIndex);
 const timeSlotsPerHour = Array.from({ length: 4 }).map(
   (_, timeSlotIndex) => timeSlotIndex
 );
+
+const handlePointerDown = () => {
+  resetDragSelection();
+  setIsDragSelectionActive(true);
+
+  window.addEventListener("pointermove", handlePointerMove);
+  window.addEventListener("pointerup", handlePointerUp);
+};
+
+const handlePointerMove = (e: PointerEvent) => {
+  const dataDate = (e.target as HTMLElement).dataset.date;
+  if (!dataDate) {
+    return;
+  }
+
+  if (calendarDragSelectionAtom.value?.firstSelected) {
+    setDragSelectionSecond(new Date(dataDate));
+  } else {
+    setDragSelectionFirst(new Date(dataDate));
+  }
+};
+
+const handlePointerUp = () => {
+  setIsDragSelectionActive(false);
+
+  window.removeEventListener("pointermove", handlePointerMove);
+  window.removeEventListener("pointerup", handlePointerUp);
+};
 
 function CalendarMultiDayView() {
   const selectedDate = useAtomRef(calendarSelectedDateAtom);
@@ -116,6 +157,7 @@ function CalendarMultiDayView() {
 
               return (
                 <div className="relative" key={day.toString()}>
+                  <DragSelectionHighlight day={day} />
                   {hours.map((hour) => (
                     <div
                       className="border-b"
@@ -127,15 +169,21 @@ function CalendarMultiDayView() {
                       {/* Change this for better creation precision */}
                       {/* 4 = 15 min, 6 = 10 min, 12 = 5 min */}
                       {timeSlotsPerHour.map((timeSlotIndex) => {
-                        const minutes = timeSlotIndex * (60 / 4);
+                        const minutes =
+                          timeSlotIndex * (60 / timeSlotsPerHour.length);
+
+                        const date = setMinutes(setHours(day, hour), minutes);
 
                         return (
                           <DroppableTimeEntry
+                            data-date={date}
                             id={`${day.toString()}-${hour}-${minutes}`}
                             key={timeSlotIndex}
-                          >
-                            <div />
-                          </DroppableTimeEntry>
+                            onPointerDown={() => handlePointerDown()}
+                            style={{
+                              height: `calc(var(${CALENDAR_HOUR_HEIGHT_VAR}) / ${timeSlotsPerHour.length})`,
+                            }}
+                          />
                         );
                       })}
                     </div>

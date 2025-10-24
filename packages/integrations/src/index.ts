@@ -1,7 +1,8 @@
-import { Schema, Layer } from "effect";
+import { Layer, Schema } from "effect";
 import { InternalTimeTrackingIntegrationAdapter } from "./adapter";
 import { floatLive } from "./float";
 
+// biome-ignore lint/performance/noBarrelFile: Exports are needed for type inference
 export * from "./errors";
 
 export class MissingIntegrationAdapterError extends Schema.TaggedError<MissingIntegrationAdapterError>()(
@@ -17,9 +18,11 @@ export class TimeTrackingIntegrationAdapter extends InternalTimeTrackingIntegrat
       case "float":
         return floatLive;
       default:
-        return Layer.fail(new MissingIntegrationAdapterError({
-          cause: `Integration adapter for kind "${kind}" is not supported`,
-        }));
+        return Layer.fail(
+          new MissingIntegrationAdapterError({
+            cause: `Integration adapter for kind "${kind}" is not supported`,
+          })
+        );
     }
   }
 }

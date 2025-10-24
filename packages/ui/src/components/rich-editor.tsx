@@ -3,14 +3,14 @@ import {
   EditorContent,
   type UseEditorOptions,
   useEditor,
-} from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import { Icons } from './icons';
-import { Toggle } from './toggle';
+} from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { Icons } from "./icons";
+import { Toggle } from "./toggle";
 
 const extensions = [StarterKit];
 
-type RichEditorProps = Omit<UseEditorOptions, 'extensions' | 'editorProps'>;
+type RichEditorProps = Omit<UseEditorOptions, "extensions" | "editorProps">;
 
 const RichEditor = ({ ...props }: RichEditorProps) => {
   const editor = useEditor({
@@ -18,7 +18,7 @@ const RichEditor = ({ ...props }: RichEditorProps) => {
     editorProps: {
       attributes: {
         class:
-          'w-full h-full outline-none focus:ring focus:ring-primary rounded-md p-2',
+          "w-full h-full outline-none focus:ring focus:ring-primary rounded-md p-2",
       },
     },
     ...props,
@@ -31,7 +31,7 @@ const RichEditor = ({ ...props }: RichEditorProps) => {
           <div className="rounded-lg bg-popover p-1.5">
             <Toggle
               onClick={() => editor.chain().focus().toggleBold().run()}
-              pressed={editor.isActive('bold')}
+              pressed={editor.isActive("bold")}
               size="sm"
               variant="outline"
             >
@@ -39,7 +39,7 @@ const RichEditor = ({ ...props }: RichEditorProps) => {
             </Toggle>
             <Toggle
               onClick={() => editor.chain().focus().toggleItalic().run()}
-              pressed={editor.isActive('italic')}
+              pressed={editor.isActive("italic")}
               size="sm"
               variant="outline"
             >
@@ -47,7 +47,7 @@ const RichEditor = ({ ...props }: RichEditorProps) => {
             </Toggle>
             <Toggle
               onClick={() => editor.chain().focus().toggleStrike().run()}
-              pressed={editor.isActive('strike')}
+              pressed={editor.isActive("strike")}
               size="sm"
               variant="outline"
             >
@@ -62,4 +62,4 @@ const RichEditor = ({ ...props }: RichEditorProps) => {
 };
 
 export { RichEditor };
-export { useEditor } from '@tiptap/react';
+export { useEditor } from "@tiptap/react";

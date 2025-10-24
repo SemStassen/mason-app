@@ -1,6 +1,8 @@
-import { Collapsible as BaseCollapsible } from '@base-ui-components/react/collapsible';
+// Source: 9ui
 
-import { cn } from '../utils';
+import { Collapsible as BaseCollapsible } from "@base-ui-components/react/collapsible";
+
+import { cn } from "../utils";
 
 function Collapsible({ ...props }: BaseCollapsible.Root.Props) {
   return <BaseCollapsible.Root data-slot="collapsible" {...props} />;
@@ -17,7 +19,7 @@ function CollapsibleContent({
   return (
     <BaseCollapsible.Panel
       className={cn(
-        'h-[var(--collapsible-panel-height)] overflow-hidden text-sm transition-all duration-200 data-ending-style:h-0 data-starting-style:h-0',
+        "h-[var(--collapsible-panel-height)] overflow-hidden text-sm transition-all duration-200 data-ending-style:h-0 data-starting-style:h-0",
         className
       )}
       data-slot="collapsible-content"

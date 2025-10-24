@@ -7,11 +7,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { workspaceIntegrationsAtom } from "~/atoms/api";
 
 export const Route = createFileRoute("/$workspaceSlug/settings/integrations/")({
-  beforeLoad: () => {
-    return {
-      getTitle: () => "Integrations",
-    };
-  },
+  beforeLoad: () => ({
+    getTitle: () => "Integrations",
+  }),
   component: RouteComponent,
 });
 
@@ -20,7 +18,7 @@ const defaultDescription =
 
 function RouteComponent() {
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <IntegrationCard
         description={defaultDescription}
         icon={<Icons.Company.Float />}

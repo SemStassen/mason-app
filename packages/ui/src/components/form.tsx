@@ -3,10 +3,19 @@ import {
   createFormHookContexts,
   useStore,
 } from "@tanstack/react-form";
+import type { VariantProps } from "class-variance-authority";
 import { useId } from "react";
 import { Button, type ButtonProps } from "./button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  type fieldVariants,
+} from "./field";
 import { Input, type InputProps } from "./input";
-import { Label, type LabelProps } from "./label";
+import type { LabelProps } from "./label";
+import { TimePicker, type TimePickerProps } from "./time-picker";
 
 const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts();
@@ -14,6 +23,7 @@ const { fieldContext, formContext, useFieldContext, useFormContext } =
 const { useAppForm } = createFormHook({
   fieldComponents: {
     TextField: TextField,
+    TimeField: TimeField,
   },
   formComponents: {
     SubmitButton: SubmitButton,
@@ -28,58 +38,6 @@ function useFormIds() {
   const errorId = `${itemId}-form-item-error`;
 
   return { itemId, descriptionId, errorId };
-}
-
-function FormField(props: React.ComponentProps<"div">) {
-  return <div className="grid flex-1 gap-2" {...props} />;
-}
-
-function FormLabel(props: LabelProps & { htmlFor: string }) {
-  return <Label {...props} />;
-}
-
-function FormDescription(props: React.ComponentProps<"p"> & { id: string }) {
-  if (!props.children) {
-    return null;
-  }
-
-  return <p className="text-muted-foreground text-sm" {...props} />;
-}
-
-// biome-ignore lint/suspicious/noExplicitAny: errors are from tanstack form
-function getErrorMessage(error: any): string {
-  if (typeof error === "string") {
-    return error;
-  }
-
-  if (error && typeof error === "object") {
-    if (Array.isArray(error.issues) && error.issues.length > 0) {
-      return error.issues[0].message;
-    }
-    if (typeof error.message === "string") {
-      return error.message;
-    }
-  }
-
-  return String(error);
-}
-
-function FormMessage({
-  errors,
-  ...props
-  // biome-ignore lint/suspicious/noExplicitAny: errors are from tanstack form
-}: React.ComponentProps<"p"> & { id: string; errors: Array<any> }) {
-  const body = errors.length > 0 ? getErrorMessage(errors[0]) : props.children;
-
-  if (!body) {
-    return null;
-  }
-
-  return (
-    <p className="text-destructive text-sm" {...props}>
-      {body}
-    </p>
-  );
 }
 
 function FormControl({
@@ -111,10 +69,12 @@ function TextField({
   label,
   input,
   description,
+  orientation,
 }: {
   label: Omit<LabelProps, "htmlFor">;
   input?: InputProps;
   description?: React.ComponentProps<"p">;
+  orientation?: VariantProps<typeof fieldVariants>["orientation"];
 }) {
   const { itemId, descriptionId, errorId } = useFormIds();
 
@@ -122,8 +82,8 @@ function TextField({
   const errors = useStore(field.store, (state) => state.meta.errors);
 
   return (
-    <FormField>
-      <FormLabel htmlFor={itemId} {...label} />
+    <Field orientation={orientation}>
+      <FieldLabel htmlFor={itemId} {...label} />
       <FormControl
         descriptionId={descriptionId}
         errorId={errorId}
@@ -138,9 +98,55 @@ function TextField({
           {...input}
         />
       </FormControl>
-      <FormDescription {...description} id={descriptionId} />
-      <FormMessage errors={errors} id={errorId} />
-    </FormField>
+      <FieldDescription {...description} id={descriptionId} />
+      <FieldError errors={errors} id={errorId} />
+    </Field>
+  );
+}
+
+function TimeField({
+  format,
+  step,
+  label,
+  input,
+  description,
+  orientation,
+}: {
+  format: TimePickerProps["format"];
+  label: Omit<LabelProps, "htmlFor">;
+  step?: TimePickerProps["step"];
+  input?: InputProps;
+  description?: React.ComponentProps<"p">;
+  orientation?: VariantProps<typeof fieldVariants>["orientation"];
+}) {
+  const { itemId, descriptionId, errorId } = useFormIds();
+
+  const field = useFieldContext<string>();
+  const errors = useStore(field.store, (state) => state.meta.errors);
+
+  return (
+    <Field orientation={orientation}>
+      <FieldLabel htmlFor={itemId} {...label} />
+      <FormControl
+        descriptionId={descriptionId}
+        errorId={errorId}
+        errors={errors}
+        itemId={itemId}
+      >
+        <TimePicker
+          format={format}
+          onBlur={field.handleBlur}
+          onChange={(e) => field.handleChange(e.target.value)}
+          // @ts-expect-error - TS is being silly here
+          step={step}
+          type="text"
+          value={field.state.value}
+          {...input}
+        />
+      </FormControl>
+      <FieldDescription {...description} id={descriptionId} />
+      <FieldError errors={errors} id={errorId} />
+    </Field>
   );
 }
 

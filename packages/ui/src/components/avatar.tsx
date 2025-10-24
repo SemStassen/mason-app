@@ -1,3 +1,5 @@
+// Source: 9ui
+
 import { Avatar as AvatarBase } from "@base-ui-components/react/avatar";
 import { cva, type VariantProps } from "class-variance-authority";
 

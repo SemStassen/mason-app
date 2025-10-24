@@ -1,3 +1,5 @@
+// Source: 9ui
+
 import { Input as BaseInput } from "@base-ui-components/react/input";
 import type * as React from "react";
 import { useEffect, useRef } from "react";
@@ -5,7 +7,7 @@ import { cn } from "../utils";
 
 export interface InputProps
   extends Omit<React.ComponentProps<typeof BaseInput>, "prefix"> {
-  inputContainerClassName?: string;
+  containerClassName?: string;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
   affixGapPx?: number;
@@ -92,7 +94,7 @@ function useDynamicAffixPadding(gapPx: number) {
 }
 
 function Input({
-  inputContainerClassName,
+  containerClassName,
   className,
   type,
   prefix,
@@ -104,7 +106,7 @@ function Input({
     useDynamicAffixPadding(affixGapPx);
   return (
     <div
-      className={cn("relative w-full", inputContainerClassName)}
+      className={cn("relative w-full", containerClassName)}
       data-slot="input-container"
       ref={containerRef}
     >

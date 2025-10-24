@@ -13,20 +13,20 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "drizzle-orm": "workspace:^",
+    "drizzle-orm": "catalog:",
     "pg": "^8.16.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.9.0",
     "@mason/config": "workspace:*",
     "@types/pg": "^8.15.5",
-    "drizzle-kit": "workspace:^",
+    "drizzle-kit": "catalog:",
     "drizzle-seed": "^0.3.1",
-    "typescript": "workspace:^"
+    "typescript": "catalog:"
   },
   "exports": {
     "./db": "./src/db.ts",
     "./operators": "./src/operators.ts",
-    "./schema": "./src/schema.ts"
+    "./schema": "./src/schema/index.ts"
   }
 }

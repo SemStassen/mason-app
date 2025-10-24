@@ -1,16 +1,20 @@
-import { useDroppable } from '@dnd-kit/react';
+import { useDroppable } from "@dnd-kit/react";
+import { cn } from "@mason/ui/utils";
 
-type DroppableTimeEntryProps = {
+type DroppableTimeEntryProps = React.ComponentProps<"div"> & {
   id: string;
-  children: React.ReactNode;
 };
 
-function DroppableTimeEntry({ id, children }: DroppableTimeEntryProps) {
+function DroppableTimeEntry({
+  id,
+  className,
+  ...props
+}: DroppableTimeEntryProps) {
   const { ref } = useDroppable({
     id: id,
   });
 
-  return <div ref={ref}>{children}</div>;
+  return <div className={cn("h-full", className)} ref={ref} {...props} />;
 }
 
 export { DroppableTimeEntry };

@@ -9,11 +9,13 @@
       },
       "complexity": {
         "noExcessiveLinesPerFunction": {
+          "level": "off",
           "options": {
             "maxLines": 100
           }
         },
         "noExcessiveCognitiveComplexity": {
+          "level": "warn",
           "options": {
             "maxAllowedComplexity": 50
           }
@@ -21,6 +23,7 @@
       },
       "style": {
         "useConsistentArrayType": {
+          "level": "warn",
           "options": {
             "syntax": "generic"
           }
@@ -29,8 +32,15 @@
         "noMagicNumbers": "off",
         "useNodejsImportProtocol": "off"
       },
+      "suspicious": {
+        "noShadowRestrictedNames": {
+          "level": "info",
+          "options": {}
+        }
+      },
       "nursery": {
         "useMaxParams": {
+          "level": "warn",
           "options": {
             "max": 4
           }

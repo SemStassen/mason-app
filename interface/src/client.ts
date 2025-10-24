@@ -2,7 +2,6 @@ import { FetchHttpClient, HttpApiClient } from "@effect/platform";
 import { AtomHttpApi } from "@effect-atom/atom-react";
 import { MasonApi } from "@mason/api-contract";
 import { Effect, Layer, Match } from "effect";
-import { router } from ".";
 import { PLATFORM } from "./utils/constants";
 
 const MasonHttpClient = FetchHttpClient.layer.pipe(
@@ -10,16 +9,17 @@ const MasonHttpClient = FetchHttpClient.layer.pipe(
     Layer.effect(
       FetchHttpClient.Fetch,
       Effect.sync(() => {
-        const baseFetch = PLATFORM.platform === "desktop" ? PLATFORM.fetch : fetch;
+        const baseFetch =
+          PLATFORM.platform === "desktop" ? PLATFORM.fetch : fetch;
 
         return (input: RequestInfo | URL, init?: RequestInit) => {
           const token = localStorage.getItem("mason-bearer-token");
           const headers = new Headers(init?.headers);
-          
+
           if (token) {
             headers.set("Authorization", `Bearer ${token}`);
           }
-          
+
           return baseFetch(input, {
             ...init,
             headers,
@@ -58,7 +58,9 @@ export const MasonClient = Effect.runSync(
                   Effect.promise(() => platform.openUrl(url))
                 ),
                 Match.orElse(() =>
-                  Effect.sync(() => router.navigate({ href: url }))
+                  Effect.sync(() => {
+                    window.location.href = url;
+                  })
                 )
               )
             )

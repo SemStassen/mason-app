@@ -1,14 +1,26 @@
-import { useAtomRef } from '@effect-atom/atom-react';
-import { AnimatePresence, motion } from 'motion/react';
-import { rightSidebarAtom } from '~/atoms/ui-atoms';
+import { useAtomRef } from "@effect-atom/atom-react";
+import { AnimatePresence, motion } from "motion/react";
+import {
+  calendarIsDragSelectionActiveAtom,
+  calendarSortedDragSelectionAtom,
+} from "~/atoms/calendar-atom";
+import { useConditionalMemo } from "~/hooks/use-conditional-memo";
+import { CreateTimeEntryForm } from "./create-time-entry-form";
 
-const SIDEBAR_WIDTH = 240;
+const SIDEBAR_WIDTH = 300;
 
 function RightSidebar() {
-  const { isOpen } = useAtomRef(rightSidebarAtom);
+  // To prevent re-renders only isDragSelectionActive is reactive
+  const isDragSelectionActive = useAtomRef(calendarIsDragSelectionActiveAtom);
+
+  const isOpen = useConditionalMemo(
+    () =>
+      Boolean(calendarSortedDragSelectionAtom.value && !isDragSelectionActive),
+    isDragSelectionActive
+  );
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isOpen && (
         <motion.aside
           animate={{ width: SIDEBAR_WIDTH }}
@@ -16,17 +28,17 @@ function RightSidebar() {
           exit={{ width: 0 }}
           initial={{ width: 0 }}
           transition={{
-            ease: 'linear',
+            ease: "linear",
             duration: 0.1,
           }}
         >
           <div
-            className="flex h-full flex-col justify-between px-4 pt-3 pb-4"
+            className="mt-8 flex h-full flex-col justify-between px-4 pt-3 pb-4"
             style={{
               width: SIDEBAR_WIDTH,
             }}
           >
-            Info panel
+            <CreateTimeEntryForm />
           </div>
         </motion.aside>
       )}

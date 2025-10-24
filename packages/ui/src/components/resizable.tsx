@@ -1,3 +1,5 @@
+// Source: 9ui
+
 // biome-ignore lint/performance/noNamespaceImport: Fine here
 import * as BaseResizable from "react-resizable-panels";
 

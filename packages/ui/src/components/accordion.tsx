@@ -1,3 +1,5 @@
+// Source: 9ui
+
 import { Accordion as BaseAccordion } from "@base-ui-components/react/accordion";
 
 import { cn } from "../utils";

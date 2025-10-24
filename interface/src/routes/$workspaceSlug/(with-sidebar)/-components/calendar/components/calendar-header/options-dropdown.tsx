@@ -1,5 +1,5 @@
-import { useAtomRef } from '@effect-atom/atom-react';
-import { Button } from '@mason/ui/button';
+import { useAtomRef } from "@effect-atom/atom-react";
+import { Button } from "@mason/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -9,12 +9,12 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@mason/ui/dropdown-menu';
-import { Icons } from '@mason/ui/icons';
+} from "@mason/ui/dropdown-menu";
+import { Icons } from "@mason/ui/icons";
 import {
   calendarDaysInViewAtom,
   setCalendarDaysInView,
-} from '~/atoms/calendar-atom';
+} from "~/atoms/calendar-atom";
 
 function OptionsDropdown() {
   const daysInView = useAtomRef(calendarDaysInViewAtom);

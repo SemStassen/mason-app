@@ -5,11 +5,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback } from "react";
 
 export const Route = createFileRoute("/$workspaceSlug/settings/")({
-  beforeLoad: () => {
-    return {
-      getTitle: () => "Preferences",
-    };
-  },
+  beforeLoad: () => ({
+    getTitle: () => "Preferences",
+  }),
   component: RouteComponent,
 });
 

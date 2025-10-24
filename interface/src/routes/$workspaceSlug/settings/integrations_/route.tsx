@@ -19,7 +19,7 @@ function RouteComponent() {
         }
         variant="ghost"
       >
-        <Icons.ArrowLeft /> Integrations.
+        <Icons.ArrowLeft /> Integrations
       </Button>
       <Outlet />
     </>

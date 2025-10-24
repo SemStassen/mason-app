@@ -1,3 +1,5 @@
+// Source: 9ui
+
 import { Menu as BaseMenu } from "@base-ui-components/react/menu";
 import type * as React from "react";
 
@@ -23,10 +25,15 @@ function DropdownMenuTrigger({
 }
 
 function DropdownMenuPositioner({
+  className,
   ...props
 }: React.ComponentProps<typeof BaseMenu.Positioner>) {
   return (
-    <BaseMenu.Positioner data-slot="dropdown-menu-positioner" {...props} />
+    <BaseMenu.Positioner
+      className={cn("z-10", className)}
+      data-slot="dropdown-menu-positioner"
+      {...props}
+    />
   );
 }
 
@@ -51,7 +58,7 @@ function DropdownMenuContent({
       >
         <BaseMenu.Popup
           className={cn(
-            "data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[12rem] origin-[var(--transform-origin)] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-closed:animate-out data-open:animate-in",
+            "data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 min-w-[12rem] origin-[var(--transform-origin)] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-closed:animate-out data-open:animate-in",
             className
           )}
           data-slot="dropdown-menu-content"
@@ -147,7 +154,6 @@ function DropdownMenuCheckboxItem({
   ...props
 }: React.ComponentProps<typeof BaseMenu.CheckboxItem>) {
   return (
-    // @ts-expect-error This is okay
     <BaseMenu.CheckboxItem
       checked={checked}
       className={cn(

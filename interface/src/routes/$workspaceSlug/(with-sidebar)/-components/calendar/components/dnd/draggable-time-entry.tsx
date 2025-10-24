@@ -1,4 +1,4 @@
-import { useDraggable } from '@dnd-kit/react';
+import { useDraggable } from "@dnd-kit/react";
 
 type DraggableTimeEntryProps = {
   id: string;

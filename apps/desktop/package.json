@@ -17,18 +17,18 @@
     "@tauri-apps/plugin-http": "~2.5.2",
     "@tauri-apps/plugin-opener": "~2.5.0",
     "@tauri-apps/plugin-os": "~2.3.1",
-    "react": "workspace:^",
-    "react-dom": "workspace:^"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
-    "@tailwindcss/vite": "workspace:^",
+    "@tailwindcss/vite": "catalog:",
     "@tauri-apps/cli": "^2.8.4",
-    "@types/react": "workspace:^",
-    "@types/react-dom": "workspace:^",
-    "@vitejs/plugin-react": "workspace:^",
-    "typescript": "workspace:^",
-    "vite": "workspace:^",
-    "vite-tsconfig-paths": "workspace:^"
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-tsconfig-paths": "catalog:"
   }
 }

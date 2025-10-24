@@ -1,8 +1,10 @@
-import { Select as BaseSelect } from '@base-ui-components/react/select';
-import type * as React from 'react';
+// Source: 9ui
 
-import { cn } from '../utils';
-import { Icons } from './icons';
+import { Select as BaseSelect } from "@base-ui-components/react/select";
+import type * as React from "react";
+
+import { cn } from "../utils";
+import { Icons } from "./icons";
 
 function Select({ ...props }: React.ComponentProps<typeof BaseSelect.Root>) {
   return <BaseSelect.Root data-slot="select" {...props} />;
@@ -32,7 +34,7 @@ function SelectValue({
 }: React.ComponentProps<typeof BaseSelect.Value>) {
   return (
     <BaseSelect.Value
-      className={cn('text-sm', className)}
+      className={cn("text-sm", className)}
       data-slot="select-value"
       {...props}
     />
@@ -41,11 +43,13 @@ function SelectValue({
 
 function SelectTrigger({
   className,
-  size = 'default',
+  size = "default",
   children,
+  showChevron = true,
   ...props
 }: React.ComponentProps<typeof BaseSelect.Trigger> & {
-  size?: 'sm' | 'default';
+  size?: "sm" | "default";
+  showChevron?: boolean;
 }) {
   return (
     <BaseSelect.Trigger
@@ -58,9 +62,11 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      <BaseSelect.Icon>
-        <Icons.ChevronDown className="size-4 opacity-50" />
-      </BaseSelect.Icon>
+      {showChevron && (
+        <BaseSelect.Icon>
+          <Icons.ChevronDown className="size-4 opacity-50" />
+        </BaseSelect.Icon>
+      )}
     </BaseSelect.Trigger>
   );
 }
@@ -68,23 +74,29 @@ function SelectTrigger({
 function SelectContent({
   className,
   children,
+  align = "center",
+  side = "bottom",
   sideOffset = 4,
-  position = 'popper',
+  position = "popper",
   ...props
 }: React.ComponentProps<typeof BaseSelect.Popup> & {
-  sideOffset?: BaseSelect.Positioner.Props['sideOffset'];
-  position?: 'popper' | 'item-aligned';
+  align?: BaseSelect.Positioner.Props["align"];
+  side?: BaseSelect.Positioner.Props["side"];
+  sideOffset?: BaseSelect.Positioner.Props["sideOffset"];
+  position?: "popper" | "item-aligned";
 }) {
   return (
     <SelectPortal>
       <SelectPositioner
-        alignItemWithTrigger={position === 'item-aligned'}
+        align={align}
+        alignItemWithTrigger={position === "item-aligned"}
+        side={side}
         sideOffset={sideOffset}
       >
         <SelectScrollUpButton />
         <BaseSelect.Popup
           className={cn(
-            'relative z-50 max-h-[var(--available-height)] w-[var(--anchor-width)] min-w-[8rem] origin-[var(--transform-origin)] overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md transition-[transform,scale,opacity] data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
+            "relative z-50 max-h-[var(--available-height)] w-[var(--anchor-width)] min-w-[8rem] origin-[var(--transform-origin)] overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md transition-[transform,scale,opacity] data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
             className
           )}
           data-slot="select-content"
@@ -101,8 +113,11 @@ function SelectContent({
 function SelectItem({
   className,
   children,
+  showCheck = true,
   ...props
-}: React.ComponentProps<typeof BaseSelect.Item>) {
+}: React.ComponentProps<typeof BaseSelect.Item> & {
+  showCheck?: boolean;
+}) {
   return (
     <BaseSelect.Item
       className={cn(
@@ -112,11 +127,13 @@ function SelectItem({
       data-slot="select-item"
       {...props}
     >
-      <span className="absolute right-2 flex size-3.5 items-center justify-center">
-        <BaseSelect.ItemIndicator>
-          <Icons.Check className="size-4" />
-        </BaseSelect.ItemIndicator>
-      </span>
+      {showCheck && (
+        <span className="absolute right-2 flex size-3.5 items-center justify-center">
+          <BaseSelect.ItemIndicator>
+            <Icons.Check className="size-4" />
+          </BaseSelect.ItemIndicator>
+        </span>
+      )}
       <BaseSelect.ItemText>{children}</BaseSelect.ItemText>
     </BaseSelect.Item>
   );
@@ -129,7 +146,7 @@ function SelectLabel({
   return (
     <BaseSelect.GroupLabel
       className={cn(
-        'px-2 py-1.5 font-medium text-muted-foreground text-xs',
+        "px-2 py-1.5 font-medium text-muted-foreground text-xs",
         className
       )}
       data-slot="select-label"
@@ -144,7 +161,7 @@ function SelectSeparator({
 }: React.ComponentProps<typeof BaseSelect.Separator>) {
   return (
     <BaseSelect.Separator
-      className={cn('-mx-1 pointer-events-none my-1 h-px bg-border', className)}
+      className={cn("-mx-1 pointer-events-none my-1 h-px bg-border", className)}
       data-slot="select-separator"
       {...props}
     />
@@ -158,13 +175,13 @@ function SelectScrollUpButton({
   return (
     <BaseSelect.ScrollUpArrow
       className={cn(
-        'top-px left-[1px] z-[100] flex w-[calc(100%-2px)] cursor-default items-center justify-center rounded-t-md bg-popover py-1',
+        "top-px left-[1px] z-[100] flex w-[calc(100%-2px)] cursor-default items-center justify-center rounded-t-md bg-popover py-1",
         className
       )}
       data-slot="select-scroll-up-button"
       {...props}
     >
-      <Icons.ChevronUp className="size-4" />
+      <Icons.ChevronUp className="size-4 text-muted-foreground" />
     </BaseSelect.ScrollUpArrow>
   );
 }
@@ -176,13 +193,13 @@ function SelectScrollDownButton({
   return (
     <BaseSelect.ScrollDownArrow
       className={cn(
-        'bottom-px left-[1px] z-[100] flex w-[calc(100%-2px)] cursor-default items-center justify-center rounded-b-md bg-popover py-1',
+        "bottom-px left-[1px] z-[100] flex w-[calc(100%-2px)] cursor-default items-center justify-center rounded-b-md bg-popover py-1",
         className
       )}
       data-slot="select-scroll-down-button"
       {...props}
     >
-      <Icons.ChevronDown className="size-4" />
+      <Icons.ChevronDown className="size-4 text-muted-foreground" />
     </BaseSelect.ScrollDownArrow>
   );
 }

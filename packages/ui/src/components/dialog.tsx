@@ -1,3 +1,5 @@
+// Source: 9ui
+
 import { Dialog as BaseDialog } from "@base-ui-components/react";
 import type * as React from "react";
 

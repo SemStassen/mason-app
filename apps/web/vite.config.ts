@@ -2,8 +2,12 @@ import { paraglideVitePlugin } from "@inlang/paraglide-js";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import path from "path";
+import { fileURLToPath } from "url";
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: "src",
@@ -30,20 +34,21 @@ export default defineConfig({
   plugins: [
     tsConfigPaths({
       projects: [
-        "./../../../interface/tsconfig.json",
-        "./../../../packages/api-contract/tsconfig.json",
+        path.resolve(__dirname, "../../interface/tsconfig.json"),
+        path.resolve(__dirname, "../../packages/api-contract/tsconfig.json"),
       ],
     }),
     paraglideVitePlugin({
-      project: "./../../interface/project.inlang",
-      outdir: "./../../interface/src/paraglide",
+      project: path.resolve(__dirname, "../../interface/project.inlang"),
+      outdir: path.resolve(__dirname, "../../interface/src/paraglide"),
     }),
-    // tanstackStart({ customViteReactPlugin: true }),
     tanstackRouter({
       target: "react",
-      autoCodeSplitting: true,
-      routesDirectory: "./../../interface/src/routes",
-      generatedRouteTree: "./../../interface/src/routeTree.gen.ts",
+      routesDirectory: path.resolve(__dirname, "../../interface/src/routes"),
+      generatedRouteTree: path.resolve(
+        __dirname,
+        "../../interface/src/routeTree.gen.ts"
+      ),
       routeFileIgnorePrefix: "-",
     }),
     tailwindcss(),

@@ -1,7 +1,9 @@
-import { Tooltip as BaseTooltip } from '@base-ui-components/react/tooltip';
-import type * as React from 'react';
+// Source: 9ui
 
-import { cn } from '../utils';
+import { Tooltip as BaseTooltip } from "@base-ui-components/react/tooltip";
+import type * as React from "react";
+
+import { cn } from "../utils";
 
 function TooltipProvider({
   delay = 0,
@@ -52,22 +54,22 @@ function TooltipArrow({
 
 function TooltipContent({
   className,
-  align = 'center',
+  align = "center",
   sideOffset = 8,
-  side = 'top',
+  side = "top",
   children,
   ...props
 }: React.ComponentProps<typeof BaseTooltip.Popup> & {
-  align?: BaseTooltip.Positioner.Props['align'];
-  side?: BaseTooltip.Positioner.Props['side'];
-  sideOffset?: BaseTooltip.Positioner.Props['sideOffset'];
+  align?: BaseTooltip.Positioner.Props["align"];
+  side?: BaseTooltip.Positioner.Props["side"];
+  sideOffset?: BaseTooltip.Positioner.Props["sideOffset"];
 }) {
   return (
     <TooltipPortal>
       <TooltipPositioner align={align} side={side} sideOffset={sideOffset}>
         <BaseTooltip.Popup
           className={cn(
-            '-outline-offset-1 z-50 w-fit origin-[var(--transform-origin)] text-balance rounded-md bg-popover px-3 py-1.5 text-popover-foreground text-xs shadow-sm outline outline-border transition-[transform,scale,opacity] data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
+            "-outline-offset-1 z-50 w-fit origin-[var(--transform-origin)] text-balance rounded-md bg-popover px-3 py-1.5 text-popover-foreground text-xs shadow-sm outline outline-border transition-[transform,scale,opacity] data-[ending-style]:scale-95 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
             className
           )}
           data-slot="tooltip-content"

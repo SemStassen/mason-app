@@ -1,3 +1,4 @@
+import type { Dialog } from "@base-ui-components/react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -20,15 +21,24 @@ import { Hotkey } from "./hotkey";
 
 export type CommandCategory = "navigation" | "settings" | "developer";
 
-export type ICommandItem = {
+type BaseCommandItem = {
   title: string;
   value: string;
   hotkey?: string;
   category: CommandCategory;
-  onSelect: (dialog: { close: () => void }) => void;
   disabled?: boolean;
   icon?: React.ReactNode;
 };
+
+export type ICommandItem =
+  | (BaseCommandItem & {
+      subCommands: () => Array<ICommandItem>;
+      onSelect?: (dialog: { close: () => void }) => void;
+    })
+  | (BaseCommandItem & {
+      onSelect: (dialog: { close: () => void }) => void;
+      subCommands?: never;
+    });
 
 type Context = {
   register: (cb: () => Array<ICommandItem>) => () => void;
@@ -75,7 +85,7 @@ function useRegisterCommands(cb: () => Array<ICommandItem>) {
     if (cmd.hotkey) {
       // biome-ignore lint/suspicious/noEmptyBlockStatements: This is needed to mock the close function
       // biome-ignore lint/correctness/useHookAtTopLevel: This is fine since the order should stay the same
-      useHotkeys(cmd.hotkey, () => cmd.onSelect({ close: () => {} }), {
+      useHotkeys(cmd.hotkey, () => cmd.onSelect?.({ close: () => {} }), {
         preventDefault: true,
       });
     }
@@ -91,13 +101,18 @@ const CATEGORY_ORDER: CommandCategory[] = [
 function AppCommandsDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const { getCommands } = useAppCommands();
+  const [stack, setStack] = useState<
+    Array<{ title: string; commands: Array<ICommandItem> }>
+  >([]);
 
   useHotkeys("meta+j", () => setIsOpen(true), { preventDefault: true });
 
-  const commands = getCommands();
+  const allCommands = getCommands();
+
+  const currentCommands = stack.at(-1)?.commands ?? allCommands;
 
   const groupedCommands = useMemo(() => {
-    const filtered = commands.filter((cmd) => !cmd.disabled);
+    const filtered = currentCommands.filter((cmd) => !cmd.disabled);
     const grouped = filtered.reduce(
       (acc, cmd) => {
         if (!acc[cmd.category]) {
@@ -117,11 +132,32 @@ function AppCommandsDialog() {
       category,
       commands: grouped[category],
     }));
-  }, [commands]);
+  }, [currentCommands]);
+
+  function getChildren(cmd: ICommandItem) {
+    const children = cmd.subCommands?.();
+    return children;
+  }
+
+  function handleOpenChange(open: boolean, e?: Dialog.Root.ChangeEventDetails) {
+    if (e?.reason === "escape-key" && stack.length > 0) {
+      setStack((prev) => prev.slice(0, -1));
+      return;
+    }
+
+    setIsOpen(open);
+    if (!open) {
+      setStack([]);
+    }
+  }
 
   return (
-    <CommandDialog onOpenChange={setIsOpen} open={isOpen}>
-      <CommandInput placeholder="Search for a command..." />
+    <CommandDialog onOpenChange={handleOpenChange} open={isOpen}>
+      <CommandInput
+        placeholder={
+          stack.length > 0 ? stack.at(-1)?.title : "Search for a command..."
+        }
+      />
       <CommandList>
         <CommandEmpty>No command found.</CommandEmpty>
         {groupedCommands.map(({ category, commands: categoryCommands }) => (
@@ -129,7 +165,17 @@ function AppCommandsDialog() {
             {categoryCommands.map((cmd) => (
               <CommandItem
                 key={cmd.value}
-                onSelect={() => cmd.onSelect({ close: () => setIsOpen(false) })}
+                onSelect={() => {
+                  const children = getChildren(cmd);
+                  if (children) {
+                    setStack((prev) => [
+                      ...prev,
+                      { title: cmd.title, commands: children },
+                    ]);
+                    return;
+                  }
+                  cmd.onSelect?.({ close: () => handleOpenChange(false) });
+                }}
               >
                 {cmd.icon}
                 <span>{cmd.title}</span>

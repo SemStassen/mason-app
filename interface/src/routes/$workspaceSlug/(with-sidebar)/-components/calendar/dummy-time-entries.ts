@@ -4,8 +4,8 @@ import {
   addMinutes,
   endOfWeek,
   startOfWeek,
-} from 'date-fns';
-import type { ITimeEntry } from './types';
+} from "date-fns";
+import type { ITimeEntry } from "./types";
 
 // Generate dummy time entries from previous week to next week
 const generateDummyTimeEntries = (): ITimeEntry[] => {
@@ -15,11 +15,11 @@ const generateDummyTimeEntries = (): ITimeEntry[] => {
 
   const entries: ITimeEntry[] = [];
   const projects = [
-    { name: 'Project Alpha', hexColor: '#3b82f6' },
-    { name: 'Project Beta', hexColor: '#f59e42' },
-    { name: 'Project Gamma', hexColor: '#10b981' },
-    { name: 'Meeting', hexColor: '#f43f5e' },
-    { name: 'Research', hexColor: '#a78bfa' },
+    { name: "Project Alpha", hexColor: "#3b82f6" },
+    { name: "Project Beta", hexColor: "#f59e42" },
+    { name: "Project Gamma", hexColor: "#10b981" },
+    { name: "Meeting", hexColor: "#f43f5e" },
+    { name: "Research", hexColor: "#a78bfa" },
   ];
 
   // Generate 3-5 entries per day for 3 weeks

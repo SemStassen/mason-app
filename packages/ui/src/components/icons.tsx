@@ -21,6 +21,7 @@ import {
   EyeIcon,
   FadersIcon,
   FolderIcon,
+  FolderPlusIcon,
   GearIcon,
   GithubLogoIcon,
   GoogleLogoIcon,
@@ -79,6 +80,7 @@ const Icons = {
   EyeOpen: EyeIcon,
   Mail: EnvelopeIcon,
   Folder: FolderIcon,
+  FolderPlus: FolderPlusIcon,
   Github: GithubLogoIcon,
   Google: GoogleLogoIcon,
   Headings: TextHIcon,
@@ -108,12 +110,12 @@ const Icons = {
   User: UserIcon,
   X: XIcon,
   Company: {
-    Early: (props: IconProps) => (
+    Early: ({ size, ...props }: IconProps) => (
       <svg
         fill="none"
-        height="64"
+        height={size}
         viewBox="0 0 64 64"
-        width="64"
+        width={size}
         xmlns="http://www.w3.org/2000/svg"
         {...props}
       >
@@ -128,12 +130,12 @@ const Icons = {
         />
       </svg>
     ),
-    Float: (props: IconProps) => (
+    Float: ({ size, ...props }: IconProps) => (
       <svg
         fill="none"
-        height="64"
+        height={size}
         viewBox="0 0 64 64"
-        width="64"
+        width={size}
         xmlns="http://www.w3.org/2000/svg"
         {...props}
       >
@@ -151,12 +153,12 @@ const Icons = {
         />
       </svg>
     ),
-    Simplicate: (props: IconProps) => (
+    Simplicate: ({ size, ...props }: IconProps) => (
       <svg
         fill="none"
-        height="64"
+        height={size}
         viewBox="0 0 64 64"
-        width="64"
+        width={size}
         xmlns="http://www.w3.org/2000/svg"
         {...props}
       >
@@ -167,12 +169,12 @@ const Icons = {
         />
       </svg>
     ),
-    Toggl: (props: IconProps) => (
+    Toggl: ({ size, ...props }: IconProps) => (
       <svg
         fill="none"
-        height="64"
+        height={size}
         viewBox="0 0 64 64"
-        width="64"
+        width={size}
         xmlns="http://www.w3.org/2000/svg"
         {...props}
       >

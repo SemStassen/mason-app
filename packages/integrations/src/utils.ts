@@ -1,3 +1,6 @@
+import { Effect } from "effect";
+import { IntegrationDecodingError } from "./errors";
+
 // Simplest tiptap format storable in DB
 type TiptapDoc = {
   type: "doc";
@@ -42,3 +45,50 @@ export const buildUrl = (
   const queryString = searchParams.toString();
   return queryString ? `${path}?${queryString}` : path;
 };
+
+export function fetchPaginated<A, E>({
+  fetchPage,
+  getNextPage,
+  extractItems,
+}: {
+  /** Fetch one page, given a page number or cursor */
+  fetchPage: (page: number | string) => Effect.Effect<Response, E>;
+
+  /** Given the response body and current page, return next page param or `null` if done */
+  getNextPage: (
+    res: Response,
+    currentPage: number | string
+  ) => number | string | null;
+
+  /** How to extract items from the response body */
+  extractItems: (body: unknown) => Array<A>;
+}): Effect.Effect<Array<A>, E | IntegrationDecodingError> {
+  return Effect.gen(function* () {
+    let results: Array<A> = [];
+    let page: number | string = 1;
+
+    while (true) {
+      const response = yield* fetchPage(page);
+
+      const body = yield* Effect.tryPromise({
+        try: () => response.json(),
+        catch: (e) => new IntegrationDecodingError({ error: e }),
+      });
+
+      const items = yield* Effect.try({
+        try: () => extractItems(body),
+        catch: (e) => new IntegrationDecodingError({ error: e }),
+      });
+
+      results = results.concat(items);
+
+      const nextPage = getNextPage(response, page);
+      if (!nextPage) {
+        break;
+      }
+      page = nextPage;
+    }
+
+    return results;
+  });
+}

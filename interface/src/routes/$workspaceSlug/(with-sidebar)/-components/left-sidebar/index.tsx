@@ -3,13 +3,13 @@ import { Button } from "@mason/ui/button";
 import { type IconProps, Icons } from "@mason/ui/icons";
 import { Link, linkOptions } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import { leftSidebarAtom } from "~/atoms/ui-atoms";
-
 import { LedgerToggle } from "./ledger-toggle";
 import { UserDropdownMenu } from "./user-dropdown-menu";
 import { WorkspaceDropdownMenu } from "./workspace-dropdown-menu";
 
-const SIDEBAR_WIDTH = 240;
+const DEFAULT_SIDEBAR_WIDTH = 240;
 
 const NAV_ITEMS = [
   {
@@ -25,7 +25,7 @@ const NAV_ITEMS = [
         to: "/$workspaceSlug/projects",
         from: "/$workspaceSlug",
         label: "Projects",
-        Icon: (props: IconProps) => <Icons.Home {...props} />,
+        Icon: (props: IconProps) => <Icons.Folder {...props} />,
       }),
     ],
   },
@@ -33,13 +33,18 @@ const NAV_ITEMS = [
 
 function LeftSidebar() {
   const { isOpen } = useAtomRef(leftSidebarAtom);
+  const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
+
+  const handleResize = (e: React.MouseEvent<HTMLDivElement>) => {
+    setSidebarWidth(e.clientX);
+  };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isOpen && (
         <motion.aside
-          animate={{ width: SIDEBAR_WIDTH }}
-          className="h-full overflow-hidden border-r"
+          animate={{ width: sidebarWidth }}
+          className="relative h-full overflow-hidden"
           exit={{ width: 0 }}
           initial={{ width: 0 }}
           transition={{
@@ -47,10 +52,10 @@ function LeftSidebar() {
             duration: 0.1,
           }}
         >
-          <div
-            className="flex h-full flex-col justify-between px-4 pt-2 pb-4"
+          <nav
+            className="flex h-full flex-col justify-between border-r px-4 pt-2 pb-4"
             style={{
-              width: SIDEBAR_WIDTH,
+              width: sidebarWidth,
             }}
           >
             <div className="space-y-4">
@@ -104,7 +109,13 @@ function LeftSidebar() {
                 <UserDropdownMenu />
               </div>
             </div>
-          </div>
+          </nav>
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: Okay for resize */}
+          <div
+            className="absolute inset-y-0 right-0 w-[7px] cursor-col-resize"
+            onMouseDown={handleResize}
+            role="presentation"
+          />
         </motion.aside>
       )}
     </AnimatePresence>

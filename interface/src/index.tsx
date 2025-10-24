@@ -3,9 +3,9 @@ import { StrictMode, Suspense, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { ErrorPage } from "./routes/-error";
 import { NotFoundPage } from "./routes/-not-found";
-import { routeTree } from "./routeTree.gen";
 
 import "./globals.css";
+import { routeTree } from "./routeTree.gen";
 import { PLATFORM } from "./utils/constants";
 
 // This is required for Tanstack router to work properly
@@ -16,8 +16,16 @@ declare module "@tanstack/react-router" {
   }
 }
 
+declare module "@tanstack/react-table" {
+  // biome-ignore lint/nursery/useConsistentTypeDefinitions: Needed for declaration merging
+  // biome-ignore lint/correctness/noUnusedVariables: Needed for declaration merging
+  interface ColumnMeta<TData, TValue> {
+    className?: string;
+  }
+}
+
 export const router = createRouter({
-  routeTree,
+  routeTree: routeTree,
   defaultNotFoundComponent: NotFoundPage,
   defaultErrorComponent: ErrorPage,
 });

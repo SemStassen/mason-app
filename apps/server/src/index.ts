@@ -6,10 +6,10 @@ import {
 } from "@effect/platform";
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
 import { appLayer } from "@mason/core/instrumentation";
+import { AuthService } from "@mason/core/services/auth.service";
 import { Layer } from "effect";
 import { MasonApiLive } from "./api";
-import { AuthService } from "./auth-service";
-import { AuthMiddlewareLive } from "./middleware";
+import { AuthMiddlewareLive } from "./middleware/auth.middleware";
 
 const HttpLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
   Layer.provide(

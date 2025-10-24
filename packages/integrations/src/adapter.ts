@@ -1,29 +1,19 @@
-import type { CreateProjectRequest } from "@mason/api-contract/dto/project.dto";
 import type { WorkspaceId } from "@mason/core/models/ids";
+import type { ExternalProject } from "@mason/core/models/project.model";
+import type { ExternalTask } from "@mason/core/models/task.model";
 import { Context, type Effect } from "effect";
 import type { IntegrationAdapterError } from "./errors";
 
 export class InternalTimeTrackingIntegrationAdapter extends Context.Tag(
-  "@mason/integrations/TimeTrackingAdapter"
+  "@mason/integrations/TimeTrackingAdapter",
 )<
   InternalTimeTrackingIntegrationAdapter,
   {
     readonly testIntegration: ({
-      workspaceId,
       apiKeyUnencrypted,
     }: {
-      workspaceId: typeof WorkspaceId.Type;
       apiKeyUnencrypted: string;
     }) => Effect.Effect<void, IntegrationAdapterError>;
-
-    readonly retrieveActivePersonByEmail: ({
-      workspaceId,
-      email,
-    }: {
-      workspaceId: typeof WorkspaceId.Type;
-      email: string;
-    }) => Effect.Effect<void, IntegrationAdapterError>;
-
     readonly listActivePeople: ({
       workspaceId,
     }: {
@@ -35,7 +25,15 @@ export class InternalTimeTrackingIntegrationAdapter extends Context.Tag(
     }: {
       workspaceId: typeof WorkspaceId.Type;
     }) => Effect.Effect<
-      Array<typeof CreateProjectRequest.Type>,
+      Array<typeof ExternalProject.Type>,
+      IntegrationAdapterError
+    >;
+    readonly listTasks: ({
+      workspaceId,
+    }: {
+      workspaceId: typeof WorkspaceId.Type;
+    }) => Effect.Effect<
+      Array<typeof ExternalTask.Type>,
       IntegrationAdapterError
     >;
   }

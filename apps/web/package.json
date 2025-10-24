@@ -13,17 +13,18 @@
   },
   "dependencies": {
     "@mason/interface": "workspace:*",
-    "react": "workspace:^",
-    "react-dom": "workspace:^"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
-    "@tailwindcss/vite": "workspace:^",
-    "@types/react": "workspace:^",
-    "@types/react-dom": "workspace:^",
-    "@vitejs/plugin-react": "workspace:^",
-    "typescript": "workspace:^",
-    "vite": "workspace:^",
-    "vite-tsconfig-paths": "workspace:^"
+    "@tailwindcss/vite": "catalog:",
+    "@tanstack/router-plugin": "^1.132.51",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-tsconfig-paths": "catalog:"
   }
 }

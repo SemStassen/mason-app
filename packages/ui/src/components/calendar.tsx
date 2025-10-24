@@ -1,8 +1,10 @@
-import type * as React from 'react';
-import { DayPicker } from 'react-day-picker';
-import { cn } from '../utils';
-import { buttonVariants } from './button';
-import { Icons } from './icons';
+// Source: 9ui
+
+import type * as React from "react";
+import { DayPicker } from "react-day-picker";
+import { cn } from "../utils";
+import { buttonVariants } from "./button";
+import { Icons } from "./icons";
 
 function Calendar({
   classNames,
@@ -12,62 +14,62 @@ function Calendar({
     <DayPicker
       classNames={{
         root: cn(
-          'relative size-fit select-none rounded-md border p-3 shadow-xs',
+          "relative size-fit select-none rounded-md border p-3 shadow-xs",
           props.className
         ),
-        month: cn('m-0 space-y-1 text-center', classNames?.month),
+        month: cn("m-0 space-y-1 text-center", classNames?.month),
         month_caption: cn(
-          'flex h-8 items-center justify-center font-medium text-sm',
+          "flex h-8 items-center justify-center font-medium text-sm",
           classNames?.month_caption
         ),
-        today: cn('bg-accent', classNames?.today),
-        week: cn('flex justify-center py-0.5', classNames?.week),
+        today: cn("bg-accent", classNames?.today),
+        week: cn("flex justify-center py-0.5", classNames?.week),
         day: cn(
-          'flex size-8 items-center justify-center rounded-md font-normal text-sm hover:[&:has(>button)]:bg-accent hover:[&:has(>button)]:text-accent-foreground',
+          "flex size-8 items-center justify-center rounded-md font-normal text-sm hover:[&:has(>button)]:bg-accent hover:[&:has(>button)]:text-accent-foreground",
           classNames?.day
         ),
         day_button: cn(
-          'size-8 rounded-md focus:outline-hidden focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1',
+          "size-8 rounded-md focus:outline-hidden focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1",
           classNames?.day_button
         ),
-        weekdays: cn('flex justify-center', classNames?.weekdays),
+        weekdays: cn("flex justify-center", classNames?.weekdays),
         weekday: cn(
-          'size-8 font-normal text-muted-foreground text-sm',
+          "size-8 font-normal text-muted-foreground text-sm",
           classNames?.weekday
         ),
         outside: cn(
-          'text-muted-foreground/80 hover:text-muted-foreground/80!',
+          "text-muted-foreground/80 hover:text-muted-foreground/80!",
           classNames?.outside
         ),
         selected: cn(
-          'bg-primary! text-primary-foreground! hover:text-primary-foreground!',
+          "bg-primary! text-primary-foreground! hover:text-primary-foreground!",
           classNames?.selected
         ),
         range_middle: cn(
-          'rounded-none bg-secondary! text-secondary-foreground! first:rounded-l-md last:rounded-r-md hover:bg-secondary! hover:text-secondary-foreground!',
+          "rounded-none bg-secondary! text-secondary-foreground! first:rounded-l-md last:rounded-r-md hover:bg-secondary! hover:text-secondary-foreground!",
           classNames?.range_middle
         ),
         range_start: cn(
-          props.mode === 'range' &&
+          props.mode === "range" &&
             props.selected?.from?.getTime() !== props.selected?.to?.getTime()
-            ? 'not-last:rounded-r-none bg-secondary! [&>button]:bg-primary!'
-            : '',
+            ? "not-last:rounded-r-none bg-secondary! [&>button]:bg-primary!"
+            : "",
           classNames?.range_start
         ),
         range_end: cn(
-          props.mode === 'range' &&
+          props.mode === "range" &&
             props.selected?.from?.getTime() !== props.selected?.to?.getTime()
-            ? 'not-first:rounded-l-none bg-secondary! [&>button]:bg-primary!'
-            : '',
+            ? "not-first:rounded-l-none bg-secondary! [&>button]:bg-primary!"
+            : "",
           classNames?.range_end
         ),
         disabled: cn(
-          'pointer-events-none text-muted-foreground opacity-50',
+          "pointer-events-none text-muted-foreground opacity-50",
           classNames?.disabled
         ),
-        hidden: cn('pointer-events-none', classNames?.hidden),
-        nav: cn('', classNames?.nav),
-        month_grid: cn('', classNames?.month_grid),
+        hidden: cn("pointer-events-none", classNames?.hidden),
+        nav: cn("", classNames?.nav),
+        month_grid: cn("", classNames?.month_grid),
       }}
       components={{
         // biome-ignore lint/correctness/noNestedComponentDefinitions: Fine for calendar
@@ -76,8 +78,8 @@ function Calendar({
           <button
             {...props}
             className={cn(
-              buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
-              'absolute right-3',
+              buttonVariants({ variant: "ghost", size: "icon-sm" }),
+              "absolute right-3",
               classNames?.button_next
             )}
           >
@@ -90,8 +92,8 @@ function Calendar({
           <button
             {...props}
             className={cn(
-              buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
-              'absolute left-3',
+              buttonVariants({ variant: "ghost", size: "icon-sm" }),
+              "absolute left-3",
               classNames?.button_previous
             )}
           >

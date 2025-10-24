@@ -1,8 +1,10 @@
-import { Tabs as BaseTabs } from '@base-ui-components/react/tabs';
-import { createContext, useContext } from 'react';
-import { cn } from '../utils';
+// Source: 9ui
 
-type TabsVariant = 'capsule' | 'underline';
+import { Tabs as BaseTabs } from "@base-ui-components/react/tabs";
+import { createContext, useContext } from "react";
+import { cn } from "../utils";
+
+type TabsVariant = "capsule" | "underline";
 
 type TabsContext = {
   variant: TabsVariant;
@@ -14,14 +16,14 @@ const useTabs = () => {
   const context = useContext(TabsContext);
 
   if (!context) {
-    throw new Error('useTabs must be used within a Tabs');
+    throw new Error("useTabs must be used within a Tabs");
   }
 
   return context;
 };
 
 function Tabs({
-  variant = 'capsule',
+  variant = "capsule",
   className,
   ...props
 }: React.ComponentProps<typeof BaseTabs.Root> & {
@@ -30,7 +32,7 @@ function Tabs({
   return (
     <TabsContext.Provider value={{ variant }}>
       <BaseTabs.Root
-        className={cn('flex flex-col gap-2', className)}
+        className={cn("flex flex-col gap-2", className)}
         data-slot="tabs"
         {...props}
       />
@@ -48,8 +50,8 @@ function TabsList({
   return (
     <BaseTabs.List
       className={cn(
-        'relative z-0 inline-flex h-9 w-fit items-center justify-center gap-x-1 p-1 text-muted-foreground',
-        variant === 'capsule' ? 'rounded-lg bg-muted' : '',
+        "relative z-0 inline-flex h-9 w-fit items-center justify-center gap-x-1 p-1 text-muted-foreground",
+        variant === "capsule" ? "rounded-lg bg-muted" : "",
         className
       )}
       data-slot="tabs-list"
@@ -86,10 +88,10 @@ function TabIndicator({
   return (
     <BaseTabs.Indicator
       className={cn(
-        '-translate-y-1/2 absolute left-0 w-[var(--active-tab-width)] translate-x-[var(--active-tab-left)] transition-all duration-300 ease-in-out',
-        variant === 'underline'
-          ? 'top-full z-10 h-px bg-primary'
-          : '-z-[1] top-1/2 h-[var(--active-tab-height)] rounded-md border bg-input shadow-sm',
+        "-translate-y-1/2 absolute left-0 w-[var(--active-tab-width)] translate-x-[var(--active-tab-left)] transition-all duration-300 ease-in-out",
+        variant === "underline"
+          ? "top-full z-10 h-px bg-primary"
+          : "-z-[1] top-1/2 h-[var(--active-tab-height)] rounded-md border bg-input shadow-sm",
         className
       )}
       data-slot="tab-indicator"
@@ -104,7 +106,7 @@ function TabsContent({
 }: React.ComponentProps<typeof BaseTabs.Panel>) {
   return (
     <BaseTabs.Panel
-      className={cn('flex-1 outline-none', className)}
+      className={cn("flex-1 outline-none", className)}
       data-slot="tabs-content"
       {...props}
     />

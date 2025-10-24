@@ -8,12 +8,14 @@ import { Context, Schema } from "effect";
 // These are copied from core/src/models/shared.ts
 // because we don't want to depend on the core package in the api-contract package
 const UserId = Schema.NonEmptyString.pipe(Schema.brand("UserId"));
+const MemberId = Schema.NonEmptyString.pipe(Schema.brand("MemberId"));
 const WorkspaceId = Schema.NonEmptyString.pipe(Schema.brand("WorkspaceId"));
 
 export class RequestContextData extends Schema.Class<RequestContextData>(
   "@mason/api-contract/requestContextData"
 )({
   userId: UserId,
+  memberId: MemberId,
   workspaceId: WorkspaceId,
 }) {}
 
