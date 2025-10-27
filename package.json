@@ -25,6 +25,7 @@
       "@types/react": "^19.2.2",
       "@types/react-dom": "^19.2.1",
       "@vitejs/plugin-react": "^5.0.4",
+      "babel-plugin-react-compiler": "^1.0.0",
       "drizzle-kit": "^0.31.4",
       "drizzle-orm": "^0.44.4",
       "effect": "^3.17.6",

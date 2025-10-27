@@ -1,8 +1,8 @@
-import { useAppForm } from "@mason/ui/form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Effect } from "effect";
 import z from "zod";
 import { MasonClient } from "~/client";
+import { useAppForm } from "~/components/form";
 import { slugify } from "~/utils/slugify";
 
 export const Route = createFileRoute("/(onboarding)/create-workspace/")({

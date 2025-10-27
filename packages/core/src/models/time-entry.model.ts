@@ -2,7 +2,7 @@ import type { DbTimeEntry } from "@mason/db/schema";
 import { isAfter } from "date-fns";
 import { Effect, Schema } from "effect";
 import { generateUUID } from "../utils/uuid";
-import { MemberId, TaskId, TimeEntryId, WorkspaceId } from "./ids";
+import { MemberId, ProjectId, TaskId, TimeEntryId, WorkspaceId } from "./ids";
 
 export class TimeEntryDateOrderError extends Schema.TaggedError<TimeEntryDateOrderError>()(
   "@mason/core/timeEntryDateOrderError",
@@ -12,25 +12,29 @@ export class TimeEntryDateOrderError extends Schema.TaggedError<TimeEntryDateOrd
   }
 ) {}
 
+export class TimeEntryMissingStoppedAtError extends Schema.TaggedError<TimeEntryMissingStoppedAtError>()(
+  "@mason/core/timeEntryMissingStoppedAtError",
+  {
+    startedAt: Schema.DateFromSelf,
+  }
+) {}
+
 export class TimeEntry extends Schema.Class<TimeEntry>("@mason/core/timeEntry")(
   {
     id: TimeEntryId,
     // References
     workspaceId: WorkspaceId,
     memberId: MemberId,
-    taskId: TaskId,
+    projectId: ProjectId,
+    taskId: Schema.NullOr(TaskId),
     // General
     startedAt: Schema.DateFromSelf,
-    // Nullable
-    stoppedAt: Schema.NullOr(Schema.DateFromSelf),
+    stoppedAt: Schema.DateFromSelf,
   }
 ) {
   private static validate(timeEntry: TimeEntry) {
     return Effect.gen(function* () {
-      if (
-        timeEntry.stoppedAt &&
-        isAfter(timeEntry.startedAt, timeEntry.stoppedAt)
-      ) {
+      if (isAfter(timeEntry.startedAt, timeEntry.stoppedAt)) {
         return yield* Effect.fail(
           new TimeEntryDateOrderError({
             startedAt: timeEntry.startedAt,
@@ -45,11 +49,21 @@ export class TimeEntry extends Schema.Class<TimeEntry>("@mason/core/timeEntry")(
 
   static makeFromDb(dbRecord: DbTimeEntry) {
     return Effect.gen(function* () {
+      if (!dbRecord.stoppedAt) {
+        return yield* Effect.fail(
+          new TimeEntryMissingStoppedAtError({
+            startedAt: dbRecord.startedAt,
+          })
+        );
+      }
+
       const timeEntry = new TimeEntry({
-        ...dbRecord,
+        startedAt: dbRecord.startedAt,
+        stoppedAt: dbRecord.stoppedAt,
         id: TimeEntryId.make(dbRecord.id),
         memberId: MemberId.make(dbRecord.memberId),
-        taskId: TaskId.make(dbRecord.taskId),
+        projectId: ProjectId.make(dbRecord.projectId),
+        taskId: dbRecord.taskId ? TaskId.make(dbRecord.taskId) : null,
         workspaceId: WorkspaceId.make(dbRecord.workspaceId),
       });
 
@@ -81,9 +95,7 @@ export class TimeEntry extends Schema.Class<TimeEntry>("@mason/core/timeEntry")(
       const timeEntry = new TimeEntry({
         ...existingTimeEntry,
         ...input,
-        workspaceId: WorkspaceId.make(existingTimeEntry.workspaceId),
-        memberId: MemberId.make(existingTimeEntry.memberId),
-        taskId: TaskId.make(existingTimeEntry.taskId),
+        id: existingTimeEntry.id,
       });
 
       return yield* TimeEntry.validate(timeEntry);
@@ -94,20 +106,17 @@ export class TimeEntry extends Schema.Class<TimeEntry>("@mason/core/timeEntry")(
 export const TimeEntryToCreate = Schema.TaggedStruct("TimeEntryToCreate", {
   // References
   memberId: TimeEntry.fields.memberId,
+  projectId: TimeEntry.fields.projectId,
   taskId: TimeEntry.fields.taskId,
   // General
   startedAt: TimeEntry.fields.startedAt,
-  // Nullable
-  stoppedAt: Schema.optionalWith(TimeEntry.fields.stoppedAt, {
-    default: () => null,
-    exact: true,
-  }),
+  stoppedAt: TimeEntry.fields.stoppedAt,
 });
 
 export const TimeEntryToUpdate = Schema.TaggedStruct("TimeEntryToUpdate", {
   id: TimeEntry.fields.id,
   // References
-  memberId: TimeEntry.fields.memberId,
+  projectId: TimeEntry.fields.projectId,
   taskId: TimeEntry.fields.taskId,
   // General
   startedAt: Schema.optionalWith(TimeEntry.fields.startedAt, { exact: true }),

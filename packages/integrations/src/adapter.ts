@@ -1,11 +1,10 @@
 import type { WorkspaceId } from "@mason/core/models/ids";
-import type { ExternalProject } from "@mason/core/models/project.model";
-import type { ExternalTask } from "@mason/core/models/task.model";
 import { Context, type Effect } from "effect";
 import type { IntegrationAdapterError } from "./errors";
+import type { ExternalProject, ExternalTask } from "./models";
 
 export class InternalTimeTrackingIntegrationAdapter extends Context.Tag(
-  "@mason/integrations/TimeTrackingAdapter",
+  "@mason/integrations/TimeTrackingAdapter"
 )<
   InternalTimeTrackingIntegrationAdapter,
   {

@@ -3,7 +3,7 @@ import { AuthGroup } from "./groups/auth";
 import { OAuthGroup } from "./groups/o-auth";
 import { PingGroup } from "./groups/ping";
 import { ProjectGroup } from "./groups/project";
-import { TaskGroup } from "./groups/tasks";
+import { TaskGroup } from "./groups/task";
 import { WorkspaceGroup } from "./groups/workspace";
 import { WorkspaceIntegrationGroup } from "./groups/workspace-integrations";
 import { FloatWorkspaceIntegrationGroup } from "./groups/workspace-integrations/float";

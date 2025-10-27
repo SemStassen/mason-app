@@ -1,25 +1,31 @@
-import { useAtomRef } from "@effect-atom/atom-react";
+import { useAtomRef, useAtomValue } from "@effect-atom/atom-react";
 import { Field, FieldGroup, FieldSet } from "@mason/ui/field";
-import { useAppForm } from "@mason/ui/form";
 import { Icons } from "@mason/ui/icons";
-import { TimePicker } from "@mason/ui/time-picker";
-import { revalidateLogic } from "@tanstack/react-form";
-import z from "zod";
+import { revalidateLogic, useStore } from "@tanstack/react-form";
+import { Schema } from "effect";
+import { projectsWithTasksAtom } from "~/atoms/api";
 import { calendarSortedDragSelectionAtom } from "~/atoms/calendar-atom";
-import { formatter } from "~/utils/date-time";
+import { useAppForm } from "~/components/form";
 
-const createTimeEntrySchema = z.object({
-  startedAt: z.iso.datetime(),
-  stoppedAt: z.iso.datetime(),
-});
+const createTimeEntrySchema = Schema.standardSchemaV1(
+  Schema.Struct({
+    startedAt: Schema.Date,
+    stoppedAt: Schema.Date,
+    projectId: Schema.NonEmptyString,
+    taskId: Schema.String,
+  })
+);
 
 function CreateTimeEntryForm() {
   const dragSelection = useAtomRef(calendarSortedDragSelectionAtom);
+  const projectsWithTasks = useAtomValue(projectsWithTasksAtom);
 
   const form = useAppForm({
     defaultValues: {
       startedAt: dragSelection?.start.toISOString() ?? new Date().toISOString(),
       stoppedAt: dragSelection?.end.toISOString() ?? new Date().toISOString(),
+      projectId: "",
+      taskId: "",
     },
     validationLogic: revalidateLogic(),
     validators: {
@@ -27,37 +33,97 @@ function CreateTimeEntryForm() {
     },
   });
 
+  const selectedProjectId = useStore(
+    form.store,
+    (state) => state.values.projectId
+  );
+  const tasks = projectsWithTasks.find(
+    (item) => item.id === selectedProjectId
+  )?.tasks;
+
   return (
     <form>
-      <FieldSet>
-        <FieldGroup className="gap-3" direction="horizontal">
-          <form.Field
-            children={(field) => (
-              <Field>
-                <TimePicker
-                  format={(date) => formatter.time(date)}
-                  onChange={(value) => field.handleChange(value.toISOString())}
-                  value={new Date(field.state.value)}
+      <FieldGroup>
+        <FieldSet>
+          <FieldGroup className="gap-2" direction="horizontal">
+            <Icons.Clock className="size-4 shrink-0 text-muted-foreground" />
+            <form.AppField
+              children={(field) => (
+                <field.TimeField
+                  description={{
+                    className: "sr-only",
+                    children: "Time you started working on the task",
+                  }}
+                  label={{ className: "sr-only", children: "Started At" }}
                 />
-              </Field>
-            )}
-            name="startedAt"
-          />
-          <Icons.ArrowRight className="muted-foreground size-4 shrink-0" />
-          <form.Field
-            children={(field) => (
-              <Field>
-                <TimePicker
-                  format={(date) => formatter.time(date)}
-                  onChange={(value) => field.handleChange(value.toISOString())}
-                  value={new Date(field.state.value)}
+              )}
+              name="startedAt"
+            />
+            <Icons.ArrowRight className="muted-foreground size-4 shrink-0" />
+            <form.AppField
+              children={(field) => (
+                <field.TimeField
+                  description={{
+                    className: "sr-only",
+                    children: "Time you stopped working on the task",
+                  }}
+                  label={{ className: "sr-only", children: "Stopped At" }}
                 />
-              </Field>
-            )}
-            name="stoppedAt"
-          />
-        </FieldGroup>
-      </FieldSet>
+              )}
+              name="stoppedAt"
+            />
+          </FieldGroup>
+        </FieldSet>
+        <FieldSet>
+          <FieldGroup className="items-start gap-2" direction="horizontal">
+            <Icons.Folder className="mt-2.5 size-4 shrink-0 text-muted-foreground" />
+
+            <FieldGroup>
+              <form.AppField
+                children={(field) => (
+                  <field.SelectField
+                    description={{
+                      className: "sr-only",
+                      children: "The project you worked on",
+                    }}
+                    items={projectsWithTasks}
+                    itemValue={(item) => item.id}
+                    label={{ className: "sr-only", children: "Project" }}
+                    renderItem={(item) => item.name}
+                    renderValue={(value) => value?.name}
+                  />
+                )}
+                name="projectId"
+              />
+
+              <form.AppField
+                children={(field) => (
+                  <field.SelectField
+                    description={{
+                      className: "sr-only",
+                      children: "The task of the project you worked on",
+                    }}
+                    field={{
+                      disabled: !selectedProjectId,
+                    }}
+                    items={tasks ?? []}
+                    itemValue={(item) => item.id}
+                    label={{ className: "sr-only", children: "Task" }}
+                    renderItem={(item) => item.name}
+                    renderValue={(value) => value?.name}
+                  />
+                )}
+                name="taskId"
+              />
+            </FieldGroup>
+          </FieldGroup>
+        </FieldSet>
+        <Field>
+          <form.AppForm>
+            <form.SubmitButton>Create Time Entry</form.SubmitButton>
+          </form.AppForm>
+        </Field>
+      </FieldGroup>
     </form>
   );
 }

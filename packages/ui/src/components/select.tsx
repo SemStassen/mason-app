@@ -28,6 +28,8 @@ function SelectPositioner({
   return <BaseSelect.Positioner data-slot="select-positioner" {...props} />;
 }
 
+export type SelectValueProps = BaseSelect.Value.Props;
+
 function SelectValue({
   className,
   ...props
@@ -47,7 +49,7 @@ function SelectTrigger({
   children,
   showChevron = true,
   ...props
-}: React.ComponentProps<typeof BaseSelect.Trigger> & {
+}: BaseSelect.Trigger.Props & {
   size?: "sm" | "default";
   showChevron?: boolean;
 }) {
@@ -79,7 +81,7 @@ function SelectContent({
   sideOffset = 4,
   position = "popper",
   ...props
-}: React.ComponentProps<typeof BaseSelect.Popup> & {
+}: BaseSelect.Popup.Props & {
   align?: BaseSelect.Positioner.Props["align"];
   side?: BaseSelect.Positioner.Props["side"];
   sideOffset?: BaseSelect.Positioner.Props["sideOffset"];

@@ -96,7 +96,6 @@ function useDynamicAffixPadding(gapPx: number) {
 function Input({
   containerClassName,
   className,
-  type,
   prefix,
   suffix,
   affixGapPx = 8,
@@ -128,7 +127,6 @@ function Input({
           className
         )}
         data-slot="input"
-        type={type}
         {...props}
       />
       {suffix && (

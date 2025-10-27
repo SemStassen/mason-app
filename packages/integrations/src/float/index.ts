@@ -1,6 +1,4 @@
 import type { WorkspaceId } from "@mason/core/models/ids";
-import { ExternalProject } from "@mason/core/models/project.model";
-import { ExternalTask } from "@mason/core/models/task.model";
 import { WorkspaceIntegrationsService } from "@mason/core/services/workspace-integrations.service";
 import { Effect, Layer, Schema } from "effect";
 import { InternalTimeTrackingIntegrationAdapter } from "../adapter";
@@ -9,6 +7,7 @@ import {
   IntegrationFetchError,
   IntegrationInvalidApiKeyError,
 } from "../errors";
+import { ExternalProject, ExternalTask } from "../models";
 import { buildUrl, fetchPaginated, stringToTiptapJSON } from "../utils";
 
 /**
@@ -56,20 +55,18 @@ const CURRENT_PAGE_HEADER = "X-Pagination-Current-Page";
 const TOTAL_PAGES_HEADER = "X-Pagination-Page-Count";
 
 const floatFetch = ({ apiKey, path }: { apiKey: string; path: string }) =>
-  Effect.gen(function* (_) {
-    const res = yield* _(
-      Effect.tryPromise({
-        try: () =>
-          fetch(`${BASE_URL}${path}`, {
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "User-Agent": "Mason app - private demo (semstassen@gmail.com)",
-            },
-          }),
-        catch: (e) =>
-          new IntegrationFetchError({ kind: "float", path: path, error: e }),
-      })
-    );
+  Effect.gen(function* () {
+    const res = yield* Effect.tryPromise({
+      try: () =>
+        fetch(`${BASE_URL}${path}`, {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "User-Agent": "Mason app - private demo (semstassen@gmail.com)",
+          },
+        }),
+      catch: (e) =>
+        new IntegrationFetchError({ kind: "float", path: path, error: e }),
+    });
 
     if (!res.ok) {
       const body = yield* Effect.tryPromise({
@@ -78,21 +75,17 @@ const floatFetch = ({ apiKey, path }: { apiKey: string; path: string }) =>
       });
 
       if (res.status === 401) {
-        return yield* _(
-          Effect.fail(
-            new IntegrationInvalidApiKeyError({
-              kind: "float",
-              path: path,
-              error: body,
-            })
-          )
+        return yield* Effect.fail(
+          new IntegrationInvalidApiKeyError({
+            kind: "float",
+            path: path,
+            error: body,
+          })
         );
       }
 
-      return yield* _(
-        Effect.fail(
-          new IntegrationFetchError({ kind: "float", path: path, error: body })
-        )
+      return yield* Effect.fail(
+        new IntegrationFetchError({ kind: "float", path: path, error: body })
       );
     }
 

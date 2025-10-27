@@ -1,9 +1,9 @@
 import { useAtomSet } from "@effect-atom/atom-react";
-import { useAppForm } from "@mason/ui/form";
 import { toast } from "@mason/ui/sonner";
 import { Effect } from "effect";
 import z from "zod";
 import { createWorkspaceIntegrationAtom } from "~/atoms/api";
+import { useAppForm } from "~/components/form";
 
 const createWorkspaceIntegrationSchema = z.object({
   apiKeyUnencrypted: z.string(),

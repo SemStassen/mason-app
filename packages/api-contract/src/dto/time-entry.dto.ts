@@ -26,8 +26,12 @@ export const UpdateTimeEntryRequest = Schema.Struct({
   id: TimeEntry.fields.id,
   // References
   memberId: TimeEntry.fields.memberId,
-  taskId: TimeEntry.fields.taskId,
+  taskId: Schema.optionalWith(TimeEntry.fields.taskId, { exact: true }),
   // General
   startedAt: Schema.optionalWith(TimeEntry.fields.startedAt, { exact: true }),
   stoppedAt: Schema.optionalWith(TimeEntry.fields.stoppedAt, { exact: true }),
+});
+
+export const TimeEntryResponse = Schema.Struct({
+  ...TimeEntry.fields,
 });

@@ -1,7 +1,6 @@
 import type { DbTask } from "@mason/db/schema";
 import { Effect, Schema } from "effect";
 import { generateUUID } from "../utils/uuid";
-import { OptionFromNonEmptyTrimmedStringMax } from "./data-types";
 import { ProjectId, TaskId, WorkspaceId } from "./ids";
 
 export class Task extends Schema.Class<Task>("@mason/core/task")({
@@ -70,12 +69,6 @@ export const TaskToCreate = Schema.TaggedStruct("TaskToCreate", {
     default: () => null,
     exact: true,
   }),
-});
-
-export const ExternalTask = Schema.Struct({
-  externalId: Schema.String,
-  externalProjectId: Schema.String,
-  name: OptionFromNonEmptyTrimmedStringMax({ maxLength: 255 }),
 });
 
 export const TaskToUpdate = Schema.TaggedStruct("TaskToUpdate", {

@@ -45,7 +45,6 @@
     "./dialog": "./src/components/dialog.tsx",
     "./dropdown-menu": "./src/components/dropdown-menu.tsx",
     "./field": "./src/components/field.tsx",
-    "./form": "./src/components/form.tsx",
     "./html-table": "./src/components/html-table.tsx",
     "./icons": "./src/components/icons.tsx",
     "./input-otp": "./src/components/input-otp.tsx",

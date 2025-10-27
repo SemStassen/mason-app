@@ -3,3 +3,8 @@
 
 /* biome-ignore lint/suspicious/noUnknownAtRules: This is necessary for tailwind to work */
 @source "../src";
+
+/* https://base-ui.com/react/overview/quick-start */
+body {
+  position: relative;
+}

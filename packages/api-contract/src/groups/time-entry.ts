@@ -1,9 +1,9 @@
 import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from "@effect/platform";
 import { Schema } from "effect";
-import { ProjectResponse } from "../../../project.dto";
+import { TaskResponse } from "../dto/task.dto";
 
-export const ProjectGroup = HttpApiGroup.make("Project").add(
+export const TimeEntryGroup = HttpApiGroup.make("TimeEntry").add(
   HttpApiEndpoint.get("List")`/`
-    .addSuccess(Schema.Array(ProjectResponse))
+    .addSuccess(Schema.Array(TaskResponse))
     .addError(HttpApiError.InternalServerError)
 );

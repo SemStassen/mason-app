@@ -1,7 +1,6 @@
 import type { DbProject } from "@mason/db/schema";
 import { Effect, Schema } from "effect";
 import { generateUUID } from "../utils/uuid";
-import { OptionFromNonEmptyTrimmedStringMax } from "./data-types";
 import { ProjectId, WorkspaceId } from "./ids";
 
 export class Project extends Schema.Class<Project>("@mason/core/project")({
@@ -101,20 +100,6 @@ export const ProjectToCreate = Schema.TaggedStruct("ProjectToCreate", {
     default: () => null,
     exact: true,
   }),
-});
-
-export const ExternalProject = Schema.Struct({
-  externalId: Schema.String,
-  name: OptionFromNonEmptyTrimmedStringMax({ maxLength: 255 }),
-  hexColor: Schema.optionalWith(Project.fields.hexColor, {
-    exact: true,
-  }),
-  isBillable: Schema.optionalWith(Project.fields.isBillable, {
-    exact: true,
-  }),
-  startDate: Schema.optionalWith(Project.fields.startDate, { exact: true }),
-  endDate: Schema.optionalWith(Project.fields.endDate, { exact: true }),
-  notes: Schema.optionalWith(Project.fields.notes, { exact: true }),
 });
 
 export const ProjectToUpdate = Schema.TaggedStruct("ProjectToUpdate", {

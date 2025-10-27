@@ -1,14 +1,16 @@
 // Source: Shadcn
 
+import { Field as BaseField } from "@base-ui-components/react/field";
+import { Fieldset as BaseFieldset } from "@base-ui-components/react/fieldset";
 import { cva, type VariantProps } from "class-variance-authority";
 import { useMemo } from "react";
 import { cn } from "../utils";
-import { Label } from "./label";
+import { Label, type LabelProps } from "./label";
 import { Separator } from "./separator";
 
-function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
+function FieldSet({ className, ...props }: BaseFieldset.Root.Props) {
   return (
-    <fieldset
+    <BaseFieldset.Root
       className={cn(
         "flex flex-col gap-6",
         "has-[>[data-slot=checkbox-group]]:gap-3 has-[>[data-slot=radio-group]]:gap-3",
@@ -24,9 +26,9 @@ function FieldLegend({
   className,
   variant = "legend",
   ...props
-}: React.ComponentProps<"legend"> & { variant?: "legend" | "label" }) {
+}: BaseFieldset.Legend.Props & { variant?: "legend" | "label" }) {
   return (
-    <legend
+    <BaseFieldset.Legend
       className={cn(
         "mb-3 font-medium",
         "data-[variant=legend]:text-base",
@@ -41,12 +43,12 @@ function FieldLegend({
 }
 
 export const fieldGroupVariants = cva(
-  "group/field-group @container/field-group flex w-full gap-7 data-[slot=checkbox-group]:gap-3 [&>[data-slot=field-group]]:gap-4",
+  "group/field-group @container/field-group flex w-full data-[slot=checkbox-group]:gap-3 [&>[data-slot=field-group]]:gap-4",
   {
     variants: {
       direction: {
-        horizontal: "flex-row items-center",
-        vertical: "flex-col",
+        horizontal: "flex-row items-center gap-2",
+        vertical: "flex-col gap-7",
       },
     },
   }
@@ -90,14 +92,12 @@ export const fieldVariants = cva(
   }
 );
 
-function Field({
-  className,
-  orientation = "vertical",
-  ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof fieldVariants>) {
+export type FieldProps = BaseField.Root.Props &
+  VariantProps<typeof fieldVariants>;
+
+function Field({ className, orientation = "vertical", ...props }: FieldProps) {
   return (
-    // biome-ignore lint/a11y/useSemanticElements: Fine
-    <div
+    <BaseField.Root
       className={cn(fieldVariants({ orientation }), className)}
       data-orientation={orientation}
       data-slot="field"
@@ -120,20 +120,22 @@ function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function FieldLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof Label>) {
+function FieldLabel({ className, ...props }: LabelProps) {
   return (
-    <Label
-      className={cn(
-        "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50",
-        "has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-md has-[>[data-slot=field]]:border [&>*]:data-[slot=field]:p-4",
-        "has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5 dark:has-data-[state=checked]:bg-primary/10",
-        className
+    <BaseField.Label
+      render={(baseProps) => (
+        <Label
+          className={cn(
+            "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50",
+            "has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-md has-[>[data-slot=field]]:border [&>*]:data-[slot=field]:p-4",
+            "has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5 dark:has-data-[state=checked]:bg-primary/10",
+            className
+          )}
+          data-slot="field-label"
+          {...baseProps}
+          {...props}
+        />
       )}
-      data-slot="field-label"
-      {...props}
     />
   );
 }
@@ -151,9 +153,11 @@ function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
+export type FieldDescriptionProps = BaseField.Description.Props;
+
+function FieldDescription({ className, ...props }: FieldDescriptionProps) {
   return (
-    <p
+    <BaseField.Description
       className={cn(
         "font-normal text-muted-foreground text-sm leading-normal group-has-[[data-orientation=horizontal]]/field:text-balance",
         "nth-last-2:-mt-1 [[data-variant=legend]+&]:-mt-1.5 last:mt-0",
@@ -201,51 +205,41 @@ function FieldError({
   children,
   errors,
   ...props
-}: React.ComponentProps<"div"> & {
+}: BaseField.Error.Props & {
   errors?: Array<{ message?: string } | undefined>;
 }) {
-  const content = useMemo(() => {
-    if (children) {
-      return children;
-    }
-
+  const error = useMemo(() => {
     if (!errors?.length) {
       return null;
     }
 
     const uniqueErrors = [
-      ...new Map(errors.map((error) => [error?.message, error])).values(),
+      ...new Map(errors.map((e) => [e?.message, e])).values(),
     ];
 
-    if (uniqueErrors?.length === 1) {
-      return uniqueErrors[0]?.message;
-    }
+    return uniqueErrors[0]?.message;
+  }, [errors]);
 
-    return (
-      <ul className="ml-4 flex list-disc flex-col gap-1">
-        {uniqueErrors.map(
-          (error, index) =>
-            // biome-ignore lint/suspicious/noArrayIndexKey: Fine
-            error?.message && <li key={index}>{error.message}</li>
-        )}
-      </ul>
-    );
-  }, [children, errors]);
-
-  if (!content) {
+  if (!error) {
     return null;
   }
 
   return (
-    <div
+    <BaseField.Error
       className={cn("font-normal text-destructive text-sm", className)}
       data-slot="field-error"
       role="alert"
       {...props}
     >
-      {content}
-    </div>
+      {error}
+    </BaseField.Error>
   );
+}
+
+export type FieldControlProps = BaseField.Control.Props;
+
+function FieldControl(props: FieldControlProps) {
+  return <BaseField.Control data-slot="field-control" {...props} />;
 }
 
 export {
@@ -259,4 +253,5 @@ export {
   FieldSet,
   FieldContent,
   FieldTitle,
+  FieldControl,
 };

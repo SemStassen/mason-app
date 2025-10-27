@@ -1,11 +1,11 @@
 import { Button } from "@mason/ui/button";
-import { useAppForm } from "@mason/ui/form";
 import { Icons } from "@mason/ui/icons";
 import { revalidateLogic } from "@tanstack/react-form";
 import { Effect } from "effect";
 import type { Dispatch, SetStateAction } from "react";
 import { z } from "zod";
 import { MasonClient } from "~/client";
+import { useAppForm } from "~/components/form";
 import type { SignUpStep } from "..";
 
 const enterEmailSchema = z.object({

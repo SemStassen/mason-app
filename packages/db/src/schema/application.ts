@@ -93,6 +93,7 @@ export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
     references: [workspacesTable.id],
   }),
   tasks: many(tasksTable),
+  timeEntries: many(timeEntriesTable),
 }));
 
 export type DbProject = typeof projectsTable.$inferSelect;
@@ -138,9 +139,12 @@ export const timeEntriesTable = pgTable(
     memberId: uuid("member_id")
       .references(() => membersTable.id, { onDelete: "cascade" })
       .notNull(),
-    taskId: uuid("task_id")
-      .references(() => tasksTable.id, { onDelete: "cascade" })
+    projectId: uuid("project_id")
+      .references(() => projectsTable.id, { onDelete: "cascade" })
       .notNull(),
+    taskId: uuid("task_id").references(() => tasksTable.id, {
+      onDelete: "set null",
+    }),
     // General
     startedAt: timestamp("started_at", {
       withTimezone: true,
@@ -160,6 +164,10 @@ export const timeEntriesRelations = relations(timeEntriesTable, ({ one }) => ({
   member: one(membersTable, {
     fields: [timeEntriesTable.memberId],
     references: [membersTable.userId],
+  }),
+  project: one(projectsTable, {
+    fields: [timeEntriesTable.projectId],
+    references: [projectsTable.id],
   }),
   task: one(tasksTable, {
     fields: [timeEntriesTable.taskId],

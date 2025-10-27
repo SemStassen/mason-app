@@ -13,12 +13,7 @@ export interface LabelProps
   extends React.ComponentProps<"label">,
     VariantProps<typeof labelVariants> {}
 
-const Label = ({
-  className,
-  "aria-label": ariaLabel,
-  htmlFor,
-  ...props
-}: LabelProps) => {
+const Label = ({ className, ...props }: LabelProps) => {
   // biome-ignore lint/a11y/noLabelWithoutControl: Fine for now
   return <label className={cn(labelVariants(), className)} {...props} />;
 };
