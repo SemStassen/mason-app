@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
-    "typescript": "catalog:"
+    "typescript": "catalog:dev"
   },
   "exports": {
     ".": "./src/index.ts",

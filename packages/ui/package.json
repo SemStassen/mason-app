@@ -8,10 +8,10 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@base-ui-components/react": "catalog:",
+    "@base-ui-components/react": "catalog:frontend",
     "@fontsource-variable/inter": "^5.2.5",
     "@phosphor-icons/react": "^2.1.7",
-    "@tanstack/react-form": "catalog:",
+    "@tanstack/react-form": "catalog:frontend",
     "@tiptap/pm": "^3.4.1",
     "@tiptap/react": "^3.4.1",
     "@tiptap/starter-kit": "^3.4.1",
@@ -28,7 +28,7 @@
     "@mason/config": "workspace:*",
     "tw-animate-css": "^1.3.8",
     "tailwindcss": "^4.0.15",
-    "typescript": "catalog:"
+    "typescript": "catalog:dev"
   },
   "exports": {
     "./globals.css": "./src/globals.css",

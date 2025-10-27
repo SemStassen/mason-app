@@ -13,16 +13,16 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "drizzle-orm": "catalog:",
+    "drizzle-orm": "catalog:server",
     "pg": "^8.16.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.9.0",
     "@mason/config": "workspace:*",
     "@types/pg": "^8.15.5",
-    "drizzle-kit": "catalog:",
+    "drizzle-kit": "catalog:dev",
     "drizzle-seed": "^0.3.1",
-    "typescript": "catalog:"
+    "typescript": "catalog:dev"
   },
   "exports": {
     "./db": "./src/db.ts",

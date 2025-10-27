@@ -11,7 +11,7 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@base-ui-components/react": "catalog:",
+    "@base-ui-components/react": "catalog:frontend",
     "@dnd-kit/react": "^0.1.21",
     "@effect-atom/atom-react": "^0.3.2",
     "@effect/platform": "catalog:",
@@ -19,17 +19,17 @@
     "@electric-sql/pglite-repl": "^0.2.25",
     "@mason/api-contract": "workspace:*",
     "@mason/ui": "workspace:*",
-    "@tanstack/react-form": "catalog:",
+    "@tanstack/react-form": "catalog:frontend",
     "@tanstack/react-router": "^1.132.47",
     "@tanstack/react-router-devtools": "^1.132.51",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.12",
     "date-fns": "^4.1.0",
-    "drizzle-orm": "catalog:",
+    "drizzle-orm": "catalog:frontend",
     "effect": "catalog:",
     "motion": "^12.23.12",
-    "react": "catalog:",
-    "react-dom": "catalog:",
+    "react": "catalog:frontend",
+    "react-dom": "catalog:frontend",
     "react-hotkeys-hook": "^5.1.0",
     "slug": "^11.0.0",
     "zod": "^4.1.5"
@@ -38,11 +38,11 @@
     "@inlang/cli": "^3.0.12",
     "@inlang/paraglide-js": "2.4.0",
     "@mason/config": "workspace:*",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
+    "@types/react": "catalog:dev",
+    "@types/react-dom": "catalog:dev",
     "@types/slug": "^5.0.9",
-    "drizzle-kit": "catalog:",
-    "typescript": "catalog:"
+    "drizzle-kit": "catalog:dev",
+    "typescript": "catalog:dev"
   },
   "exports": {
     ".": "./src/exports.ts"
