@@ -154,6 +154,10 @@ export const timeEntriesTable = pgTable(
       withTimezone: true,
       precision: 0,
     }),
+    notes: jsonb("notes").$type<{
+      // Generic object type
+      [key: string]: unknown;
+    }>(),
     // Metadata
     ...tableSoftDelete,
     ...tableMetadata,

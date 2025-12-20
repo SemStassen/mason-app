@@ -2,9 +2,7 @@ name: mason
 
 services:
   pg:
-    build:
-      context: ./docker/postgres
-      dockerfile: Dockerfile
+    image: docker.io/library/postgres:18
     restart: unless-stopped
     shm_size: 1g
     ports:
@@ -14,7 +12,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: mason
     volumes:
-      - pg:/var/lib/postgresql/data
+      - pg:/var/lib/postgresql
     networks:
       - internal
     command:
@@ -43,8 +41,16 @@ services:
       pg:
         condition: service_healthy
 
+  telemetry:
+    image: docker.io/grafana/otel-lgtm
+    volumes:
+      - grafana:/var/lib/grafana
+    networks:
+      - internal
+
 volumes:
   pg:
+  grafana:
 
 networks:
   internal:

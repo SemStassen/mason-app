@@ -1,8 +1,8 @@
 import { HttpApiBuilder, HttpApiError } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
+import { SessionContext } from "@mason/api-contract/middleware/session";
 import { syncIntegrationUseCase } from "@mason/use-cases/sync.use-cases";
 import { Effect } from "effect";
-import { RequestContext } from "~/middleware/auth.middleware";
 
 export const FloatWorkspaceIntegrationGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -10,7 +10,7 @@ export const FloatWorkspaceIntegrationGroupLive = HttpApiBuilder.group(
   (handlers) =>
     handlers.handle("Sync", () =>
       Effect.gen(function* () {
-        const ctx = yield* RequestContext;
+        const ctx = yield* SessionContext;
 
         yield* syncIntegrationUseCase({
           kind: "float",

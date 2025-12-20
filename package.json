@@ -18,19 +18,19 @@
       "packages/*"
     ],
     "catalog": {
-      "@effect/platform": "^0.92.1",
-      "effect": "^3.17.6"
+      "@effect/platform": "^0.93.0",
+      "effect": "^3.19.3"
     },
     "catalogs": {
       "dev": {
-        "@tailwindcss/vite": "^4.1.14",
+        "@tailwindcss/vite": "^4.1.17",
         "@types/react": "^19.2.2",
         "@types/react-dom": "^19.2.1",
         "@vitejs/plugin-react": "^5.0.4",
         "babel-plugin-react-compiler": "^1.0.0",
-        "drizzle-kit": "^0.31.4",
+        "drizzle-kit": "^0.31.6",
         "typescript": "^5.9.3",
-        "vite": "^7.1.9",
+        "vite": "^7.2.2",
         "vite-tsconfig-paths": "^5.1.4"
       },
       "frontend": {
@@ -46,11 +46,11 @@
     }
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.5",
-    "@effect/language-service": "^0.44.0",
-    "lefthook": "^1.13.6",
-    "turbo": "^2.5.8",
+    "@biomejs/biome": "2.3.5",
+    "@effect/language-service": "^0.55.3",
+    "lefthook": "^2.0.3",
+    "turbo": "^2.6.1",
     "typescript": "catalog:dev",
-    "ultracite": "5.6.2"
+    "ultracite": "6.3.2"
   }
 }

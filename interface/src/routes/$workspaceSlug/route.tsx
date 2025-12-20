@@ -119,7 +119,7 @@ function Layout() {
 
   return (
     <WorkspaceProviders>
-      <div className="isolate h-screen w-screen overflow-hidden bg-background text-foreground">
+      <div className="isolate h-screen w-screen overflow-hidden overscroll-none bg-background text-foreground">
         <main className="flex h-full">
           <Outlet />
         </main>

@@ -1,78 +1,104 @@
-import { useRef } from "react";
-import { Input, type InputProps } from "./input";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "./select";
+import { useMemo, useState } from "react";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "./combobox.coss";
+import { InputTime, type InputTimeProps } from "./input-time";
 
-export interface TimePickerProps
-  extends Omit<InputProps, "value" | "onChange" | "type"> {
-  format: (date: Date) => string;
-  value: Date;
-  onChange: (value: Date) => void;
+export interface TimePickerProps extends InputTimeProps {
   step?: 5 | 10 | 15 | 20 | 30;
 }
 
-function TimePicker({
+type Item = Date;
+
+const TimePicker = ({
   format,
   step = 15,
   value,
   onChange,
+  defaultValue,
   ...props
-}: TimePickerProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+}: TimePickerProps) => {
+  const [internalValue, setInternalValue] = useState(
+    defaultValue ?? new Date()
+  );
+
+  const isControlled = value !== undefined;
+  const currentValue = isControlled ? value : internalValue;
+
+  function setValue(next: Date) {
+    if (!isControlled) {
+      setInternalValue(next);
+    }
+    onChange?.(next);
+  }
 
   const totalSteps = (24 * 60) / step;
 
-  return (
-    <Select
-      onOpenChange={(open) => {
-        if (open) {
-          setTimeout(() => {
-            inputRef.current?.focus();
-          }, 0);
-        }
-      }}
-    >
-      <SelectTrigger
-        render={({ className: discard, ...triggerProps }) => (
-          <div {...triggerProps} />
-        )}
-        showChevron={false}
-      >
-        <Input
-          {...props}
-          onChange={(e) => onChange(new Date(e.target.value))}
-          ref={inputRef}
-          step={60}
-          type="time"
-          value={value ? format(value) : ""}
-        />
-      </SelectTrigger>
-      <SelectContent
-        align="end"
-        className="max-h-[200px] overflow-y-auto"
-        side="left"
-      >
-        {Array.from({ length: totalSteps }, (_, i) => {
-          const minutesSinceMidnight = i * step;
-          const hours = Math.floor(minutesSinceMidnight / 60);
-          const minutes = minutesSinceMidnight % 60;
-          const numberDate = new Date().setHours(hours, minutes, 0, 0);
-          const date = new Date(numberDate);
+  const items: Array<Date> = useMemo(
+    () =>
+      Array.from({ length: totalSteps }, (_, i) => {
+        const minutes = i * step;
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
 
-          return (
-            <SelectItem
-              key={numberDate}
-              onClick={() => {
-                onChange(date);
-              }}
-              showCheck={false}
-            >
-              {format(date)}
-            </SelectItem>
-          );
-        })}
-      </SelectContent>
-    </Select>
+        const d = new Date(currentValue);
+        d.setHours(hours, mins, 0, 0);
+        return d;
+      }),
+    [totalSteps, step, currentValue]
   );
-}
+
+  function handleValueChange(selected: unknown) {
+    if (typeof selected === "string") {
+      const parsed = new Date(selected);
+      if (!Number.isNaN(parsed.getTime())) {
+        setValue(parsed);
+      }
+    }
+  }
+
+  return (
+    <Combobox
+      // Disable filtering
+      filter={() => true}
+      items={items}
+      onValueChange={handleValueChange}
+      value={currentValue.toISOString()}
+    >
+      <ComboboxInput
+        render={(inputProps) => {
+          const {
+            // @ts-expect-error: Value does exist
+            value: _value,
+            defaultValue: _defaultValue,
+            ...safeInputProps
+          } = inputProps;
+          return (
+            <InputTime
+              {...safeInputProps}
+              format={format}
+              onBlur={props.onBlur}
+              onChange={setValue}
+              value={currentValue}
+            />
+          );
+        }}
+      />
+      <ComboboxContent>
+        <ComboboxList>
+          {(item: Item) => (
+            <ComboboxItem key={item.toISOString()} value={item.toISOString()}>
+              {format(item)}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  );
+};
 
 export { TimePicker };

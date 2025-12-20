@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { pgPolicy, timestamp, uuid } from "drizzle-orm/pg-core";
 
-export const tableId = uuid("id").primaryKey().default(sql`uuid_generate_v7()`);
+export const tableId = uuid("id").primaryKey().default(sql`uuidv7()`);
 
 export const tableMetadata = {
   createdAt: timestamp("created_at", {

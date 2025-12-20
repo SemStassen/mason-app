@@ -6,47 +6,44 @@ import type {
 import { TimeEntryService } from "@mason/core/services/time-entry.service";
 import { Effect } from "effect";
 
-export const createTimeEntriesUseCase = ({
+export const createTimeEntriesUseCase = Effect.fn("createTimeEntriesUseCase")(function* ({
   workspaceId,
   timeEntries,
 }: {
   workspaceId: typeof WorkspaceId.Type;
   timeEntries: Array<typeof TimeEntryToCreate.Type>;
-}) =>
-  Effect.gen(function* () {
-    const timeEntryService = yield* TimeEntryService;
+}) {
+  const timeEntryService = yield* TimeEntryService;
 
-    return yield* timeEntryService.createTimeEntries({
-      workspaceId: workspaceId,
-      timeEntries: timeEntries,
-    });
+  return yield* timeEntryService.createTimeEntries({
+    workspaceId: workspaceId,
+    timeEntries: timeEntries,
   });
+});
 
-export const updateTimeEntriesUseCase = ({
+export const updateTimeEntriesUseCase = Effect.fn("updateTimeEntriesUseCase")(function* ({
   workspaceId,
   timeEntries,
 }: {
   workspaceId: typeof WorkspaceId.Type;
   timeEntries: Array<typeof TimeEntryToUpdate.Type>;
-}) =>
-  Effect.gen(function* () {
-    const timeEntryService = yield* TimeEntryService;
+}) {
+  const timeEntryService = yield* TimeEntryService;
 
-    return yield* timeEntryService.updateTimeEntries({
-      workspaceId: workspaceId,
-      timeEntries: timeEntries,
-    });
+  return yield* timeEntryService.updateTimeEntries({
+    workspaceId: workspaceId,
+    timeEntries: timeEntries,
   });
+});
 
-export const listTimeEntriesUseCase = ({
+export const listTimeEntriesUseCase = Effect.fn("listTimeEntriesUseCase")(function* ({
   workspaceId,
 }: {
   workspaceId: typeof WorkspaceId.Type;
-}) =>
-  Effect.gen(function* () {
-    const timeEntryService = yield* TimeEntryService;
+}) {
+  const timeEntryService = yield* TimeEntryService;
 
-    return yield* timeEntryService.listTimeEntries({
-      workspaceId: workspaceId,
-    });
+  return yield* timeEntryService.listTimeEntries({
+    workspaceId: workspaceId,
   });
+});

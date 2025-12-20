@@ -51,14 +51,10 @@ export const AuthGroupLive = HttpApiBuilder.group(
               {
                 headers: auth.headersToObject(headers),
               }
-            );
+            )
           }).pipe(
             Effect.tapError((e) => Effect.logError(e)),
-            Effect.catchTags({
-              "@mason/server/betterAuthError": () =>
-                new HttpApiError.InternalServerError(),
-              HttpBodyError: () => new HttpApiError.InternalServerError(),
-            })
+            Effect.mapError(() => new HttpApiError.InternalServerError()),
           )
         )
         .handle("SendEmailVerificationOTP", ({ payload, request }) =>

@@ -1,32 +1,33 @@
-import { FetchHttpClient, HttpApiClient } from "@effect/platform";
+import { FetchHttpClient, HttpApiClient, HttpClient } from "@effect/platform";
 import { AtomHttpApi } from "@effect-atom/atom-react";
 import { MasonApi } from "@mason/api-contract";
 import { Effect, Layer, Match } from "effect";
 import { PLATFORM } from "./utils/constants";
 
-const MasonHttpClient = FetchHttpClient.layer.pipe(
-  Layer.provide(
-    Layer.effect(
-      FetchHttpClient.Fetch,
-      Effect.sync(() => {
-        const baseFetch =
-          PLATFORM.platform === "desktop" ? PLATFORM.fetch : fetch;
+const MasonHttpClient = Layer.provide(
+  FetchHttpClient.layer,
+  Layer.effect(
+    FetchHttpClient.Fetch,
+    Effect.sync(() => {
+      const baseFetch =
+        PLATFORM.platform === "desktop" ? PLATFORM.fetch : fetch;
 
-        return (input: RequestInfo | URL, init?: RequestInit) => {
-          const token = localStorage.getItem("mason-bearer-token");
-          const headers = new Headers(init?.headers);
+        if (PLATFORM.platform === "desktop") {
+          return (input: RequestInfo | URL, init?: RequestInit) => {
+            const token = localStorage.getItem("mason-bearer-token");
+            const headers = new Headers(init?.headers);
+            if (token) {
+              headers.set("Authorization", `Bearer ${token}`);
+            }
+            return baseFetch(input, {
+              ...init,
+              headers,
+            });
+          };
+        }
 
-          if (token) {
-            headers.set("Authorization", `Bearer ${token}`);
-          }
-
-          return baseFetch(input, {
-            ...init,
-            headers,
-          });
-        };
-      })
-    )
+        return fetch;
+    })
   )
 );
 
@@ -42,6 +43,20 @@ export class MasonAtomClient extends AtomHttpApi.Tag<MasonAtomClient>()(
 export const MasonClient = Effect.runSync(
   HttpApiClient.make(MasonApi, {
     baseUrl: "http://localhost:8002",
+    transformClient(client) {
+      return client.pipe(
+        HttpClient.transformResponse(
+          Effect.tap((response) => {
+            if (PLATFORM.platform === "desktop") {
+              const authToken = response.headers["set-auth-token"];
+              if (authToken) {
+                localStorage.setItem("mason-bearer-token", authToken);
+              }
+            }
+          })
+        )
+      );
+    },
   }).pipe(
     Effect.provide(MasonHttpClient),
     Effect.map((client) => ({

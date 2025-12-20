@@ -3,7 +3,7 @@ import { MasonApi } from "@mason/api-contract";
 import { TaskResponse } from "@mason/api-contract/dto/task.dto";
 import { listTasksUseCase } from "@mason/use-cases/tasks.use-cases";
 import { Effect } from "effect";
-import { RequestContext } from "~/middleware/auth.middleware";
+import { SessionContext } from "@mason/api-contract/middleware/session";
 
 export const TaskGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -12,7 +12,7 @@ export const TaskGroupLive = HttpApiBuilder.group(
     Effect.gen(function* () {
       return handlers.handle("List", () =>
         Effect.gen(function* () {
-          const ctx = yield* RequestContext;
+          const ctx = yield* SessionContext;
 
           const tasks = yield* listTasksUseCase({
             workspaceId: ctx.workspaceId,

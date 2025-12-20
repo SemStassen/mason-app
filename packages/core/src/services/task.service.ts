@@ -153,20 +153,17 @@ export class TasksService extends Effect.Service<TasksService>()(
                 : undefined,
             ].filter(Boolean);
 
-            const tasks = yield* db.use(workspaceId, (conn) =>
+            const dbTasks = yield* db.use(workspaceId, (conn) =>
               conn.query.tasksTable.findMany({
                 where: and(...whereConditions),
               })
             );
 
-            return tasks.map((t) =>
-              Schema.decodeUnknownSync(Task)({
-                ...t,
-                id: TaskId.make(t.id),
-                projectId: ProjectId.make(t.projectId),
-                workspaceId: workspaceId,
-              })
+            const tasks = yield* Effect.all(
+              dbTasks.map((t) => Task.makeFromDb(t))
             );
+
+            return tasks;
           }),
       };
     }),

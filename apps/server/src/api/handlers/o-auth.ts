@@ -37,36 +37,30 @@ export const OAuthGroupLive = HttpApiBuilder.group(
         )
         .handle("GoogleCallback", ({ request }) =>
           Effect.gen(function* () {
-            // This is a silly thing we have to do because the better auth handler only matches/
-            // /api/auth/callback/${provider_id}
-            const betterAuthUrl = request.url.replace(
-              "/api/oauth/google/callback",
-              "http://localhost:8002/api/auth/callback/google"
-            );
+
+            const url = new URL(request.url, "http://placeholder-base-url.com");
 
             const response = yield* auth.use((client) =>
-              client.handler(
-                new Request(betterAuthUrl, {
-                  method: "GET",
-                  headers: new Headers(request.headers),
-                })
-              )
+              client.api.callbackOAuth({
+                method: "GET",
+                params: {
+                  id: "google"
+                },
+                headers: new Headers(request.headers),
+                query: {
+                  code: url.searchParams.get("code") ?? undefined ,
+                  state: url.searchParams.get("state") ?? undefined ,
+                  device_id: url.searchParams.get("device_id") ?? undefined ,
+                  user: url.searchParams.get("authuser") ?? undefined ,
+                },
+                returnHeaders: true,
+              })
             );
-
-            const location = response.headers.get("Location");
-            const setCookie =
-              response.headers.get("set-cookie") ||
-              response.headers.get("Set-Cookie");
-
-            if (!location) {
-              return yield* Effect.fail(new HttpApiError.InternalServerError());
-            }
 
             return yield* HttpServerResponse.empty({
               status: 302,
               headers: {
-                Location: location,
-                ...(setCookie ? { "set-cookie": setCookie } : {}),
+                ...auth.headersToObject(response.headers),
               },
             });
           }).pipe(

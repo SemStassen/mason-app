@@ -47,7 +47,11 @@ export default defineConfig({
       ],
     }),
     tailwindcss(),
-    viteReact(),
+    viteReact({
+      babel: {
+        plugins: ["babel-plugin-react-compiler"],
+      },
+    }),
   ],
   build: {
     // Tauri uses Chromium on Windows and WebKit on macOS and Linux

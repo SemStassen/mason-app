@@ -52,7 +52,11 @@ export default defineConfig({
       routeFileIgnorePrefix: "-",
     }),
     tailwindcss(),
-    viteReact(),
+    viteReact({
+      babel: {
+        plugins: ["babel-plugin-react-compiler"],
+      },
+    }),
   ],
   build: {
     outDir: "../dist",

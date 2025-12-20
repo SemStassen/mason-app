@@ -2,6 +2,7 @@ import type { DbProject } from "@mason/db/schema";
 import { Effect, Schema } from "effect";
 import { generateUUID } from "../utils/uuid";
 import { ProjectId, WorkspaceId } from "./ids";
+import { JsonRecord } from "./data-types";
 
 export class Project extends Schema.Class<Project>("@mason/core/project")({
   id: ProjectId,
@@ -19,7 +20,7 @@ export class Project extends Schema.Class<Project>("@mason/core/project")({
     Schema.Union(Schema.DateFromSelf, Schema.DateFromString)
   ),
   notes: Schema.NullOr(
-    Schema.Record({ key: Schema.String, value: Schema.Unknown })
+    JsonRecord
   ),
   _metadata: Schema.NullOr(
     Schema.Struct({

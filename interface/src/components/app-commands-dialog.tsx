@@ -92,7 +92,7 @@ function useRegisterCommands(cb: () => Array<ICommandItem>) {
   }
 }
 
-const CATEGORY_ORDER: CommandCategory[] = [
+const CATEGORY_ORDER: Array<CommandCategory> = [
   "navigation",
   "settings",
   "developer",

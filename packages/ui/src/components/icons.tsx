@@ -12,8 +12,10 @@ import {
   CaretRightIcon,
   CaretUpDownIcon,
   CaretUpIcon,
+  CheckCircleIcon,
   CheckIcon,
   CircleIcon,
+  CircleNotchIcon,
   ClockIcon,
   DotsThreeIcon,
   DotsThreeVerticalIcon,
@@ -28,6 +30,7 @@ import {
   GoogleLogoIcon,
   HouseIcon,
   type IconProps,
+  InfoIcon,
   LinkSimpleIcon,
   MagnifyingGlassIcon,
   MinusIcon,
@@ -52,8 +55,11 @@ import {
   UserIcon,
   UsersFourIcon,
   WallIcon,
+  WarningCircleIcon,
+  WarningIcon,
   XIcon,
 } from "@phosphor-icons/react";
+import { cn } from "../utils";
 
 export type { IconProps } from "@phosphor-icons/react";
 
@@ -68,6 +74,7 @@ const Icons = {
   Bug: BugIcon,
   Calendar: CalendarDotsIcon,
   Check: CheckIcon,
+  CheckCircle: CheckCircleIcon,
   ChevronDown: CaretDownIcon,
   ChevronLeft: CaretLeftIcon,
   ChevronRight: CaretRightIcon,
@@ -90,6 +97,7 @@ const Icons = {
   HeadingTwo: TextHTwoIcon,
   HeadingThree: TextHThreeIcon,
   Home: HouseIcon,
+  InfoCircle: InfoIcon,
   Italic: TextItalicIcon,
   Link: LinkSimpleIcon,
   LookingGlass: MagnifyingGlassIcon,
@@ -105,12 +113,22 @@ const Icons = {
   SignIn: SignInIcon,
   SignOut: SignOutIcon,
   Slider: FadersIcon,
+  Spinner: ({ className, ...props }: IconProps) => (
+    <CircleNotchIcon
+      aria-label="Loading"
+      className={cn("animate-spin", className)}
+      role="status"
+      {...props}
+    />
+  ),
   SortAscending: SortAscendingIcon,
   SortDescending: SortDescendingIcon,
   StrikeThrough: TextStrikethroughIcon,
   Sun: SunIcon,
   Target: TargetIcon,
   User: UserIcon,
+  Warning: WarningIcon,
+  WarningCircle: WarningCircleIcon,
   X: XIcon,
   Company: {
     Early: ({ size, ...props }: IconProps) => (

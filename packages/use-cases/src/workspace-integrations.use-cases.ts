@@ -16,16 +16,16 @@ import { WorkspaceIntegrationsService } from "@mason/core/services/workspace-int
 import { TimeTrackingIntegrationAdapter } from "@mason/integrations";
 import { Effect } from "effect";
 
-export const createWorkspaceIntegrationUseCase = ({
+export const createWorkspaceIntegrationUseCase = Effect.fn("createWorkspaceIntegrationUseCase")(function* ({
   workspaceId,
   createdByMemberId,
   request,
-}: {
-  workspaceId: typeof WorkspaceId.Type;
-  createdByMemberId: typeof MemberId.Type;
-  request: typeof CreateWorkspaceIntegrationRequest.Type;
-}) =>
-  Effect.gen(function* () {
+  }: {
+    workspaceId: typeof WorkspaceId.Type;
+    createdByMemberId: typeof MemberId.Type;
+    request: typeof CreateWorkspaceIntegrationRequest.Type;
+  }) {
+    return yield* Effect.gen(function* () {
     const workspaceIntegrationsService = yield* WorkspaceIntegrationsService;
     const integrationService = yield* TimeTrackingIntegrationAdapter;
 
@@ -36,39 +36,36 @@ export const createWorkspaceIntegrationUseCase = ({
     return yield* workspaceIntegrationsService.createWorkspaceIntegration({
       workspaceId: workspaceId,
       createdByMemberId: createdByMemberId,
-      workspaceIntegration: WorkspaceIntegrationToCreate.make(request),
-    });
-  }).pipe(
-    Effect.provide(TimeTrackingIntegrationAdapter.getLayer(request.kind))
-  );
+        workspaceIntegration: WorkspaceIntegrationToCreate.make(request),
+      });
+    }).pipe(Effect.provide(TimeTrackingIntegrationAdapter.getLayer(request.kind)));
+  });
 
-export const updateWorkspaceIntegrationUseCase = ({
+export const updateWorkspaceIntegrationUseCase = Effect.fn("updateWorkspaceIntegrationUseCase")(function* ({
   workspaceId,
   request,
 }: {
-  workspaceId: typeof WorkspaceId.Type;
-  request: typeof UpdateWorkspaceIntegrationRequest.Type;
-}) =>
-  Effect.gen(function* () {
-    const workspaceIntegrationsService = yield* WorkspaceIntegrationsService;
+    workspaceId: typeof WorkspaceId.Type;
+    request: typeof UpdateWorkspaceIntegrationRequest.Type;
+  }) {
+  const workspaceIntegrationsService = yield* WorkspaceIntegrationsService;
 
-    return yield* workspaceIntegrationsService.updateWorkspaceIntegration({
-      workspaceId: workspaceId,
-      workspaceIntegration: WorkspaceIntegrationToUpdate.make({
-        ...request,
-        id: WorkspaceIntegrationId.make(request.id),
-      }),
-    });
+  return yield* workspaceIntegrationsService.updateWorkspaceIntegration({
+    workspaceId: workspaceId,
+    workspaceIntegration: WorkspaceIntegrationToUpdate.make({
+      ...request,
+      id: WorkspaceIntegrationId.make(request.id),
+    }),
   });
+});
 
-export const deleteWorkspaceIntegrationUseCase = ({
+export const deleteWorkspaceIntegrationUseCase = Effect.fn("deleteWorkspaceIntegrationUseCase")(function* ({
   workspaceId,
   request,
 }: {
   workspaceId: typeof WorkspaceId.Type;
   request: typeof DeleteWorkspaceIntegrationRequest.Type;
-}) =>
-  Effect.gen(function* () {
+  }) {
     const workspaceIntegrationsService = yield* WorkspaceIntegrationsService;
 
     return yield* workspaceIntegrationsService.hardDeleteWorkspaceIntegration({
@@ -77,12 +74,11 @@ export const deleteWorkspaceIntegrationUseCase = ({
     });
   });
 
-export const listWorkspaceIntegrationsUseCase = ({
+export const listWorkspaceIntegrationsUseCase = Effect.fn("listWorkspaceIntegrationsUseCase")(function* ({
   workspaceId,
 }: {
   workspaceId: typeof WorkspaceId.Type;
-}) =>
-  Effect.gen(function* () {
+  }) {
     const workspaceIntegrationsService = yield* WorkspaceIntegrationsService;
 
     return yield* workspaceIntegrationsService.listWorkspaceIntegrations({

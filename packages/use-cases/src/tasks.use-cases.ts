@@ -2,17 +2,16 @@ import type { WorkspaceId } from "@mason/core/models/ids";
 import { TasksService } from "@mason/core/services/task.service";
 import { Effect } from "effect";
 
-export const listTasksUseCase = ({
+export const listTasksUseCase = Effect.fn("listTasksUseCase")(function* ({
   workspaceId,
 }: {
   workspaceId: typeof WorkspaceId.Type;
-}) =>
-  Effect.gen(function* () {
-    const tasksService = yield* TasksService;
+}) {
+  const tasksService = yield* TasksService;
 
-    const tasks = yield* tasksService.listTasks({
-      workspaceId: workspaceId,
-    });
-
-    return tasks;
+  const tasks = yield* tasksService.listTasks({
+    workspaceId: workspaceId,
   });
+
+  return tasks;
+});

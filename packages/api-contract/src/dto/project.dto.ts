@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+import { JsonRecord } from "./data-types";
 
 const Project = Schema.Struct({
   id: Schema.NonEmptyString,
@@ -12,7 +13,7 @@ const Project = Schema.Struct({
   }),
   isBillable: Schema.Boolean,
   // Optional
-  notes: Schema.Record({ key: Schema.String, value: Schema.Unknown }),
+  notes: JsonRecord,
   _metadata: Schema.Struct({
     source: Schema.optionalWith(Schema.Literal("float"), {
       exact: true,

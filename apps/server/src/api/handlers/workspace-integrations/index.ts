@@ -1,6 +1,7 @@
 import { HttpApiBuilder, HttpApiError } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
 import { WorkspaceIntegrationResponse } from "@mason/api-contract/dto/workspace-integration.dto";
+import { SessionContext } from "@mason/api-contract/middleware/session";
 import {
   createWorkspaceIntegrationUseCase,
   deleteWorkspaceIntegrationUseCase,
@@ -8,7 +9,6 @@ import {
   updateWorkspaceIntegrationUseCase,
 } from "@mason/use-cases/workspace-integrations.use-cases";
 import { Effect } from "effect";
-import { RequestContext } from "~/middleware/auth.middleware";
 
 export const WorkspaceIntegrationsGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -18,7 +18,7 @@ export const WorkspaceIntegrationsGroupLive = HttpApiBuilder.group(
       return handlers
         .handle("Create", ({ payload }) =>
           Effect.gen(function* () {
-            const ctx = yield* RequestContext;
+            const ctx = yield* SessionContext;
 
             const createdWorkspaceIntegration =
               yield* createWorkspaceIntegrationUseCase({
@@ -41,7 +41,7 @@ export const WorkspaceIntegrationsGroupLive = HttpApiBuilder.group(
         )
         .handle("Update", ({ payload, path }) =>
           Effect.gen(function* () {
-            const ctx = yield* RequestContext;
+            const ctx = yield* SessionContext;
 
             const updatedWorkspaceIntegration =
               yield* updateWorkspaceIntegrationUseCase({
@@ -62,7 +62,7 @@ export const WorkspaceIntegrationsGroupLive = HttpApiBuilder.group(
         )
         .handle("Delete", ({ path }) =>
           Effect.gen(function* () {
-            const ctx = yield* RequestContext;
+            const ctx = yield* SessionContext;
 
             yield* deleteWorkspaceIntegrationUseCase({
               workspaceId: ctx.workspaceId,
@@ -77,7 +77,7 @@ export const WorkspaceIntegrationsGroupLive = HttpApiBuilder.group(
         )
         .handle("List", () =>
           Effect.gen(function* () {
-            const ctx = yield* RequestContext;
+            const ctx = yield* SessionContext;
 
             const workspaceIntegrations =
               yield* listWorkspaceIntegrationsUseCase({

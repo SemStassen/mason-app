@@ -76,12 +76,15 @@ export const updateDomainEntities: <
           ? Either.left(toDomain(updateData, existing))
           : Either.right(existing);
       }).pipe(
-        Effect.tap(([_, missing]) =>
-          Effect.logError({
-            msg: `updateDomainEntities: ${entityName} not found`,
-            missingIds: missing.map((m) => m.id),
-          })
-        ),
+        Effect.tap(([_, missing]) => {
+          if (missing.length > 0) {
+            return Effect.logError({
+              msg: `updateDomainEntities: ${entityName} not found`,
+              missingIds: missing.map((m) => m.id),
+            });
+          }
+          return Effect.void;
+        }),
         Effect.flatMap(([existing]) => Effect.all(existing))
       );
 

@@ -1,21 +1,17 @@
-import { HttpServerRequest } from "@effect/platform";
-import {
-  AuthMiddleware,
-  RequestContextData,
-} from "@mason/api-contract/middleware/auth";
-import { MemberId, UserId, WorkspaceId } from "@mason/core/models/ids";
+import { HttpApiError, HttpServerRequest } from "@effect/platform";
+import { AuthMiddleware, AuthData } from "@mason/api-contract/middleware/auth";
+import { UserId } from "@mason/core/models/ids";
 import { AuthService } from "@mason/core/services/auth.service";
 import { Effect, Layer } from "effect";
 
-// biome-ignore lint/performance/noBarrelFile: This is for cleanliness
-export { RequestContext } from "@mason/api-contract/middleware/auth";
-
+// Technically this does not need to be bearer based anymore. Since better auth just checks the headers anyways.
+// Which might be browser cookies or Authorization header.
 export const AuthMiddlewareLive = Layer.effect(
   AuthMiddleware,
   Effect.gen(function* () {
     const authService = yield* AuthService;
     return {
-      bearer: (bearerToken) =>
+      bearer: () =>
         Effect.gen(function* () {
           const request = yield* HttpServerRequest.HttpServerRequest;
 
@@ -27,14 +23,15 @@ export const AuthMiddlewareLive = Layer.effect(
             )
             .pipe(Effect.catchAll(() => Effect.succeed(null)));
 
-          yield* Effect.log("Hitting auth middleware (not implemented)");
+          if (!session) {
+            return yield* Effect.fail(new HttpApiError.Unauthorized());
+          }
 
-          return new RequestContextData({
-            userId: UserId.make("0199196e-9662-7fcd-8a57-5080915b3851"),
-            memberId: MemberId.make("01992928-9155-78f4-8141-942a0fbcd851"),
-            workspaceId: WorkspaceId.make(
-              "01992928-9148-7951-b4b4-f69448ce5912"
-            ),
+          // Store session for downstream middlewares
+          // yield* FiberRef.set(CurrentSession, session);
+
+          return new AuthData({
+            userId: UserId.make(session.session.userId),
           });
         }),
     };

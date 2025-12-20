@@ -152,21 +152,17 @@ export class TimeEntryService extends Effect.Service<TimeEntryService>()(
                 : undefined,
             ].filter(Boolean);
 
-            const timeEntries = yield* db.use(workspaceId, (conn) =>
+            const dbTimeEntries = yield* db.use(workspaceId, (conn) =>
               conn.query.timeEntriesTable.findMany({
                 where: and(...whereConditions),
               })
             );
-
-            return timeEntries.map((t) =>
-              Schema.decodeUnknownSync(Task)({
-                ...t,
-                id: TimeEntryId.make(t.id),
-                memberId: MemberId.make(t.memberId),
-                taskId: TaskId.make(t.taskId),
-                workspaceId: workspaceId,
-              })
+            
+            const timeEntries = yield* Effect.all(
+              dbTimeEntries.map((t) => TimeEntry.makeFromDb(t))
             );
+
+            return timeEntries;
           }),
       };
     }),

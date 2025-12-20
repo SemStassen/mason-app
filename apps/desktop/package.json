@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "tauri dev",
+    "dev:vite": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri"
@@ -27,6 +28,7 @@
     "@types/react": "catalog:dev",
     "@types/react-dom": "catalog:dev",
     "@vitejs/plugin-react": "catalog:dev",
+    "babel-plugin-react-compiler": "catalog:dev",
     "typescript": "catalog:dev",
     "vite": "catalog:dev",
     "vite-tsconfig-paths": "catalog:dev"

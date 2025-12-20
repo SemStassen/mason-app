@@ -3,6 +3,7 @@ import { isAfter } from "date-fns";
 import { Effect, Schema } from "effect";
 import { generateUUID } from "../utils/uuid";
 import { MemberId, ProjectId, TaskId, TimeEntryId, WorkspaceId } from "./ids";
+import { JsonRecord } from "./data-types";
 
 export class TimeEntryDateOrderError extends Schema.TaggedError<TimeEntryDateOrderError>()(
   "@mason/core/timeEntryDateOrderError",
@@ -30,6 +31,7 @@ export class TimeEntry extends Schema.Class<TimeEntry>("@mason/core/timeEntry")(
     // General
     startedAt: Schema.DateFromSelf,
     stoppedAt: Schema.DateFromSelf,
+    notes: Schema.NullOr(JsonRecord),
   }
 ) {
   private static validate(timeEntry: TimeEntry) {
@@ -60,6 +62,7 @@ export class TimeEntry extends Schema.Class<TimeEntry>("@mason/core/timeEntry")(
       const timeEntry = new TimeEntry({
         startedAt: dbRecord.startedAt,
         stoppedAt: dbRecord.stoppedAt,
+        notes: dbRecord.notes,
         id: TimeEntryId.make(dbRecord.id),
         memberId: MemberId.make(dbRecord.memberId),
         projectId: ProjectId.make(dbRecord.projectId),
@@ -111,6 +114,7 @@ export const TimeEntryToCreate = Schema.TaggedStruct("TimeEntryToCreate", {
   // General
   startedAt: TimeEntry.fields.startedAt,
   stoppedAt: TimeEntry.fields.stoppedAt,
+  notes: TimeEntry.fields.notes,
 });
 
 export const TimeEntryToUpdate = Schema.TaggedStruct("TimeEntryToUpdate", {
@@ -121,4 +125,5 @@ export const TimeEntryToUpdate = Schema.TaggedStruct("TimeEntryToUpdate", {
   // General
   startedAt: Schema.optionalWith(TimeEntry.fields.startedAt, { exact: true }),
   stoppedAt: Schema.optionalWith(TimeEntry.fields.stoppedAt, { exact: true }),
+  notes: Schema.optionalWith(JsonRecord, { exact: true }),
 });

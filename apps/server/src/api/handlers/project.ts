@@ -1,9 +1,9 @@
 import { HttpApiBuilder, HttpApiError } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
 import { ProjectResponse } from "@mason/api-contract/dto/project.dto";
+import { SessionContext } from "@mason/api-contract/middleware/session";
 import { listProjectsUseCase } from "@mason/use-cases/projects.use-cases";
 import { Effect } from "effect";
-import { RequestContext } from "~/middleware/auth.middleware";
 
 export const ProjectGroupLive = HttpApiBuilder.group(
   MasonApi,
@@ -12,7 +12,7 @@ export const ProjectGroupLive = HttpApiBuilder.group(
     Effect.gen(function* () {
       return handlers.handle("List", () =>
         Effect.gen(function* () {
-          const ctx = yield* RequestContext;
+          const ctx = yield* SessionContext;
 
           const projects = yield* listProjectsUseCase({
             workspaceId: ctx.workspaceId,

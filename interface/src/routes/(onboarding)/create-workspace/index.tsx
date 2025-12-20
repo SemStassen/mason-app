@@ -1,3 +1,10 @@
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@mason/ui/input-group";
+import { defaultValidationLogic } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Effect } from "effect";
 import z from "zod";
@@ -24,8 +31,9 @@ function RouteComponent() {
   const form = useAppForm({
     defaultValues: defaultValues,
     validators: {
-      onChange: createWorkspaceSchema,
+      onDynamic: createWorkspaceSchema,
     },
+    validationLogic: defaultValidationLogic,
     onSubmit: async ({ value }) => {
       const result = createWorkspaceSchema.parse(value);
 
@@ -61,32 +69,50 @@ function RouteComponent() {
                 autoFocus: true,
               }}
               label={{
-                children: "Workspace URL",
+                children: "Workspace name",
               }}
             />
           )}
           listeners={{
             onChange: ({ value, fieldApi }) => {
               if (!fieldApi.form.getFieldMeta("slug")?.isDirty) {
-                fieldApi.form.setFieldValue("slug", slugify(value));
+                fieldApi.form.setFieldValue("slug", slugify(value), {
+                  dontUpdateMeta: true
+                });
               }
             },
           }}
-          name="slug"
+          name="name"
         />
         <form.AppField
           children={(field) => (
-            <field.TextField
-              input={{
-                autoComplete: "off",
-                prefix: "mason.app/",
-                affixGapPx: 0,
+            <field.AppField
+              control={{
+                render: (props) => (
+                  <InputGroup>
+                    <InputGroupInput className="[&>[data-slot=input]]:pl-0!" autoComplete="off" {...props}  />
+                    <InputGroupAddon>
+                      <InputGroupText>mason.app/</InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
+                ),
               }}
               label={{
                 children: "Workspace URL",
               }}
             />
           )}
+          listeners={{
+            onChange: ({ value, fieldApi }) => {
+              if (!value) {
+                fieldApi.setMeta((meta) => ({
+                  ...meta,
+                  isDirty: false
+                }))
+                
+              }
+            },
+          }}
           name="slug"
         />
         <form.AppForm>

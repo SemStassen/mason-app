@@ -6,14 +6,12 @@ const WorkspaceIntegration = Schema.Struct({
   workspaceId: Schema.NonEmptyString,
   // General
   kind: Schema.Literal("float"),
-  // Nullable
-  _metadata: Schema.NullOr(
-    Schema.Struct({
-      lastSyncedAt: Schema.optionalWith(Schema.Date, {
-        exact: true,
-      }),
-    })
-  ),
+  // Optional
+  _metadata: Schema.Struct({
+    lastSyncedAt: Schema.optionalWith(Schema.Date, {
+      exact: true,
+    }),
+  }),
   // Metadata
   createdAt: Schema.Date,
 });
@@ -34,5 +32,9 @@ export const DeleteWorkspaceIntegrationRequest = Schema.Struct({
 
 export const WorkspaceIntegrationResponse = Schema.TaggedStruct(
   "WorkspaceIntegrationResponse",
-  WorkspaceIntegration.fields
+  {
+    ...WorkspaceIntegration.fields,
+    // Optional
+    _metadata: Schema.NullOr(WorkspaceIntegration.fields._metadata),
+  }
 );

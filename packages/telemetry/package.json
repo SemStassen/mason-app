@@ -1,0 +1,27 @@
+{
+  "name": "@mason/telemetry",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf node_modules",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
+  },
+  "dependencies": {
+    "@effect/opentelemetry": "^0.59.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.208.0",
+    "@opentelemetry/sdk-metrics": "^2.2.0",
+    "@opentelemetry/sdk-trace-base": "^2.2.0",
+    "@opentelemetry/sdk-trace-node": "^2.2.0",
+    "@opentelemetry/sdk-trace-web": "^2.2.0",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "typescript": "catalog:dev"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

@@ -1,5 +1,6 @@
 import { useAtomRef } from "@effect-atom/atom-react";
 import { Button } from "@mason/ui/button";
+import { Icons } from "@mason/ui/icons";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -9,8 +10,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@mason/ui/dropdown-menu";
-import { Icons } from "@mason/ui/icons";
+} from "@mason/ui/menu";
 import {
   calendarDaysInViewAtom,
   setCalendarDaysInView,

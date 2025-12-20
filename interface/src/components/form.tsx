@@ -1,5 +1,13 @@
 import { Button, type ButtonProps } from "@mason/ui/button";
 import {
+  Combobox,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+} from "@mason/ui/combobox";
+import {
   Field,
   FieldControl,
   type FieldControlProps,
@@ -7,11 +15,11 @@ import {
   type FieldDescriptionProps,
   FieldError,
   FieldLabel,
+  type FieldLabelProps,
   type FieldProps,
-  type fieldVariants,
 } from "@mason/ui/field";
 import { Input, type InputProps } from "@mason/ui/input";
-import type { LabelProps } from "@mason/ui/label";
+import { InputTime, type InputTimeProps } from "@mason/ui/input-time";
 import {
   Select,
   SelectContent,
@@ -19,13 +27,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@mason/ui/select";
-import { TimePicker, type TimePickerProps } from "@mason/ui/time-picker";
+import { Textarea, type TextareaProps } from "@mason/ui/textarea";
+import type { TimePickerProps } from "@mason/ui/time-picker";
 import {
   createFormHook,
   createFormHookContexts,
   useStore,
 } from "@tanstack/react-form";
-import type { VariantProps } from "class-variance-authority";
 import { formatter } from "~/utils/date-time";
 
 const { fieldContext, formContext, useFieldContext, useFormContext } =
@@ -33,10 +41,12 @@ const { fieldContext, formContext, useFieldContext, useFormContext } =
 
 const { useAppForm } = createFormHook({
   fieldComponents: {
-    Field: AppField,
-    SelectField: SelectField,
+    AppField: AppField,
     TextField: TextField,
+    TextareaField: TextareaField,
     TimeField: TimeField,
+    SelectField: SelectField,
+    ComboBoxField: ComboBoxField,
   },
   formComponents: {
     SubmitButton: SubmitButton,
@@ -46,23 +56,29 @@ const { useAppForm } = createFormHook({
 });
 
 function AppField({
-  orientation,
   label,
+  field,
   description,
-  render,
+  control,
 }: {
-  orientation?: VariantProps<typeof fieldVariants>["orientation"];
-  label: Omit<LabelProps, "htmlFor">;
+  label: FieldLabelProps;
+  field?: FieldProps;
   description?: FieldDescriptionProps;
-  render?: FieldControlProps["render"];
+  control?: FieldControlProps;
 }) {
-  const field = useFieldContext<string>();
-  const errors = useStore(field.store, (state) => state.meta.errors);
+  const fieldCtx = useFieldContext<string>();
+  const errors = useStore(fieldCtx.store, (state) => state.meta.errors);
 
   return (
-    <Field orientation={orientation}>
+    <Field {...field}>
       <FieldLabel {...label} />
-      <FieldControl render={render} />
+      <FieldControl
+        defaultValue={fieldCtx.options.defaultValue}
+        onBlur={fieldCtx.handleBlur}
+        onChange={(e) => fieldCtx.handleChange(e.target.value)}
+        value={fieldCtx.state.value}
+        {...control}
+      />
       <FieldDescription {...description} />
       <FieldError errors={errors} />
     </Field>
@@ -71,32 +87,56 @@ function AppField({
 
 function TextField({
   label,
-  input,
+  field,
   description,
-  orientation,
+  input,
 }: {
-  label: Omit<LabelProps, "htmlFor">;
-  input?: InputProps;
+  label: FieldLabelProps;
+  field?: FieldProps;
   description?: FieldDescriptionProps;
-  orientation?: VariantProps<typeof fieldVariants>["orientation"];
+  input?: InputProps;
 }) {
-  const field = useFieldContext<string>();
-  const errors = useStore(field.store, (state) => state.meta.errors);
+  const fieldCtx = useFieldContext<string>();
+  const errors = useStore(fieldCtx.store, (state) => state.meta.errors);
 
   return (
-    <Field orientation={orientation}>
+    <Field {...field}>
       <FieldLabel {...label} />
-      <FieldControl
-        render={(props) => (
-          <Input
-            onBlur={field.handleBlur}
-            onChange={(e) => field.handleChange(e.target.value)}
-            type="text"
-            value={field.state.value}
-            {...props}
-            {...input}
-          />
-        )}
+      <Input
+        onBlur={fieldCtx.handleBlur}
+        type="text"
+        value={fieldCtx.state.value}
+        onValueChange={(value) => fieldCtx.handleChange(value)}
+        {...input}
+      />
+      <FieldDescription {...description} />
+      <FieldError errors={errors} />
+    </Field>
+  );
+}
+
+function TextareaField({
+  label,
+  field,
+  description,
+  textarea,
+}: {
+  label: FieldLabelProps;
+  field?: FieldProps;
+  description?: FieldDescriptionProps;
+  textarea?: TextareaProps;
+}) {
+  const fieldCtx = useFieldContext<string>();
+  const errors = useStore(fieldCtx.store, (state) => state.meta.errors);
+
+  return (
+    <Field {...field}>
+      <FieldLabel {...label} />
+      <Textarea
+        onChange={(e) => fieldCtx.handleChange(e.target.value)}
+        value={fieldCtx.state.value}
+        onBlur={fieldCtx.handleBlur}
+        {...textarea}
       />
       <FieldDescription {...description} />
       <FieldError errors={errors} />
@@ -105,93 +145,118 @@ function TextField({
 }
 
 function TimeField({
-  step,
   label,
-  input,
+  field,
   description,
-  orientation,
+  input,
+  step,
 }: {
-  step?: TimePickerProps["step"];
-  label: Omit<LabelProps, "htmlFor">;
-  input?: Omit<InputProps, "id">;
+  label: FieldLabelProps;
+  field?: FieldProps;
   description?: FieldDescriptionProps;
-  orientation?: VariantProps<typeof fieldVariants>["orientation"];
+  input?: InputTimeProps;
+  step?: TimePickerProps["step"];
 }) {
-  const field = useFieldContext<string>();
-  const errors = useStore(field.store, (state) => state.meta.errors);
+  const fieldCtx = useFieldContext<string | null>();
+  const errors = useStore(fieldCtx.store, (state) => state.meta.errors);
 
   return (
-    <Field orientation={orientation}>
+    <Field {...field}>
       <FieldLabel {...label} />
-      <FieldControl
-        render={(props) => (
-          <TimePicker
-            format={formatter.time}
-            onBlur={field.handleBlur}
-            onValueChange={(value) => field.handleChange(value)}
-            // @ts-expect-error - TS is being silly here
-            step={step}
-            // @ts-expect-error - TS is being silly here
-            value={new Date(field.state.value)}
-            {...props}
-            {...input}
-          />
-        )}
+      <InputTime
+      format={formatter.time}
+      onBlur={fieldCtx.handleBlur}
+      onChange={(value: Date | null) => {
+        fieldCtx.handleChange(value ? value.toISOString() : null);
+      }}
+      step={step}
+      value={fieldCtx.state.value ? new Date(fieldCtx.state.value) : null}
+      {...input}
       />
-
       <FieldDescription {...description} />
       <FieldError errors={errors} />
     </Field>
   );
 }
 
-function SelectField<Item extends { id: string }>({
+function SelectField<
+  Item extends { label: React.ReactNode; value: string | null },
+>({
   label,
   items,
-  itemValue,
-  renderItem,
-  renderValue,
-  description,
   field,
+  description,
 }: {
-  label: Omit<LabelProps, "htmlFor">;
+  label: FieldLabelProps;
   items: Array<Item>;
-  itemValue: (item: Item) => string;
-  renderItem: (item: Item) => React.ReactNode;
-  renderValue?: (selectedItem?: Item) => React.ReactNode;
-  description?: FieldDescriptionProps;
   field?: FieldProps;
+  description?: FieldDescriptionProps;
 }) {
-  const fieldCtx = useFieldContext<string>();
+  const fieldCtx = useFieldContext<string | null>();
   const errors = useStore(fieldCtx.store, (state) => state.meta.errors);
-
-  const selectedItem = items.find((item) => item.id === fieldCtx.state.value);
 
   return (
     <Field {...field}>
       <FieldLabel {...label} />
-      <FieldControl
-        render={({ id, className, ...props }) => (
-          <Select
-            onBlur={fieldCtx.handleBlur}
-            onValueChange={(value) => fieldCtx.handleChange(value)}
-            value={fieldCtx.state.value}
-            {...props}
-          >
-            <SelectTrigger className={className} id={id}>
-              <SelectValue>{renderValue?.(selectedItem)}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {items.map((item) => (
-                <SelectItem key={item.id} value={itemValue(item)}>
-                  {renderItem(item)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      />
+      <Select
+        items={items}
+        onValueChange={(value) => fieldCtx.handleChange(value)}
+        value={fieldCtx.state.value}
+      >
+        <SelectTrigger onBlur={fieldCtx.handleBlur}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {items.map(({ label, value }) => (
+            <SelectItem key={value} value={value}>
+              {label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <FieldDescription {...description} />
+      <FieldError errors={errors} />
+    </Field>
+  );
+}
 
+function ComboBoxField<
+  Item extends { label: React.ReactNode; value: string | null },
+>({
+  label,
+  items,
+  field,
+  description,
+  placeholder = "Select an item...",
+  emptyMessage = "No results found.",
+}: {
+  label: FieldLabelProps;
+  items: Array<Item>;
+  field?: FieldProps;
+  description?: FieldDescriptionProps;
+  placeholder?: string;
+  emptyMessage?: string;
+}) {
+  const fieldCtx = useFieldContext<string | null>();
+  const errors = useStore(fieldCtx.store, (state) => state.meta.errors);
+
+  return (
+    <Field {...field}>
+      <FieldLabel {...label} />
+      {/* We need to map the value to the actual item object and onValueChange to the item value */}
+      <Combobox items={items} onValueChange={(item) => {fieldCtx.handleChange(item.value)}} value={items.find((item) => item.value === fieldCtx.state.value)} >
+        <ComboboxInput placeholder={placeholder} onBlur={fieldCtx.handleBlur}/>
+        <ComboboxPopup>
+          <ComboboxEmpty>{emptyMessage}</ComboboxEmpty>
+          <ComboboxList>
+            {(item: Item) => (
+              <ComboboxItem key={item.value} value={item}>
+                {item.label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxPopup>
+      </Combobox>
       <FieldDescription {...description} />
       <FieldError errors={errors} />
     </Field>

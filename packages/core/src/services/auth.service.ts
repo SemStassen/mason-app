@@ -6,7 +6,6 @@ import {
   bearer,
   customSession,
   emailOTP,
-  jwt,
   organization,
 } from "better-auth/plugins";
 import { Config, Effect, Schema } from "effect";
@@ -125,13 +124,6 @@ export class AuthService extends Effect.Service<AuthService>()(
           bearer({
             requireSignature: true,
           }),
-          jwt({
-            schema: {
-              jwks: {
-                modelName: "jwksTable",
-              },
-            },
-          }),
           emailOTP({
             async sendVerificationOTP({ email, otp, type }) {
               return await Effect.runPromise(
@@ -187,6 +179,7 @@ export class AuthService extends Effect.Service<AuthService>()(
                       with: { memberships: true },
                     })
                   );
+
 
                   if (!baseUser) {
                     return yield* Effect.fail(

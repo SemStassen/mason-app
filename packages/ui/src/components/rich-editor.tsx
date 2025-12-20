@@ -1,12 +1,5 @@
-import {
-  BubbleMenu,
-  EditorContent,
-  type UseEditorOptions,
-  useEditor,
-} from "@tiptap/react";
+import { EditorContent, type UseEditorOptions, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Icons } from "./icons";
-import { Toggle } from "./toggle";
 
 const extensions = [StarterKit];
 
@@ -26,7 +19,7 @@ const RichEditor = ({ ...props }: RichEditorProps) => {
 
   return (
     <div className="h-full w-full">
-      {editor && (
+      {/* {editor && (
         <BubbleMenu editor={editor}>
           <div className="rounded-lg bg-popover p-1.5">
             <Toggle
@@ -55,11 +48,10 @@ const RichEditor = ({ ...props }: RichEditorProps) => {
             </Toggle>
           </div>
         </BubbleMenu>
-      )}
+      )} */}
       <EditorContent className="h-full w-full" editor={editor} />
     </div>
   );
 };
 
 export { RichEditor };
-export { useEditor } from "@tiptap/react";

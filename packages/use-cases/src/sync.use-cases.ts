@@ -23,14 +23,15 @@ export class TaskProjectNotFoundError extends Schema.TaggedError<TaskProjectNotF
   }
 ) {}
 
-export const syncIntegrationProjectsUseCase = ({
+
+export const syncIntegrationProjectsUseCase = Effect.fn("syncIntegrationProjectsUseCase")(function* ({
   workspaceId,
   kind,
 }: {
   workspaceId: typeof WorkspaceId.Type;
   kind: "float";
-}) =>
-  Effect.gen(function* () {
+}) {
+  return yield* Effect.gen(function* () {
     const db = yield* DatabaseService;
     const projectsService = yield* ProjectsService;
     const integrationService = yield* TimeTrackingIntegrationAdapter;
@@ -120,16 +121,17 @@ export const syncIntegrationProjectsUseCase = ({
         }),
       ])
     );
-  }).pipe(Effect.provide(TimeTrackingIntegrationAdapter.getLayer(kind)));
+  }).pipe(Effect.provide(TimeTrackingIntegrationAdapter.getLayer(kind)))
+});
 
-export const syncIntegrationTasksUseCase = ({
+export const syncIntegrationTasksUseCase = Effect.fn("syncIntegrationTasksUseCase")(function* ({
   workspaceId,
   kind,
 }: {
   workspaceId: typeof WorkspaceId.Type;
   kind: "float";
-}) =>
-  Effect.gen(function* () {
+}) {
+  return yield* Effect.gen(function* () {
     const db = yield* DatabaseService;
     const tasksService = yield* TasksService;
     const projectsService = yield* ProjectsService;
@@ -253,16 +255,17 @@ export const syncIntegrationTasksUseCase = ({
         }),
       ])
     );
-  }).pipe(Effect.provide(TimeTrackingIntegrationAdapter.getLayer(kind)));
+  }).pipe(Effect.provide(TimeTrackingIntegrationAdapter.getLayer(kind)))
+});
 
-export const syncIntegrationUseCase = ({
+export const syncIntegrationUseCase = Effect.fn("syncIntegrationUseCase")(function* ({
   workspaceId,
   kind,
 }: {
   workspaceId: typeof WorkspaceId.Type;
   kind: "float";
-}) =>
-  Effect.gen(function* () {
+}) {
+  return yield* Effect.gen(function* () {
     const db = yield* DatabaseService;
     const workspaceIntegrationsService = yield* WorkspaceIntegrationsService;
 
@@ -302,3 +305,4 @@ export const syncIntegrationUseCase = ({
       })
     );
   });
+});

@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+import { JsonRecord } from "./data-types";
 
 const TimeEntry = Schema.Struct({
   id: Schema.NonEmptyString,
@@ -8,8 +9,9 @@ const TimeEntry = Schema.Struct({
   taskId: Schema.NonEmptyString,
   // General
   startedAt: Schema.DateFromSelf,
-  // Optional
   stoppedAt: Schema.DateFromSelf,
+  // Optional
+  notes: JsonRecord,
 });
 
 export const CreateTimeEntryRequest = Schema.Struct({
@@ -18,8 +20,9 @@ export const CreateTimeEntryRequest = Schema.Struct({
   taskId: TimeEntry.fields.taskId,
   // General
   startedAt: TimeEntry.fields.startedAt,
+  stoppedAt: TimeEntry.fields.stoppedAt,
   // Optional
-  stoppedAt: Schema.optionalWith(TimeEntry.fields.stoppedAt, { exact: true }),
+  notes: Schema.optionalWith(TimeEntry.fields.notes, { exact: true }),
 });
 
 export const UpdateTimeEntryRequest = Schema.Struct({
@@ -30,8 +33,11 @@ export const UpdateTimeEntryRequest = Schema.Struct({
   // General
   startedAt: Schema.optionalWith(TimeEntry.fields.startedAt, { exact: true }),
   stoppedAt: Schema.optionalWith(TimeEntry.fields.stoppedAt, { exact: true }),
+  // Optional
+  notes: Schema.optionalWith(Schema.NullOr(TimeEntry.fields.notes), { exact: true }),
 });
 
 export const TimeEntryResponse = Schema.Struct({
   ...TimeEntry.fields,
+  notes: Schema.NullOr(TimeEntry.fields.notes),
 });

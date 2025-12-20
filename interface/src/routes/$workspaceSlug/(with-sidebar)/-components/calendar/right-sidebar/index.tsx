@@ -7,7 +7,7 @@ import {
 import { useConditionalMemo } from "~/hooks/use-conditional-memo";
 import { CreateTimeEntryForm } from "./create-time-entry-form";
 
-const SIDEBAR_WIDTH = 300;
+const SIDEBAR_WIDTH = 400;
 
 function RightSidebar() {
   // To prevent re-renders only isDragSelectionActive is reactive

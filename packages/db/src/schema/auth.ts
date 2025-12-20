@@ -62,14 +62,6 @@ export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
 
 export type DbSession = typeof sessionsTable.$inferSelect;
 
-export const jwksTable = pgTable("jwks", {
-  id: tableId,
-  publicKey: varchar("public_key").notNull(),
-  privateKey: varchar("private_key").notNull(),
-  // Metadata
-  createdAt: tableMetadata.createdAt,
-});
-
 export const accountsTable = pgTable("accounts", {
   id: tableId,
   // References

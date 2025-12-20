@@ -1,0 +1,48 @@
+diff --git a/dist/plugins/bearer/index.d.ts b/dist/plugins/bearer/index.d.ts
+index 6955e210901bdc24c0468cc4887ab2d44b2d5301..77b219a28de19366690aef6948b28488914473a2 100644
+--- a/dist/plugins/bearer/index.d.ts
++++ b/dist/plugins/bearer/index.d.ts
+@@ -23,7 +23,7 @@ declare const bearer: (options?: BearerOptions) => {
+                     returned?: unknown;
+                     responseHeaders?: Headers;
+                 };
+-                headers?: Headers;
++                headers: Headers | undefined;
+             }): boolean;
+             handler: (inputContext: better_call.MiddlewareInputContext<better_call.MiddlewareOptions>) => Promise<{
+                 context: {
+@@ -37,7 +37,7 @@ declare const bearer: (options?: BearerOptions) => {
+                     returned?: unknown;
+                     responseHeaders?: Headers;
+                 };
+-                headers?: Headers;
++                headers: Headers | undefined;
+             }): true;
+             handler: (inputContext: better_call.MiddlewareInputContext<better_call.MiddlewareOptions>) => Promise<void>;
+         }[];
+diff --git a/dist/plugins/custom-session/index.d.ts b/dist/plugins/custom-session/index.d.ts
+index db942a8b6a0866fa4849301d45f0b03c3db81364..88a23ab2fd006ffb173f1d2d8185455f73b97ee9 100644
+--- a/dist/plugins/custom-session/index.d.ts
++++ b/dist/plugins/custom-session/index.d.ts
+@@ -33,7 +33,7 @@ declare const customSession: <Returns extends Record<string, any>, O extends Bet
+                     returned?: unknown;
+                     responseHeaders?: Headers;
+                 };
+-                headers?: Headers;
++                headers: Headers | undefined;
+             }) => boolean;
+             handler: (inputContext: better_call.MiddlewareInputContext<better_call.MiddlewareOptions>) => Promise<Awaited<Returns>[] | undefined>;
+         }[];
+diff --git a/dist/plugins/email-otp/index.d.ts b/dist/plugins/email-otp/index.d.ts
+index ac81d31f26c01b446a24109b95a06db56ebf68f1..531994ece730914cf515094d6243cfd67de5fabb 100644
+--- a/dist/plugins/email-otp/index.d.ts
++++ b/dist/plugins/email-otp/index.d.ts
+@@ -806,7 +806,7 @@ declare const emailOTP: (options: EmailOTPOptions) => {
+                     returned?: unknown;
+                     responseHeaders?: Headers;
+                 };
+-                headers?: Headers;
++                headers: Headers | undefined;
+             }): boolean;
+             handler: (inputContext: better_call.MiddlewareInputContext<better_call.MiddlewareOptions>) => Promise<void>;
+         }[];

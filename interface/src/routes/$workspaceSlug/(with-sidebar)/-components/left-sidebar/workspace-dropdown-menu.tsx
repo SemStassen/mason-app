@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@mason/ui/avatar";
 import { Button } from "@mason/ui/button";
+import { Icons } from "@mason/ui/icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,8 +13,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@mason/ui/dropdown-menu";
-import { Icons } from "@mason/ui/icons";
+} from "@mason/ui/menu";
 import { Link, useRouteContext, useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { MasonClient } from "~/client";

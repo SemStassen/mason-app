@@ -1,7 +1,6 @@
 import { useAtomSet, useAtomValue } from "@effect-atom/atom-react";
-import { Button, type ButtonProps } from "@mason/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@mason/ui/card";
-import { Separator } from "@mason/ui/separator";
+import { Button } from "@mason/ui/button";
+import { Frame, FrameHeader, FramePanel, FrameTitle } from "@mason/ui/frame";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTransition } from "react";
 import {
@@ -13,7 +12,7 @@ import { formatter } from "~/utils/date-time";
 import { CreateWorkspaceIntegrationForm } from "../-components/create-workspace-integration-form";
 
 export const Route = createFileRoute(
-  "/$workspaceSlug/settings/integrations_/float/",
+  "/$workspaceSlug/settings/integrations_/float/"
 )({
   beforeLoad: () => ({
     getTitle: () => "Float",
@@ -30,7 +29,7 @@ function RouteComponent() {
     MasonAtomClient.mutation("FloatWorkspaceIntegration", "Sync"),
     {
       mode: "promise",
-    },
+    }
   );
 
   const handleSyncProjects = () => {
@@ -43,37 +42,36 @@ function RouteComponent() {
 
   return (
     <>
-      <Card>
-        <CardHeader>
+      <Frame>
+        <FrameHeader>
           {integration ? (
             <div className="flex items-center justify-between">
-              <CardTitle>
+              <FrameTitle>
                 Connected on {formatter.date(integration.createdAt)}
-              </CardTitle>
+              </FrameTitle>
               <DisconnectWorkspaceIntegrationButton
                 integrationId={integration?.id}
               />
             </div>
           ) : (
-            <CardTitle>Connect</CardTitle>
+            <FrameTitle>Connect</FrameTitle>
           )}
-        </CardHeader>
+        </FrameHeader>
         {!integration && (
-          <CardContent>
+          <FramePanel>
             <CreateWorkspaceIntegrationForm kind="float" />
-          </CardContent>
+          </FramePanel>
         )}
-      </Card>
+      </Frame>
       {integration && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Settings</CardTitle>
-          </CardHeader>
-          <Separator />
-          <CardContent>
+        <Frame>
+          <FrameHeader>
+            <FrameTitle>Settings</FrameTitle>
+          </FrameHeader>
+          <FramePanel>
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
-                <div>Sycn all</div>
+                <div>Sync all</div>
                 {integration._metadata?.lastSyncedAt && (
                   <div className="text-muted-foreground text-sm">
                     Last synced on{" "}
@@ -85,8 +83,8 @@ function RouteComponent() {
                 Sync from Float
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </FramePanel>
+        </Frame>
       )}
     </>
   );
@@ -94,20 +92,15 @@ function RouteComponent() {
 
 function DisconnectWorkspaceIntegrationButton({
   integrationId,
-  ...props
-}: ButtonProps & {
+}: {
   integrationId: string;
 }) {
   const deleteWorkspaceIntegration = useAtomSet(
-    deleteWorkspaceIntegrationAtom(integrationId),
+    deleteWorkspaceIntegrationAtom(integrationId)
   );
 
   return (
-    <Button
-      onClick={() => deleteWorkspaceIntegration()}
-      variant="destructive"
-      {...props}
-    >
+    <Button onClick={() => deleteWorkspaceIntegration()} variant="destructive">
       Disconnect
     </Button>
   );

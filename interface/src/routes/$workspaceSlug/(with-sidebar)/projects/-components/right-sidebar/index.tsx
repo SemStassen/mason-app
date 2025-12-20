@@ -3,7 +3,7 @@ import { Icons } from "@mason/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
 import type { Project, Task } from "~/types";
 
-const SIDEBAR_WIDTH = 440;
+const SIDEBAR_WIDTH = 450;
 
 function RightSidebar({
   selectedProject,

@@ -1,5 +1,5 @@
 mod commands;
-use commands::{ai, capture_window_activity};
+use commands::capture_window_activity;
 
 use specta_typescript::Typescript;
 use tauri_specta::{collect_commands, Builder};
@@ -8,7 +8,7 @@ use tauri_specta::{collect_commands, Builder};
 pub fn run() {
     // Build Specta command registry
     let specta_builder =
-        Builder::<tauri::Wry>::new().commands(collect_commands![capture_window_activity, call_ai]);
+        Builder::<tauri::Wry>::new().commands(collect_commands![capture_window_activity]);
 
     // Export TypeScript bindings in debug builds
     #[cfg(debug_assertions)]
