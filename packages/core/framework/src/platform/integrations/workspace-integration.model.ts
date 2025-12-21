@@ -48,4 +48,3 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
     );
   }
 }
-

@@ -1,21 +1,19 @@
 import {
-  WorkspaceIntegrationId,
   type MemberId,
   type WorkspaceId,
+  WorkspaceIntegrationId,
 } from "@mason/framework/types/ids";
 import { Context, Effect, Layer, Option } from "effect";
-import {
-  WorkspaceIntegration,
-} from "./workspace-integration.model";
-import { WorkspaceIntegrationRepository } from "./workspace-integration.repo";
-import { generateUUID } from "../../utils/uuid";
 import { decrypt, encrypt } from "../../utils/encryption";
+import { generateUUID } from "../../utils/uuid";
 import {
   GenericIntegrationError,
-  WorkspaceIntegrationNotFoundError,
   type IntegrationError,
+  WorkspaceIntegrationNotFoundError,
 } from "./errors";
 import type { WorkspaceIntegrationToCreate } from "./workspace-integration.dto";
+import { WorkspaceIntegration } from "./workspace-integration.model";
+import { WorkspaceIntegrationRepository } from "./workspace-integration.repo";
 
 export class IntegrationService extends Context.Tag(
   "@mason/framework/IntegrationService"
@@ -37,7 +35,7 @@ export class IntegrationService extends Context.Tag(
     }) => Effect.Effect<WorkspaceIntegration, IntegrationError>;
     listWorkspaceIntegrations: (params: {
       workspaceId: WorkspaceId;
-    }) => Effect.Effect<readonly WorkspaceIntegration[], IntegrationError>;
+    }) => Effect.Effect<ReadonlyArray<WorkspaceIntegration>, IntegrationError>;
     retrieveWorkspaceApiKey: (params: {
       workspaceId: WorkspaceId;
       kind: "float";
@@ -94,25 +92,32 @@ export class IntegrationService extends Context.Tag(
 
         retrieveWorkspaceIntegration: Effect.fn(
           "@mason/framework/IntegrationService.retrieveWorkspaceIntegration"
-        )(({ workspaceId, workspaceIntegrationId }) => Effect.gen(function* () {
-          const maybeWorkspaceIntegration = yield* workspaceIntegrationRepo
-            .retrieve({
-              workspaceId: workspaceId,
-              query: {
-                id: workspaceIntegrationId,
-              },
+        )(({ workspaceId, workspaceIntegrationId }) =>
+          Effect.gen(function* () {
+            const maybeWorkspaceIntegration =
+              yield* workspaceIntegrationRepo.retrieve({
+                workspaceId: workspaceId,
+                query: {
+                  id: workspaceIntegrationId,
+                },
               });
-              
-              const workspaceIntegration = yield* Option.match(maybeWorkspaceIntegration, {
-                onNone: () => Effect.fail(new WorkspaceIntegrationNotFoundError()),
-                onSome: (workspaceIntegration) => Effect.succeed(workspaceIntegration),
-              })
+
+            const workspaceIntegration = yield* Option.match(
+              maybeWorkspaceIntegration,
+              {
+                onNone: () =>
+                  Effect.fail(new WorkspaceIntegrationNotFoundError()),
+                onSome: Effect.succeed,
+              }
+            );
 
             return workspaceIntegration;
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) => Effect.fail(new GenericIntegrationError({ cause: e })),
-              SqlError: (e) => Effect.fail(new GenericIntegrationError({ cause: e })),
+              ParseError: (e) =>
+                Effect.fail(new GenericIntegrationError({ cause: e })),
+              SqlError: (e) =>
+                Effect.fail(new GenericIntegrationError({ cause: e })),
             })
           )
         ),
@@ -123,7 +128,8 @@ export class IntegrationService extends Context.Tag(
           workspaceIntegrationRepo
             .list({
               workspaceId: workspaceId,
-            }).pipe(
+            })
+            .pipe(
               Effect.mapError((e) => new GenericIntegrationError({ cause: e }))
             )
         ),
@@ -132,21 +138,28 @@ export class IntegrationService extends Context.Tag(
           "@mason/framework/IntegrationService.retrieveWorkspaceApiKey"
         )(({ workspaceId, kind }) =>
           Effect.gen(function* () {
-            const maybeWorkspaceIntegration = yield* workspaceIntegrationRepo.retrieve({
-              workspaceId: workspaceId,
-              query: { kind: kind },
-            });
+            const maybeWorkspaceIntegration =
+              yield* workspaceIntegrationRepo.retrieve({
+                workspaceId: workspaceId,
+                query: { kind: kind },
+              });
 
-            const workspaceIntegration = yield* Option.match(maybeWorkspaceIntegration, {
-              onNone: () => Effect.fail(new WorkspaceIntegrationNotFoundError()),
-              onSome: Effect.succeed,
-            });
+            const workspaceIntegration = yield* Option.match(
+              maybeWorkspaceIntegration,
+              {
+                onNone: () =>
+                  Effect.fail(new WorkspaceIntegrationNotFoundError()),
+                onSome: Effect.succeed,
+              }
+            );
 
             return yield* decrypt(workspaceIntegration.apiKeyEncrypted);
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) => Effect.fail(new GenericIntegrationError({ cause: e })),
-              SqlError: (e) => Effect.fail(new GenericIntegrationError({ cause: e })),
+              ParseError: (e) =>
+                Effect.fail(new GenericIntegrationError({ cause: e })),
+              SqlError: (e) =>
+                Effect.fail(new GenericIntegrationError({ cause: e })),
             })
           )
         ),

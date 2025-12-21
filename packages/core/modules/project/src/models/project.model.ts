@@ -1,8 +1,8 @@
 import type { DbProject } from "@mason/db/schema";
-import { Effect, Schema } from "effect";
-import { generateUUID } from "@mason/framework/utils/uuid";
 import { ProjectId, WorkspaceId } from "@mason/framework/types/ids";
 import { JsonRecord } from "@mason/framework/utils/schema";
+import { generateUUID } from "@mason/framework/utils/uuid";
+import { Effect, Schema } from "effect";
 
 export class Project extends Schema.Class<Project>("@mason/mason/project")({
   id: ProjectId,
@@ -15,9 +15,7 @@ export class Project extends Schema.Class<Project>("@mason/mason/project")({
   // Nullable
   startDate: Schema.NullOr(Schema.DateFromSelf),
   endDate: Schema.NullOr(Schema.DateFromSelf),
-  notes: Schema.NullOr(
-    JsonRecord
-  ),
+  notes: Schema.NullOr(JsonRecord),
   _metadata: Schema.NullOr(
     Schema.Struct({
       source: Schema.optionalWith(Schema.Literal("float"), {
@@ -68,7 +66,6 @@ export class Project extends Schema.Class<Project>("@mason/mason/project")({
     });
   }
 }
-
 
 export type ProjectToCreate = typeof ProjectToCreate.Type;
 export const ProjectToCreate = Schema.TaggedStruct("ProjectToCreate", {

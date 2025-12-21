@@ -1,4 +1,3 @@
-// biome-ignore lint/performance/noBarrelFile: Fine
 export {
   and,
   eq,

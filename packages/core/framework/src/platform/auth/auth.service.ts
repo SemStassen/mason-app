@@ -1,6 +1,7 @@
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
+import { WorkspaceId } from "@mason/framework/types/ids";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
@@ -9,7 +10,6 @@ import {
   emailOTP,
   organization,
 } from "better-auth/plugins";
-import { WorkspaceId } from "@mason/framework/types/ids";
 import { Config, Effect, Schema } from "effect";
 
 export class BetterAuthError extends Schema.TaggedError<BetterAuthError>()(
@@ -48,9 +48,7 @@ export class AuthService extends Effect.Service<AuthService>()(
                   with: {
                     memberships: true,
                     sessions: {
-                      orderBy: (fields, { desc }) => [
-                        desc(fields.createdAt),
-                      ],
+                      orderBy: (fields, { desc }) => [desc(fields.createdAt)],
                       limit: 1,
                     },
                   },
@@ -177,7 +175,6 @@ export class AuthService extends Effect.Service<AuthService>()(
                       })
                     )
                   );
-
 
                   if (!baseUser) {
                     return yield* Effect.fail(

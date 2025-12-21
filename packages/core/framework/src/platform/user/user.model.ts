@@ -1,6 +1,6 @@
 import { Schema } from "effect";
-import { generateUUID } from "../../utils/uuid";
 import { UserId } from "../../types/ids";
+import { generateUUID } from "../../utils/uuid";
 
 export const User = Schema.Struct({
   id: Schema.optionalWith(UserId, {

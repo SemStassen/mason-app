@@ -1,11 +1,11 @@
-import { Context, Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "@effect/sql";
 import { and, eq, gte, inArray, lte } from "@mason/db/operators";
 import { timeEntriesTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
-import { TimeEntryId, WorkspaceId } from "@mason/framework/types/ids";
-import { TimeEntry } from "../models/time-entry.model";
 import type { RepositoryError } from "@mason/framework/errors/database";
+import { TimeEntryId, WorkspaceId } from "@mason/framework/types/ids";
+import { Context, Effect, Layer, Schema } from "effect";
+import { TimeEntry } from "../models/time-entry.model";
 
 export class TimeEntryRepository extends Context.Tag(
   "@mason/time-tracking/TimeEntryRepository"
@@ -15,11 +15,11 @@ export class TimeEntryRepository extends Context.Tag(
     insert: (params: {
       workspaceId: WorkspaceId;
       timeEntries: Array<TimeEntry>;
-    }) => Effect.Effect<readonly TimeEntry[], RepositoryError>;
+    }) => Effect.Effect<ReadonlyArray<TimeEntry>, RepositoryError>;
     update: (params: {
       workspaceId: WorkspaceId;
       timeEntries: Array<TimeEntry>;
-    }) => Effect.Effect<readonly TimeEntry[], RepositoryError>;
+    }) => Effect.Effect<ReadonlyArray<TimeEntry>, RepositoryError>;
     softDelete: (params: {
       workspaceId: WorkspaceId;
       timeEntryIds: Array<TimeEntryId>;
@@ -35,7 +35,7 @@ export class TimeEntryRepository extends Context.Tag(
         startedAt?: Date;
         stoppedAt?: Date;
       };
-    }) => Effect.Effect<readonly TimeEntry[], RepositoryError>;
+    }) => Effect.Effect<ReadonlyArray<TimeEntry>, RepositoryError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -53,7 +53,9 @@ export class TimeEntryRepository extends Context.Tag(
         execute: ({ workspaceId, timeEntries }) =>
           db.drizzle
             .insert(timeEntriesTable)
-            .values(timeEntries.map((timeEntry) => ({ ...timeEntry, workspaceId })))
+            .values(
+              timeEntries.map((timeEntry) => ({ ...timeEntry, workspaceId }))
+            )
             .returning(),
       });
 
@@ -131,8 +133,12 @@ export class TimeEntryRepository extends Context.Tag(
           const whereConditions = [
             eq(timeEntriesTable.workspaceId, workspaceId),
             query?.ids ? inArray(timeEntriesTable.id, query.ids) : undefined,
-            query?.startedAt ? gte(timeEntriesTable.startedAt, query.startedAt) : undefined,
-            query?.stoppedAt ? lte(timeEntriesTable.stoppedAt, query.stoppedAt) : undefined,
+            query?.startedAt
+              ? gte(timeEntriesTable.startedAt, query.startedAt)
+              : undefined,
+            query?.stoppedAt
+              ? lte(timeEntriesTable.stoppedAt, query.stoppedAt)
+              : undefined,
           ].filter(Boolean);
 
           return db.drizzle.query.timeEntriesTable.findMany({
@@ -142,24 +148,44 @@ export class TimeEntryRepository extends Context.Tag(
       });
 
       return TimeEntryRepository.of({
-        insert: Effect.fn("@mason/time-tracking/TimeEntryRepo.insert")(({ workspaceId, timeEntries }) =>
-          db.withWorkspace(workspaceId, InsertTimeEntries({ workspaceId, timeEntries }))
+        insert: Effect.fn("@mason/time-tracking/TimeEntryRepo.insert")(
+          ({ workspaceId, timeEntries }) =>
+            db.withWorkspace(
+              workspaceId,
+              InsertTimeEntries({ workspaceId, timeEntries })
+            )
         ),
 
-        update: Effect.fn("@mason/time-tracking/TimeEntryRepo.update")(({ workspaceId, timeEntries }) =>
-          db.withWorkspace(workspaceId, UpdateTimeEntries({ workspaceId, timeEntries }))
+        update: Effect.fn("@mason/time-tracking/TimeEntryRepo.update")(
+          ({ workspaceId, timeEntries }) =>
+            db.withWorkspace(
+              workspaceId,
+              UpdateTimeEntries({ workspaceId, timeEntries })
+            )
         ),
 
-        softDelete: Effect.fn("@mason/time-tracking/TimeEntryRepo.softDelete")(({ workspaceId, timeEntryIds }) =>
-          db.withWorkspace(workspaceId, SoftDeleteTimeEntries({ workspaceId, timeEntryIds }))
+        softDelete: Effect.fn("@mason/time-tracking/TimeEntryRepo.softDelete")(
+          ({ workspaceId, timeEntryIds }) =>
+            db.withWorkspace(
+              workspaceId,
+              SoftDeleteTimeEntries({ workspaceId, timeEntryIds })
+            )
         ),
 
-        hardDelete: Effect.fn("@mason/time-tracking/TimeEntryRepo.hardDelete")(({ workspaceId, timeEntryIds }) =>
-          db.withWorkspace(workspaceId, HardDeleteTimeEntries({ workspaceId, timeEntryIds }))
+        hardDelete: Effect.fn("@mason/time-tracking/TimeEntryRepo.hardDelete")(
+          ({ workspaceId, timeEntryIds }) =>
+            db.withWorkspace(
+              workspaceId,
+              HardDeleteTimeEntries({ workspaceId, timeEntryIds })
+            )
         ),
 
-        list: Effect.fn("@mason/time-tracking/TimeEntryRepo.list")(({ workspaceId, query }) =>
-          db.withWorkspace(workspaceId, ListTimeEntries({ workspaceId, query }))
+        list: Effect.fn("@mason/time-tracking/TimeEntryRepo.list")(
+          ({ workspaceId, query }) =>
+            db.withWorkspace(
+              workspaceId,
+              ListTimeEntries({ workspaceId, query })
+            )
         ),
       });
     })

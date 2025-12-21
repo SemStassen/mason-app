@@ -26,6 +26,5 @@ const Toaster = ({ ...props }: ToasterProps) => (
   />
 );
 
-// biome-ignore lint/performance/noBarrelFile: We want to export the toast function
 export { toast } from "sonner";
 export { Toaster };

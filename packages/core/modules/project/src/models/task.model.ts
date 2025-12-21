@@ -1,7 +1,7 @@
 import type { DbTask } from "@mason/db/schema";
-import { Effect, Schema } from "effect";
+import { ProjectId, TaskId, WorkspaceId } from "@mason/framework/types/ids";
 import { generateUUID } from "@mason/framework/utils/uuid";
-import { TaskId, WorkspaceId, ProjectId } from "@mason/framework/types/ids";
+import { Effect, Schema } from "effect";
 
 export class Task extends Schema.Class<Task>("@mason/mason/task")({
   id: TaskId,

@@ -8,5 +8,4 @@
     },
     "exactOptionalPropertyTypes": false
   },
-  "references": [{ "path": "../packages/api-contract" }]
 }

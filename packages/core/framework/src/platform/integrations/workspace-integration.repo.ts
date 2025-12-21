@@ -1,13 +1,13 @@
-import { Context, Effect, Layer, Option, Schema } from "effect";
 import { SqlSchema } from "@effect/sql";
 import { and, eq, inArray } from "@mason/db/operators";
 import { workspaceIntegrationsTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
+import type { RepositoryError } from "@mason/framework/errors/database";
 import {
   WorkspaceId,
   WorkspaceIntegrationId,
 } from "@mason/framework/types/ids";
-import type { RepositoryError } from "@mason/framework/errors/database";
+import { Context, Effect, Layer, type Option, Schema } from "effect";
 import { WorkspaceIntegration } from "./workspace-integration.model";
 
 export class WorkspaceIntegrationRepository extends Context.Tag(
@@ -18,18 +18,18 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
     insert: (params: {
       workspaceId: WorkspaceId;
       workspaceIntegrations: Array<WorkspaceIntegration>;
-    }) => Effect.Effect<readonly WorkspaceIntegration[], RepositoryError>;
+    }) => Effect.Effect<ReadonlyArray<WorkspaceIntegration>, RepositoryError>;
     update: (params: {
       workspaceId: WorkspaceId;
       workspaceIntegrations: Array<WorkspaceIntegration>;
-    }) => Effect.Effect<readonly WorkspaceIntegration[], RepositoryError>;
+    }) => Effect.Effect<ReadonlyArray<WorkspaceIntegration>, RepositoryError>;
     hardDelete: (params: {
       workspaceId: WorkspaceId;
       workspaceIntegrationIds: Array<WorkspaceIntegrationId>;
     }) => Effect.Effect<void, RepositoryError>;
     list: (params: {
       workspaceId: WorkspaceId;
-    }) => Effect.Effect<readonly WorkspaceIntegration[], RepositoryError>;
+    }) => Effect.Effect<ReadonlyArray<WorkspaceIntegration>, RepositoryError>;
     retrieve: (params: {
       workspaceId: WorkspaceId;
       query?: {
@@ -118,24 +118,31 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
       const RetrieveWorkspaceIntegration = SqlSchema.findOne({
         Request: Schema.Struct({
           workspaceId: WorkspaceId,
-          query: Schema.optional(Schema.Struct({
-            id: Schema.optional(WorkspaceIntegrationId),
-            kind: Schema.optional(Schema.Literal("float"))
-          })),
+          query: Schema.optional(
+            Schema.Struct({
+              id: Schema.optional(WorkspaceIntegrationId),
+              kind: Schema.optional(Schema.Literal("float")),
+            })
+          ),
         }),
         Result: WorkspaceIntegration,
-        execute: ({ workspaceId, query }) => Effect.gen(function* () {  
-          const whereConditions = [
-            eq(workspaceIntegrationsTable.workspaceId, workspaceId),
-            query?.id ? eq(workspaceIntegrationsTable.id, query.id) : undefined,
-            query?.kind ? eq(workspaceIntegrationsTable.kind, query.kind) : undefined,
-          ].filter(Boolean);
+        execute: ({ workspaceId, query }) =>
+          Effect.gen(function* () {
+            const whereConditions = [
+              eq(workspaceIntegrationsTable.workspaceId, workspaceId),
+              query?.id
+                ? eq(workspaceIntegrationsTable.id, query.id)
+                : undefined,
+              query?.kind
+                ? eq(workspaceIntegrationsTable.kind, query.kind)
+                : undefined,
+            ].filter(Boolean);
 
-          return yield* db.drizzle.query.workspaceIntegrationsTable.findMany({
-            where: and(...whereConditions),
-            limit: 1,
-          });
-        }),
+            return yield* db.drizzle.query.workspaceIntegrationsTable.findMany({
+              where: and(...whereConditions),
+              limit: 1,
+            });
+          }),
       });
 
       return WorkspaceIntegrationRepository.of({

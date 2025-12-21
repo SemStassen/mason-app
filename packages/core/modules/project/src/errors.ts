@@ -7,5 +7,5 @@ export class GenericProjectModuleError extends Schema.TaggedError<GenericProject
   }
 ) {}
 
-export type ProjectModuleError = typeof ProjectModuleError.Type
-export const ProjectModuleError = Schema.Union(GenericProjectModuleError)
+export type ProjectModuleError = typeof ProjectModuleError.Type;
+export const ProjectModuleError = Schema.Union(GenericProjectModuleError);

@@ -7,5 +7,7 @@ export class GenericTimeTrackingModuleError extends Schema.TaggedError<GenericTi
   }
 ) {}
 
-export type TimeTrackingModuleError = typeof TimeTrackingModuleError.Type
-export const TimeTrackingModuleError = Schema.Union(GenericTimeTrackingModuleError)
+export type TimeTrackingModuleError = typeof TimeTrackingModuleError.Type;
+export const TimeTrackingModuleError = Schema.Union(
+  GenericTimeTrackingModuleError
+);

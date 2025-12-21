@@ -1,6 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.3/schema.json",
-  "extends": ["ultracite"],
+  "$schema": "https://biomejs.dev/schemas/2.3.5/schema.json",
+  "extends": ["ultracite/core"],
   "linter": {
     "rules": {
       "correctness": {
@@ -20,6 +20,9 @@
             "maxAllowedComplexity": 50
           }
         }
+      },
+      "performance": {
+        "noBarrelFile": "off"
       },
       "style": {
         "useConsistentArrayType": {

@@ -1,11 +1,11 @@
-import type {
-  TimeEntryId,
-  WorkspaceId,
-} from "@mason/framework/types/ids";
+import type { TimeEntryId, WorkspaceId } from "@mason/framework/types/ids";
 import { Context, Effect, Layer } from "effect";
+import {
+  GenericTimeTrackingModuleError,
+  type TimeTrackingModuleError,
+} from "./errors";
 import type { TimeEntry } from "./models/time-entry.model";
 import { TimeEntryRepository } from "./repositories/time-entry.repo";
-import { GenericTimeTrackingModuleError, type TimeTrackingModuleError } from "./errors";
 
 export class TimeTrackingModuleService extends Context.Tag(
   "@mason/time-tracking/TimeTrackingModuleService"
@@ -15,11 +15,11 @@ export class TimeTrackingModuleService extends Context.Tag(
     createTimeEntries: (params: {
       workspaceId: WorkspaceId;
       timeEntries: Array<TimeEntry>;
-    }) => Effect.Effect<readonly TimeEntry[], TimeTrackingModuleError>;
+    }) => Effect.Effect<ReadonlyArray<TimeEntry>, TimeTrackingModuleError>;
     updateTimeEntries: (params: {
       workspaceId: WorkspaceId;
       timeEntries: Array<TimeEntry>;
-    }) => Effect.Effect<readonly TimeEntry[], TimeTrackingModuleError>;
+    }) => Effect.Effect<ReadonlyArray<TimeEntry>, TimeTrackingModuleError>;
     softDeleteTimeEntries: (params: {
       workspaceId: WorkspaceId;
       timeEntryIds: Array<TimeEntryId>;
@@ -35,7 +35,7 @@ export class TimeTrackingModuleService extends Context.Tag(
         startedAt?: Date;
         stoppedAt?: Date;
       };
-    }) => Effect.Effect<readonly TimeEntry[], TimeTrackingModuleError>;
+    }) => Effect.Effect<ReadonlyArray<TimeEntry>, TimeTrackingModuleError>;
   }
 >() {
   static readonly live = Layer.effect(

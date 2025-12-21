@@ -1,29 +1,25 @@
-import { Context, Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "@effect/sql";
 import { and, eq, inArray, sql } from "@mason/db/operators";
 import { tasksTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
-import { ProjectId, TaskId, WorkspaceId } from "@mason/framework/types/ids";
-import { Task } from "../models/task.model";
 import type { RepositoryError } from "@mason/framework/errors/database";
+import { ProjectId, TaskId, WorkspaceId } from "@mason/framework/types/ids";
+import { Context, Effect, Layer, Schema } from "effect";
+import { Task } from "../models/task.model";
 
-export class TaskRepository extends Context.Tag("@mason/project/TaskRepository")<
+export class TaskRepository extends Context.Tag(
+  "@mason/project/TaskRepository"
+)<
   TaskRepository,
   {
     insert: (params: {
       workspaceId: WorkspaceId;
       tasks: Array<Task>;
-    }) => Effect.Effect<
-      readonly Task[],
-      RepositoryError
-    >;
+    }) => Effect.Effect<ReadonlyArray<Task>, RepositoryError>;
     update: (params: {
       workspaceId: WorkspaceId;
       tasks: Array<Task>;
-    }) => Effect.Effect<
-      readonly Task[],
-      RepositoryError
-    >;
+    }) => Effect.Effect<ReadonlyArray<Task>, RepositoryError>;
     softDelete: (params: {
       workspaceId: WorkspaceId;
       taskIds: Array<TaskId>;
@@ -40,7 +36,7 @@ export class TaskRepository extends Context.Tag("@mason/project/TaskRepository")
         _source?: "float";
         _externalIds?: Array<string>;
       };
-    }) => Effect.Effect<readonly Task[], RepositoryError>;
+    }) => Effect.Effect<ReadonlyArray<Task>, RepositoryError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -161,30 +157,37 @@ export class TaskRepository extends Context.Tag("@mason/project/TaskRepository")
       });
 
       return TaskRepository.of({
-        insert: Effect.fn("@mason/project/TaskRepo.insert")(({ workspaceId, tasks }) =>
-          db.withWorkspace(workspaceId, InsertTasks({ workspaceId, tasks }))
+        insert: Effect.fn("@mason/project/TaskRepo.insert")(
+          ({ workspaceId, tasks }) =>
+            db.withWorkspace(workspaceId, InsertTasks({ workspaceId, tasks }))
         ),
 
-        update: Effect.fn("@mason/project/TaskRepo.update")(({ workspaceId, tasks }) =>
-          db.withWorkspace(workspaceId, UpdateTasks({ workspaceId, tasks }))
+        update: Effect.fn("@mason/project/TaskRepo.update")(
+          ({ workspaceId, tasks }) =>
+            db.withWorkspace(workspaceId, UpdateTasks({ workspaceId, tasks }))
         ),
 
-        softDelete: Effect.fn("@mason/project/TaskRepo.softDelete")(({ workspaceId, taskIds }) =>
-          db.withWorkspace(
-            workspaceId,
-            SoftDeleteTasks({ workspaceId, taskIds })
-          )),
-
-        hardDelete: Effect.fn("@mason/project/TaskRepo.hardDelete")(({ workspaceId, taskIds }) =>
-          db.withWorkspace(
-            workspaceId,
-            HardDeleteTasks({ workspaceId, taskIds })
-          )),
-
-        list: Effect.fn("@mason/project/TaskRepo.list")(({ workspaceId, query }) =>
-          db.withWorkspace(workspaceId, ListTasks({ workspaceId, query }))
+        softDelete: Effect.fn("@mason/project/TaskRepo.softDelete")(
+          ({ workspaceId, taskIds }) =>
+            db.withWorkspace(
+              workspaceId,
+              SoftDeleteTasks({ workspaceId, taskIds })
+            )
         ),
-      })
+
+        hardDelete: Effect.fn("@mason/project/TaskRepo.hardDelete")(
+          ({ workspaceId, taskIds }) =>
+            db.withWorkspace(
+              workspaceId,
+              HardDeleteTasks({ workspaceId, taskIds })
+            )
+        ),
+
+        list: Effect.fn("@mason/project/TaskRepo.list")(
+          ({ workspaceId, query }) =>
+            db.withWorkspace(workspaceId, ListTasks({ workspaceId, query }))
+        ),
+      });
     })
   );
 }

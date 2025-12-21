@@ -4,11 +4,11 @@ import type {
   WorkspaceId,
 } from "@mason/framework/types/ids";
 import { Context, Effect, Layer } from "effect";
+import { GenericProjectModuleError, type ProjectModuleError } from "./errors";
 import type { Project } from "./models/project.model";
+import type { Task } from "./models/task.model";
 import { ProjectRepository } from "./repositories/project.repo";
 import { TaskRepository } from "./repositories/task.repo";
-import { GenericProjectModuleError, ProjectModuleError } from "./errors";
-import type { Task } from "./models/task.model";
 
 export class ProjectModuleService extends Context.Tag(
   "@mason/project/ProjectModuleService"
@@ -18,11 +18,11 @@ export class ProjectModuleService extends Context.Tag(
     createProjects: (params: {
       workspaceId: WorkspaceId;
       projects: Array<Project>;
-    }) => Effect.Effect<readonly Project[], ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Project>, ProjectModuleError>;
     updateProjects: (params: {
       workspaceId: WorkspaceId;
       projects: Array<Project>;
-    }) => Effect.Effect<readonly Project[], ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Project>, ProjectModuleError>;
     softDeleteProjects: (params: {
       workspaceId: WorkspaceId;
       projectIds: Array<ProjectId>;
@@ -38,15 +38,15 @@ export class ProjectModuleService extends Context.Tag(
         _source?: "float";
         _externalIds?: Array<string>;
       };
-    }) => Effect.Effect<readonly Project[], ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Project>, ProjectModuleError>;
     createTasks: (params: {
       workspaceId: WorkspaceId;
       tasks: Array<Task>;
-    }) => Effect.Effect<readonly Task[], ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Task>, ProjectModuleError>;
     updateTasks: (params: {
       workspaceId: WorkspaceId;
       tasks: Array<Task>;
-    }) => Effect.Effect<readonly Task[], ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Task>, ProjectModuleError>;
     softDeleteTasks: (params: {
       workspaceId: WorkspaceId;
       taskIds: Array<TaskId>;
@@ -63,7 +63,7 @@ export class ProjectModuleService extends Context.Tag(
         _source?: "float";
         _externalIds?: Array<string>;
       };
-    }) => Effect.Effect<readonly Task[], ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Task>, ProjectModuleError>;
   }
 >() {
   static readonly live = Layer.effect(
