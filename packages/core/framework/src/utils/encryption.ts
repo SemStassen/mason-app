@@ -6,7 +6,7 @@ const IV_LENGTH = 16;
 const AUTH_TAG_LENGTH = 16;
 
 export class EncryptionError extends Schema.TaggedError<EncryptionError>()(
-  "@mason/core/EncryptionError",
+  "@mason/mason/EncryptionError",
   {
     cause: Schema.Unknown,
   }
@@ -28,7 +28,7 @@ export const getKey = () =>
   }).pipe(
     Effect.catchTags({
       ConfigError: (error) => Effect.die(error),
-      "@mason/core/EncryptionError": (error) => Effect.die(error),
+      "@mason/mason/EncryptionError": (error) => Effect.die(error),
     })
   );
 

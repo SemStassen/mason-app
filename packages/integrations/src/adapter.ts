@@ -1,4 +1,4 @@
-import type { WorkspaceId } from "@mason/core/models/ids";
+import type { WorkspaceId } from "@mason/mason/models/ids";
 import { Context, type Effect } from "effect";
 import type { IntegrationAdapterError } from "./errors";
 import type { ExternalProject, ExternalTask } from "./models";

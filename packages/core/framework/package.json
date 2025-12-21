@@ -1,5 +1,5 @@
 {
-  "name": "@mason/use-cases",
+  "name": "@mason/framework",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,16 +9,17 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@mason/api-contract": "workspace:*",
-    "@mason/mason": "workspace:*",
-    "@mason/integrations": "workspace:*",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
     "typescript": "catalog:dev"
   },
   "exports": {
-    "./*": "./src/*.ts"
+    "./errors/*": "./src/errors/*.ts",
+    "./schemas": "./src/schemas/index.ts",
+    "./types/*": "./src/types/*.ts",
+    "./utils/*": "./src/utils/*.ts"
   }
 }

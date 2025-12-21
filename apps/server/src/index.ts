@@ -5,8 +5,8 @@ import {
   HttpServer,
 } from "@effect/platform";
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
-import { appLayer } from "@mason/core/instrumentation";
-import { AuthService } from "@mason/core/services/auth.service";
+import { appLayer } from "@mason/mason/instrumentation";
+import { AuthService } from "@mason/mason/services/auth.service";
 import { Layer } from "effect";
 import { MasonApiLive } from "./api";
 import { AuthMiddlewareLive } from "./middleware/auth.middleware";

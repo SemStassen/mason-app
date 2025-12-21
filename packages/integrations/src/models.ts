@@ -1,4 +1,4 @@
-import { Project } from "@mason/core/models/project.model";
+import { Project } from "@mason/mason/models/project.model";
 import { Schema } from "effect";
 
 /** Custom date types */

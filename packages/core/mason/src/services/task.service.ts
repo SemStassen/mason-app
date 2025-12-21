@@ -11,7 +11,7 @@ import { createDomainEntities, updateDomainEntities } from "./crud-helpers";
 import { DatabaseService } from "./db.service";
 
 export class TasksService extends Effect.Service<TasksService>()(
-  "@mason/core/tasksService",
+  "@mason/mason/tasksService",
   {
     effect: Effect.gen(function* () {
       const db = yield* DatabaseService;

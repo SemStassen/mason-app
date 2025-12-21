@@ -97,6 +97,7 @@ export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
 }));
 
 export type DbProject = typeof projectsTable.$inferSelect;
+export type DbProjectInsert = typeof projectsTable.$inferInsert;
 
 export const tasksTable = pgTable(
   "tasks",

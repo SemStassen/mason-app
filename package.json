@@ -15,10 +15,15 @@
     "packages": [
       "interface",
       "apps/*",
-      "packages/*"
+      "packages/*",
+      "packages/core/*",
+      "packages/core/modules/*"
     ],
     "catalog": {
       "@effect/platform": "^0.93.0",
+      "@effect/sql": "^0.49.0",
+      "@effect/sql-drizzle": "^0.48.0",
+      "@effect/sql-pg": "catalog:",
       "effect": "^3.19.3"
     },
     "catalogs": {
@@ -52,5 +57,7 @@
     "turbo": "^2.6.1",
     "typescript": "catalog:dev",
     "ultracite": "6.3.2"
+  },
+  "dependencies": {
   }
 }

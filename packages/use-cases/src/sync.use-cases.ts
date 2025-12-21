@@ -1,17 +1,17 @@
-import { ProjectId, TaskId, type WorkspaceId } from "@mason/core/models/ids";
+import { ProjectId, TaskId, type WorkspaceId } from "@mason/mason/models/ids";
 import {
   ProjectToCreate,
   ProjectToUpdate,
-} from "@mason/core/models/project.model";
-import { TaskToCreate, TaskToUpdate } from "@mason/core/models/task.model";
-import { WorkspaceIntegrationToUpdate } from "@mason/core/models/workspace-integration.model";
-import { DatabaseService } from "@mason/core/services/db.service";
-import { ProjectsService } from "@mason/core/services/projects.service";
-import { TasksService } from "@mason/core/services/task.service";
+} from "@mason/mason/models/project.model";
+import { TaskToCreate, TaskToUpdate } from "@mason/mason/models/task.model";
+import { WorkspaceIntegrationToUpdate } from "@mason/mason/models/workspace-integration.model";
+import { DatabaseService } from "@mason/mason/services/db.service";
+import { ProjectsService } from "@mason/mason/services/projects.service";
+import { TasksService } from "@mason/mason/services/task.service";
 import {
   WorkspaceIntegrationNotFoundError,
   WorkspaceIntegrationsService,
-} from "@mason/core/services/workspace-integrations.service";
+} from "@mason/mason/services/workspace-integrations.service";
 import { TimeTrackingIntegrationAdapter } from "@mason/integrations";
 import { Effect, Either, Option, Schema } from "effect";
 

@@ -9,21 +9,21 @@ type Drizzle = ReturnType<typeof drizzle<typeof schema>>;
 type Transaction = Parameters<Parameters<Drizzle["transaction"]>[0]>[0];
 
 export class DatabaseError extends Schema.TaggedError<DatabaseError>()(
-  "@mason/core/databaseError",
+  "@mason/mason/databaseError",
   {
     cause: Schema.Unknown,
   }
 ) {}
 
 export class DatabaseConnectionError extends Schema.TaggedError<DatabaseConnectionError>()(
-  "@mason/core/databaseConnectionError",
+  "@mason/mason/databaseConnectionError",
   {
     cause: Schema.Unknown,
   }
 ) {}
 
 export class DatabaseService extends Effect.Service<DatabaseService>()(
-  "@mason/core/databaseService",
+  "@mason/mason/databaseService",
   {
     scoped: Effect.gen(function* () {
       const DbConfig = Config.all({

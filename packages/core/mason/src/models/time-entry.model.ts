@@ -6,7 +6,7 @@ import { MemberId, ProjectId, TaskId, TimeEntryId, WorkspaceId } from "./ids";
 import { JsonRecord } from "./data-types";
 
 export class TimeEntryDateOrderError extends Schema.TaggedError<TimeEntryDateOrderError>()(
-  "@mason/core/timeEntryDateOrderError",
+  "@mason/mason/timeEntryDateOrderError",
   {
     startedAt: Schema.DateFromSelf,
     stoppedAt: Schema.DateFromSelf,
@@ -14,13 +14,13 @@ export class TimeEntryDateOrderError extends Schema.TaggedError<TimeEntryDateOrd
 ) {}
 
 export class TimeEntryMissingStoppedAtError extends Schema.TaggedError<TimeEntryMissingStoppedAtError>()(
-  "@mason/core/timeEntryMissingStoppedAtError",
+  "@mason/mason/timeEntryMissingStoppedAtError",
   {
     startedAt: Schema.DateFromSelf,
   }
 ) {}
 
-export class TimeEntry extends Schema.Class<TimeEntry>("@mason/core/timeEntry")(
+export class TimeEntry extends Schema.Class<TimeEntry>("@mason/mason/timeEntry")(
   {
     id: TimeEntryId,
     // References

@@ -1,7 +1,7 @@
 import { HttpApiError, HttpServerRequest } from "@effect/platform";
 import { AuthMiddleware, AuthData } from "@mason/api-contract/middleware/auth";
-import { UserId } from "@mason/core/models/ids";
-import { AuthService } from "@mason/core/services/auth.service";
+import { UserId } from "@mason/mason/models/ids";
+import { AuthService } from "@mason/mason/services/auth.service";
 import { Effect, Layer } from "effect";
 
 // Technically this does not need to be bearer based anymore. Since better auth just checks the headers anyways.

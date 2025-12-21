@@ -1,9 +1,9 @@
-import type { WorkspaceId } from "@mason/core/models/ids";
+import type { WorkspaceId } from "@mason/mason/models/ids";
 import type {
   TimeEntryToCreate,
   TimeEntryToUpdate,
-} from "@mason/core/models/time-entry.model";
-import { TimeEntryService } from "@mason/core/services/time-entry.service";
+} from "@mason/mason/models/time-entry.model";
+import { TimeEntryService } from "@mason/mason/services/time-entry.service";
 import { Effect } from "effect";
 
 export const createTimeEntriesUseCase = Effect.fn("createTimeEntriesUseCase")(function* ({

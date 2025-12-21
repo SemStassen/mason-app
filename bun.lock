@@ -45,7 +45,7 @@
         "@effect/platform": "catalog:",
         "@effect/platform-bun": "^0.81.1",
         "@mason/api-contract": "workspace:*",
-        "@mason/core": "workspace:*",
+        "@mason/mason": "workspace:*",
         "@mason/use-cases": "workspace:*",
         "effect": "catalog:",
       },
@@ -125,8 +125,19 @@
     "packages/config": {
       "name": "@mason/config",
     },
-    "packages/core": {
-      "name": "@mason/core",
+    "packages/core/framework": {
+      "name": "@mason/framework",
+      "dependencies": {
+        "effect": "catalog:",
+        "uuid": "^13.0.0",
+      },
+      "devDependencies": {
+        "@mason/config": "workspace:*",
+        "typescript": "catalog:dev",
+      },
+    },
+    "packages/core/mason": {
+      "name": "@mason/mason",
       "dependencies": {
         "@effect/platform": "catalog:",
         "@mason/db": "workspace:*",
@@ -141,9 +152,27 @@
         "typescript": "catalog:dev",
       },
     },
+    "packages/core/modules/project": {
+      "name": "@mason/project",
+      "dependencies": {
+        "@effect/sql": "catalog:",
+        "@effect/sql-drizzle": "catalog:",
+        "@mason/db": "workspace:*",
+        "@mason/framework": "workspace:*",
+        "effect": "catalog:",
+      },
+      "devDependencies": {
+        "@mason/config": "workspace:*",
+        "typescript": "catalog:dev",
+      },
+    },
     "packages/db": {
       "name": "@mason/db",
       "dependencies": {
+        "@effect/sql": "catalog:",
+        "@effect/sql-drizzle": "catalog:",
+        "@effect/sql-pg": "^0.46.0",
+        "@mason/framework": "workspace:*",
         "drizzle-orm": "catalog:server",
         "pg": "^8.16.3",
       },
@@ -159,7 +188,7 @@
     "packages/integrations": {
       "name": "@mason/integrations",
       "dependencies": {
-        "@mason/core": "workspace:*",
+        "@mason/mason": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
@@ -214,8 +243,8 @@
       "name": "@mason/use-cases",
       "dependencies": {
         "@mason/api-contract": "workspace:*",
-        "@mason/core": "workspace:*",
         "@mason/integrations": "workspace:*",
+        "@mason/mason": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
@@ -226,6 +255,9 @@
   },
   "catalog": {
     "@effect/platform": "^0.93.0",
+    "@effect/sql": "^0.49.0",
+    "@effect/sql-drizzle": "^0.48.0",
+    "@effect/sql-pg": "catalog:",
     "effect": "^3.19.3",
   },
   "catalogs": {
@@ -402,7 +434,11 @@
 
     "@effect/rpc": ["@effect/rpc@0.71.1", "", { "dependencies": { "msgpackr": "^1.11.4" }, "peerDependencies": { "@effect/platform": "^0.92.1", "effect": "^3.18.4" } }, "sha512-WgASRYmLBbCHM+3xfAGACVM8nOl8DJb+46znAN80hURVOzbPDd7/xjepj59idpIZYBsErv4ixRKfVLLtrGGPyg=="],
 
-    "@effect/sql": ["@effect/sql@0.46.0", "", { "dependencies": { "uuid": "^11.0.3" }, "peerDependencies": { "@effect/experimental": "^0.56.0", "@effect/platform": "^0.92.0", "effect": "^3.18.0" } }, "sha512-nm9TuTTG7gLmJlIPkf71wA5lXArSvkpm1oYoIF+rhf01wef+1ujz9Mv1SfuzYbzsk7W9+OXUIRMxz/nSlKkiGQ=="],
+    "@effect/sql": ["@effect/sql@0.49.0", "", { "dependencies": { "uuid": "^11.0.3" }, "peerDependencies": { "@effect/experimental": "^0.58.0", "@effect/platform": "^0.94.0", "effect": "^3.19.13" } }, "sha512-9UEKR+z+MrI/qMAmSvb/RiD9KlgIazjZUCDSpwNgm0lEK9/Q6ExEyfziiYFVCPiptp52cBw8uBHRic8hHnwqXA=="],
+
+    "@effect/sql-drizzle": ["@effect/sql-drizzle@0.48.0", "", { "peerDependencies": { "@effect/sql": "^0.49.0", "drizzle-orm": ">=0.43.1 <0.50", "effect": "^3.19.13" } }, "sha512-igvoBrc3RwHq2IOVBAzT3rzMWTIronHa+aL1SFDZDDGIAY4BEmos+ahCAyPfhyW8UbYljJtL9PWJWHtXgYa9MA=="],
+
+    "@effect/sql-pg": ["@effect/sql-pg@0.46.0", "", { "dependencies": { "postgres": "^3.4.4" }, "peerDependencies": { "@effect/experimental": "^0.55.0", "@effect/platform": "^0.91.0", "@effect/sql": "^0.45.0", "effect": "^3.17.14" } }, "sha512-7MgAjN+Eie9/fSe634GNDKAFlX11MQgA0HYWI/HPhhdwLM27U6QV5DMhRe01EKGqe9fkzDpZjJiPr8ITfQmTwQ=="],
 
     "@effect/workflow": ["@effect/workflow@0.11.5", "", { "peerDependencies": { "@effect/platform": "^0.92.1", "@effect/rpc": "^0.71.1", "effect": "^3.18.4" } }, "sha512-kdv0amQ/F1xTFeK3g/merYZiy31E5kLEoAafz+JZQDsVzShaL3DlRqG+HOZTUFUCeCDX/kSrvsHBRWRBofaLQQ=="],
 
@@ -524,13 +560,17 @@
 
     "@mason/config": ["@mason/config@workspace:packages/config"],
 
-    "@mason/core": ["@mason/core@workspace:packages/core"],
-
     "@mason/db": ["@mason/db@workspace:packages/db"],
+
+    "@mason/framework": ["@mason/framework@workspace:packages/core/framework"],
 
     "@mason/integrations": ["@mason/integrations@workspace:packages/integrations"],
 
     "@mason/interface": ["@mason/interface@workspace:interface"],
+
+    "@mason/mason": ["@mason/mason@workspace:packages/core/mason"],
+
+    "@mason/project": ["@mason/project@workspace:packages/core/modules/project"],
 
     "@mason/server": ["@mason/server@workspace:apps/server"],
 
@@ -1244,6 +1284,8 @@
 
     "postcss": ["postcss@8.5.6", "", { "dependencies": { "nanoid": "^3.3.11", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg=="],
 
+    "postgres": ["postgres@3.4.7", "", {}, "sha512-Jtc2612XINuBjIl/QTWsV5UvE8UHuNblcO3vVADSrKsrc6RqGX6lOW1cEo3CM2v0XG4Nat8nI+YM7/f26VxXLw=="],
+
     "postgres-array": ["postgres-array@2.0.0", "", {}, "sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA=="],
 
     "postgres-bytea": ["postgres-bytea@1.0.0", "", {}, "sha512-xy3pmLuQqRBZBXDULy7KbaitYqLcmxigw14Q5sj8QBVLqEwXfeybIKVWiqAXTlcvdvb0+xkOtDbfQMOf4lST1w=="],
@@ -1475,8 +1517,6 @@
     "@effect/platform-node-shared/@effect/platform": ["@effect/platform@0.92.1", "", { "dependencies": { "find-my-way-ts": "^0.1.6", "msgpackr": "^1.11.4", "multipasta": "^0.2.7" }, "peerDependencies": { "effect": "^3.18.1" } }, "sha512-XXWCBVwyhaKZISN7aM1fv/3fWDGyxr84ObywnUrL8aHvJLoIeskWFAP/fqw3c5MFCrJ3ZV97RWLbv6JiBQugdg=="],
 
     "@effect/rpc/@effect/platform": ["@effect/platform@0.92.1", "", { "dependencies": { "find-my-way-ts": "^0.1.6", "msgpackr": "^1.11.4", "multipasta": "^0.2.7" }, "peerDependencies": { "effect": "^3.18.1" } }, "sha512-XXWCBVwyhaKZISN7aM1fv/3fWDGyxr84ObywnUrL8aHvJLoIeskWFAP/fqw3c5MFCrJ3ZV97RWLbv6JiBQugdg=="],
-
-    "@effect/sql/@effect/platform": ["@effect/platform@0.92.1", "", { "dependencies": { "find-my-way-ts": "^0.1.6", "msgpackr": "^1.11.4", "multipasta": "^0.2.7" }, "peerDependencies": { "effect": "^3.18.1" } }, "sha512-XXWCBVwyhaKZISN7aM1fv/3fWDGyxr84ObywnUrL8aHvJLoIeskWFAP/fqw3c5MFCrJ3ZV97RWLbv6JiBQugdg=="],
 
     "@effect/sql/uuid": ["uuid@11.1.0", "", { "bin": { "uuid": "dist/esm/bin/uuid" } }, "sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A=="],
 

@@ -7,12 +7,12 @@ import {
   type MemberId,
   type WorkspaceId,
   WorkspaceIntegrationId,
-} from "@mason/core/models/ids";
+} from "@mason/mason/models/ids";
 import {
   WorkspaceIntegrationToCreate,
   WorkspaceIntegrationToUpdate,
-} from "@mason/core/models/workspace-integration.model";
-import { WorkspaceIntegrationsService } from "@mason/core/services/workspace-integrations.service";
+} from "@mason/mason/models/workspace-integration.model";
+import { WorkspaceIntegrationsService } from "@mason/mason/services/workspace-integrations.service";
 import { TimeTrackingIntegrationAdapter } from "@mason/integrations";
 import { Effect } from "effect";
 

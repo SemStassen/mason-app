@@ -3,8 +3,8 @@ import {
   SessionData,
   SessionMiddleware,
 } from "@mason/api-contract/middleware/session";
-import { MemberId, UserId, WorkspaceId } from "@mason/core/models/ids";
-import { AuthService } from "@mason/core/services/auth.service";
+import { MemberId, UserId, WorkspaceId } from "@mason/mason/models/ids";
+import { AuthService } from "@mason/mason/services/auth.service";
 import { Effect, Layer } from "effect";
 
 

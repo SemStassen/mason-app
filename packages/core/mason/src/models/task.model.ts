@@ -3,7 +3,7 @@ import { Effect, Schema } from "effect";
 import { generateUUID } from "../utils/uuid";
 import { ProjectId, TaskId, WorkspaceId } from "./ids";
 
-export class Task extends Schema.Class<Task>("@mason/core/task")({
+export class Task extends Schema.Class<Task>("@mason/mason/task")({
   id: TaskId,
   // References
   workspaceId: WorkspaceId,

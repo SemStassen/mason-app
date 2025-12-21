@@ -12,7 +12,7 @@ import { createDomainEntities, updateDomainEntities } from "./crud-helpers";
 import { DatabaseService } from "./db.service";
 
 export class TimeEntryService extends Effect.Service<TimeEntryService>()(
-  "@mason/core/timeEntryService",
+  "@mason/mason/timeEntryService",
   {
     effect: Effect.gen(function* () {
       const db = yield* DatabaseService;

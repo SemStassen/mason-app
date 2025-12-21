@@ -11,12 +11,12 @@ import { decrypt, encrypt } from "../utils/encryption";
 import { DatabaseService } from "./db.service";
 
 export class WorkspaceIntegrationNotFoundError extends Schema.TaggedError<WorkspaceIntegrationNotFoundError>()(
-  "@mason/core/workspaceIntegrationNotFoundError",
+  "@mason/mason/workspaceIntegrationNotFoundError",
   {},
 ) {}
 
 export class WorkspaceIntegrationsService extends Effect.Service<WorkspaceIntegrationsService>()(
-  "@mason/core/workspaceIntegrationsService",
+  "@mason/mason/workspaceIntegrationsService",
   {
     effect: Effect.gen(function* () {
       const db = yield* DatabaseService;

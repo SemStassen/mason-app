@@ -4,7 +4,7 @@ import { generateUUID } from "../utils/uuid";
 import { ProjectId, WorkspaceId } from "./ids";
 import { JsonRecord } from "./data-types";
 
-export class Project extends Schema.Class<Project>("@mason/core/project")({
+export class Project extends Schema.Class<Project>("@mason/mason/project")({
   id: ProjectId,
   // References
   workspaceId: WorkspaceId,

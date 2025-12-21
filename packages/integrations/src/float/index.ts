@@ -1,5 +1,5 @@
-import type { WorkspaceId } from "@mason/core/models/ids";
-import { WorkspaceIntegrationsService } from "@mason/core/services/workspace-integrations.service";
+import type { WorkspaceId } from "@mason/mason/models/ids";
+import { WorkspaceIntegrationsService } from "@mason/mason/services/workspace-integrations.service";
 import { Effect, Layer, Schema } from "effect";
 import { InternalTimeTrackingIntegrationAdapter } from "../adapter";
 import {

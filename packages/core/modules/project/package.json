@@ -1,5 +1,5 @@
 {
-  "name": "@mason/use-cases",
+  "name": "@mason/project",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,16 +9,15 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@mason/api-contract": "workspace:*",
-    "@mason/mason": "workspace:*",
-    "@mason/integrations": "workspace:*",
+    "@effect/sql": "catalog:",
+    "@effect/sql-drizzle": "catalog:",
+    "@mason/db": "workspace:*",
+    "@mason/framework": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
     "typescript": "catalog:dev"
   },
-  "exports": {
-    "./*": "./src/*.ts"
-  }
+  "exports": {}
 }

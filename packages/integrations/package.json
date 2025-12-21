@@ -9,7 +9,7 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@mason/core": "workspace:*",
+    "@mason/mason": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

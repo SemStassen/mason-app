@@ -1,5 +1,5 @@
-import type { WorkspaceId } from "@mason/core/models/ids";
-import { TasksService } from "@mason/core/services/task.service";
+import type { WorkspaceId } from "@mason/mason/models/ids";
+import { TasksService } from "@mason/mason/services/task.service";
 import { Effect } from "effect";
 
 export const listTasksUseCase = Effect.fn("listTasksUseCase")(function* ({

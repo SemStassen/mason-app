@@ -14,7 +14,7 @@
     "@effect/platform": "catalog:",
     "@effect/platform-bun": "^0.81.1",
     "@mason/api-contract": "workspace:*",
-    "@mason/core": "workspace:*",
+    "@mason/mason": "workspace:*",
     "@mason/use-cases": "workspace:*",
     "effect": "catalog:"
   },

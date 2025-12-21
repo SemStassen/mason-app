@@ -5,7 +5,7 @@ import {
 } from "@effect/platform";
 import { MasonApi } from "@mason/api-contract";
 import { WorkspaceResponse } from "@mason/api-contract/dto/workspace.dto";
-import { AuthService } from "@mason/core/services/auth.service";
+import { AuthService } from "@mason/mason/services/auth.service";
 import { Effect } from "effect";
 
 export const WorkspaceGroupLive = HttpApiBuilder.group(

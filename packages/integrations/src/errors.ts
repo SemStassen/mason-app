@@ -1,5 +1,5 @@
-import type { DatabaseError } from "@mason/core/services/db.service";
-import type { WorkspaceIntegrationNotFoundError } from "@mason/core/services/workspace-integrations.service";
+import type { DatabaseError } from "@mason/mason/services/db.service";
+import type { WorkspaceIntegrationNotFoundError } from "@mason/mason/services/workspace-integrations.service";
 import { Schema } from "effect";
 
 export class IntegrationInvalidApiKeyError extends Schema.TaggedError<IntegrationInvalidApiKeyError>()(

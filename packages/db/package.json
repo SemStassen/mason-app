@@ -13,6 +13,10 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
+    "@mason/framework": "workspace:*",
+    "@effect/sql": "catalog:",
+    "@effect/sql-drizzle": "catalog:",
+    "@effect/sql-pg": "catalog:",
     "drizzle-orm": "catalog:server",
     "pg": "^8.16.3"
   },
@@ -27,6 +31,7 @@
   "exports": {
     "./db": "./src/db.ts",
     "./operators": "./src/operators.ts",
-    "./schema": "./src/schema/index.ts"
+    "./schema": "./src/schema/index.ts",
+    "./service": "./src/database.service.ts"
   }
 }
