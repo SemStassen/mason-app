@@ -1,6 +1,6 @@
 import { Schema } from "effect";
-import { generateUUID } from "../utils/uuid";
-import { WorkspaceId } from "./ids";
+import { generateUUID } from "../../utils/uuid";
+import { WorkspaceId } from "../../types/ids";
 
 export const Workspace = Schema.Struct({
   id: Schema.optionalWith(WorkspaceId, {

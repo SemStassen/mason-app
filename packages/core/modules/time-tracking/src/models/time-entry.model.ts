@@ -1,9 +1,15 @@
 import type { DbTimeEntry } from "@mason/db/schema";
+import {
+  MemberId,
+  ProjectId,
+  TaskId,
+  TimeEntryId,
+  WorkspaceId,
+} from "@mason/framework/types/ids";
+import { JsonRecord } from "@mason/framework/utils/schema";
+import { generateUUID } from "@mason/framework/utils/uuid";
 import { isAfter } from "date-fns";
 import { Effect, Schema } from "effect";
-import { generateUUID } from "../utils/uuid";
-import { MemberId, ProjectId, TaskId, TimeEntryId, WorkspaceId } from "./ids";
-import { JsonRecord } from "./data-types";
 
 export class TimeEntryDateOrderError extends Schema.TaggedError<TimeEntryDateOrderError>()(
   "@mason/mason/timeEntryDateOrderError",
@@ -20,8 +26,10 @@ export class TimeEntryMissingStoppedAtError extends Schema.TaggedError<TimeEntry
   }
 ) {}
 
-export class TimeEntry extends Schema.Class<TimeEntry>("@mason/mason/timeEntry")(
-  {
+export class TimeEntry extends Schema.Class<TimeEntry>(
+  "@mason/mason/timeEntry"
+)(
+  Schema.Struct({
     id: TimeEntryId,
     // References
     workspaceId: WorkspaceId,
@@ -32,7 +40,7 @@ export class TimeEntry extends Schema.Class<TimeEntry>("@mason/mason/timeEntry")
     startedAt: Schema.DateFromSelf,
     stoppedAt: Schema.DateFromSelf,
     notes: Schema.NullOr(JsonRecord),
-  }
+  }).pipe(Schema.filter(({ startedAt, stoppedAt }) => isAfter(stoppedAt, startedAt)))
 ) {
   private static validate(timeEntry: TimeEntry) {
     return Effect.gen(function* () {

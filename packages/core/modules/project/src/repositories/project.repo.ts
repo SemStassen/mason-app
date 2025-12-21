@@ -12,23 +12,23 @@ export class ProjectRepository extends Context.Tag(
 )<
   ProjectRepository,
   {
-    insertProjects: (params: {
+    insert: (params: {
       workspaceId: WorkspaceId;
       projects: Array<Project>;
     }) => Effect.Effect<readonly Project[], RepositoryError>;
-    updateProjects: (params: {
+    update: (params: {
       workspaceId: WorkspaceId;
       projects: Array<Project>;
     }) => Effect.Effect<readonly Project[], RepositoryError>;
-    softDeleteProjects: (params: {
+    softDelete: (params: {
       workspaceId: WorkspaceId;
       projectIds: Array<ProjectId>;
     }) => Effect.Effect<void, RepositoryError>;
-    hardDeleteProjects: (params: {
+    hardDelete: (params: {
       workspaceId: WorkspaceId;
       projectIds: Array<ProjectId>;
     }) => Effect.Effect<void, RepositoryError>;
-    listProjects: (params: {
+    list: (params: {
       workspaceId: WorkspaceId;
       query?: {
         ids?: Array<ProjectId>;
@@ -152,23 +152,23 @@ export class ProjectRepository extends Context.Tag(
       });
 
       return ProjectRepository.of({
-        insertProjects: Effect.fn("@mason/project/ProjectRepository.insertProjects")(({ workspaceId, projects }) =>
+        insert: Effect.fn("@mason/project/ProjectRepo.insert")(({ workspaceId, projects }) =>
           db.withWorkspace(workspaceId, InsertProjects({ workspaceId, projects }))
         ),
 
-        updateProjects: Effect.fn("@mason/project/ProjectRepository.updateProjects")(({ workspaceId, projects }) =>
+        update: Effect.fn("@mason/project/ProjectRepo.update")(({ workspaceId, projects }) =>
           db.withWorkspace(workspaceId, UpdateProjects({ workspaceId, projects }))
         ),
 
-        softDeleteProjects: Effect.fn("@mason/project/ProjectRepository.softDeleteProjects")(({ workspaceId, projectIds }) =>
+        softDelete: Effect.fn("@mason/project/ProjectRepo.softDelete")(({ workspaceId, projectIds }) =>
           db.withWorkspace(workspaceId, SoftDeleteProjects({ workspaceId, projectIds }))
         ),
 
-        hardDeleteProjects: Effect.fn("@mason/project/ProjectRepository.hardDeleteProjects")(({ workspaceId, projectIds }) =>
+        hardDelete: Effect.fn("@mason/project/ProjectRepo.hardDelete")(({ workspaceId, projectIds }) =>
           db.withWorkspace(workspaceId, HardDeleteProjects({ workspaceId, projectIds }))
         ),
 
-        listProjects: Effect.fn("@mason/project/ProjectRepository.listProjects")(({ workspaceId, query }) =>
+        list: Effect.fn("@mason/project/ProjectRepo.list")(({ workspaceId, query }) =>
           db.withWorkspace(workspaceId, ListProjects({ workspaceId, query }))
         ),
       });

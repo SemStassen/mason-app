@@ -2,7 +2,7 @@ import type { DbProject } from "@mason/db/schema";
 import { Effect, Schema } from "effect";
 import { generateUUID } from "@mason/framework/utils/uuid";
 import { ProjectId, WorkspaceId } from "@mason/framework/types/ids";
-import { JsonRecord } from "@mason/framework/schemas";
+import { JsonRecord } from "@mason/framework/utils/schema";
 
 export class Project extends Schema.Class<Project>("@mason/mason/project")({
   id: ProjectId,

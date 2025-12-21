@@ -1,7 +1,7 @@
-import type { WorkspaceId } from "@mason/mason/models/ids";
 import { Context, type Effect } from "effect";
 import type { IntegrationAdapterError } from "./errors";
 import type { ExternalProject, ExternalTask } from "./models";
+import type { WorkspaceId } from "@mason/framework/types/ids";
 
 export class InternalTimeTrackingIntegrationAdapter extends Context.Tag(
   "@mason/integrations/TimeTrackingAdapter"
@@ -16,23 +16,23 @@ export class InternalTimeTrackingIntegrationAdapter extends Context.Tag(
     readonly listActivePeople: ({
       workspaceId,
     }: {
-      workspaceId: typeof WorkspaceId.Type;
+      workspaceId: WorkspaceId;
     }) => Effect.Effect<void, IntegrationAdapterError>;
 
     readonly listProjects: ({
       workspaceId,
     }: {
-      workspaceId: typeof WorkspaceId.Type;
+      workspaceId: WorkspaceId;
     }) => Effect.Effect<
-      Array<typeof ExternalProject.Type>,
+      Array<ExternalProject>,
       IntegrationAdapterError
     >;
     readonly listTasks: ({
       workspaceId,
     }: {
-      workspaceId: typeof WorkspaceId.Type;
+      workspaceId: WorkspaceId;
     }) => Effect.Effect<
-      Array<typeof ExternalTask.Type>,
+      Array<ExternalTask>,
       IntegrationAdapterError
     >;
   }

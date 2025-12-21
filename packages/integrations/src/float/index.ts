@@ -1,5 +1,3 @@
-import type { WorkspaceId } from "@mason/mason/models/ids";
-import { WorkspaceIntegrationsService } from "@mason/mason/services/workspace-integrations.service";
 import { Effect, Layer, Schema } from "effect";
 import { InternalTimeTrackingIntegrationAdapter } from "../adapter";
 import {
@@ -9,6 +7,8 @@ import {
 } from "../errors";
 import { ExternalProject, ExternalTask } from "../models";
 import { buildUrl, fetchPaginated, stringToTiptapJSON } from "../utils";
+import type { WorkspaceId } from "@mason/framework/types/ids";
+import { IntegrationService } from "@mason/framework/platform";
 
 /**
  * Represents a person from the Float API
@@ -106,19 +106,19 @@ const floatGetNextPage = (response: Response) => {
 export const floatLive = Layer.effect(
   InternalTimeTrackingIntegrationAdapter,
   Effect.gen(function* () {
-    const workspaceIntegrationsService = yield* WorkspaceIntegrationsService;
+    const integrationsService = yield* IntegrationService;
 
     const retrieveFloatApiKey = ({
       workspaceId,
     }: {
       workspaceId: typeof WorkspaceId.Type;
     }) =>
-      workspaceIntegrationsService.retrieveUnencryptedApiKey({
+      integrationsService.retrieveWorkspaceApiKey({
         workspaceId: workspaceId,
         kind: "float",
       });
 
-    return {
+    return InternalTimeTrackingIntegrationAdapter.of({
       testIntegration: ({ apiKeyUnencrypted }) =>
         fetchPaginated({
           fetchPage: () =>
@@ -195,6 +195,6 @@ export const floatLive = Layer.effect(
 
           return floatTasks;
         }),
-    };
+    });
   })
 );

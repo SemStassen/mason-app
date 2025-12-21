@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@effect/sql": "catalog:",
-    "@effect/sql-drizzle": "catalog:",
     "@mason/db": "workspace:*",
     "@mason/framework": "workspace:*",
     "effect": "catalog:"

@@ -19,7 +19,7 @@
   },
   "exports": {
     "./errors/*": "./src/errors/*.ts",
-    "./schemas": "./src/schemas/index.ts",
+    "./platform": "./src/platform/index.ts",
     "./types/*": "./src/types/*.ts",
     "./utils/*": "./src/utils/*.ts"
   }

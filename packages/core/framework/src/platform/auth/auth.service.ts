@@ -1,5 +1,6 @@
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "@mason/db/schema";
+import { DatabaseService } from "@mason/db/service";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
@@ -8,9 +9,8 @@ import {
   emailOTP,
   organization,
 } from "better-auth/plugins";
+import { WorkspaceId } from "@mason/framework/types/ids";
 import { Config, Effect, Schema } from "effect";
-import { WorkspaceId } from "../models/ids";
-import { DatabaseService } from "./db.service";
 
 export class BetterAuthError extends Schema.TaggedError<BetterAuthError>()(
   "@mason/server/betterAuthError",
@@ -35,7 +35,7 @@ export class AuthService extends Effect.Service<AuthService>()(
       // This is required to be separate for the type inference to work in the customSession plugin
       const betterAuthOptions = {
         appName: "Mason",
-        database: drizzleAdapter(db._drizzle, {
+        database: drizzleAdapter(db.drizzle, {
           provider: "pg",
           schema: schema,
         }),
@@ -43,22 +43,18 @@ export class AuthService extends Effect.Service<AuthService>()(
           session: {
             create: {
               before: async (session) => {
-                const user = await Effect.runPromise(
-                  db.use(null, (conn) =>
-                    conn.query.usersTable.findFirst({
-                      where: (fields, { eq }) => eq(fields.id, session.userId),
-                      with: {
-                        memberships: true,
-                        sessions: {
-                          orderBy: (fields, { desc }) => [
-                            desc(fields.createdAt),
-                          ],
-                          limit: 1,
-                        },
-                      },
-                    })
-                  )
-                );
+                const user = await db.drizzle.query.usersTable.findFirst({
+                  where: (fields, { eq }) => eq(fields.id, session.userId),
+                  with: {
+                    memberships: true,
+                    sessions: {
+                      orderBy: (fields, { desc }) => [
+                        desc(fields.createdAt),
+                      ],
+                      limit: 1,
+                    },
+                  },
+                });
 
                 return {
                   data: {
@@ -172,12 +168,14 @@ export class AuthService extends Effect.Service<AuthService>()(
               Effect.runPromise(
                 Effect.gen(function* () {
                   // Always fetch user baseline without tenant RLS
-                  const baseUser = yield* db.use(null, (conn) =>
-                    conn.query.usersTable.findFirst({
-                      where: (userFields, { eq }) =>
-                        eq(userFields.id, session.userId),
-                      with: { memberships: true },
-                    })
+                  const baseUser = yield* db.withTransaction(
+                    Effect.tryPromise(() =>
+                      db.drizzle.query.usersTable.findFirst({
+                        where: (userFields, { eq }) =>
+                          eq(userFields.id, session.userId),
+                        with: { memberships: true },
+                      })
+                    )
                   );
 
 
@@ -205,16 +203,17 @@ export class AuthService extends Effect.Service<AuthService>()(
                   }
 
                   // Refetch user with RLS in place
-                  const userWithWorkspaces = yield* db.use(
+                  const userWithWorkspaces = yield* db.withWorkspace(
                     WorkspaceId.make(activeWorkspaceId),
-                    (conn) =>
-                      conn.query.usersTable.findFirst({
+                    Effect.tryPromise(() =>
+                      db.drizzle.query.usersTable.findFirst({
                         where: (userFields, { eq }) =>
                           eq(userFields.id, baseUser.id),
                         with: {
                           memberships: { with: { workspace: true } },
                         },
                       })
+                    )
                   );
 
                   if (!userWithWorkspaces) {

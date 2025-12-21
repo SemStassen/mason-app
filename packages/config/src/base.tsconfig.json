@@ -2,27 +2,36 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Default",
   "compilerOptions": {
+    "incremental": true,
+    "composite": true,
+
     "lib": ["ESNext", "DOM"],
-    "module": "ESNext",
     "target": "ES2022",
-    "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
 
+    "module": "preserve",
+    "moduleDetection": "force",
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true,
+
     "noEmit": true,
+    "declarationMap": true,
+    "sourceMap": true,
 
     "strict": true,
-    "skipLibCheck": true,
     "strictNullChecks": true,
+    "exactOptionalPropertyTypes": true,
     "noFallthroughCasesInSwitch": true,
-
-    "experimentalDecorators": false,
-    "noUnusedLocals": false,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
-    "exactOptionalPropertyTypes": true,
+
+    "skipLibCheck": true,
+    "experimentalDecorators": false,
+
     "plugins": [
       {
         "name": "@effect/language-service"

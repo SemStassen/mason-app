@@ -4,6 +4,7 @@ import { floatLive } from "./float";
 
 // biome-ignore lint/performance/noBarrelFile: Exports are needed for type inference
 export * from "./errors";
+export type { InternalTimeTrackingIntegrationAdapter } from "./adapter";
 
 export class MissingIntegrationAdapterError extends Schema.TaggedError<MissingIntegrationAdapterError>()(
   "@mason/integrations/missingIntegrationAdapterError",

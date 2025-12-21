@@ -1,37 +1,21 @@
-import { Project } from "@mason/mason/models/project.model";
+import { JsonRecord } from "@mason/framework/utils/schema";
 import { Schema } from "effect";
+import { OptionFromNonEmptyTrimmedString } from "effect/Schema";
 
-/** Custom date types */
-
-export const OptionFromNonEmptyTrimmedStringMax = ({
-  maxLength,
-}: {
-  maxLength: number;
-}) =>
-  Schema.transform(Schema.String, Schema.OptionFromNonEmptyTrimmedString, {
-    strict: true,
-    decode: (s: string) => s.trim().slice(0, maxLength),
-    encode: (s: string) => s,
-  });
-
-/** Models */
-
+export type ExternalProject = typeof ExternalProject.Type;
 export const ExternalProject = Schema.Struct({
   externalId: Schema.String,
-  name: OptionFromNonEmptyTrimmedStringMax({ maxLength: 255 }),
-  hexColor: Schema.optionalWith(Project.fields.hexColor, {
-    exact: true,
-  }),
-  isBillable: Schema.optionalWith(Project.fields.isBillable, {
-    exact: true,
-  }),
-  startDate: Schema.optionalWith(Project.fields.startDate, { exact: true }),
-  endDate: Schema.optionalWith(Project.fields.endDate, { exact: true }),
-  notes: Schema.optionalWith(Project.fields.notes, { exact: true }),
+  name: OptionFromNonEmptyTrimmedString,
+  hexColor: Schema.optionalWith(Schema.NonEmptyString.pipe(Schema.maxLength(9)), { exact: true }),
+  isBillable: Schema.optionalWith(Schema.Boolean, { exact: true }),
+  startDate: Schema.optionalWith(Schema.DateFromSelf, { exact: true }),
+  endDate: Schema.optionalWith(Schema.DateFromSelf, { exact: true }),
+  notes: Schema.optionalWith(JsonRecord, { exact: true }),
 });
 
+export type ExternalTask = typeof ExternalTask.Type;
 export const ExternalTask = Schema.Struct({
   externalId: Schema.String,
   externalProjectId: Schema.String,
-  name: OptionFromNonEmptyTrimmedStringMax({ maxLength: 255 }),
+  name: OptionFromNonEmptyTrimmedString,
 });

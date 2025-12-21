@@ -16,6 +16,7 @@ const WorkspaceIntegration = Schema.Struct({
   createdAt: Schema.Date,
 });
 
+export type CreateWorkspaceIntegrationRequest = typeof CreateWorkspaceIntegrationRequest.Type;
 export const CreateWorkspaceIntegrationRequest = Schema.Struct({
   kind: WorkspaceIntegration.fields.kind,
   apiKeyUnencrypted: Schema.NonEmptyString,

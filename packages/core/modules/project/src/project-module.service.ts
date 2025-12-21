@@ -69,15 +69,15 @@ export class ProjectModuleService extends Context.Tag(
   static readonly live = Layer.effect(
     ProjectModuleService,
     Effect.gen(function* () {
-      const projectRepository = yield* ProjectRepository;
-      const taskRepository = yield* TaskRepository;
+      const projectRepo = yield* ProjectRepository;
+      const taskRepo = yield* TaskRepository;
 
       return ProjectModuleService.of({
         createProjects: Effect.fn(
           "@mason/project/ProjectModuleService.createProjects"
         )((params) =>
-          projectRepository
-            .insertProjects(params)
+          projectRepo
+            .insert(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
@@ -87,8 +87,8 @@ export class ProjectModuleService extends Context.Tag(
         updateProjects: Effect.fn(
           "@mason/project/ProjectModuleService.updateProjects"
         )((params) =>
-          projectRepository
-            .updateProjects(params)
+          projectRepo
+            .update(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
@@ -98,8 +98,8 @@ export class ProjectModuleService extends Context.Tag(
         softDeleteProjects: Effect.fn(
           "@mason/project/ProjectModuleService.softDeleteProjects"
         )((params) =>
-          projectRepository
-            .softDeleteProjects(params)
+          projectRepo
+            .softDelete(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
@@ -109,8 +109,8 @@ export class ProjectModuleService extends Context.Tag(
         hardDeleteProjects: Effect.fn(
           "@mason/project/ProjectModuleService.hardDeleteProjects"
         )((params) =>
-          projectRepository
-            .hardDeleteProjects(params)
+          projectRepo
+            .hardDelete(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
@@ -120,8 +120,8 @@ export class ProjectModuleService extends Context.Tag(
         listProjects: Effect.fn(
           "@mason/project/ProjectModuleService.listProjects"
         )((params) =>
-          projectRepository
-            .listProjects(params)
+          projectRepo
+            .list(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
@@ -131,8 +131,8 @@ export class ProjectModuleService extends Context.Tag(
         createTasks: Effect.fn(
           "@mason/project/ProjectModuleService.createTasks"
         )((params) =>
-          taskRepository
-            .insertTasks(params)
+          taskRepo
+            .insert(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
@@ -142,8 +142,8 @@ export class ProjectModuleService extends Context.Tag(
         updateTasks: Effect.fn(
           "@mason/project/ProjectModuleService.updateTasks"
         )((params) =>
-          taskRepository
-            .updateTasks(params)
+          taskRepo
+            .update(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
@@ -153,8 +153,8 @@ export class ProjectModuleService extends Context.Tag(
         softDeleteTasks: Effect.fn(
           "@mason/project/ProjectModuleService.softDeleteTasks"
         )((params) =>
-          taskRepository
-            .softDeleteTasks(params)
+          taskRepo
+            .softDelete(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
@@ -164,8 +164,8 @@ export class ProjectModuleService extends Context.Tag(
         hardDeleteTasks: Effect.fn(
           "@mason/project/ProjectModuleService.hardDeleteTasks"
         )((params) =>
-          taskRepository
-            .hardDeleteTasks(params)
+          taskRepo
+            .hardDelete(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
@@ -174,8 +174,8 @@ export class ProjectModuleService extends Context.Tag(
         ),
         listTasks: Effect.fn("@mason/project/ProjectModuleService.listTasks")(
           (params) =>
-            taskRepository
-              .listTasks(params)
+            taskRepo
+              .list(params)
               .pipe(
                 Effect.mapError(
                   (e) => new GenericProjectModuleError({ cause: e })

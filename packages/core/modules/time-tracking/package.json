@@ -1,5 +1,5 @@
 {
-  "name": "@mason/mason",
+  "name": "@mason/time-tracking",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,23 +9,14 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@mason/api-contract": "workspace:*",
+    "@effect/sql": "catalog:",
     "@mason/db": "workspace:*",
     "@mason/framework": "workspace:*",
-    "@mason/integrations": "workspace:*",
-    "@mason/project": "workspace:*",
-    "@mason/telemetry": "workspace:*",
-    "@mason/time-tracking": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
     "typescript": "catalog:dev"
   },
-  "exports": {
-    "./models/*": "./src/models/*.ts",
-    "./services/*": "./src/services/*.ts",
-    "./utils/*": "./src/utils/*.ts",
-    "./instrumentation": "./src/instrumentation.ts"
-  }
+  "exports": {}
 }
