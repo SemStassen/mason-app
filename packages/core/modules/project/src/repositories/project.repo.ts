@@ -1,46 +1,45 @@
 import { Context, Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "@effect/sql";
-import type { ResultLengthMismatch, SqlError } from "@effect/sql/SqlError";
-import type { ParseError } from "effect/ParseResult";
 import { and, eq, inArray, sql } from "@mason/db/operators";
 import { projectsTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
 import { ProjectId, WorkspaceId } from "@mason/framework/types/ids";
 import { Project } from "../models/project.model";
+import type { RepositoryError } from "@mason/framework/errors/database";
 
-export class ProjectRepository extends Context.Tag("ProjectRepository")<
+export class ProjectRepository extends Context.Tag("@mason/project/ProjectRepository")<
   ProjectRepository,
   {
-    insertProjects: (
-      workspaceId: WorkspaceId,
-      projects: Array<Project>
-    ) => Effect.Effect<
+    insertProjects: (params: {
+      workspaceId: WorkspaceId;
+      projects: Array<Project>;
+    }) => Effect.Effect<
       readonly Project[],
-      ResultLengthMismatch | SqlError | ParseError
+      RepositoryError
     >;
-    updateProjects: (
-      workspaceId: WorkspaceId,
-      projects: Array<Project>
-    ) => Effect.Effect<
+    updateProjects: (params: {
+      workspaceId: WorkspaceId;
+      projects: Array<Project>;
+    }) => Effect.Effect<
       readonly Project[],
-      ResultLengthMismatch | SqlError | ParseError
+      RepositoryError
     >;
-    softDeleteProjects: (
-      workspaceId: WorkspaceId,
-      projectIds: Array<ProjectId>
-    ) => Effect.Effect<void, SqlError | ParseError>;
-    hardDeleteProjects: (
-      workspaceId: WorkspaceId,
-      projectIds: Array<ProjectId>
-    ) => Effect.Effect<void, SqlError | ParseError>;
-    listProjects: (
-      workspaceId: WorkspaceId,
-      query: {
+    softDeleteProjects: (params: {
+      workspaceId: WorkspaceId;
+      projectIds: Array<ProjectId>;
+    }) => Effect.Effect<void, RepositoryError>;
+    hardDeleteProjects: (params: {
+      workspaceId: WorkspaceId;
+      projectIds: Array<ProjectId>;
+    }) => Effect.Effect<void, RepositoryError>;
+    listProjects: (params: {
+      workspaceId: WorkspaceId;
+      query?: {
         ids?: Array<ProjectId>;
         _source?: "float";
         _externalIds?: Array<string>;
-      }
-    ) => Effect.Effect<readonly Project[], SqlError | ParseError>;
+      };
+    }) => Effect.Effect<readonly Project[], RepositoryError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -156,58 +155,27 @@ export class ProjectRepository extends Context.Tag("ProjectRepository")<
         },
       });
 
-      // --- Repository Methods ---
-      const insertProjects = (
-        workspaceId: WorkspaceId,
-        projects: Array<Project>
-      ) =>
-        db.withWorkspace(
-          workspaceId,
-          InsertProjects({ workspaceId, projects })
-        );
-
-      const updateProjects = (
-        workspaceId: WorkspaceId,
-        projects: Array<Project>
-      ) =>
-        db.withWorkspace(
-          workspaceId,
-          UpdateProjects({ workspaceId, projects })
-        );
-
-      const softDeleteProjects = (
-        workspaceId: WorkspaceId,
-        projectIds: Array<ProjectId>
-      ) =>
-        db.withWorkspace(
-          workspaceId,
-          SoftDeleteProjects({ workspaceId, projectIds })
-        );
-
-      const hardDeleteProjects = (
-        workspaceId: WorkspaceId,
-        projectIds: Array<ProjectId>
-      ) =>
-        db.withWorkspace(
-          workspaceId,
-          HardDeleteProjects({ workspaceId, projectIds })
-        );
-
-      const listProjects = (
-        workspaceId: WorkspaceId,
-        query: {
-          ids?: Array<ProjectId>;
-          _source?: "float";
-          _externalIds?: Array<string>;
-        }
-      ) => db.withWorkspace(workspaceId, ListProjects({ workspaceId, query }));
-
       return ProjectRepository.of({
-        insertProjects,
-        updateProjects,
-        softDeleteProjects,
-        hardDeleteProjects,
-        listProjects,
+        insertProjects: ({ workspaceId, projects }) =>
+          db.withWorkspace(workspaceId, InsertProjects({ workspaceId, projects })),
+
+        updateProjects: ({ workspaceId, projects }) =>
+          db.withWorkspace(workspaceId, UpdateProjects({ workspaceId, projects })),
+
+        softDeleteProjects: ({ workspaceId, projectIds }) =>
+          db.withWorkspace(
+            workspaceId,
+            SoftDeleteProjects({ workspaceId, projectIds })
+          ),
+
+        hardDeleteProjects: ({ workspaceId, projectIds }) =>
+          db.withWorkspace(
+            workspaceId,
+            HardDeleteProjects({ workspaceId, projectIds })
+          ),
+
+        listProjects: ({ workspaceId, query }) =>
+          db.withWorkspace(workspaceId, ListProjects({ workspaceId, query })),
       });
     })
   );

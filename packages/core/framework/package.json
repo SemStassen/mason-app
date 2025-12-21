@@ -9,6 +9,7 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
+    "@effect/sql": "catalog:",
     "effect": "catalog:",
     "uuid": "^13.0.0"
   },
