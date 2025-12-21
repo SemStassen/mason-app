@@ -1,4 +1,8 @@
-import type { ProjectId, TaskId, WorkspaceId } from "@mason/framework/types/ids";
+import type {
+  ProjectId,
+  TaskId,
+  WorkspaceId,
+} from "@mason/framework/types/ids";
 import { Context, Effect, Layer } from "effect";
 import type { Project } from "./models/project.model";
 import { ProjectRepository } from "./repositories/project.repo";
@@ -69,86 +73,115 @@ export class ProjectModuleService extends Context.Tag(
       const taskRepository = yield* TaskRepository;
 
       return ProjectModuleService.of({
-        createProjects: (params) =>
+        createProjects: Effect.fn(
+          "@mason/project/ProjectModuleService.createProjects"
+        )((params) =>
           projectRepository
             .insertProjects(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            ),
-        updateProjects: (params) =>
+            )
+        ),
+        updateProjects: Effect.fn(
+          "@mason/project/ProjectModuleService.updateProjects"
+        )((params) =>
           projectRepository
             .updateProjects(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            ),
-        softDeleteProjects: (params) =>
+            )
+        ),
+        softDeleteProjects: Effect.fn(
+          "@mason/project/ProjectModuleService.softDeleteProjects"
+        )((params) =>
           projectRepository
             .softDeleteProjects(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            ),
-        hardDeleteProjects: (params) =>
+            )
+        ),
+        hardDeleteProjects: Effect.fn(
+          "@mason/project/ProjectModuleService.hardDeleteProjects"
+        )((params) =>
           projectRepository
             .hardDeleteProjects(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            ),
-        listProjects: (params) =>
+            )
+        ),
+        listProjects: Effect.fn(
+          "@mason/project/ProjectModuleService.listProjects"
+        )((params) =>
           projectRepository
             .listProjects(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            ),
-        createTasks: (params) =>
+            )
+        ),
+        createTasks: Effect.fn(
+          "@mason/project/ProjectModuleService.createTasks"
+        )((params) =>
           taskRepository
             .insertTasks(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            ),
-        updateTasks: (params) =>
+            )
+        ),
+        updateTasks: Effect.fn(
+          "@mason/project/ProjectModuleService.updateTasks"
+        )((params) =>
           taskRepository
             .updateTasks(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            ),
-        softDeleteTasks: (params) =>
+            )
+        ),
+        softDeleteTasks: Effect.fn(
+          "@mason/project/ProjectModuleService.softDeleteTasks"
+        )((params) =>
           taskRepository
             .softDeleteTasks(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            ),
-        hardDeleteTasks: (params) =>
+            )
+        ),
+        hardDeleteTasks: Effect.fn(
+          "@mason/project/ProjectModuleService.hardDeleteTasks"
+        )((params) =>
           taskRepository
             .hardDeleteTasks(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            ),
-        listTasks: (params) =>
-          taskRepository
-            .listTasks(params)
-            .pipe(
-              Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
+            )
+        ),
+        listTasks: Effect.fn("@mason/project/ProjectModuleService.listTasks")(
+          (params) =>
+            taskRepository
+              .listTasks(params)
+              .pipe(
+                Effect.mapError(
+                  (e) => new GenericProjectModuleError({ cause: e })
+                )
               )
-            ),
+        ),
       });
     })
   );
