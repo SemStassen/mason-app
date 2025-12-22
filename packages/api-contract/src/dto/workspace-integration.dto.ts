@@ -16,21 +16,28 @@ const WorkspaceIntegration = Schema.Struct({
   createdAt: Schema.Date,
 });
 
-export type CreateWorkspaceIntegrationRequest = typeof CreateWorkspaceIntegrationRequest.Type;
+export type CreateWorkspaceIntegrationRequest =
+  typeof CreateWorkspaceIntegrationRequest.Type;
 export const CreateWorkspaceIntegrationRequest = Schema.Struct({
   kind: WorkspaceIntegration.fields.kind,
   apiKeyUnencrypted: Schema.NonEmptyString,
 });
 
+export type UpdateWorkspaceIntegrationRequest =
+  typeof UpdateWorkspaceIntegrationRequest.Type;
 export const UpdateWorkspaceIntegrationRequest = Schema.Struct({
   id: WorkspaceIntegration.fields.id,
   apiKeyUnencrypted: Schema.NonEmptyString,
 });
 
+export type DeleteWorkspaceIntegrationRequest =
+  typeof DeleteWorkspaceIntegrationRequest.Type;
 export const DeleteWorkspaceIntegrationRequest = Schema.Struct({
   id: WorkspaceIntegration.fields.id,
 });
 
+export type WorkspaceIntegrationResponse =
+  typeof WorkspaceIntegrationResponse.Type;
 export const WorkspaceIntegrationResponse = Schema.TaggedStruct(
   "WorkspaceIntegrationResponse",
   {

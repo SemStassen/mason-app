@@ -26,3 +26,7 @@ export type WorkspaceIntegrationId = typeof WorkspaceIntegrationId.Type;
 export const WorkspaceIntegrationId = Schema.NonEmptyString.pipe(
   Schema.brand("WorkspaceIntegrationId")
 );
+
+// Misc.
+export type ApiKey = typeof ApiKey.Type;
+export const ApiKey = Schema.NonEmptyString.pipe(Schema.brand("ApiKey"));

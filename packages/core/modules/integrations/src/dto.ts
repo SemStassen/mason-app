@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { WorkspaceIntegration } from "./workspace-integration.model";
+import { WorkspaceIntegration } from "./models/workspace-integration.model";
 
 export type WorkspaceIntegrationToCreate =
   typeof WorkspaceIntegrationToCreate.Type;

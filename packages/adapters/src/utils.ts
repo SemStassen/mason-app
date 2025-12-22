@@ -2,13 +2,13 @@ import { Effect } from "effect";
 import { IntegrationDecodingError } from "./errors";
 
 // Simplest tiptap format storable in DB
-type TiptapDoc = {
+interface TiptapDoc {
   type: "doc";
   content: Array<{
     type: "paragraph";
     content: Array<{ type: "hardBreak" } | { type: "text"; text: string }>;
   }>;
-};
+}
 
 const LINE_BREAK_REGEX = /\r?\n/;
 

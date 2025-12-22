@@ -1,4 +1,3 @@
-import type { DbTimeEntry } from "@mason/db/schema";
 import {
   MemberId,
   ProjectId,
@@ -40,98 +39,44 @@ export class TimeEntry extends Schema.Class<TimeEntry>(
     startedAt: Schema.DateFromSelf,
     stoppedAt: Schema.DateFromSelf,
     notes: Schema.NullOr(JsonRecord),
-  }).pipe(Schema.filter(({ startedAt, stoppedAt }) => isAfter(stoppedAt, startedAt)))
+  }).pipe(
+    Schema.filter(({ startedAt, stoppedAt }) => isAfter(stoppedAt, startedAt))
+  )
 ) {
-  private static validate(timeEntry: TimeEntry) {
-    return Effect.gen(function* () {
-      if (isAfter(timeEntry.startedAt, timeEntry.stoppedAt)) {
-        return yield* Effect.fail(
-          new TimeEntryDateOrderError({
-            startedAt: timeEntry.startedAt,
-            stoppedAt: timeEntry.stoppedAt,
-          })
-        );
-      }
-
-      return timeEntry;
-    });
-  }
-
-  static makeFromDb(dbRecord: DbTimeEntry) {
-    return Effect.gen(function* () {
-      if (!dbRecord.stoppedAt) {
-        return yield* Effect.fail(
-          new TimeEntryMissingStoppedAtError({
-            startedAt: dbRecord.startedAt,
-          })
-        );
-      }
-
-      const timeEntry = new TimeEntry({
-        startedAt: dbRecord.startedAt,
-        stoppedAt: dbRecord.stoppedAt,
-        notes: dbRecord.notes,
-        id: TimeEntryId.make(dbRecord.id),
-        memberId: MemberId.make(dbRecord.memberId),
-        projectId: ProjectId.make(dbRecord.projectId),
-        taskId: dbRecord.taskId ? TaskId.make(dbRecord.taskId) : null,
-        workspaceId: WorkspaceId.make(dbRecord.workspaceId),
-      });
-
-      return yield* TimeEntry.validate(timeEntry);
-    });
-  }
+  static readonly Create = Schema.Struct({
+    memberId: TimeEntry.fields.memberId,
+    projectId: TimeEntry.fields.projectId,
+    taskId: TimeEntry.fields.taskId,
+    startedAt: TimeEntry.fields.startedAt,
+    stoppedAt: TimeEntry.fields.stoppedAt,
+    notes: TimeEntry.fields.notes,
+  });
 
   static makeFromCreate(
-    input: typeof TimeEntryToCreate.Type,
-    workspaceId: typeof WorkspaceId.Type
+    input: typeof TimeEntry.Create.Type,
+    workspaceId: WorkspaceId
   ) {
-    return Effect.gen(function* () {
-      const timeEntry = new TimeEntry({
-        ...input,
-        id: TimeEntryId.make(generateUUID()),
-        workspaceId: workspaceId,
-      });
-
-      return yield* TimeEntry.validate(timeEntry);
-    });
+    return Schema.decodeUnknown(TimeEntry.Create)(input).pipe(
+      Effect.map((validated) =>
+        TimeEntry.make({
+          ...validated,
+          id: TimeEntryId.make(generateUUID()),
+          workspaceId,
+        })
+      )
+    );
   }
 
-  static makeFromUpdate(
-    input: typeof TimeEntryToUpdate.Type,
-    existing: DbTimeEntry
-  ) {
-    return Effect.gen(function* () {
-      const existingTimeEntry = yield* TimeEntry.makeFromDb(existing);
-      const timeEntry = new TimeEntry({
-        ...existingTimeEntry,
-        ...input,
-        id: existingTimeEntry.id,
-      });
-
-      return yield* TimeEntry.validate(timeEntry);
-    });
+  static readonly Patch = Schema.Struct({
+    projectId: Schema.optionalWith(TimeEntry.fields.projectId, { exact: true }),
+    taskId: Schema.optionalWith(TimeEntry.fields.taskId, { exact: true }),
+    startedAt: Schema.optionalWith(TimeEntry.fields.startedAt, { exact: true }),
+    stoppedAt: Schema.optionalWith(TimeEntry.fields.stoppedAt, { exact: true }),
+    notes: Schema.optionalWith(TimeEntry.fields.notes, { exact: true }),
+  });
+  patch(updates: typeof TimeEntry.Patch.Type) {
+    return Schema.decodeUnknown(TimeEntry.Patch)(updates).pipe(
+      Effect.map((validated) => TimeEntry.make({ ...this, ...validated }))
+    );
   }
 }
-
-export const TimeEntryToCreate = Schema.TaggedStruct("TimeEntryToCreate", {
-  // References
-  memberId: TimeEntry.fields.memberId,
-  projectId: TimeEntry.fields.projectId,
-  taskId: TimeEntry.fields.taskId,
-  // General
-  startedAt: TimeEntry.fields.startedAt,
-  stoppedAt: TimeEntry.fields.stoppedAt,
-  notes: TimeEntry.fields.notes,
-});
-
-export const TimeEntryToUpdate = Schema.TaggedStruct("TimeEntryToUpdate", {
-  id: TimeEntry.fields.id,
-  // References
-  projectId: TimeEntry.fields.projectId,
-  taskId: TimeEntry.fields.taskId,
-  // General
-  startedAt: Schema.optionalWith(TimeEntry.fields.startedAt, { exact: true }),
-  stoppedAt: Schema.optionalWith(TimeEntry.fields.stoppedAt, { exact: true }),
-  notes: Schema.optionalWith(JsonRecord, { exact: true }),
-});

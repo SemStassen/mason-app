@@ -4,9 +4,15 @@ import type {
   WorkspaceId,
 } from "@mason/framework/types/ids";
 import { Context, Effect, Layer } from "effect";
+import type {
+  ProjectToCreate,
+  ProjectToUpdate,
+  TaskToCreate,
+  TaskToUpdate,
+} from "./dto";
 import { GenericProjectModuleError, type ProjectModuleError } from "./errors";
-import type { Project } from "./models/project.model";
-import type { Task } from "./models/task.model";
+import { Project } from "./models/project.model";
+import { Task } from "./models/task.model";
 import { ProjectRepository } from "./repositories/project.repo";
 import { TaskRepository } from "./repositories/task.repo";
 
@@ -17,11 +23,11 @@ export class ProjectModuleService extends Context.Tag(
   {
     createProjects: (params: {
       workspaceId: WorkspaceId;
-      projects: Array<Project>;
+      projects: Array<ProjectToCreate>;
     }) => Effect.Effect<ReadonlyArray<Project>, ProjectModuleError>;
     updateProjects: (params: {
       workspaceId: WorkspaceId;
-      projects: Array<Project>;
+      projects: Array<ProjectToUpdate>;
     }) => Effect.Effect<ReadonlyArray<Project>, ProjectModuleError>;
     softDeleteProjects: (params: {
       workspaceId: WorkspaceId;
@@ -41,11 +47,11 @@ export class ProjectModuleService extends Context.Tag(
     }) => Effect.Effect<ReadonlyArray<Project>, ProjectModuleError>;
     createTasks: (params: {
       workspaceId: WorkspaceId;
-      tasks: Array<Task>;
+      tasks: Array<TaskToCreate>;
     }) => Effect.Effect<ReadonlyArray<Task>, ProjectModuleError>;
     updateTasks: (params: {
       workspaceId: WorkspaceId;
-      tasks: Array<Task>;
+      tasks: Array<TaskToUpdate>;
     }) => Effect.Effect<ReadonlyArray<Task>, ProjectModuleError>;
     softDeleteTasks: (params: {
       workspaceId: WorkspaceId;
@@ -75,37 +81,77 @@ export class ProjectModuleService extends Context.Tag(
       return ProjectModuleService.of({
         createProjects: Effect.fn(
           "@mason/project/ProjectModuleService.createProjects"
-        )((params) =>
-          projectRepo
-            .insert(params)
-            .pipe(
-              Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
-              )
-            )
+        )(
+          function* ({ workspaceId, projects }) {
+            const projectsToCreate = yield* Effect.forEach(
+              projects,
+              (project) => Project.makeFromCreate(project, workspaceId)
+            );
+
+            return yield* projectRepo.insert({
+              workspaceId: workspaceId,
+              projects: projectsToCreate,
+            });
+          },
+          Effect.catchTags({
+            ParseError: (e) =>
+              Effect.fail(new GenericProjectModuleError({ cause: e })),
+            SqlError: (e) =>
+              Effect.fail(new GenericProjectModuleError({ cause: e })),
+          })
         ),
         updateProjects: Effect.fn(
           "@mason/project/ProjectModuleService.updateProjects"
-        )((params) =>
-          projectRepo
-            .update(params)
-            .pipe(
-              Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
-              )
-            )
+        )(
+          function* ({ workspaceId, projects }) {
+            const existingProjects = yield* projectRepo.list({
+              workspaceId: workspaceId,
+              query: {
+                ids: projects.map((project) => project.id),
+              },
+            });
+
+            const projectsToUpdate = yield* Effect.forEach(
+              projects,
+              (project) =>
+                Effect.gen(function* () {
+                  const existingProject = existingProjects.find(
+                    (p) => p.id === project.id
+                  );
+                  if (!existingProject) {
+                    return yield* Effect.fail(
+                      new GenericProjectModuleError({
+                        cause: `Project ${project.id} not found`,
+                      })
+                    );
+                  }
+                  return yield* existingProject.patch(project);
+                })
+            );
+
+            return yield* projectRepo.update({
+              workspaceId: workspaceId,
+              projects: projectsToUpdate,
+            });
+          },
+          Effect.catchTags({
+            ParseError: (e) =>
+              Effect.fail(new GenericProjectModuleError({ cause: e })),
+            SqlError: (e) =>
+              Effect.fail(new GenericProjectModuleError({ cause: e })),
+          })
         ),
         softDeleteProjects: Effect.fn(
           "@mason/project/ProjectModuleService.softDeleteProjects"
-        )((params) =>
-          projectRepo
+        )(function* (params) {
+          return yield* projectRepo
             .softDelete(params)
             .pipe(
               Effect.mapError(
                 (e) => new GenericProjectModuleError({ cause: e })
               )
-            )
-        ),
+            );
+        }),
         hardDeleteProjects: Effect.fn(
           "@mason/project/ProjectModuleService.hardDeleteProjects"
         )((params) =>
@@ -130,25 +176,62 @@ export class ProjectModuleService extends Context.Tag(
         ),
         createTasks: Effect.fn(
           "@mason/project/ProjectModuleService.createTasks"
-        )((params) =>
-          taskRepo
-            .insert(params)
-            .pipe(
-              Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
-              )
-            )
+        )(
+          function* ({ workspaceId, tasks }) {
+            const tasksToCreate = yield* Effect.forEach(tasks, (task) =>
+              Task.makeFromCreate(task, workspaceId)
+            );
+
+            return yield* taskRepo.insert({
+              workspaceId: workspaceId,
+              tasks: tasksToCreate,
+            });
+          },
+          Effect.catchTags({
+            ParseError: (e) =>
+              Effect.fail(new GenericProjectModuleError({ cause: e })),
+            SqlError: (e) =>
+              Effect.fail(new GenericProjectModuleError({ cause: e })),
+          })
         ),
         updateTasks: Effect.fn(
           "@mason/project/ProjectModuleService.updateTasks"
-        )((params) =>
-          taskRepo
-            .update(params)
-            .pipe(
-              Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
-              )
-            )
+        )(
+          function* ({ workspaceId, tasks }) {
+            const existingTasks = yield* taskRepo.list({
+              workspaceId: workspaceId,
+              query: {
+                ids: tasks.map((task) => task.id),
+              },
+            });
+
+            const tasksToUpdate = yield* Effect.forEach(tasks, (task) =>
+              Effect.gen(function* () {
+                const existingTask = existingTasks.find(
+                  (t) => t.id === task.id
+                );
+                if (!existingTask) {
+                  return yield* Effect.fail(
+                    new GenericProjectModuleError({
+                      cause: `Task ${task.id} not found`,
+                    })
+                  );
+                }
+                return yield* existingTask.patch(task);
+              })
+            );
+
+            return yield* taskRepo.update({
+              workspaceId: workspaceId,
+              tasks: tasksToUpdate,
+            });
+          },
+          Effect.catchTags({
+            ParseError: (e) =>
+              Effect.fail(new GenericProjectModuleError({ cause: e })),
+            SqlError: (e) =>
+              Effect.fail(new GenericProjectModuleError({ cause: e })),
+          })
         ),
         softDeleteTasks: Effect.fn(
           "@mason/project/ProjectModuleService.softDeleteTasks"

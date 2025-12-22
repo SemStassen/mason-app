@@ -1,5 +1,5 @@
 {
-  "name": "@mason/integrations",
+  "name": "@mason/adapters",
   "private": true,
   "type": "module",
   "scripts": {

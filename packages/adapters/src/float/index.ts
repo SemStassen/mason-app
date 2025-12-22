@@ -7,27 +7,25 @@ import {
 } from "../errors";
 import { ExternalProject, ExternalTask } from "../models";
 import { buildUrl, fetchPaginated, stringToTiptapJSON } from "../utils";
-import type { WorkspaceId } from "@mason/framework/types/ids";
-import { IntegrationService } from "@mason/framework/platform";
 
 /**
  * Represents a person from the Float API
  * Only the necessary fields are typed
  * @see https://developer.float.com/api_reference.html#People
  */
-type FloatPerson = {
+interface FloatPerson {
   people_id: number;
   email: string;
   name: string;
   active: 0 | 1;
-};
+}
 
 /**
  * Represents a project from the Float API
  * Only the necessary fields are typed
  * @see https://developer.float.com/api_reference.html#Projects
  */
-type FloatProject = {
+interface FloatProject {
   project_id: number;
   name: string;
   /** Hex color (does not include #) */
@@ -37,18 +35,18 @@ type FloatProject = {
   notes?: string | null;
   start_date?: string | null;
   end_date?: string | null;
-};
+}
 
 /**
  * Represents a task from the Float API
  * Only the necessary fields are typed
  * @see https://developer.float.com/api_reference.html#Project_Tasks
  */
-type FloatProjectTask = {
+interface FloatProjectTask {
   task_meta_id: number;
   project_id: number;
   task_name: string;
-};
+}
 
 const BASE_URL = "https://api.float.com/v3";
 const CURRENT_PAGE_HEADER = "X-Pagination-Current-Page";
@@ -106,33 +104,20 @@ const floatGetNextPage = (response: Response) => {
 export const floatLive = Layer.effect(
   InternalTimeTrackingIntegrationAdapter,
   Effect.gen(function* () {
-    const integrationsService = yield* IntegrationService;
-
-    const retrieveFloatApiKey = ({
-      workspaceId,
-    }: {
-      workspaceId: typeof WorkspaceId.Type;
-    }) =>
-      integrationsService.retrieveWorkspaceApiKey({
-        workspaceId: workspaceId,
-        kind: "float",
-      });
-
     return InternalTimeTrackingIntegrationAdapter.of({
-      testIntegration: ({ apiKeyUnencrypted }) =>
+      testIntegration: ({ apiKey }) =>
         fetchPaginated({
           fetchPage: () =>
             floatFetch({
-              apiKey: apiKeyUnencrypted,
+              apiKey: apiKey,
               path: buildUrl("/people", { "per-page": 1 }),
             }),
           getNextPage: () => null,
           extractItems: (body) => body as Array<FloatPerson>,
         }),
-      listActivePeople: ({ workspaceId }) =>
-        Effect.gen(function* () {
-          const apiKey = yield* retrieveFloatApiKey({ workspaceId });
 
+      listActivePeople: ({ apiKey }) =>
+        Effect.gen(function* () {
           yield* fetchPaginated({
             fetchPage: () =>
               floatFetch({
@@ -143,10 +128,9 @@ export const floatLive = Layer.effect(
             extractItems: (body) => body as Array<FloatPerson>,
           });
         }),
-      listProjects: ({ workspaceId }) =>
-        Effect.gen(function* () {
-          const apiKey = yield* retrieveFloatApiKey({ workspaceId });
 
+      listProjects: ({ apiKey }) =>
+        Effect.gen(function* () {
           const floatProjects = yield* fetchPaginated({
             fetchPage: (page) =>
               floatFetch({
@@ -172,10 +156,9 @@ export const floatLive = Layer.effect(
 
           return floatProjects;
         }),
-      listTasks: ({ workspaceId }) =>
-        Effect.gen(function* () {
-          const apiKey = yield* retrieveFloatApiKey({ workspaceId });
 
+      listTasks: ({ apiKey }) =>
+        Effect.gen(function* () {
           const floatTasks = yield* fetchPaginated({
             fetchPage: (page) =>
               floatFetch({

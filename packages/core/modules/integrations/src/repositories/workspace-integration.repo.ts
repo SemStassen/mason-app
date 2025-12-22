@@ -8,7 +8,7 @@ import {
   WorkspaceIntegrationId,
 } from "@mason/framework/types/ids";
 import { Context, Effect, Layer, type Option, Schema } from "effect";
-import { WorkspaceIntegration } from "./workspace-integration.model";
+import { WorkspaceIntegration } from "../models/workspace-integration.model";
 
 export class WorkspaceIntegrationRepository extends Context.Tag(
   "@mason/integrations/WorkspaceIntegrationRepository"

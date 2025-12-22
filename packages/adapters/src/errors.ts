@@ -1,4 +1,3 @@
-import type { IntegrationError } from "@mason/framework/platform";
 import { Schema } from "effect";
 
 export class IntegrationInvalidApiKeyError extends Schema.TaggedError<IntegrationInvalidApiKeyError>()(
@@ -27,7 +26,6 @@ export class IntegrationDecodingError extends Schema.TaggedError<IntegrationDeco
 ) {}
 
 export type IntegrationAdapterError =
-  | IntegrationError
   | IntegrationFetchError
   | IntegrationDecodingError
   | IntegrationInvalidApiKeyError;

@@ -1,5 +1,9 @@
+import {
+  MemberId,
+  WorkspaceId,
+  WorkspaceIntegrationId,
+} from "@mason/framework/types/ids";
 import { Effect, Schema } from "effect";
-import { MemberId, WorkspaceId, WorkspaceIntegrationId } from "../../types/ids";
 
 export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
   "@mason/integrations/WorkspaceIntegration"

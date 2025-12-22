@@ -1,19 +1,23 @@
+import { CryptoService } from "@mason/framework/platform";
 import {
+  ApiKey,
   type MemberId,
   type WorkspaceId,
   WorkspaceIntegrationId,
 } from "@mason/framework/types/ids";
+import { generateUUID } from "@mason/framework/utils/uuid";
 import { Context, Effect, Layer, Option } from "effect";
-import { decrypt, encrypt } from "../../utils/encryption";
-import { generateUUID } from "../../utils/uuid";
+import type {
+  WorkspaceIntegrationToCreate,
+  WorkspaceIntegrationToUpdate,
+} from "./dto";
 import {
   GenericIntegrationError,
   type IntegrationError,
   WorkspaceIntegrationNotFoundError,
 } from "./errors";
-import type { WorkspaceIntegrationToCreate } from "./workspace-integration.dto";
-import { WorkspaceIntegration } from "./workspace-integration.model";
-import { WorkspaceIntegrationRepository } from "./workspace-integration.repo";
+import { WorkspaceIntegration } from "./models/workspace-integration.model";
+import { WorkspaceIntegrationRepository } from "./repositories/workspace-integration.repo";
 
 export class IntegrationService extends Context.Tag(
   "@mason/framework/IntegrationService"
@@ -25,13 +29,20 @@ export class IntegrationService extends Context.Tag(
       createdByMemberId: MemberId;
       workspaceIntegration: WorkspaceIntegrationToCreate;
     }) => Effect.Effect<WorkspaceIntegration, IntegrationError>;
+    updateWorkspaceIntegration: (params: {
+      workspaceId: WorkspaceId;
+      workspaceIntegration: WorkspaceIntegrationToUpdate;
+    }) => Effect.Effect<WorkspaceIntegration, IntegrationError>;
     hardDeleteWorkspaceIntegration: (params: {
       workspaceId: WorkspaceId;
       workspaceIntegrationId: WorkspaceIntegrationId;
     }) => Effect.Effect<void, IntegrationError>;
     retrieveWorkspaceIntegration: (params: {
       workspaceId: WorkspaceId;
-      workspaceIntegrationId: WorkspaceIntegrationId;
+      query?: {
+        id?: WorkspaceIntegrationId;
+        kind?: "float";
+      };
     }) => Effect.Effect<WorkspaceIntegration, IntegrationError>;
     listWorkspaceIntegrations: (params: {
       workspaceId: WorkspaceId;
@@ -39,12 +50,13 @@ export class IntegrationService extends Context.Tag(
     retrieveWorkspaceApiKey: (params: {
       workspaceId: WorkspaceId;
       kind: "float";
-    }) => Effect.Effect<string, IntegrationError>;
+    }) => Effect.Effect<ApiKey, IntegrationError>;
   }
 >() {
   static readonly live = Layer.effect(
     IntegrationService,
     Effect.gen(function* () {
+      const cryptoService = yield* CryptoService;
       const workspaceIntegrationRepo = yield* WorkspaceIntegrationRepository;
 
       return IntegrationService.of({
@@ -52,7 +64,7 @@ export class IntegrationService extends Context.Tag(
           "@mason/framework/IntegrationService.createWorkspaceIntegration"
         )(({ workspaceId, createdByMemberId, workspaceIntegration }) =>
           Effect.gen(function* () {
-            const apiKeyEncrypted = yield* encrypt(
+            const apiKeyEncrypted = yield* cryptoService.encrypt(
               workspaceIntegration.apiKeyUnencrypted
             );
 
@@ -77,6 +89,49 @@ export class IntegrationService extends Context.Tag(
           )
         ),
 
+        updateWorkspaceIntegration: Effect.fn(
+          "@mason/framework/IntegrationService.updateWorkspaceIntegration"
+        )(({ workspaceId, workspaceIntegration }) =>
+          Effect.gen(function* () {
+            const maybeExisting = yield* workspaceIntegrationRepo.retrieve({
+              workspaceId,
+              query: { id: workspaceIntegration.id },
+            });
+
+            const existing = yield* Option.match(maybeExisting, {
+              onNone: () =>
+                Effect.fail(new WorkspaceIntegrationNotFoundError()),
+              onSome: Effect.succeed,
+            });
+
+            const apiKeyEncrypted = workspaceIntegration.apiKeyUnencrypted
+              ? yield* cryptoService.encrypt(
+                  workspaceIntegration.apiKeyUnencrypted
+                )
+              : existing.apiKeyEncrypted;
+
+            const updated = WorkspaceIntegration.make({
+              ...existing,
+              apiKeyEncrypted,
+              _metadata: workspaceIntegration._metadata ?? existing._metadata,
+            });
+
+            const [result] = yield* workspaceIntegrationRepo.update({
+              workspaceId,
+              workspaceIntegrations: [updated],
+            });
+
+            return result;
+          }).pipe(
+            Effect.catchTags({
+              ParseError: (e) =>
+                Effect.fail(new GenericIntegrationError({ cause: e })),
+              SqlError: (e) =>
+                Effect.fail(new GenericIntegrationError({ cause: e })),
+            })
+          )
+        ),
+
         hardDeleteWorkspaceIntegration: Effect.fn(
           "@mason/framework/IntegrationService.hardDeleteWorkspaceIntegration"
         )(({ workspaceId, workspaceIntegrationId }) =>
@@ -92,26 +147,16 @@ export class IntegrationService extends Context.Tag(
 
         retrieveWorkspaceIntegration: Effect.fn(
           "@mason/framework/IntegrationService.retrieveWorkspaceIntegration"
-        )(({ workspaceId, workspaceIntegrationId }) =>
+        )((params) =>
           Effect.gen(function* () {
             const maybeWorkspaceIntegration =
-              yield* workspaceIntegrationRepo.retrieve({
-                workspaceId: workspaceId,
-                query: {
-                  id: workspaceIntegrationId,
-                },
-              });
+              yield* workspaceIntegrationRepo.retrieve(params);
 
-            const workspaceIntegration = yield* Option.match(
-              maybeWorkspaceIntegration,
-              {
-                onNone: () =>
-                  Effect.fail(new WorkspaceIntegrationNotFoundError()),
-                onSome: Effect.succeed,
-              }
-            );
-
-            return workspaceIntegration;
+            return yield* Option.match(maybeWorkspaceIntegration, {
+              onNone: () =>
+                Effect.fail(new WorkspaceIntegrationNotFoundError()),
+              onSome: Effect.succeed,
+            });
           }).pipe(
             Effect.catchTags({
               ParseError: (e) =>
@@ -126,9 +171,7 @@ export class IntegrationService extends Context.Tag(
           "@mason/framework/IntegrationService.listWorkspaceIntegrations"
         )(({ workspaceId }) =>
           workspaceIntegrationRepo
-            .list({
-              workspaceId: workspaceId,
-            })
+            .list({ workspaceId })
             .pipe(
               Effect.mapError((e) => new GenericIntegrationError({ cause: e }))
             )
@@ -140,8 +183,8 @@ export class IntegrationService extends Context.Tag(
           Effect.gen(function* () {
             const maybeWorkspaceIntegration =
               yield* workspaceIntegrationRepo.retrieve({
-                workspaceId: workspaceId,
-                query: { kind: kind },
+                workspaceId,
+                query: { kind },
               });
 
             const workspaceIntegration = yield* Option.match(
@@ -153,7 +196,11 @@ export class IntegrationService extends Context.Tag(
               }
             );
 
-            return yield* decrypt(workspaceIntegration.apiKeyEncrypted);
+            const decrypted = yield* cryptoService.decrypt(
+              workspaceIntegration.apiKeyEncrypted
+            );
+
+            return ApiKey.make(decrypted);
           }).pipe(
             Effect.catchTags({
               ParseError: (e) =>
