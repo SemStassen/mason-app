@@ -9,8 +9,8 @@
     "format": "biome format --write .",
     "lint": "turbo lint && manypkg check",
     "typecheck": "turbo typecheck",
-    "subtree:create:effect": "git remote add effect https://github.com/effect-ts/effect && git subtree add --prefix=effect effect main --squash",
-    "subtree:update:effect": "git subtree pull --prefix=effect effect main --squash"
+    "subtree:create:effect": "git remote add effect https://github.com/effect-ts/effect && git subtree add --prefix=.better-agents/effect effect main --squash",
+    "subtree:update:effect": "git subtree pull --prefix=.better-agents/effect effect main --squash"
   },
   "private": true,
   "workspaces": {
