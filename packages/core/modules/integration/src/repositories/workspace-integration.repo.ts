@@ -3,15 +3,12 @@ import { and, eq, inArray } from "@mason/db/operators";
 import { workspaceIntegrationsTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
 import type { RepositoryError } from "@mason/framework/errors/database";
-import {
-  WorkspaceId,
-  WorkspaceIntegrationId,
-} from "@mason/framework/types/ids";
+import { WorkspaceId, WorkspaceIntegrationId } from "@mason/framework/types";
 import { Context, Effect, Layer, type Option, Schema } from "effect";
 import { WorkspaceIntegration } from "../models/workspace-integration.model";
 
 export class WorkspaceIntegrationRepository extends Context.Tag(
-  "@mason/integrations/WorkspaceIntegrationRepository"
+  "@mason/integration/WorkspaceIntegrationRepository"
 )<
   WorkspaceIntegrationRepository,
   {
@@ -146,7 +143,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
       });
 
       return WorkspaceIntegrationRepository.of({
-        insert: Effect.fn("@mason/framework/WorkspaceIntegrationRepo.insert")(
+        insert: Effect.fn("@mason/integration/WorkspaceIntegrationRepo.insert")(
           ({ workspaceId, workspaceIntegrations }) =>
             db.withWorkspace(
               workspaceId,
@@ -156,7 +153,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
               })
             )
         ),
-        update: Effect.fn("@mason/framework/WorkspaceIntegrationRepo.update")(
+        update: Effect.fn("@mason/integration/WorkspaceIntegrationRepo.update")(
           ({ workspaceId, workspaceIntegrations }) =>
             db.withWorkspace(
               workspaceId,
@@ -167,7 +164,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
             )
         ),
         hardDelete: Effect.fn(
-          "@mason/framework/WorkspaceIntegrationRepo.hardDelete"
+          "@mason/integration/WorkspaceIntegrationRepo.hardDelete"
         )(({ workspaceId, workspaceIntegrationIds }) =>
           db.withWorkspace(
             workspaceId,
@@ -177,7 +174,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
             })
           )
         ),
-        list: Effect.fn("@mason/framework/WorkspaceIntegrationRepo.list")(
+        list: Effect.fn("@mason/integration/WorkspaceIntegrationRepo.list")(
           ({ workspaceId }) =>
             db.withWorkspace(
               workspaceId,
@@ -185,7 +182,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
             )
         ),
         retrieve: Effect.fn(
-          "@mason/framework/WorkspaceIntegrationRepo.retrieve"
+          "@mason/integration/WorkspaceIntegrationRepo.retrieve"
         )(({ workspaceId, query }) =>
           db.withWorkspace(
             workspaceId,

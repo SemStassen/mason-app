@@ -3,7 +3,7 @@ import { and, eq, gte, inArray, lte } from "@mason/db/operators";
 import { timeEntriesTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
 import type { RepositoryError } from "@mason/framework/errors/database";
-import { TimeEntryId, WorkspaceId } from "@mason/framework/types/ids";
+import { TimeEntryId, WorkspaceId } from "@mason/framework/types";
 import { Context, Effect, Layer, Schema } from "effect";
 import { TimeEntry } from "../models/time-entry.model";
 

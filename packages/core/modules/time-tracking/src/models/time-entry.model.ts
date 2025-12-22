@@ -4,29 +4,14 @@ import {
   TaskId,
   TimeEntryId,
   WorkspaceId,
-} from "@mason/framework/types/ids";
+} from "@mason/framework/types";
 import { JsonRecord } from "@mason/framework/utils/schema";
 import { generateUUID } from "@mason/framework/utils/uuid";
 import { isAfter } from "date-fns";
 import { Effect, Schema } from "effect";
 
-export class TimeEntryDateOrderError extends Schema.TaggedError<TimeEntryDateOrderError>()(
-  "@mason/mason/timeEntryDateOrderError",
-  {
-    startedAt: Schema.DateFromSelf,
-    stoppedAt: Schema.DateFromSelf,
-  }
-) {}
-
-export class TimeEntryMissingStoppedAtError extends Schema.TaggedError<TimeEntryMissingStoppedAtError>()(
-  "@mason/mason/timeEntryMissingStoppedAtError",
-  {
-    startedAt: Schema.DateFromSelf,
-  }
-) {}
-
 export class TimeEntry extends Schema.Class<TimeEntry>(
-  "@mason/mason/timeEntry"
+  "time-tracking/TimeEntry"
 )(
   Schema.Struct({
     id: TimeEntryId,

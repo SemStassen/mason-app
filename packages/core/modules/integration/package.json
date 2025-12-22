@@ -1,5 +1,5 @@
 {
-  "name": "@mason/integrations",
+  "name": "@mason/integration",
   "private": true,
   "type": "module",
   "scripts": {

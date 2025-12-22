@@ -155,7 +155,7 @@
         "@mason/api-contract": "workspace:*",
         "@mason/db": "workspace:*",
         "@mason/framework": "workspace:*",
-        "@mason/integrations": "workspace:*",
+        "@mason/integration": "workspace:*",
         "@mason/project": "workspace:*",
         "@mason/telemetry": "workspace:*",
         "@mason/time-tracking": "workspace:*",
@@ -166,8 +166,8 @@
         "typescript": "catalog:dev",
       },
     },
-    "packages/core/modules/integrations": {
-      "name": "@mason/integrations",
+    "packages/core/modules/integration": {
+      "name": "@mason/integration",
       "dependencies": {
         "@effect/sql": "catalog:",
         "@mason/db": "workspace:*",
@@ -271,7 +271,7 @@
       "name": "@mason/use-cases",
       "dependencies": {
         "@mason/api-contract": "workspace:*",
-        "@mason/integrations": "workspace:*",
+        "@mason/integration": "workspace:*",
         "@mason/mason": "workspace:*",
         "effect": "catalog:",
       },
@@ -580,7 +580,7 @@
 
     "@mason/framework": ["@mason/framework@workspace:packages/core/framework"],
 
-    "@mason/integrations": ["@mason/integrations@workspace:packages/core/modules/integrations"],
+    "@mason/integration": ["@mason/integration@workspace:packages/core/modules/integration"],
 
     "@mason/interface": ["@mason/interface@workspace:interface"],
 

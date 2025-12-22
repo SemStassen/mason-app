@@ -1,13 +1,8 @@
 import { Schema } from "effect";
 
-export class GenericTimeTrackingModuleError extends Schema.TaggedError<GenericTimeTrackingModuleError>()(
-  "@mason/time-tracking/GenericTimeTrackingModuleError",
+export class InternalTimeTrackingModuleError extends Schema.TaggedError<InternalTimeTrackingModuleError>()(
+  "time-tracking/InternalTimeTrackingModuleError",
   {
     cause: Schema.Unknown,
   }
 ) {}
-
-export type TimeTrackingModuleError = typeof TimeTrackingModuleError.Type;
-export const TimeTrackingModuleError = Schema.Union(
-  GenericTimeTrackingModuleError
-);

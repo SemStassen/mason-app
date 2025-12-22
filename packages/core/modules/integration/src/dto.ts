@@ -4,7 +4,7 @@ import { WorkspaceIntegration } from "./models/workspace-integration.model";
 export type WorkspaceIntegrationToCreate =
   typeof WorkspaceIntegrationToCreate.Type;
 export const WorkspaceIntegrationToCreate = Schema.TaggedStruct(
-  "WorkspaceIntegrationToCreate",
+  "integration/WorkspaceIntegrationToCreate",
   {
     // General
     kind: WorkspaceIntegration.fields.kind,
@@ -20,7 +20,7 @@ export const WorkspaceIntegrationToCreate = Schema.TaggedStruct(
 export type WorkspaceIntegrationToUpdate =
   typeof WorkspaceIntegrationToUpdate.Type;
 export const WorkspaceIntegrationToUpdate = Schema.TaggedStruct(
-  "WorkspaceIntegrationToUpdate",
+  "integration/WorkspaceIntegrationToUpdate",
   {
     id: WorkspaceIntegration.fields.id,
     // General

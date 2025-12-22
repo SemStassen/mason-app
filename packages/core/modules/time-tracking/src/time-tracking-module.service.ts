@@ -1,10 +1,7 @@
-import type { TimeEntryId, WorkspaceId } from "@mason/framework/types/ids";
+import type { TimeEntryId, WorkspaceId } from "@mason/framework/types";
 import { Context, Effect, Layer } from "effect";
 import type { TimeEntryToCreate, TimeEntryToUpdate } from "./dto";
-import {
-  GenericTimeTrackingModuleError,
-  type TimeTrackingModuleError,
-} from "./errors";
+import { InternalTimeTrackingModuleError } from "./errors";
 import { TimeEntry } from "./models/time-entry.model";
 import { TimeEntryRepository } from "./repositories/time-entry.repo";
 
@@ -16,19 +13,25 @@ export class TimeTrackingModuleService extends Context.Tag(
     createTimeEntries: (params: {
       workspaceId: WorkspaceId;
       timeEntries: Array<TimeEntryToCreate>;
-    }) => Effect.Effect<ReadonlyArray<TimeEntry>, TimeTrackingModuleError>;
+    }) => Effect.Effect<
+      ReadonlyArray<TimeEntry>,
+      InternalTimeTrackingModuleError
+    >;
     updateTimeEntries: (params: {
       workspaceId: WorkspaceId;
       timeEntries: Array<TimeEntryToUpdate>;
-    }) => Effect.Effect<ReadonlyArray<TimeEntry>, TimeTrackingModuleError>;
+    }) => Effect.Effect<
+      ReadonlyArray<TimeEntry>,
+      InternalTimeTrackingModuleError
+    >;
     softDeleteTimeEntries: (params: {
       workspaceId: WorkspaceId;
       timeEntryIds: Array<TimeEntryId>;
-    }) => Effect.Effect<void, TimeTrackingModuleError>;
+    }) => Effect.Effect<void, InternalTimeTrackingModuleError>;
     hardDeleteTimeEntries: (params: {
       workspaceId: WorkspaceId;
       timeEntryIds: Array<TimeEntryId>;
-    }) => Effect.Effect<void, TimeTrackingModuleError>;
+    }) => Effect.Effect<void, InternalTimeTrackingModuleError>;
     listTimeEntries: (params: {
       workspaceId: WorkspaceId;
       query?: {
@@ -36,7 +39,10 @@ export class TimeTrackingModuleService extends Context.Tag(
         startedAt?: Date;
         stoppedAt?: Date;
       };
-    }) => Effect.Effect<ReadonlyArray<TimeEntry>, TimeTrackingModuleError>;
+    }) => Effect.Effect<
+      ReadonlyArray<TimeEntry>,
+      InternalTimeTrackingModuleError
+    >;
   }
 >() {
   static readonly live = Layer.effect(
@@ -61,9 +67,9 @@ export class TimeTrackingModuleService extends Context.Tag(
           },
           Effect.catchTags({
             ParseError: (e) =>
-              Effect.fail(new GenericTimeTrackingModuleError({ cause: e })),
+              Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
             SqlError: (e) =>
-              Effect.fail(new GenericTimeTrackingModuleError({ cause: e })),
+              Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
           })
         ),
         updateTimeEntries: Effect.fn(
@@ -86,7 +92,7 @@ export class TimeTrackingModuleService extends Context.Tag(
                   );
                   if (!existingTimeEntry) {
                     return yield* Effect.fail(
-                      new GenericTimeTrackingModuleError({
+                      new InternalTimeTrackingModuleError({
                         cause: `Time entry ${timeEntry.id} not found`,
                       })
                     );
@@ -102,9 +108,9 @@ export class TimeTrackingModuleService extends Context.Tag(
           },
           Effect.catchTags({
             ParseError: (e) =>
-              Effect.fail(new GenericTimeTrackingModuleError({ cause: e })),
+              Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
             SqlError: (e) =>
-              Effect.fail(new GenericTimeTrackingModuleError({ cause: e })),
+              Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
           })
         ),
         softDeleteTimeEntries: Effect.fn(
@@ -114,7 +120,7 @@ export class TimeTrackingModuleService extends Context.Tag(
             .softDelete(params)
             .pipe(
               Effect.mapError(
-                (e) => new GenericTimeTrackingModuleError({ cause: e })
+                (e) => new InternalTimeTrackingModuleError({ cause: e })
               )
             )
         ),
@@ -125,7 +131,7 @@ export class TimeTrackingModuleService extends Context.Tag(
             .hardDelete(params)
             .pipe(
               Effect.mapError(
-                (e) => new GenericTimeTrackingModuleError({ cause: e })
+                (e) => new InternalTimeTrackingModuleError({ cause: e })
               )
             )
         ),
@@ -136,7 +142,7 @@ export class TimeTrackingModuleService extends Context.Tag(
             .list(params)
             .pipe(
               Effect.mapError(
-                (e) => new GenericTimeTrackingModuleError({ cause: e })
+                (e) => new InternalTimeTrackingModuleError({ cause: e })
               )
             )
         ),

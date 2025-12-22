@@ -1,7 +1,7 @@
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
-import { WorkspaceId } from "@mason/framework/types/ids";
+import { WorkspaceId } from "@mason/framework/types";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
@@ -13,14 +13,14 @@ import {
 import { Config, Effect, Schema } from "effect";
 
 export class BetterAuthError extends Schema.TaggedError<BetterAuthError>()(
-  "@mason/server/betterAuthError",
+  "framework/BetterAuthError",
   {
     cause: Schema.Unknown,
   }
 ) {}
 
 export class AuthService extends Effect.Service<AuthService>()(
-  "@mason/server/authService",
+  "@mason/framework/AuthService",
   {
     effect: Effect.gen(function* () {
       const AuthConfig = Config.all({

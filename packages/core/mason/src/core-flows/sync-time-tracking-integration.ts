@@ -1,14 +1,10 @@
 import { TimeTrackingIntegrationAdapter } from "@mason/adapters";
 import { DatabaseService } from "@mason/db/service";
-import {
-  ProjectId,
-  TaskId,
-  type WorkspaceId,
-} from "@mason/framework/types/ids";
+import { ProjectId, TaskId, type WorkspaceId } from "@mason/framework/types";
 import {
   IntegrationService,
   WorkspaceIntegrationToUpdate,
-} from "@mason/integrations";
+} from "@mason/integration";
 import {
   ProjectModuleService,
   ProjectToCreate,
@@ -17,11 +13,10 @@ import {
   TaskToUpdate,
 } from "@mason/project";
 import { Effect, Either, Option, Schema } from "effect";
-
-// ============ Errors ============
+import { InternalError } from "../errors";
 
 export class TaskProjectNotFoundError extends Schema.TaggedError<TaskProjectNotFoundError>()(
-  "@mason/core-flows/taskProjectNotFoundError",
+  "@mason/core-flows/TaskProjectNotFoundError",
   {
     externalTaskId: Schema.String,
     externalProjectId: Schema.String,
@@ -247,29 +242,37 @@ const syncTasks = ({
 
 // ============ Public core flow ============
 
-export const syncWorkspaceIntegration = Effect.fn(
-  "@mason/core-flows/syncWorkspaceIntegration"
-)(function* (params: { workspaceId: WorkspaceId; kind: "float" }) {
-  const db = yield* DatabaseService;
-  const integrationService = yield* IntegrationService;
+export const syncTimeTrackingIntegration: (params: {
+  workspaceId: WorkspaceId;
+  kind: "float";
+}) => Effect.Effect<
+  void,
+  InternalError,
+  IntegrationService | DatabaseService | ProjectModuleService
+> = Effect.fn("@mason/core-flows/syncWorkspaceIntegration")(
+  function* (params: { workspaceId: WorkspaceId; kind: "float" }) {
+    const db = yield* DatabaseService;
+    const integrationService = yield* IntegrationService;
 
-  const workspaceIntegration =
-    yield* integrationService.retrieveWorkspaceIntegration({
-      workspaceId: params.workspaceId,
-      query: { kind: params.kind },
-    });
-
-  yield* db.withTransaction(
-    Effect.gen(function* () {
-      yield* syncProjects(params);
-      yield* syncTasks(params);
-      yield* integrationService.updateWorkspaceIntegration({
+    const workspaceIntegration =
+      yield* integrationService.retrieveWorkspaceIntegration({
         workspaceId: params.workspaceId,
-        workspaceIntegration: WorkspaceIntegrationToUpdate.make({
-          id: workspaceIntegration.id,
-          _metadata: { lastSyncedAt: new Date() },
-        }),
+        query: { kind: params.kind },
       });
-    })
-  );
-});
+
+    yield* db.withTransaction(
+      Effect.gen(function* () {
+        yield* syncProjects(params);
+        yield* syncTasks(params);
+        yield* integrationService.updateWorkspaceIntegration({
+          workspaceId: params.workspaceId,
+          workspaceIntegration: WorkspaceIntegrationToUpdate.make({
+            id: workspaceIntegration.id,
+            _metadata: { lastSyncedAt: new Date() },
+          }),
+        });
+      })
+    );
+  },
+  Effect.mapError((e) => new InternalError({ cause: e }))
+);

@@ -1,9 +1,9 @@
-import { ProjectId, WorkspaceId } from "@mason/framework/types/ids";
+import { ProjectId, WorkspaceId } from "@mason/framework/types";
 import { JsonRecord } from "@mason/framework/utils/schema";
 import { generateUUID } from "@mason/framework/utils/uuid";
 import { Effect, Schema } from "effect";
 
-export class Project extends Schema.Class<Project>("@mason/mason/project")({
+export class Project extends Schema.Class<Project>("project/Project")({
   id: ProjectId,
   // References
   workspaceId: WorkspaceId,

@@ -3,7 +3,7 @@ import { and, eq, inArray, sql } from "@mason/db/operators";
 import { projectsTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
 import type { RepositoryError } from "@mason/framework/errors/database";
-import { ProjectId, WorkspaceId } from "@mason/framework/types/ids";
+import { ProjectId, WorkspaceId } from "@mason/framework/types";
 import { Context, Effect, Layer, Schema } from "effect";
 import { Project } from "../models/project.model";
 

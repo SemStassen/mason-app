@@ -13,7 +13,7 @@
     "@mason/api-contract": "workspace:*",
     "@mason/db": "workspace:*",
     "@mason/framework": "workspace:*",
-    "@mason/integrations": "workspace:*",
+    "@mason/integration": "workspace:*",
     "@mason/project": "workspace:*",
     "@mason/telemetry": "workspace:*",
     "@mason/time-tracking": "workspace:*",

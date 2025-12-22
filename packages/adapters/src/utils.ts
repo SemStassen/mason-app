@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { IntegrationDecodingError } from "./errors";
+import { InternalAdapterError } from "./errors";
 
 // Simplest tiptap format storable in DB
 interface TiptapDoc {
@@ -62,7 +62,7 @@ export function fetchPaginated<A, E>({
 
   /** How to extract items from the response body */
   extractItems: (body: unknown) => Array<A>;
-}): Effect.Effect<Array<A>, E | IntegrationDecodingError> {
+}): Effect.Effect<Array<A>, E | InternalAdapterError> {
   return Effect.gen(function* () {
     let results: Array<A> = [];
     let page: number | string = 1;
@@ -72,12 +72,12 @@ export function fetchPaginated<A, E>({
 
       const body = yield* Effect.tryPromise({
         try: () => response.json(),
-        catch: (e) => new IntegrationDecodingError({ error: e }),
+        catch: (e) => new InternalAdapterError({ cause: e }),
       });
 
       const items = yield* Effect.try({
         try: () => extractItems(body),
-        catch: (e) => new IntegrationDecodingError({ error: e }),
+        catch: (e) => new InternalAdapterError({ cause: e }),
       });
 
       results = results.concat(items);

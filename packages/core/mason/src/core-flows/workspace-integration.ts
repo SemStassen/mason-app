@@ -1,8 +1,4 @@
-import {
-  type IntegrationAdapterError,
-  type MissingIntegrationAdapterError,
-  TimeTrackingIntegrationAdapter,
-} from "@mason/adapters";
+import { TimeTrackingIntegrationAdapter } from "@mason/adapters";
 import {
   type CreateWorkspaceIntegrationRequest,
   type DeleteWorkspaceIntegrationRequest,
@@ -13,13 +9,13 @@ import {
   type MemberId,
   type WorkspaceId,
   WorkspaceIntegrationId,
-} from "@mason/framework/types/ids";
+} from "@mason/framework/types";
 import {
-  type IntegrationError,
   IntegrationService,
   WorkspaceIntegrationToCreate,
-} from "@mason/integrations";
+} from "@mason/integration";
 import { Effect } from "effect";
+import { InternalError } from "../errors";
 
 export const createWorkspaceIntegration: (params: {
   workspaceId: WorkspaceId;
@@ -27,7 +23,7 @@ export const createWorkspaceIntegration: (params: {
   request: CreateWorkspaceIntegrationRequest;
 }) => Effect.Effect<
   WorkspaceIntegrationResponse,
-  IntegrationAdapterError | MissingIntegrationAdapterError | IntegrationError,
+  InternalError,
   IntegrationService
 > = Effect.fn("@mason/core-flows/createWorkspaceIntegration")(
   function* (params) {
@@ -53,29 +49,33 @@ export const createWorkspaceIntegration: (params: {
         }),
       })
       .pipe(Effect.map(WorkspaceIntegrationResponse.make));
-  }
+  },
+  Effect.mapError((e) => new InternalError({ cause: e }))
 );
 
 export const deleteWorkspaceIntegration: (params: {
   workspaceId: WorkspaceId;
   workspaceIntegrationId: DeleteWorkspaceIntegrationRequest;
-}) => Effect.Effect<void, IntegrationError, IntegrationService> = Effect.fn(
+}) => Effect.Effect<void, InternalError, IntegrationService> = Effect.fn(
   "@mason/core-flows/deleteWorkspaceIntegration"
-)(function* (params) {
-  const workspaceIntegrationService = yield* IntegrationService;
-  return yield* workspaceIntegrationService.hardDeleteWorkspaceIntegration({
-    workspaceId: params.workspaceId,
-    workspaceIntegrationId: WorkspaceIntegrationId.make(
-      params.workspaceIntegrationId.id
-    ),
-  });
-});
+)(
+  function* (params) {
+    const workspaceIntegrationService = yield* IntegrationService;
+    return yield* workspaceIntegrationService.hardDeleteWorkspaceIntegration({
+      workspaceId: params.workspaceId,
+      workspaceIntegrationId: WorkspaceIntegrationId.make(
+        params.workspaceIntegrationId.id
+      ),
+    });
+  },
+  Effect.mapError((e) => new InternalError({ cause: e }))
+);
 
 export const listWorkspaceIntegrations: (params: {
   workspaceId: WorkspaceId;
 }) => Effect.Effect<
   ReadonlyArray<WorkspaceIntegrationResponse>,
-  IntegrationError,
+  InternalError,
   IntegrationService
 > = Effect.fn("@mason/core-flows/listWorkspaceIntegrations")(
   function* (params) {
@@ -89,5 +89,6 @@ export const listWorkspaceIntegrations: (params: {
           items.map((item) => WorkspaceIntegrationResponse.make(item))
         )
       );
-  }
+  },
+  Effect.mapError((e) => new InternalError({ cause: e }))
 );

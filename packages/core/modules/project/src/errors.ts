@@ -1,11 +1,22 @@
 import { Schema } from "effect";
 
-export class GenericProjectModuleError extends Schema.TaggedError<GenericProjectModuleError>()(
-  "@mason/project/GenericProjectModuleError",
+export class InternalProjectModuleError extends Schema.TaggedError<InternalProjectModuleError>()(
+  "project/InternalProjectModuleError",
   {
     cause: Schema.Unknown,
   }
 ) {}
 
-export type ProjectModuleError = typeof ProjectModuleError.Type;
-export const ProjectModuleError = Schema.Union(GenericProjectModuleError);
+export class ProjectNotFoundError extends Schema.TaggedError<ProjectNotFoundError>()(
+  "project/ProjectNotFoundError",
+  {
+    projectId: Schema.String,
+  }
+) {}
+
+export class TaskNotFoundError extends Schema.TaggedError<TaskNotFoundError>()(
+  "project/TaskNotFoundError",
+  {
+    taskId: Schema.String,
+  }
+) {}

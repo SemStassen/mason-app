@@ -1,23 +1,23 @@
 import { Layer, Schema } from "effect";
-import { InternalTimeTrackingIntegrationAdapter } from "./adapter";
+import { TimeTrackingIntegrationAdapter as TimeTrackingIntegrationAdapterBase } from "./adapter";
 import { floatLive } from "./float";
 
-export type { InternalTimeTrackingIntegrationAdapter } from "./adapter";
 export * from "./errors";
 
 export class MissingIntegrationAdapterError extends Schema.TaggedError<MissingIntegrationAdapterError>()(
-  "@mason/integrations/missingIntegrationAdapterError",
+  "adapters/MissingIntegrationAdapterError",
   {
     cause: Schema.Unknown,
   }
 ) {}
 
-export class TimeTrackingIntegrationAdapter extends InternalTimeTrackingIntegrationAdapter {
+export class TimeTrackingIntegrationAdapter extends TimeTrackingIntegrationAdapterBase {
   static getLayer(kind: "float") {
     switch (kind) {
       case "float":
         return floatLive;
       default:
+        /** This should basically never happen */
         return Layer.fail(
           new MissingIntegrationAdapterError({
             cause: `Integration adapter for kind "${kind}" is not supported`,

@@ -2,11 +2,11 @@ import {
   MemberId,
   WorkspaceId,
   WorkspaceIntegrationId,
-} from "@mason/framework/types/ids";
+} from "@mason/framework/types";
 import { Effect, Schema } from "effect";
 
 export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
-  "@mason/integrations/WorkspaceIntegration"
+  "integration/WorkspaceIntegration"
 )(
   Schema.Struct({
     id: WorkspaceIntegrationId,

@@ -1,8 +1,4 @@
-import type {
-  ProjectId,
-  TaskId,
-  WorkspaceId,
-} from "@mason/framework/types/ids";
+import type { ProjectId, TaskId, WorkspaceId } from "@mason/framework/types";
 import { Context, Effect, Layer } from "effect";
 import type {
   ProjectToCreate,
@@ -10,7 +6,11 @@ import type {
   TaskToCreate,
   TaskToUpdate,
 } from "./dto";
-import { GenericProjectModuleError, type ProjectModuleError } from "./errors";
+import {
+  InternalProjectModuleError,
+  ProjectNotFoundError,
+  TaskNotFoundError,
+} from "./errors";
 import { Project } from "./models/project.model";
 import { Task } from "./models/task.model";
 import { ProjectRepository } from "./repositories/project.repo";
@@ -24,19 +24,22 @@ export class ProjectModuleService extends Context.Tag(
     createProjects: (params: {
       workspaceId: WorkspaceId;
       projects: Array<ProjectToCreate>;
-    }) => Effect.Effect<ReadonlyArray<Project>, ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Project>, InternalProjectModuleError>;
     updateProjects: (params: {
       workspaceId: WorkspaceId;
       projects: Array<ProjectToUpdate>;
-    }) => Effect.Effect<ReadonlyArray<Project>, ProjectModuleError>;
+    }) => Effect.Effect<
+      ReadonlyArray<Project>,
+      InternalProjectModuleError | ProjectNotFoundError
+    >;
     softDeleteProjects: (params: {
       workspaceId: WorkspaceId;
       projectIds: Array<ProjectId>;
-    }) => Effect.Effect<void, ProjectModuleError>;
+    }) => Effect.Effect<void, InternalProjectModuleError>;
     hardDeleteProjects: (params: {
       workspaceId: WorkspaceId;
       projectIds: Array<ProjectId>;
-    }) => Effect.Effect<void, ProjectModuleError>;
+    }) => Effect.Effect<void, InternalProjectModuleError>;
     listProjects: (params: {
       workspaceId: WorkspaceId;
       query?: {
@@ -44,23 +47,26 @@ export class ProjectModuleService extends Context.Tag(
         _source?: "float";
         _externalIds?: Array<string>;
       };
-    }) => Effect.Effect<ReadonlyArray<Project>, ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Project>, InternalProjectModuleError>;
     createTasks: (params: {
       workspaceId: WorkspaceId;
       tasks: Array<TaskToCreate>;
-    }) => Effect.Effect<ReadonlyArray<Task>, ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Task>, InternalProjectModuleError>;
     updateTasks: (params: {
       workspaceId: WorkspaceId;
       tasks: Array<TaskToUpdate>;
-    }) => Effect.Effect<ReadonlyArray<Task>, ProjectModuleError>;
+    }) => Effect.Effect<
+      ReadonlyArray<Task>,
+      InternalProjectModuleError | TaskNotFoundError
+    >;
     softDeleteTasks: (params: {
       workspaceId: WorkspaceId;
       taskIds: Array<TaskId>;
-    }) => Effect.Effect<void, ProjectModuleError>;
+    }) => Effect.Effect<void, InternalProjectModuleError>;
     hardDeleteTasks: (params: {
       workspaceId: WorkspaceId;
       taskIds: Array<TaskId>;
-    }) => Effect.Effect<void, ProjectModuleError>;
+    }) => Effect.Effect<void, InternalProjectModuleError>;
     listTasks: (params: {
       workspaceId: WorkspaceId;
       query?: {
@@ -69,7 +75,7 @@ export class ProjectModuleService extends Context.Tag(
         _source?: "float";
         _externalIds?: Array<string>;
       };
-    }) => Effect.Effect<ReadonlyArray<Task>, ProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<Task>, InternalProjectModuleError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -95,9 +101,9 @@ export class ProjectModuleService extends Context.Tag(
           },
           Effect.catchTags({
             ParseError: (e) =>
-              Effect.fail(new GenericProjectModuleError({ cause: e })),
+              Effect.fail(new InternalProjectModuleError({ cause: e })),
             SqlError: (e) =>
-              Effect.fail(new GenericProjectModuleError({ cause: e })),
+              Effect.fail(new InternalProjectModuleError({ cause: e })),
           })
         ),
         updateProjects: Effect.fn(
@@ -120,8 +126,8 @@ export class ProjectModuleService extends Context.Tag(
                   );
                   if (!existingProject) {
                     return yield* Effect.fail(
-                      new GenericProjectModuleError({
-                        cause: `Project ${project.id} not found`,
+                      new ProjectNotFoundError({
+                        projectId: project.id,
                       })
                     );
                   }
@@ -136,9 +142,9 @@ export class ProjectModuleService extends Context.Tag(
           },
           Effect.catchTags({
             ParseError: (e) =>
-              Effect.fail(new GenericProjectModuleError({ cause: e })),
+              Effect.fail(new InternalProjectModuleError({ cause: e })),
             SqlError: (e) =>
-              Effect.fail(new GenericProjectModuleError({ cause: e })),
+              Effect.fail(new InternalProjectModuleError({ cause: e })),
           })
         ),
         softDeleteProjects: Effect.fn(
@@ -148,7 +154,7 @@ export class ProjectModuleService extends Context.Tag(
             .softDelete(params)
             .pipe(
               Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
+                (e) => new InternalProjectModuleError({ cause: e })
               )
             );
         }),
@@ -159,7 +165,7 @@ export class ProjectModuleService extends Context.Tag(
             .hardDelete(params)
             .pipe(
               Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
+                (e) => new InternalProjectModuleError({ cause: e })
               )
             )
         ),
@@ -170,7 +176,7 @@ export class ProjectModuleService extends Context.Tag(
             .list(params)
             .pipe(
               Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
+                (e) => new InternalProjectModuleError({ cause: e })
               )
             )
         ),
@@ -189,9 +195,9 @@ export class ProjectModuleService extends Context.Tag(
           },
           Effect.catchTags({
             ParseError: (e) =>
-              Effect.fail(new GenericProjectModuleError({ cause: e })),
+              Effect.fail(new InternalProjectModuleError({ cause: e })),
             SqlError: (e) =>
-              Effect.fail(new GenericProjectModuleError({ cause: e })),
+              Effect.fail(new InternalProjectModuleError({ cause: e })),
           })
         ),
         updateTasks: Effect.fn(
@@ -212,8 +218,8 @@ export class ProjectModuleService extends Context.Tag(
                 );
                 if (!existingTask) {
                   return yield* Effect.fail(
-                    new GenericProjectModuleError({
-                      cause: `Task ${task.id} not found`,
+                    new TaskNotFoundError({
+                      taskId: task.id,
                     })
                   );
                 }
@@ -228,9 +234,9 @@ export class ProjectModuleService extends Context.Tag(
           },
           Effect.catchTags({
             ParseError: (e) =>
-              Effect.fail(new GenericProjectModuleError({ cause: e })),
+              Effect.fail(new InternalProjectModuleError({ cause: e })),
             SqlError: (e) =>
-              Effect.fail(new GenericProjectModuleError({ cause: e })),
+              Effect.fail(new InternalProjectModuleError({ cause: e })),
           })
         ),
         softDeleteTasks: Effect.fn(
@@ -240,7 +246,7 @@ export class ProjectModuleService extends Context.Tag(
             .softDelete(params)
             .pipe(
               Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
+                (e) => new InternalProjectModuleError({ cause: e })
               )
             )
         ),
@@ -251,7 +257,7 @@ export class ProjectModuleService extends Context.Tag(
             .hardDelete(params)
             .pipe(
               Effect.mapError(
-                (e) => new GenericProjectModuleError({ cause: e })
+                (e) => new InternalProjectModuleError({ cause: e })
               )
             )
         ),
@@ -261,7 +267,7 @@ export class ProjectModuleService extends Context.Tag(
               .list(params)
               .pipe(
                 Effect.mapError(
-                  (e) => new GenericProjectModuleError({ cause: e })
+                  (e) => new InternalProjectModuleError({ cause: e })
                 )
               )
         ),

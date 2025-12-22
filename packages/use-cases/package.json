@@ -11,7 +11,7 @@
   "dependencies": {
     "@mason/api-contract": "workspace:*",
     "@mason/mason": "workspace:*",
-    "@mason/integrations": "workspace:*",
+    "@mason/integration": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

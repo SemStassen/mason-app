@@ -4,12 +4,12 @@ import { Task } from "./models/task.model";
 
 export type ProjectToCreate = typeof ProjectToCreate.Type;
 export const ProjectToCreate = Schema.TaggedStruct(
-  "ProjectToCreate",
+  "project/ProjectToCreate",
   Project.Create.fields
 );
 
 export type ProjectToUpdate = typeof ProjectToUpdate.Type;
-export const ProjectToUpdate = Schema.TaggedStruct("ProjectToUpdate", {
+export const ProjectToUpdate = Schema.TaggedStruct("project/ProjectToUpdate", {
   id: Project.fields.id,
   // General
   ...Project.Patch.fields,
@@ -17,12 +17,12 @@ export const ProjectToUpdate = Schema.TaggedStruct("ProjectToUpdate", {
 
 export type TaskToCreate = typeof TaskToCreate.Type;
 export const TaskToCreate = Schema.TaggedStruct(
-  "TaskToCreate",
+  "project/TaskToCreate",
   Task.Create.fields
 );
 
 export type TaskToUpdate = typeof TaskToUpdate.Type;
-export const TaskToUpdate = Schema.TaggedStruct("TaskToUpdate", {
+export const TaskToUpdate = Schema.TaggedStruct("project/TaskToUpdate", {
   id: Task.fields.id,
   ...Task.Patch.fields,
 });

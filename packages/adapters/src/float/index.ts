@@ -1,10 +1,6 @@
 import { Effect, Layer, Schema } from "effect";
-import { InternalTimeTrackingIntegrationAdapter } from "../adapter";
-import {
-  IntegrationDecodingError,
-  IntegrationFetchError,
-  IntegrationInvalidApiKeyError,
-} from "../errors";
+import { TimeTrackingIntegrationAdapter } from "../adapter";
+import { InternalAdapterError, InvalidApiKeyError } from "../errors";
 import { ExternalProject, ExternalTask } from "../models";
 import { buildUrl, fetchPaginated, stringToTiptapJSON } from "../utils";
 
@@ -62,19 +58,18 @@ const floatFetch = ({ apiKey, path }: { apiKey: string; path: string }) =>
             "User-Agent": "Mason app - private demo (semstassen@gmail.com)",
           },
         }),
-      catch: (e) =>
-        new IntegrationFetchError({ kind: "float", path: path, error: e }),
+      catch: (e) => new InternalAdapterError({ cause: e }),
     });
 
     if (!res.ok) {
       const body = yield* Effect.tryPromise({
         try: () => res.json(),
-        catch: (e) => new IntegrationDecodingError({ error: e }),
+        catch: (e) => new InternalAdapterError({ cause: e }),
       });
 
       if (res.status === 401) {
         return yield* Effect.fail(
-          new IntegrationInvalidApiKeyError({
+          new InvalidApiKeyError({
             kind: "float",
             path: path,
             error: body,
@@ -82,9 +77,7 @@ const floatFetch = ({ apiKey, path }: { apiKey: string; path: string }) =>
         );
       }
 
-      return yield* Effect.fail(
-        new IntegrationFetchError({ kind: "float", path: path, error: body })
-      );
+      return yield* Effect.fail(new InternalAdapterError({ cause: body }));
     }
 
     return res;
@@ -102,9 +95,9 @@ const floatGetNextPage = (response: Response) => {
 };
 
 export const floatLive = Layer.effect(
-  InternalTimeTrackingIntegrationAdapter,
+  TimeTrackingIntegrationAdapter,
   Effect.gen(function* () {
-    return InternalTimeTrackingIntegrationAdapter.of({
+    return TimeTrackingIntegrationAdapter.of({
       testIntegration: ({ apiKey }) =>
         fetchPaginated({
           fetchPage: () =>
