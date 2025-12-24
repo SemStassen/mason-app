@@ -1,4 +1,5 @@
 import { Effect, Option, Schema } from "effect";
+import type { NonEmptyReadonlyArray } from "effect/Array";
 import type { ProcessArray, WithNonEmptyArray } from "./types";
 
 /**
@@ -104,43 +105,67 @@ const withNonEmptyArray: WithNonEmptyArray = (params) => {
  *
  * @category utilities
  */
+
 export const processArray = ((params: Parameters<ProcessArray>[0]) => {
   const hasPrepare = "prepare" in params && params.prepare;
   const hasMapItem = "mapItem" in params && params.mapItem;
+  const hasSchema = "schema" in params && params.schema;
 
-  return withNonEmptyArray({
-    arr: params.items,
-    schema: params.schema,
-    onEmpty: params.onEmpty ?? Effect.succeed(undefined as never),
-    execute: (nea) =>
-      Effect.gen(function* () {
-        // Step 1: Run prepare if provided to get context
-        const context = hasPrepare ? yield* params.prepare(nea) : undefined;
+  // Helper to call mapItem with proper typing based on whether prepare exists
+  const callMapItem = (
+    mapItem: typeof params.mapItem,
+    item: unknown,
+    context: unknown
+  ): Effect.Effect<unknown, unknown, unknown> => {
+    if (hasPrepare && context !== undefined) {
+      // TypeScript can't narrow this, but we know the signature matches
+      return (
+        mapItem as (
+          item: unknown,
+          context: unknown
+        ) => Effect.Effect<unknown, unknown, unknown>
+      )(item, context);
+    }
+    return (
+      mapItem as (item: unknown) => Effect.Effect<unknown, unknown, unknown>
+    )(item);
+  };
 
-        // Step 2: Apply mapItem if provided (with context if prepare was used)
-        const itemsToExecute = hasMapItem
-          ? yield* Effect.forEach(
-              nea,
-              context !== undefined
-                ? (item) =>
-                    (
-                      params.mapItem as (
-                        item: unknown,
-                        context: unknown
-                      ) => Effect.Effect<unknown, unknown, unknown>
-                    )(item, context)
-                : (params.mapItem as (
-                    item: unknown
-                  ) => Effect.Effect<unknown, unknown, unknown>)
-            )
-          : nea;
+  const executeFn = (nea: NonEmptyReadonlyArray<unknown>) =>
+    Effect.gen(function* () {
+      // Step 1: Run prepare if provided to get context
+      const context = hasPrepare ? yield* params.prepare(nea) : undefined;
 
-        // Step 3: Execute (always receives items only, never context)
-        return yield* (
-          params.execute as (
-            items: unknown
-          ) => Effect.Effect<unknown, unknown, unknown>
-        )(itemsToExecute);
-      }),
-  });
+      // Step 2: Apply mapItem if provided (with context if prepare was used)
+      const itemsToExecute = hasMapItem
+        ? yield* Effect.forEach(nea, (item) =>
+            callMapItem(params.mapItem, item, context)
+          )
+        : nea;
+
+      // Step 3: Execute (always receives items only, never context)
+      return yield* params.execute(itemsToExecute);
+    });
+
+  if (hasSchema) {
+    return withNonEmptyArray({
+      arr: params.items,
+      schema: params.schema,
+      onEmpty: params.onEmpty ?? Effect.succeed(undefined as never),
+      execute: executeFn,
+    });
+  }
+
+  // No schema: validate non-empty array structure without element validation
+  return Schema.decodeUnknown(Schema.NonEmptyArray(Schema.Unknown))(
+    params.items
+  ).pipe(
+    Effect.option,
+    Effect.flatMap((maybe) =>
+      Option.match(maybe, {
+        onNone: () => params.onEmpty ?? Effect.succeed(undefined as never),
+        onSome: executeFn,
+      })
+    )
+  );
 }) as ProcessArray;

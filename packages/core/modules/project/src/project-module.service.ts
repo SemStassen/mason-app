@@ -1,6 +1,11 @@
-import { processArray, ProjectId, TaskId, type WorkspaceId } from "@mason/framework";
-import { Context, Effect, Layer } from "effect";
 import {
+  ProjectId,
+  processArray,
+  TaskId,
+  type WorkspaceId,
+} from "@mason/framework";
+import { Context, Effect, Layer } from "effect";
+import type {
   ProjectToCreate,
   ProjectToUpdate,
   TaskToCreate,
@@ -90,7 +95,6 @@ export class ProjectModuleService extends Context.Tag(
         )(({ workspaceId, projects }) =>
           processArray({
             items: projects,
-            schema: ProjectToCreate,
             onEmpty: Effect.succeed([]),
             execute: (nea) =>
               Effect.gen(function* () {
@@ -114,7 +118,6 @@ export class ProjectModuleService extends Context.Tag(
         )(({ workspaceId, projects }) =>
           processArray({
             items: projects,
-            schema: ProjectToUpdate,
             onEmpty: Effect.succeed([]),
             prepare: (updates) =>
               Effect.gen(function* () {
@@ -228,7 +231,6 @@ export class ProjectModuleService extends Context.Tag(
         )(({ workspaceId, tasks }) =>
           processArray({
             items: tasks,
-            schema: TaskToCreate,
             onEmpty: Effect.succeed([]),
             execute: (nea) =>
               Effect.gen(function* () {
@@ -252,7 +254,6 @@ export class ProjectModuleService extends Context.Tag(
         )(({ workspaceId, tasks }) =>
           processArray({
             items: tasks,
-            schema: TaskToUpdate,
             onEmpty: Effect.succeed([]),
             prepare: (updates) =>
               Effect.gen(function* () {

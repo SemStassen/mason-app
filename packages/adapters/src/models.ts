@@ -6,7 +6,10 @@ export type ExternalProject = typeof ExternalProject.Type;
 export const ExternalProject = Schema.Struct({
   externalId: Schema.String,
   name: OptionFromNonEmptyTrimmedString,
-  hexColor: Schema.optionalWith(Schema.NonEmptyString.pipe(Schema.maxLength(9)), { exact: true }),
+  hexColor: Schema.optionalWith(
+    Schema.NonEmptyString.pipe(Schema.maxLength(9)),
+    { exact: true }
+  ),
   isBillable: Schema.optionalWith(Schema.Boolean, { exact: true }),
   startDate: Schema.optionalWith(Schema.DateFromSelf, { exact: true }),
   endDate: Schema.optionalWith(Schema.DateFromSelf, { exact: true }),

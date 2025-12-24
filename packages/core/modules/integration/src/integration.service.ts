@@ -9,7 +9,7 @@ import {
 } from "@mason/framework";
 import { Context, Effect, Layer, Option, Redacted } from "effect";
 import { WorkspaceIntegration } from "./domain/workspace-integration.model";
-import {
+import type {
   WorkspaceIntegrationToCreate,
   WorkspaceIntegrationToUpdate,
 } from "./dto";
@@ -105,7 +105,6 @@ export class IntegrationService extends Context.Tag(
         }) {
           return yield* processArray({
             items: workspaceIntegrations,
-            schema: WorkspaceIntegrationToCreate,
             mapItem: (workspaceIntegration) =>
               Effect.gen(function* () {
                 const encryptedApiKey = yield* _encryptApiKey(
@@ -136,7 +135,6 @@ export class IntegrationService extends Context.Tag(
         )(({ workspaceId, workspaceIntegrations }) =>
           processArray({
             items: workspaceIntegrations,
-            schema: WorkspaceIntegrationToUpdate,
             prepare: (updates) =>
               Effect.gen(function* () {
                 const existingIntegrations =

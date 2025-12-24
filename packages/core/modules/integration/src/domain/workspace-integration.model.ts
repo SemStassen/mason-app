@@ -36,7 +36,12 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
   });
 
   static makeFromCreate(
-    input: typeof WorkspaceIntegration.Create.Type,
+    input: Omit<
+      typeof WorkspaceIntegration.Create.Encoded,
+      "encryptedApiKey"
+    > & {
+      encryptedApiKey: EncryptedApiKey;
+    },
     workspaceId: WorkspaceId,
     createdByMemberId: MemberId
   ) {
@@ -62,7 +67,14 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
       exact: true,
     }),
   });
-  patch(updates: typeof WorkspaceIntegration.Patch.Type) {
+  patch(
+    updates: Omit<
+      typeof WorkspaceIntegration.Patch.Encoded,
+      "encryptedApiKey"
+    > & {
+      encryptedApiKey: EncryptedApiKey;
+    }
+  ) {
     return Schema.decodeUnknown(WorkspaceIntegration.Patch)(updates).pipe(
       Effect.map((validated) =>
         WorkspaceIntegration.make({

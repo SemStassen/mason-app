@@ -5,7 +5,7 @@ import {
   ProjectId,
   WorkspaceId,
 } from "@mason/framework";
-import { Effect, Schema } from "effect";
+import { Effect, ParseResult, Schema } from "effect";
 
 export class Project extends Schema.Class<Project>("project/Project")({
   id: ProjectId,
@@ -32,9 +32,31 @@ export class Project extends Schema.Class<Project>("project/Project")({
   // Metadata
   deletedAt: Schema.NullOr(Schema.DateFromSelf),
 }) {
+  // Schema that validates hex color string and creates HexColor
+  private static readonly HexColorFromString = Schema.transformOrFail(
+    Schema.NonEmptyString, // input type
+    HexColor, // output type
+    {
+      strict: true,
+      decode: (i, _, ast) =>
+        Effect.sync(() => HexColor.make(i)).pipe(
+          Effect.mapBoth({
+            onFailure: () =>
+              new ParseResult.Type(
+                ast,
+                i,
+                `Unable to decode ${JSON.stringify(i)} into a HexColor`
+              ),
+            onSuccess: (hexColor) => hexColor,
+          })
+        ),
+      encode: (i) => ParseResult.succeed(i),
+    }
+  );
+
   static readonly Create = Schema.Struct({
     name: Project.fields.name,
-    hexColor: Schema.optionalWith(Project.fields.hexColor, {
+    hexColor: Schema.optionalWith(Project.HexColorFromString, {
       default: () => HexColor.make("#ff0000"),
       exact: true,
     }),
@@ -60,7 +82,7 @@ export class Project extends Schema.Class<Project>("project/Project")({
     }),
   });
   static makeFromCreate(
-    input: typeof Project.Create.Type,
+    input: typeof Project.Create.Encoded,
     workspaceId: WorkspaceId
   ) {
     return Schema.decodeUnknown(Project.Create)(input).pipe(
@@ -77,16 +99,21 @@ export class Project extends Schema.Class<Project>("project/Project")({
 
   static readonly Patch = Schema.Struct({
     name: Schema.optionalWith(Project.fields.name, { exact: true }),
-    hexColor: Schema.optionalWith(Project.fields.hexColor, { exact: true }),
+    hexColor: Schema.optionalWith(Project.HexColorFromString, { exact: true }),
     isBillable: Schema.optionalWith(Project.fields.isBillable, { exact: true }),
     startDate: Schema.optionalWith(Project.fields.startDate, { exact: true }),
     endDate: Schema.optionalWith(Project.fields.endDate, { exact: true }),
     notes: Schema.optionalWith(Project.fields.notes, { exact: true }),
     _metadata: Schema.optionalWith(Project.fields._metadata, { exact: true }),
   });
-  patch(updates: typeof Project.Patch.Type) {
+  patch(updates: typeof Project.Patch.Encoded) {
     return Schema.decodeUnknown(Project.Patch)(updates).pipe(
-      Effect.map((validated) => Project.make({ ...this, ...validated }))
+      Effect.map((validated) =>
+        Project.make({
+          ...this,
+          ...validated,
+        })
+      )
     );
   }
 

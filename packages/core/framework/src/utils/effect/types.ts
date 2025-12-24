@@ -47,6 +47,28 @@ export interface ProcessArray {
     ParseResult.ParseError | EExecute,
     Schema.Schema.Context<In> | RExecute
   >;
+  // Overload 1b: No schema, no prepare, no mapItem - execute uses items as-is
+  <
+    Items extends ReadonlyArray<unknown>,
+    AExecute,
+    EExecute = never,
+    RExecute = never,
+  >(params: {
+    readonly items: Items;
+    readonly schema?: never;
+    readonly prepare?: never;
+    readonly mapItem?: never;
+    readonly execute: (
+      items: NonEmptyReadonlyArray<Items[number]>
+    ) => Effect.Effect<AExecute, EExecute, RExecute>;
+    readonly onEmpty?: Effect.Effect<
+      AExecute extends ReadonlyArray<infer Element>
+        ? ReadonlyArray<Element>
+        : AExecute,
+      EExecute,
+      RExecute
+    >;
+  }): Effect.Effect<AExecute, EExecute, RExecute>;
   // Overload 2: No prepare, with mapItem - mapItem takes only the item
   <
     In extends Schema.Schema.Any,
@@ -78,6 +100,33 @@ export interface ProcessArray {
     ParseResult.ParseError | EMapItem | EExecute,
     Schema.Schema.Context<In> | RMapItem | RExecute
   >;
+  // Overload 2b: No schema, no prepare, with mapItem
+  <
+    Items extends ReadonlyArray<unknown>,
+    OutFinal,
+    AExecute,
+    EMapItem = never,
+    EExecute = never,
+    RMapItem = never,
+    RExecute = never,
+  >(params: {
+    readonly items: Items;
+    readonly schema?: never;
+    readonly prepare?: never;
+    readonly mapItem: (
+      item: Items[number]
+    ) => Effect.Effect<OutFinal, EMapItem, RMapItem>;
+    readonly execute: (
+      items: NonEmptyReadonlyArray<OutFinal>
+    ) => Effect.Effect<AExecute, EExecute, RExecute>;
+    readonly onEmpty?: Effect.Effect<
+      AExecute extends ReadonlyArray<infer Element>
+        ? ReadonlyArray<Element>
+        : AExecute,
+      EExecute,
+      RExecute
+    >;
+  }): Effect.Effect<AExecute, EMapItem | EExecute, RMapItem | RExecute>;
   // Overload 3: With prepare, no mapItem - execute uses schema type directly
   <
     In extends Schema.Schema.Any,
@@ -109,6 +158,33 @@ export interface ProcessArray {
     ParseResult.ParseError | EPrepare | EExecute,
     Schema.Schema.Context<In> | RPrepare | RExecute
   >;
+  // Overload 3b: No schema, with prepare, no mapItem
+  <
+    Items extends ReadonlyArray<unknown>,
+    Context,
+    AExecute,
+    EPrepare = never,
+    EExecute = never,
+    RPrepare = never,
+    RExecute = never,
+  >(params: {
+    readonly items: Items;
+    readonly schema?: never;
+    readonly prepare: (
+      items: NonEmptyReadonlyArray<Items[number]>
+    ) => Effect.Effect<Context, EPrepare, RPrepare>;
+    readonly mapItem?: never;
+    readonly execute: (
+      items: NonEmptyReadonlyArray<Items[number]>
+    ) => Effect.Effect<AExecute, EExecute, RExecute>;
+    readonly onEmpty?: Effect.Effect<
+      AExecute extends ReadonlyArray<infer Element>
+        ? ReadonlyArray<Element>
+        : AExecute,
+      EExecute,
+      RExecute
+    >;
+  }): Effect.Effect<AExecute, EPrepare | EExecute, RPrepare | RExecute>;
   // Overload 4: With prepare and mapItem - mapItem takes item and context
   <
     In extends Schema.Schema.Any,
@@ -145,5 +221,42 @@ export interface ProcessArray {
     AExecute,
     ParseResult.ParseError | EPrepare | EMapItem | EExecute,
     Schema.Schema.Context<In> | RPrepare | RMapItem | RExecute
+  >;
+  // Overload 4b: No schema, with prepare and mapItem
+  <
+    Items extends ReadonlyArray<unknown>,
+    Context,
+    OutFinal,
+    AExecute,
+    EPrepare = never,
+    EMapItem = never,
+    EExecute = never,
+    RPrepare = never,
+    RMapItem = never,
+    RExecute = never,
+  >(params: {
+    readonly items: Items;
+    readonly schema?: never;
+    readonly prepare: (
+      items: NonEmptyReadonlyArray<Items[number]>
+    ) => Effect.Effect<Context, EPrepare, RPrepare>;
+    readonly mapItem: (
+      item: Items[number],
+      context: Context
+    ) => Effect.Effect<OutFinal, EMapItem, RMapItem>;
+    readonly execute: (
+      items: NonEmptyReadonlyArray<OutFinal>
+    ) => Effect.Effect<AExecute, EExecute, RExecute>;
+    readonly onEmpty?: Effect.Effect<
+      AExecute extends ReadonlyArray<infer Element>
+        ? ReadonlyArray<Element>
+        : AExecute,
+      EExecute,
+      RExecute
+    >;
+  }): Effect.Effect<
+    AExecute,
+    EPrepare | EMapItem | EExecute,
+    RPrepare | RMapItem | RExecute
   >;
 }

@@ -32,7 +32,7 @@ export class Task extends Schema.Class<Task>("project/Task")({
   });
 
   static makeFromCreate(
-    input: typeof Task.Create.Type,
+    input: typeof Task.Create.Encoded,
     workspaceId: WorkspaceId
   ) {
     return Schema.decodeUnknown(Task.Create)(input).pipe(
@@ -51,7 +51,7 @@ export class Task extends Schema.Class<Task>("project/Task")({
     name: Schema.optionalWith(Task.fields.name, { exact: true }),
     _metadata: Schema.optionalWith(Task.fields._metadata, { exact: true }),
   });
-  patch(updates: typeof Task.Patch.Type) {
+  patch(updates: typeof Task.Patch.Encoded) {
     return Schema.decodeUnknown(Task.Patch)(updates).pipe(
       Effect.map((validated) =>
         Task.make({

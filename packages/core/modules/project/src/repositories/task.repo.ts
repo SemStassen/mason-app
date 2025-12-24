@@ -2,7 +2,12 @@ import { SqlSchema } from "@effect/sql";
 import { and, eq, inArray, isNotNull, sql } from "@mason/db/operators";
 import { type DbTask, tasksTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
-import { ProjectId, RepositoryError, TaskId, WorkspaceId } from "@mason/framework";
+import {
+  ProjectId,
+  type RepositoryError,
+  TaskId,
+  WorkspaceId,
+} from "@mason/framework";
 import { Context, Effect, Layer, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
 import { Task } from "../models/task.model";
