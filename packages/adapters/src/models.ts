@@ -1,4 +1,4 @@
-import { JsonRecord } from "@mason/framework/utils/schema";
+import { JsonRecord } from "@mason/framework";
 import { Schema } from "effect";
 import { OptionFromNonEmptyTrimmedString } from "effect/Schema";
 

@@ -2,8 +2,11 @@ import { SqlSchema } from "@effect/sql";
 import { and, eq, gte, inArray, isNotNull, lte } from "@mason/db/operators";
 import { type DbTimeEntry, timeEntriesTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
-import type { RepositoryError } from "@mason/framework/errors/database";
-import { TimeEntryId, WorkspaceId } from "@mason/framework/types";
+import {
+  type RepositoryError,
+  TimeEntryId,
+  WorkspaceId,
+} from "@mason/framework";
 import { Context, Effect, Layer, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
 import { TimeEntry } from "../models/time-entry.model";

@@ -1,6 +1,6 @@
 import { TimeTrackingIntegrationAdapter } from "@mason/adapters";
 import { DatabaseService } from "@mason/db/service";
-import { ProjectId, TaskId, type WorkspaceId } from "@mason/framework/types";
+import { ProjectId, TaskId, type WorkspaceId } from "@mason/framework";
 import {
   IntegrationService,
   WorkspaceIntegrationToUpdate,

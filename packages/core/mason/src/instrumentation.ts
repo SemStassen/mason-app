@@ -1,6 +1,6 @@
 import { DatabaseService } from "@mason/db/service";
-import { CryptoService } from "@mason/framework/platform";
-import { IntegrationModuleLive } from "@mason/integrations";
+import { AuthService, CryptoService } from "@mason/framework";
+import { IntegrationModuleLive } from "@mason/integration";
 import { ProjectModuleLive } from "@mason/project";
 import { NodeTelemetryLive } from "@mason/telemetry";
 import { TimeTrackingModuleLive } from "@mason/time-tracking";
@@ -13,6 +13,7 @@ const ServicesLive = Layer.mergeAll(
 );
 
 export const AppLive = ServicesLive.pipe(
+  Layer.provideMerge(AuthService.Default),
   Layer.provideMerge(CryptoService.live),
   Layer.provideMerge(DatabaseService.live),
   Layer.provideMerge(NodeTelemetryLive)

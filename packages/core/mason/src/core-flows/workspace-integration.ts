@@ -9,7 +9,7 @@ import {
   PlainApiKey,
   type WorkspaceId,
   WorkspaceIntegrationId,
-} from "@mason/framework/types";
+} from "@mason/framework";
 import {
   IntegrationService,
   WorkspaceIntegrationToCreate,

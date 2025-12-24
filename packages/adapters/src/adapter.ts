@@ -1,4 +1,4 @@
-import type { PlainApiKey } from "@mason/framework/types";
+import type { PlainApiKey } from "@mason/framework";
 import { Context, type Effect } from "effect";
 import type { AdapterError } from "./errors";
 import type { ExternalProject, ExternalTask } from "./models";

@@ -1,5 +1,4 @@
-import { ProjectId, TaskId, WorkspaceId } from "@mason/framework/types";
-import { generateUUID } from "@mason/framework/utils/uuid";
+import { generateUUID, ProjectId, TaskId, WorkspaceId } from "@mason/framework";
 import { Effect, Schema } from "effect";
 
 export class Task extends Schema.Class<Task>("project/Task")({

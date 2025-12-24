@@ -5,8 +5,7 @@ import {
   HttpServer,
 } from "@effect/platform";
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
-import { appLayer } from "@mason/mason/instrumentation";
-import { AuthService } from "@mason/mason/services/auth.service";
+import { AppLive } from "@mason/mason/instrumentation";
 import { Layer } from "effect";
 import { MasonApiLive } from "./api";
 import { AuthMiddlewareLive } from "./middleware/auth.middleware";
@@ -28,11 +27,7 @@ const HttpLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
     })
   ),
   Layer.provide(
-    MasonApiLive.pipe(
-      Layer.provide(AuthMiddlewareLive),
-      Layer.provide(AuthService.Default),
-      Layer.provide(appLayer)
-    )
+    MasonApiLive.pipe(Layer.provide(AuthMiddlewareLive), Layer.provide(AppLive))
   ),
   HttpServer.withLogAddress,
   Layer.provide(BunHttpServer.layer({ port: 8001 }))

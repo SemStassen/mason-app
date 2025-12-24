@@ -3,10 +3,13 @@ import {
   SessionData,
   SessionMiddleware,
 } from "@mason/api-contract/middleware/session";
-import { MemberId, UserId, WorkspaceId } from "@mason/mason/models/ids";
-import { AuthService } from "@mason/mason/services/auth.service";
+import {
+  AuthService,
+  MemberId,
+  UserId,
+  WorkspaceId,
+} from "@mason/mason/framework";
 import { Effect, Layer } from "effect";
-
 
 export const SessionMiddlewareLive = Layer.effect(
   SessionMiddleware,
@@ -18,16 +21,16 @@ export const SessionMiddlewareLive = Layer.effect(
         const request = yield* HttpServerRequest.HttpServerRequest;
 
         const session = yield* authService
-        .use((client) =>
-          client.api.getSession({
-            headers: new Headers(request.headers),
-          })
-        )
-        .pipe(Effect.catchAll(() => Effect.succeed(null)));
+          .use((client) =>
+            client.api.getSession({
+              headers: new Headers(request.headers),
+            })
+          )
+          .pipe(Effect.catchAll(() => Effect.succeed(null)));
 
-      if (!session?.session.activeWorkspaceId) {
-        return yield* Effect.fail(new HttpApiError.Unauthorized());
-      }
+        if (!session?.session.activeWorkspaceId) {
+          return yield* Effect.fail(new HttpApiError.Unauthorized());
+        }
 
         // TODO: You may need to fetch memberId from workspace membership
         return new SessionData({

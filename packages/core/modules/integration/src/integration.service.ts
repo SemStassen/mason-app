@@ -1,12 +1,12 @@
-import { CryptoService } from "@mason/framework/platform";
 import {
+  CryptoService,
   EncryptedApiKey,
   type MemberId,
   PlainApiKey,
+  processArray,
   type WorkspaceId,
   WorkspaceIntegrationId,
-} from "@mason/framework/types";
-import { processArray } from "@mason/framework/utils/effect";
+} from "@mason/framework";
 import { Context, Effect, Layer, Option, Redacted } from "effect";
 import { WorkspaceIntegration } from "./domain/workspace-integration.model";
 import {

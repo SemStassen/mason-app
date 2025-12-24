@@ -1,4 +1,4 @@
-import { PlainApiKey } from "@mason/framework/types";
+import { PlainApiKey } from "@mason/framework";
 import { Schema } from "effect";
 import { WorkspaceIntegration } from "./domain/workspace-integration.model";
 

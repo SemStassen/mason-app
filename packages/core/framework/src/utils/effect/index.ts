@@ -39,7 +39,7 @@ const withNonEmptyArray: WithNonEmptyArray = (params) => {
  * @example
  * ```ts
  * import { Effect, Schema } from "effect";
- * import { processArray } from "@mason/framework/utils/effect";
+ * import { processArray } from "@mason/framework";
  *
  * // Example 1: Simple execution without mapItem
  * const UserSchema = Schema.Struct({ name: Schema.String });
@@ -57,7 +57,7 @@ const withNonEmptyArray: WithNonEmptyArray = (params) => {
  * @example
  * ```ts
  * import { Effect, Schema } from "effect";
- * import { processArray } from "@mason/framework/utils/effect";
+ * import { processArray } from "@mason/framework";
  *
  * // Example 2: With mapItem
  * const UserSchema = Schema.Struct({ name: Schema.String });
@@ -79,7 +79,7 @@ const withNonEmptyArray: WithNonEmptyArray = (params) => {
  * @example
  * ```ts
  * import { Effect, Schema } from "effect";
- * import { processArray } from "@mason/framework/utils/effect";
+ * import { processArray } from "@mason/framework";
  *
  * // Example 3: With prepare and mapItem
  * const UpdateSchema = Schema.Struct({ id: Schema.String });

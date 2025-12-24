@@ -1,10 +1,10 @@
 import {
   EncryptedApiKey,
+  generateUUID,
   MemberId,
   WorkspaceId,
   WorkspaceIntegrationId,
-} from "@mason/framework/types";
-import { generateUUID } from "@mason/framework/utils/uuid";
+} from "@mason/framework";
 import { Effect, Schema } from "effect";
 
 export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(

@@ -1,7 +1,7 @@
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
-import { WorkspaceId } from "@mason/framework/types";
+import { WorkspaceId } from "@mason/framework";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {

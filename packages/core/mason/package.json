@@ -24,6 +24,7 @@
     "typescript": "catalog:dev"
   },
   "exports": {
+    "./framework": "./src/framework/index.ts",
     "./models/*": "./src/models/*.ts",
     "./services/*": "./src/services/*.ts",
     "./utils/*": "./src/utils/*.ts",

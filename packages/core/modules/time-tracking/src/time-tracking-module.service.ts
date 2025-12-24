@@ -1,5 +1,4 @@
-import { TimeEntryId, type WorkspaceId } from "@mason/framework/types";
-import { processArray } from "@mason/framework/utils/effect/index";
+import { processArray, TimeEntryId, type WorkspaceId } from "@mason/framework";
 import { Context, Effect, Layer } from "effect";
 import { TimeEntryToCreate, TimeEntryToUpdate } from "./dto";
 import {

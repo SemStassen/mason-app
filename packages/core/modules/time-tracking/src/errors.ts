@@ -1,4 +1,4 @@
-import { TimeEntryId } from "@mason/framework/types";
+import { TimeEntryId } from "@mason/framework";
 import { Schema } from "effect";
 
 export class InternalTimeTrackingModuleError extends Schema.TaggedError<InternalTimeTrackingModuleError>()(

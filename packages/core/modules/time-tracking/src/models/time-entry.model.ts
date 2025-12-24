@@ -1,12 +1,12 @@
 import {
+  generateUUID,
+  JsonRecord,
   MemberId,
   ProjectId,
   TaskId,
   TimeEntryId,
   WorkspaceId,
-} from "@mason/framework/types";
-import { JsonRecord } from "@mason/framework/utils/schema";
-import { generateUUID } from "@mason/framework/utils/uuid";
+} from "@mason/framework";
 import { isAfter } from "date-fns";
 import { Effect, Schema } from "effect";
 

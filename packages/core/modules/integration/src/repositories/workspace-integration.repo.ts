@@ -5,8 +5,7 @@ import {
   workspaceIntegrationsTable,
 } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
-import type { RepositoryError } from "@mason/framework/errors/database";
-import { WorkspaceId, WorkspaceIntegrationId } from "@mason/framework/types";
+import { RepositoryError, WorkspaceId, WorkspaceIntegrationId } from "@mason/framework";
 import { Context, Effect, Layer, type Option, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
 import { WorkspaceIntegration } from "../domain/workspace-integration.model";

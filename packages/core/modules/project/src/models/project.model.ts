@@ -1,6 +1,10 @@
-import { HexColor, ProjectId, WorkspaceId } from "@mason/framework/types";
-import { JsonRecord } from "@mason/framework/utils/schema";
-import { generateUUID } from "@mason/framework/utils/uuid";
+import {
+  generateUUID,
+  HexColor,
+  JsonRecord,
+  ProjectId,
+  WorkspaceId,
+} from "@mason/framework";
 import { Effect, Schema } from "effect";
 
 export class Project extends Schema.Class<Project>("project/Project")({

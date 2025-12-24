@@ -1,6 +1,6 @@
 import { SqlClient, type SqlError } from "@effect/sql";
 import PgDrizzle from "@effect/sql-drizzle/Pg";
-import type { WorkspaceId } from "@mason/framework/types";
+import type { WorkspaceId } from "@mason/framework";
 import type { PgRemoteDatabase } from "drizzle-orm/pg-proxy";
 import { Context, Effect, Layer } from "effect";
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
