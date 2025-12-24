@@ -60,6 +60,7 @@ export class ProjectModuleService extends Context.Tag(
     }) => Effect.Effect<ReadonlyArray<Task>, InternalProjectModuleError>;
     updateTasks: (params: {
       workspaceId: WorkspaceId;
+      projectId: ProjectId;
       tasks: ReadonlyArray<TaskToUpdate>;
     }) => Effect.Effect<
       ReadonlyArray<Task>,
@@ -67,17 +68,19 @@ export class ProjectModuleService extends Context.Tag(
     >;
     softDeleteTasks: (params: {
       workspaceId: WorkspaceId;
+      projectId: ProjectId;
       taskIds: ReadonlyArray<TaskId>;
     }) => Effect.Effect<void, InternalProjectModuleError>;
     hardDeleteTasks: (params: {
       workspaceId: WorkspaceId;
+      projectId: ProjectId;
       taskIds: ReadonlyArray<TaskId>;
     }) => Effect.Effect<void, InternalProjectModuleError>;
     listTasks: (params: {
       workspaceId: WorkspaceId;
+      projectId: ProjectId;
       query?: {
         ids?: Array<TaskId>;
-        projectIds?: Array<ProjectId>;
         _source?: "float";
         _externalIds?: Array<string>;
       };
@@ -100,7 +103,7 @@ export class ProjectModuleService extends Context.Tag(
             execute: (nea) =>
               Effect.gen(function* () {
                 const projectsToCreate = yield* Effect.forEach(nea, (p) =>
-                  Project.makeFromCreate(p, workspaceId)
+                  Project.makeFromCreate(workspaceId, p)
                 );
 
                 return yield* projectRepo.insert(projectsToCreate);
@@ -236,7 +239,7 @@ export class ProjectModuleService extends Context.Tag(
             execute: (nea) =>
               Effect.gen(function* () {
                 const tasksToCreate = yield* Effect.forEach(nea, (task) =>
-                  Task.makeFromCreate(task, workspaceId, projectId)
+                  Task.makeFromCreate(task, { workspaceId, projectId })
                 );
 
                 return yield* taskRepo.insert(tasksToCreate);
@@ -252,7 +255,7 @@ export class ProjectModuleService extends Context.Tag(
         ),
         updateTasks: Effect.fn(
           "@mason/project/ProjectModuleService.updateTasks"
-        )(({ workspaceId, tasks }) =>
+        )(({ workspaceId, projectId, tasks }) =>
           processArray({
             items: tasks,
             onEmpty: Effect.succeed([]),
@@ -262,6 +265,7 @@ export class ProjectModuleService extends Context.Tag(
                   workspaceId: workspaceId,
                   query: {
                     ids: updates.map((task) => task.id),
+                    projectIds: [projectId],
                   },
                 });
                 return new Map(existingTasks.map((e) => [e.id, e]));
@@ -290,7 +294,7 @@ export class ProjectModuleService extends Context.Tag(
         ),
         softDeleteTasks: Effect.fn(
           "@mason/project/ProjectModuleService.softDeleteTasks"
-        )(({ workspaceId, taskIds }) =>
+        )(({ workspaceId, projectId, taskIds }) =>
           processArray({
             items: taskIds,
             schema: TaskId,
@@ -301,6 +305,7 @@ export class ProjectModuleService extends Context.Tag(
                   workspaceId,
                   query: {
                     ids: nea,
+                    projectIds: [projectId],
                   },
                 });
 
@@ -326,7 +331,7 @@ export class ProjectModuleService extends Context.Tag(
         ),
         hardDeleteTasks: Effect.fn(
           "@mason/project/ProjectModuleService.hardDeleteTasks"
-        )(({ workspaceId, taskIds }) =>
+        )(({ workspaceId, projectId, taskIds }) =>
           processArray({
             items: taskIds,
             schema: TaskId,
@@ -337,6 +342,7 @@ export class ProjectModuleService extends Context.Tag(
                   workspaceId,
                   query: {
                     ids: nea,
+                    projectIds: [projectId],
                   },
                 });
 
@@ -357,9 +363,15 @@ export class ProjectModuleService extends Context.Tag(
           )
         ),
         listTasks: Effect.fn("@mason/project/ProjectModuleService.listTasks")(
-          (params) =>
+          ({ workspaceId, projectId, query }) =>
             taskRepo
-              .list(params)
+              .list({
+                workspaceId,
+                query: {
+                  ...query,
+                  projectIds: [projectId],
+                },
+              })
               .pipe(
                 Effect.mapError(
                   (e) => new InternalProjectModuleError({ cause: e })

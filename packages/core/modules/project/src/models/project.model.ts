@@ -82,8 +82,8 @@ export class Project extends Schema.Class<Project>("project/Project")({
     }),
   });
   static makeFromCreate(
-    input: typeof Project.Create.Encoded,
-    workspaceId: WorkspaceId
+    workspaceId: WorkspaceId,
+    input: typeof Project.Create.Type
   ) {
     return Schema.decodeUnknown(Project.Create)(input).pipe(
       Effect.map((validated) =>
@@ -106,7 +106,7 @@ export class Project extends Schema.Class<Project>("project/Project")({
     notes: Schema.optionalWith(Project.fields.notes, { exact: true }),
     _metadata: Schema.optionalWith(Project.fields._metadata, { exact: true }),
   });
-  patch(updates: typeof Project.Patch.Encoded) {
+  patch(updates: typeof Project.Patch.Type) {
     return Schema.decodeUnknown(Project.Patch)(updates).pipe(
       Effect.map((validated) =>
         Project.make({

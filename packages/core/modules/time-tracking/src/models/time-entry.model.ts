@@ -40,15 +40,15 @@ export class TimeEntry extends Schema.Class<TimeEntry>(
   });
 
   static makeFromCreate(
-    input: typeof TimeEntry.Create.Type,
-    workspaceId: WorkspaceId
+    workspaceId: WorkspaceId,
+    input: typeof TimeEntry.Create.Type
   ) {
     return Schema.decodeUnknown(TimeEntry.Create)(input).pipe(
       Effect.map((validated) =>
         TimeEntry.make({
           ...validated,
           id: TimeEntryId.make(generateUUID()),
-          workspaceId,
+          workspaceId: workspaceId,
           deletedAt: null,
         })
       )

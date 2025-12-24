@@ -103,11 +103,7 @@ export class IntegrationService extends Context.Tag(
         createWorkspaceIntegrations: Effect.fn(
           "@mason/integration/IntegrationService.createWorkspaceIntegrations"
         )(
-          function* ({
-            workspaceId,
-            createdByMemberId,
-            workspaceIntegrations,
-          }) {
+          function* ({ workspaceId, workspaceIntegrations }) {
             return yield* processArray({
               items: workspaceIntegrations,
               mapItem: (workspaceIntegration) =>
@@ -117,9 +113,8 @@ export class IntegrationService extends Context.Tag(
                   );
 
                   return yield* WorkspaceIntegration.makeFromCreate(
-                    { ...workspaceIntegration, encryptedApiKey },
                     workspaceId,
-                    createdByMemberId
+                    { ...workspaceIntegration, encryptedApiKey }
                   );
                 }),
               execute: (workspaceIntegrationsToCreate) =>

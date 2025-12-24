@@ -31,17 +31,19 @@ export class Task extends Schema.Class<Task>("project/Task")({
   });
 
   static makeFromCreate(
-    input: typeof Task.Create.Encoded,
-    workspaceId: WorkspaceId,
-    projectId: ProjectId
+    input: typeof Task.Create.Type,
+    ids: {
+      workspaceId: typeof Task.fields.workspaceId.Type;
+      projectId: typeof Task.fields.projectId.Type;
+    }
   ) {
     return Schema.decodeUnknown(Task.Create)(input).pipe(
       Effect.map((validated) =>
         Task.make({
           ...validated,
           id: TaskId.make(generateUUID()),
-          workspaceId: workspaceId,
-          projectId: projectId,
+          workspaceId: ids.workspaceId,
+          projectId: ids.projectId,
           deletedAt: null,
         })
       )
@@ -52,7 +54,7 @@ export class Task extends Schema.Class<Task>("project/Task")({
     name: Schema.optionalWith(Task.fields.name, { exact: true }),
     _metadata: Schema.optionalWith(Task.fields._metadata, { exact: true }),
   });
-  patch(updates: typeof Task.Patch.Encoded) {
+  patch(updates: typeof Task.Patch.Type) {
     return Schema.decodeUnknown(Task.Patch)(updates).pipe(
       Effect.map((validated) =>
         Task.make({

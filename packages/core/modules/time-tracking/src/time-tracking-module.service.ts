@@ -66,7 +66,7 @@ export class TimeTrackingModuleService extends Context.Tag(
                 const timeEntriesToCreate = yield* Effect.forEach(
                   nea,
                   (timeEntry) =>
-                    TimeEntry.makeFromCreate(timeEntry, workspaceId)
+                    TimeEntry.makeFromCreate(workspaceId, timeEntry)
                 );
 
                 return yield* timeEntryRepo.insert(timeEntriesToCreate);

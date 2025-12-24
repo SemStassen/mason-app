@@ -31,14 +31,14 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
   })
 ) {
   static readonly Create = Schema.Struct({
+    createdByMemberId: WorkspaceIntegration.fields.createdByMemberId,
     kind: WorkspaceIntegration.fields.kind,
     encryptedApiKey: WorkspaceIntegration.fields.encryptedApiKey,
   });
 
   static makeFromCreate(
-    input: typeof WorkspaceIntegration.Create.Type,
     workspaceId: WorkspaceId,
-    createdByMemberId: MemberId
+    input: typeof WorkspaceIntegration.Create.Type
   ) {
     return Schema.decodeUnknown(WorkspaceIntegration.Create)(input).pipe(
       Effect.map((validated) =>
@@ -46,7 +46,6 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
           ...validated,
           id: WorkspaceIntegrationId.make(generateUUID()),
           workspaceId: workspaceId,
-          createdByMemberId: createdByMemberId,
           createdAt: new Date(),
           _metadata: null,
         })
@@ -62,7 +61,7 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
       exact: true,
     }),
   });
-  patch(updates: typeof WorkspaceIntegration.Patch.Encoded) {
+  patch(updates: typeof WorkspaceIntegration.Patch.Type) {
     return Schema.decodeUnknown(WorkspaceIntegration.Patch)(updates).pipe(
       Effect.map((validated) =>
         WorkspaceIntegration.make({
