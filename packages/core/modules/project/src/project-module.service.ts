@@ -55,6 +55,7 @@ export class ProjectModuleService extends Context.Tag(
     }) => Effect.Effect<ReadonlyArray<Project>, InternalProjectModuleError>;
     createTasks: (params: {
       workspaceId: WorkspaceId;
+      projectId: ProjectId;
       tasks: ReadonlyArray<TaskToCreate>;
     }) => Effect.Effect<ReadonlyArray<Task>, InternalProjectModuleError>;
     updateTasks: (params: {
@@ -228,14 +229,14 @@ export class ProjectModuleService extends Context.Tag(
         ),
         createTasks: Effect.fn(
           "@mason/project/ProjectModuleService.createTasks"
-        )(({ workspaceId, tasks }) =>
+        )(({ workspaceId, projectId, tasks }) =>
           processArray({
             items: tasks,
             onEmpty: Effect.succeed([]),
             execute: (nea) =>
               Effect.gen(function* () {
                 const tasksToCreate = yield* Effect.forEach(nea, (task) =>
-                  Task.makeFromCreate(task, workspaceId)
+                  Task.makeFromCreate(task, workspaceId, projectId)
                 );
 
                 return yield* taskRepo.insert(tasksToCreate);
@@ -270,7 +271,9 @@ export class ProjectModuleService extends Context.Tag(
                 const existing = existingMap.get(update.id);
                 if (!existing) {
                   return yield* Effect.fail(
-                    new TaskNotFoundError({ taskId: update.id })
+                    new TaskNotFoundError({
+                      taskId: update.id,
+                    })
                   );
                 }
                 return yield* existing.patch(update);

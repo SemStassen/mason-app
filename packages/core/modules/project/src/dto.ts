@@ -3,7 +3,7 @@ import type { Task } from "./models/task.model";
 
 export type ProjectToCreate = typeof Project.Create.Encoded;
 
-export type ProjectToUpdate = typeof Project.Patch.Type & {
+export type ProjectToUpdate = typeof Project.Patch.Encoded & {
   id: typeof Project.fields.id.Type;
 };
 

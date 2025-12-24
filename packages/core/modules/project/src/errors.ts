@@ -1,3 +1,4 @@
+import { ProjectId, TaskId } from "@mason/framework";
 import { Schema } from "effect";
 
 export class InternalProjectModuleError extends Schema.TaggedError<InternalProjectModuleError>()(
@@ -10,13 +11,13 @@ export class InternalProjectModuleError extends Schema.TaggedError<InternalProje
 export class ProjectNotFoundError extends Schema.TaggedError<ProjectNotFoundError>()(
   "project/ProjectNotFoundError",
   {
-    projectId: Schema.String,
+    projectId: ProjectId,
   }
 ) {}
 
 export class TaskNotFoundError extends Schema.TaggedError<TaskNotFoundError>()(
   "project/TaskNotFoundError",
   {
-    taskId: Schema.String,
+    taskId: TaskId,
   }
 ) {}

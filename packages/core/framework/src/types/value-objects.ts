@@ -2,15 +2,13 @@ import { Schema } from "effect";
 import { regex } from "../utils/regex";
 
 export type PlainApiKey = typeof PlainApiKey.Type;
-export const PlainApiKey = Schema.NonEmptyString.pipe(
-  Schema.brand("ApiKey"),
-  Schema.Redacted
+export const PlainApiKey = Schema.Redacted(
+  Schema.NonEmptyString.pipe(Schema.brand("PlainApiKey"))
 );
 
 export type EncryptedApiKey = typeof EncryptedApiKey.Type;
-export const EncryptedApiKey = Schema.NonEmptyString.pipe(
-  Schema.brand("EncryptedApiKey"),
-  Schema.Redacted
+export const EncryptedApiKey = Schema.Redacted(
+  Schema.NonEmptyString.pipe(Schema.brand("EncryptedApiKey"))
 );
 
 export type HexColor = typeof HexColor.Type;

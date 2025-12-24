@@ -23,7 +23,6 @@ export class Task extends Schema.Class<Task>("project/Task")({
   deletedAt: Schema.NullOr(Schema.DateFromSelf),
 }) {
   static readonly Create = Schema.Struct({
-    projectId: Task.fields.projectId,
     name: Task.fields.name,
     _metadata: Schema.optionalWith(Task.fields._metadata, {
       default: () => null,
@@ -33,7 +32,8 @@ export class Task extends Schema.Class<Task>("project/Task")({
 
   static makeFromCreate(
     input: typeof Task.Create.Encoded,
-    workspaceId: WorkspaceId
+    workspaceId: WorkspaceId,
+    projectId: ProjectId
   ) {
     return Schema.decodeUnknown(Task.Create)(input).pipe(
       Effect.map((validated) =>
@@ -41,6 +41,7 @@ export class Task extends Schema.Class<Task>("project/Task")({
           ...validated,
           id: TaskId.make(generateUUID()),
           workspaceId: workspaceId,
+          projectId: projectId,
           deletedAt: null,
         })
       )

@@ -18,6 +18,7 @@
     "typescript": "catalog:dev"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/index.ts"
   }
 }

@@ -10,7 +10,7 @@ import {
   WorkspaceId,
   WorkspaceIntegrationId,
 } from "@mason/framework";
-import { Context, Effect, Layer, type Option, Schema } from "effect";
+import { Context, Effect, Layer, type Option, Redacted, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
 import { WorkspaceIntegration } from "../domain/workspace-integration.model";
 
@@ -22,7 +22,7 @@ const _mapToDb = (
     workspaceId: workspaceIntegration.workspaceId,
     createdByMemberId: workspaceIntegration.createdByMemberId,
     kind: workspaceIntegration.kind,
-    encryptedApiKey: workspaceIntegration.encryptedApiKey,
+    encryptedApiKey: Redacted.value(workspaceIntegration.encryptedApiKey),
     _metadata: workspaceIntegration._metadata,
   };
 };

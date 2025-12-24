@@ -77,7 +77,9 @@ export class IntegrationService extends Context.Tag(
       const workspaceIntegrationRepo = yield* WorkspaceIntegrationRepository;
       const cryptoService = yield* CryptoService;
 
-      const _encryptApiKey = (plainApiKey: PlainApiKey) =>
+      const _encryptApiKey = (
+        plainApiKey: PlainApiKey
+      ): Effect.Effect<EncryptedApiKey> =>
         cryptoService
           .encrypt(Redacted.value(plainApiKey))
           .pipe(
@@ -86,7 +88,9 @@ export class IntegrationService extends Context.Tag(
             )
           );
 
-      const _decryptApiKey = (encryptedApiKey: EncryptedApiKey) =>
+      const _decryptApiKey = (
+        encryptedApiKey: EncryptedApiKey
+      ): Effect.Effect<PlainApiKey> =>
         cryptoService
           .decrypt(Redacted.value(encryptedApiKey))
           .pipe(
@@ -98,37 +102,38 @@ export class IntegrationService extends Context.Tag(
       return IntegrationService.of({
         createWorkspaceIntegrations: Effect.fn(
           "@mason/integration/IntegrationService.createWorkspaceIntegrations"
-        )(function* ({
-          workspaceId,
-          createdByMemberId,
-          workspaceIntegrations,
-        }) {
-          return yield* processArray({
-            items: workspaceIntegrations,
-            mapItem: (workspaceIntegration) =>
-              Effect.gen(function* () {
-                const encryptedApiKey = yield* _encryptApiKey(
-                  workspaceIntegration.plainApiKey
-                );
+        )(
+          function* ({
+            workspaceId,
+            createdByMemberId,
+            workspaceIntegrations,
+          }) {
+            return yield* processArray({
+              items: workspaceIntegrations,
+              mapItem: (workspaceIntegration) =>
+                Effect.gen(function* () {
+                  const encryptedApiKey = yield* _encryptApiKey(
+                    workspaceIntegration.plainApiKey
+                  );
 
-                return yield* WorkspaceIntegration.makeFromCreate(
-                  { ...workspaceIntegration, encryptedApiKey },
-                  workspaceId,
-                  createdByMemberId
-                );
-              }),
-            execute: (workspaceIntegrationsToCreate) =>
-              workspaceIntegrationRepo.insert(workspaceIntegrationsToCreate),
-            onEmpty: Effect.succeed([]),
-          }).pipe(
-            Effect.catchTags({
-              ParseError: (e) =>
-                Effect.fail(new InternalIntegrationModuleError({ cause: e })),
-              SqlError: (e) =>
-                Effect.fail(new InternalIntegrationModuleError({ cause: e })),
-            })
-          );
-        }),
+                  return yield* WorkspaceIntegration.makeFromCreate(
+                    { ...workspaceIntegration, encryptedApiKey },
+                    workspaceId,
+                    createdByMemberId
+                  );
+                }),
+              execute: (workspaceIntegrationsToCreate) =>
+                workspaceIntegrationRepo.insert(workspaceIntegrationsToCreate),
+              onEmpty: Effect.succeed([]),
+            });
+          },
+          Effect.catchTags({
+            ParseError: (e) =>
+              Effect.fail(new InternalIntegrationModuleError({ cause: e })),
+            SqlError: (e) =>
+              Effect.fail(new InternalIntegrationModuleError({ cause: e })),
+          })
+        ),
 
         updateWorkspaceIntegrations: Effect.fn(
           "@mason/integration/IntegrationService.updateWorkspaceIntegrations"

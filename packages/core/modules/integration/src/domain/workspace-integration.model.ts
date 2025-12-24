@@ -17,7 +17,7 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
     createdByMemberId: MemberId,
     // General
     kind: Schema.Literal("float"),
-    encryptedApiKey: EncryptedApiKey,
+    encryptedApiKey: EncryptedApiKey.to,
     // Nullable
     _metadata: Schema.NullOr(
       Schema.Struct({
@@ -36,12 +36,7 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
   });
 
   static makeFromCreate(
-    input: Omit<
-      typeof WorkspaceIntegration.Create.Encoded,
-      "encryptedApiKey"
-    > & {
-      encryptedApiKey: EncryptedApiKey;
-    },
+    input: typeof WorkspaceIntegration.Create.Type,
     workspaceId: WorkspaceId,
     createdByMemberId: MemberId
   ) {
@@ -67,14 +62,7 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
       exact: true,
     }),
   });
-  patch(
-    updates: Omit<
-      typeof WorkspaceIntegration.Patch.Encoded,
-      "encryptedApiKey"
-    > & {
-      encryptedApiKey: EncryptedApiKey;
-    }
-  ) {
+  patch(updates: typeof WorkspaceIntegration.Patch.Encoded) {
     return Schema.decodeUnknown(WorkspaceIntegration.Patch)(updates).pipe(
       Effect.map((validated) =>
         WorkspaceIntegration.make({
