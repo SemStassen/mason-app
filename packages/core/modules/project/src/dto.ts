@@ -3,16 +3,17 @@ import { Project } from "./models/project.model";
 import { Task } from "./models/task.model";
 
 export type ProjectToCreate = typeof ProjectToCreate.Type;
-export const ProjectToCreate = Schema.TaggedStruct(
-  "project/ProjectToCreate",
-  Project.Create.fields
-);
+export const ProjectToCreate = Schema.TaggedStruct("project/ProjectToCreate", {
+  ...Project.Create.fields,
+  hexColor: Schema.optionalWith(Schema.NonEmptyString, { exact: true }),
+});
 
 export type ProjectToUpdate = typeof ProjectToUpdate.Type;
 export const ProjectToUpdate = Schema.TaggedStruct("project/ProjectToUpdate", {
   id: Project.fields.id,
   // General
   ...Project.Patch.fields,
+  hexColor: Schema.optionalWith(Schema.NonEmptyString, { exact: true }),
 });
 
 export type TaskToCreate = typeof TaskToCreate.Type;

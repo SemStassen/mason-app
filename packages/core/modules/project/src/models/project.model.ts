@@ -1,4 +1,4 @@
-import { ProjectId, WorkspaceId } from "@mason/framework/types";
+import { HexColor, ProjectId, WorkspaceId } from "@mason/framework/types";
 import { JsonRecord } from "@mason/framework/utils/schema";
 import { generateUUID } from "@mason/framework/utils/uuid";
 import { Effect, Schema } from "effect";
@@ -9,7 +9,7 @@ export class Project extends Schema.Class<Project>("project/Project")({
   workspaceId: WorkspaceId,
   // General
   name: Schema.NonEmptyString.pipe(Schema.maxLength(255)),
-  hexColor: Schema.NonEmptyString.pipe(Schema.maxLength(9)), // # + hex + alpha
+  hexColor: HexColor,
   isBillable: Schema.Boolean,
   // Nullable
   startDate: Schema.NullOr(Schema.DateFromSelf),
@@ -25,11 +25,13 @@ export class Project extends Schema.Class<Project>("project/Project")({
       }),
     })
   ),
+  // Metadata
+  deletedAt: Schema.NullOr(Schema.DateFromSelf),
 }) {
   static readonly Create = Schema.Struct({
     name: Project.fields.name,
     hexColor: Schema.optionalWith(Project.fields.hexColor, {
-      default: () => "#ff0000",
+      default: () => HexColor.make("#ff0000"),
       exact: true,
     }),
     isBillable: Schema.optionalWith(Project.fields.isBillable, {
@@ -63,6 +65,7 @@ export class Project extends Schema.Class<Project>("project/Project")({
           ...validated,
           id: ProjectId.make(generateUUID()),
           workspaceId: workspaceId,
+          deletedAt: null,
         })
       )
     );
@@ -81,5 +84,12 @@ export class Project extends Schema.Class<Project>("project/Project")({
     return Schema.decodeUnknown(Project.Patch)(updates).pipe(
       Effect.map((validated) => Project.make({ ...this, ...validated }))
     );
+  }
+
+  softDelete() {
+    if (this.deletedAt) {
+      return this;
+    }
+    return Project.make({ ...this, deletedAt: new Date() });
   }
 }

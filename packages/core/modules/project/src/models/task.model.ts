@@ -20,6 +20,8 @@ export class Task extends Schema.Class<Task>("project/Task")({
       }),
     })
   ),
+  // Metadata
+  deletedAt: Schema.NullOr(Schema.DateFromSelf),
 }) {
   static readonly Create = Schema.Struct({
     projectId: Task.fields.projectId,
@@ -40,6 +42,7 @@ export class Task extends Schema.Class<Task>("project/Task")({
           ...validated,
           id: TaskId.make(generateUUID()),
           workspaceId: workspaceId,
+          deletedAt: null,
         })
       )
     );
@@ -59,5 +62,12 @@ export class Task extends Schema.Class<Task>("project/Task")({
         })
       )
     );
+  }
+
+  softDelete() {
+    if (this.deletedAt) {
+      return this;
+    }
+    return Task.make({ ...this, deletedAt: new Date() });
   }
 }

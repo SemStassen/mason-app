@@ -1,13 +1,15 @@
 import { CryptoService } from "@mason/framework/platform";
 import {
-  ApiKey,
+  EncryptedApiKey,
   type MemberId,
+  PlainApiKey,
   type WorkspaceId,
   WorkspaceIntegrationId,
 } from "@mason/framework/types";
-import { generateUUID } from "@mason/framework/utils/uuid";
-import { Context, Effect, Layer, Option } from "effect";
-import type {
+import { processArray } from "@mason/framework/utils/effect";
+import { Context, Effect, Layer, Option, Redacted } from "effect";
+import { WorkspaceIntegration } from "./domain/workspace-integration.model";
+import {
   WorkspaceIntegrationToCreate,
   WorkspaceIntegrationToUpdate,
 } from "./dto";
@@ -15,7 +17,6 @@ import {
   InternalIntegrationModuleError,
   WorkspaceIntegrationNotFoundError,
 } from "./errors";
-import { WorkspaceIntegration } from "./models/workspace-integration.model";
 import { WorkspaceIntegrationRepository } from "./repositories/workspace-integration.repo";
 
 export class IntegrationService extends Context.Tag(
@@ -23,25 +24,25 @@ export class IntegrationService extends Context.Tag(
 )<
   IntegrationService,
   {
-    createWorkspaceIntegration: (params: {
+    createWorkspaceIntegrations: (params: {
       workspaceId: WorkspaceId;
       createdByMemberId: MemberId;
-      workspaceIntegration: WorkspaceIntegrationToCreate;
-    }) => Effect.Effect<WorkspaceIntegration, InternalIntegrationModuleError>;
-    updateWorkspaceIntegration: (params: {
-      workspaceId: WorkspaceId;
-      workspaceIntegration: WorkspaceIntegrationToUpdate;
+      workspaceIntegrations: ReadonlyArray<WorkspaceIntegrationToCreate>;
     }) => Effect.Effect<
-      WorkspaceIntegration,
+      ReadonlyArray<WorkspaceIntegration>,
+      InternalIntegrationModuleError
+    >;
+    updateWorkspaceIntegrations: (params: {
+      workspaceId: WorkspaceId;
+      workspaceIntegrations: ReadonlyArray<WorkspaceIntegrationToUpdate>;
+    }) => Effect.Effect<
+      ReadonlyArray<WorkspaceIntegration>,
       InternalIntegrationModuleError | WorkspaceIntegrationNotFoundError
     >;
-    hardDeleteWorkspaceIntegration: (params: {
+    hardDeleteWorkspaceIntegrations: (params: {
       workspaceId: WorkspaceId;
-      workspaceIntegrationId: WorkspaceIntegrationId;
-    }) => Effect.Effect<
-      void,
-      InternalIntegrationModuleError | WorkspaceIntegrationNotFoundError
-    >;
+      workspaceIntegrationIds: ReadonlyArray<WorkspaceIntegrationId>;
+    }) => Effect.Effect<void, InternalIntegrationModuleError>;
     retrieveWorkspaceIntegration: (params: {
       workspaceId: WorkspaceId;
       query?: {
@@ -54,6 +55,9 @@ export class IntegrationService extends Context.Tag(
     >;
     listWorkspaceIntegrations: (params: {
       workspaceId: WorkspaceId;
+      query?: {
+        ids?: ReadonlyArray<WorkspaceIntegrationId>;
+      };
     }) => Effect.Effect<
       ReadonlyArray<WorkspaceIntegration>,
       InternalIntegrationModuleError
@@ -62,7 +66,7 @@ export class IntegrationService extends Context.Tag(
       workspaceId: WorkspaceId;
       kind: "float";
     }) => Effect.Effect<
-      ApiKey,
+      PlainApiKey,
       InternalIntegrationModuleError | WorkspaceIntegrationNotFoundError
     >;
   }
@@ -70,74 +74,102 @@ export class IntegrationService extends Context.Tag(
   static readonly live = Layer.effect(
     IntegrationService,
     Effect.gen(function* () {
-      const cryptoService = yield* CryptoService;
       const workspaceIntegrationRepo = yield* WorkspaceIntegrationRepository;
+      const cryptoService = yield* CryptoService;
+
+      const _encryptApiKey = (plainApiKey: PlainApiKey) =>
+        cryptoService
+          .encrypt(Redacted.value(plainApiKey))
+          .pipe(
+            Effect.map((encrypted) =>
+              Redacted.make(EncryptedApiKey.from.make(encrypted))
+            )
+          );
+
+      const _decryptApiKey = (encryptedApiKey: EncryptedApiKey) =>
+        cryptoService
+          .decrypt(Redacted.value(encryptedApiKey))
+          .pipe(
+            Effect.map((decrypted) =>
+              Redacted.make(PlainApiKey.from.make(decrypted))
+            )
+          );
 
       return IntegrationService.of({
-        createWorkspaceIntegration: Effect.fn(
-          "@mason/integration/IntegrationService.createWorkspaceIntegration"
-        )(({ workspaceId, createdByMemberId, workspaceIntegration }) =>
-          Effect.gen(function* () {
-            const apiKeyEncrypted = yield* cryptoService.encrypt(
-              workspaceIntegration.apiKeyUnencrypted
-            );
+        createWorkspaceIntegrations: Effect.fn(
+          "@mason/integration/IntegrationService.createWorkspaceIntegrations"
+        )(function* ({
+          workspaceId,
+          createdByMemberId,
+          workspaceIntegrations,
+        }) {
+          return yield* processArray({
+            items: workspaceIntegrations,
+            schema: WorkspaceIntegrationToCreate,
+            mapItem: (workspaceIntegration) =>
+              Effect.gen(function* () {
+                const encryptedApiKey = yield* _encryptApiKey(
+                  workspaceIntegration.plainApiKey
+                );
 
-            const workspaceIntegrationToCreate = WorkspaceIntegration.make({
-              ...workspaceIntegration,
-              id: WorkspaceIntegrationId.make(generateUUID()),
-              workspaceId: workspaceId,
-              createdByMemberId: createdByMemberId,
-              apiKeyEncrypted: apiKeyEncrypted,
-              createdAt: new Date(),
-            });
-
-            const [createdWorkspaceIntegration] =
-              yield* workspaceIntegrationRepo.insert({
-                workspaceId: workspaceId,
-                workspaceIntegrations: [workspaceIntegrationToCreate],
-              });
-
-            return createdWorkspaceIntegration;
+                return yield* WorkspaceIntegration.makeFromCreate(
+                  { ...workspaceIntegration, encryptedApiKey },
+                  workspaceId,
+                  createdByMemberId
+                );
+              }),
+            execute: (workspaceIntegrationsToCreate) =>
+              workspaceIntegrationRepo.insert(workspaceIntegrationsToCreate),
+            onEmpty: Effect.succeed([]),
           }).pipe(
-            Effect.mapError(
-              (e) => new InternalIntegrationModuleError({ cause: e })
-            )
-          )
-        ),
+            Effect.catchTags({
+              ParseError: (e) =>
+                Effect.fail(new InternalIntegrationModuleError({ cause: e })),
+              SqlError: (e) =>
+                Effect.fail(new InternalIntegrationModuleError({ cause: e })),
+            })
+          );
+        }),
 
-        updateWorkspaceIntegration: Effect.fn(
-          "@mason/integration/IntegrationService.updateWorkspaceIntegration"
-        )(({ workspaceId, workspaceIntegration }) =>
-          Effect.gen(function* () {
-            const maybeExisting = yield* workspaceIntegrationRepo.retrieve({
-              workspaceId,
-              query: { id: workspaceIntegration.id },
-            });
+        updateWorkspaceIntegrations: Effect.fn(
+          "@mason/integration/IntegrationService.updateWorkspaceIntegrations"
+        )(({ workspaceId, workspaceIntegrations }) =>
+          processArray({
+            items: workspaceIntegrations,
+            schema: WorkspaceIntegrationToUpdate,
+            prepare: (updates) =>
+              Effect.gen(function* () {
+                const existingIntegrations =
+                  yield* workspaceIntegrationRepo.list({
+                    workspaceId,
+                    query: { ids: updates.map((u) => u.id) },
+                  });
 
-            const existing = yield* Option.match(maybeExisting, {
-              onNone: () =>
-                Effect.fail(new WorkspaceIntegrationNotFoundError()),
-              onSome: Effect.succeed,
-            });
+                const existingMap = new Map(
+                  existingIntegrations.map((e) => [e.id, e])
+                );
+                return existingMap;
+              }),
+            mapItem: (update, existingMap) =>
+              Effect.gen(function* () {
+                const existing = existingMap.get(update.id);
+                if (!existing) {
+                  return yield* Effect.fail(
+                    new WorkspaceIntegrationNotFoundError()
+                  );
+                }
 
-            const apiKeyEncrypted = workspaceIntegration.apiKeyUnencrypted
-              ? yield* cryptoService.encrypt(
-                  workspaceIntegration.apiKeyUnencrypted
-                )
-              : existing.apiKeyEncrypted;
+                const encryptedApiKey = update.plainApiKey
+                  ? yield* _encryptApiKey(update.plainApiKey)
+                  : existing.encryptedApiKey;
 
-            const updated = WorkspaceIntegration.make({
-              ...existing,
-              apiKeyEncrypted,
-              _metadata: workspaceIntegration._metadata ?? existing._metadata,
-            });
-
-            const [result] = yield* workspaceIntegrationRepo.update({
-              workspaceId,
-              workspaceIntegrations: [updated],
-            });
-
-            return result;
+                return yield* existing.patch({
+                  ...update,
+                  encryptedApiKey,
+                });
+              }),
+            execute: (updated) => workspaceIntegrationRepo.update(updated),
+            onEmpty: Effect.succeed([]),
           }).pipe(
             Effect.catchTags({
               ParseError: (e) =>
@@ -148,25 +180,44 @@ export class IntegrationService extends Context.Tag(
           )
         ),
 
-        hardDeleteWorkspaceIntegration: Effect.fn(
-          "@mason/integration/IntegrationService.hardDeleteWorkspaceIntegration"
-        )(({ workspaceId, workspaceIntegrationId }) =>
-          workspaceIntegrationRepo
-            .hardDelete({
-              workspaceId: workspaceId,
-              workspaceIntegrationIds: [workspaceIntegrationId],
+        hardDeleteWorkspaceIntegrations: Effect.fn(
+          "@mason/integration/IntegrationService.hardDeleteWorkspaceIntegrations"
+        )(({ workspaceId, workspaceIntegrationIds }) =>
+          processArray({
+            items: workspaceIntegrationIds,
+            schema: WorkspaceIntegrationId,
+            onEmpty: Effect.void,
+            execute: (nea) =>
+              Effect.gen(function* () {
+                const existingIntegrations =
+                  yield* workspaceIntegrationRepo.list({
+                    workspaceId,
+                    query: {
+                      ids: nea,
+                    },
+                  });
+
+                yield* processArray({
+                  items: existingIntegrations.map((existing) => existing.id),
+                  schema: WorkspaceIntegrationId,
+                  onEmpty: Effect.void,
+                  execute: (nea) => workspaceIntegrationRepo.hardDelete(nea),
+                });
+              }),
+          }).pipe(
+            Effect.catchTags({
+              ParseError: (e) =>
+                Effect.fail(new InternalIntegrationModuleError({ cause: e })),
+              SqlError: (e) =>
+                Effect.fail(new InternalIntegrationModuleError({ cause: e })),
             })
-            .pipe(
-              Effect.mapError(
-                (e) => new InternalIntegrationModuleError({ cause: e })
-              )
-            )
+          )
         ),
 
         retrieveWorkspaceIntegration: Effect.fn(
           "@mason/integration/IntegrationService.retrieveWorkspaceIntegration"
-        )((params) =>
-          Effect.gen(function* () {
+        )(
+          function* (params) {
             const maybeWorkspaceIntegration =
               yield* workspaceIntegrationRepo.retrieve(params);
 
@@ -175,7 +226,19 @@ export class IntegrationService extends Context.Tag(
                 Effect.fail(new WorkspaceIntegrationNotFoundError()),
               onSome: Effect.succeed,
             });
-          }).pipe(
+          },
+          Effect.catchTags({
+            ParseError: (e) =>
+              Effect.fail(new InternalIntegrationModuleError({ cause: e })),
+            SqlError: (e) =>
+              Effect.fail(new InternalIntegrationModuleError({ cause: e })),
+          })
+        ),
+
+        listWorkspaceIntegrations: Effect.fn(
+          "@mason/integration/IntegrationService.listWorkspaceIntegrations"
+        )(({ workspaceId }) =>
+          workspaceIntegrationRepo.list({ workspaceId }).pipe(
             Effect.catchTags({
               ParseError: (e) =>
                 Effect.fail(new InternalIntegrationModuleError({ cause: e })),
@@ -185,22 +248,10 @@ export class IntegrationService extends Context.Tag(
           )
         ),
 
-        listWorkspaceIntegrations: Effect.fn(
-          "@mason/integration/IntegrationService.listWorkspaceIntegrations"
-        )(({ workspaceId }) =>
-          workspaceIntegrationRepo
-            .list({ workspaceId })
-            .pipe(
-              Effect.mapError(
-                (e) => new InternalIntegrationModuleError({ cause: e })
-              )
-            )
-        ),
-
         retrieveWorkspaceApiKey: Effect.fn(
           "@mason/integration/IntegrationService.retrieveWorkspaceApiKey"
-        )(({ workspaceId, kind }) =>
-          Effect.gen(function* () {
+        )(
+          function* ({ workspaceId, kind }) {
             const maybeWorkspaceIntegration =
               yield* workspaceIntegrationRepo.retrieve({
                 workspaceId,
@@ -216,19 +267,18 @@ export class IntegrationService extends Context.Tag(
               }
             );
 
-            const decrypted = yield* cryptoService.decrypt(
-              workspaceIntegration.apiKeyEncrypted
+            const decryptedApiKey = yield* _decryptApiKey(
+              workspaceIntegration.encryptedApiKey
             );
 
-            return ApiKey.make(decrypted);
-          }).pipe(
-            Effect.catchTags({
-              ParseError: (e) =>
-                Effect.fail(new InternalIntegrationModuleError({ cause: e })),
-              SqlError: (e) =>
-                Effect.fail(new InternalIntegrationModuleError({ cause: e })),
-            })
-          )
+            return decryptedApiKey;
+          },
+          Effect.catchTags({
+            ParseError: (e) =>
+              Effect.fail(new InternalIntegrationModuleError({ cause: e })),
+            SqlError: (e) =>
+              Effect.fail(new InternalIntegrationModuleError({ cause: e })),
+          })
         ),
       });
     })

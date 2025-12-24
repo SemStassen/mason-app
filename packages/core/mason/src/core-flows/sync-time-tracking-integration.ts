@@ -264,12 +264,14 @@ export const syncTimeTrackingIntegration: (params: {
       Effect.gen(function* () {
         yield* syncProjects(params);
         yield* syncTasks(params);
-        yield* integrationService.updateWorkspaceIntegration({
+        yield* integrationService.updateWorkspaceIntegrations({
           workspaceId: params.workspaceId,
-          workspaceIntegration: WorkspaceIntegrationToUpdate.make({
-            id: workspaceIntegration.id,
-            _metadata: { lastSyncedAt: new Date() },
-          }),
+          workspaceIntegrations: [
+            WorkspaceIntegrationToUpdate.make({
+              id: workspaceIntegration.id,
+              _metadata: { lastSyncedAt: new Date() },
+            }),
+          ],
         });
       })
     );

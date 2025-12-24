@@ -21,6 +21,7 @@
     "./errors/*": "./src/errors/*.ts",
     "./platform": "./src/platform/index.ts",
     "./types": "./src/types/index.ts",
-    "./utils/*": "./src/utils/*.ts"
+    "./utils/*": "./src/utils/*.ts",
+    "./utils/effect": "./src/utils/effect/index.ts"
   }
 }

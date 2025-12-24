@@ -1,4 +1,4 @@
-import type { ApiKey } from "@mason/framework/types";
+import type { PlainApiKey } from "@mason/framework/types";
 import { Context, type Effect } from "effect";
 import type { AdapterError } from "./errors";
 import type { ExternalProject, ExternalTask } from "./models";
@@ -9,16 +9,16 @@ export class TimeTrackingIntegrationAdapter extends Context.Tag(
   TimeTrackingIntegrationAdapter,
   {
     readonly testIntegration: (params: {
-      apiKey: ApiKey;
+      apiKey: PlainApiKey;
     }) => Effect.Effect<void, AdapterError>;
     readonly listActivePeople: (params: {
-      apiKey: ApiKey;
+      apiKey: PlainApiKey;
     }) => Effect.Effect<void, AdapterError>;
     readonly listProjects: (params: {
-      apiKey: ApiKey;
+      apiKey: PlainApiKey;
     }) => Effect.Effect<Array<ExternalProject>, AdapterError>;
     readonly listTasks: (params: {
-      apiKey: ApiKey;
+      apiKey: PlainApiKey;
     }) => Effect.Effect<Array<ExternalTask>, AdapterError>;
   }
 >() {}

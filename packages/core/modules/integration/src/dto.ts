@@ -1,5 +1,6 @@
+import { PlainApiKey } from "@mason/framework/types";
 import { Schema } from "effect";
-import { WorkspaceIntegration } from "./models/workspace-integration.model";
+import { WorkspaceIntegration } from "./domain/workspace-integration.model";
 
 export type WorkspaceIntegrationToCreate =
   typeof WorkspaceIntegrationToCreate.Type;
@@ -8,7 +9,7 @@ export const WorkspaceIntegrationToCreate = Schema.TaggedStruct(
   {
     // General
     kind: WorkspaceIntegration.fields.kind,
-    apiKeyUnencrypted: Schema.NonEmptyString,
+    plainApiKey: PlainApiKey,
     // Nullable
     _metadata: Schema.optionalWith(WorkspaceIntegration.fields._metadata, {
       default: () => null,
@@ -24,7 +25,7 @@ export const WorkspaceIntegrationToUpdate = Schema.TaggedStruct(
   {
     id: WorkspaceIntegration.fields.id,
     // General
-    apiKeyUnencrypted: Schema.optionalWith(Schema.NonEmptyString, {
+    plainApiKey: Schema.optionalWith(PlainApiKey, {
       exact: true,
     }),
     // Nullable

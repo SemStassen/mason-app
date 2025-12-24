@@ -24,6 +24,8 @@ export class TimeEntry extends Schema.Class<TimeEntry>(
     startedAt: Schema.DateFromSelf,
     stoppedAt: Schema.DateFromSelf,
     notes: Schema.NullOr(JsonRecord),
+    // Metadata
+    deletedAt: Schema.NullOr(Schema.DateFromSelf),
   }).pipe(
     Schema.filter(({ startedAt, stoppedAt }) => isAfter(stoppedAt, startedAt))
   )
@@ -47,6 +49,7 @@ export class TimeEntry extends Schema.Class<TimeEntry>(
           ...validated,
           id: TimeEntryId.make(generateUUID()),
           workspaceId,
+          deletedAt: null,
         })
       )
     );
@@ -63,5 +66,12 @@ export class TimeEntry extends Schema.Class<TimeEntry>(
     return Schema.decodeUnknown(TimeEntry.Patch)(updates).pipe(
       Effect.map((validated) => TimeEntry.make({ ...this, ...validated }))
     );
+  }
+
+  softDelete() {
+    if (this.deletedAt) {
+      return this;
+    }
+    return TimeEntry.make({ ...this, deletedAt: new Date() });
   }
 }

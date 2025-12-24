@@ -1,40 +1,47 @@
 import { SqlSchema } from "@effect/sql";
-import { and, eq, inArray, sql } from "@mason/db/operators";
-import { tasksTable } from "@mason/db/schema";
+import { and, eq, inArray, isNotNull, sql } from "@mason/db/operators";
+import { type DbTask, tasksTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
 import type { RepositoryError } from "@mason/framework/errors/database";
 import { ProjectId, TaskId, WorkspaceId } from "@mason/framework/types";
 import { Context, Effect, Layer, Schema } from "effect";
+import type { NonEmptyReadonlyArray } from "effect/Array";
 import { Task } from "../models/task.model";
+
+const _mapToDb = (
+  task: typeof Task.Encoded
+): Omit<DbTask, "createdAt" | "updatedAt" | "deletedAt"> => {
+  return {
+    id: task.id,
+    workspaceId: task.workspaceId,
+    projectId: task.projectId,
+    name: task.name,
+    _metadata: task._metadata,
+  };
+};
 
 export class TaskRepository extends Context.Tag(
   "@mason/project/TaskRepository"
 )<
   TaskRepository,
   {
-    insert: (params: {
-      workspaceId: WorkspaceId;
-      tasks: Array<Task>;
-    }) => Effect.Effect<ReadonlyArray<Task>, RepositoryError>;
-    update: (params: {
-      workspaceId: WorkspaceId;
-      tasks: Array<Task>;
-    }) => Effect.Effect<ReadonlyArray<Task>, RepositoryError>;
-    softDelete: (params: {
-      workspaceId: WorkspaceId;
-      taskIds: Array<TaskId>;
-    }) => Effect.Effect<void, RepositoryError>;
-    hardDelete: (params: {
-      workspaceId: WorkspaceId;
-      taskIds: Array<TaskId>;
-    }) => Effect.Effect<void, RepositoryError>;
+    insert: (
+      tasks: NonEmptyReadonlyArray<Task>
+    ) => Effect.Effect<ReadonlyArray<Task>, RepositoryError>;
+    update: (
+      tasks: NonEmptyReadonlyArray<Task>
+    ) => Effect.Effect<ReadonlyArray<Task>, RepositoryError>;
+    hardDelete: (
+      taskIds: NonEmptyReadonlyArray<TaskId>
+    ) => Effect.Effect<void, RepositoryError>;
     list: (params: {
       workspaceId: WorkspaceId;
       query?: {
-        ids?: Array<TaskId>;
-        projectIds?: Array<ProjectId>;
+        ids?: ReadonlyArray<TaskId>;
+        projectIds?: ReadonlyArray<ProjectId>;
         _source?: "float";
-        _externalIds?: Array<string>;
+        _externalIds?: ReadonlyArray<string>;
+        _includeDeleted?: boolean;
       };
     }) => Effect.Effect<ReadonlyArray<Task>, RepositoryError>;
   }
@@ -46,73 +53,32 @@ export class TaskRepository extends Context.Tag(
 
       // --- Mutations / Commands ---
       const InsertTasks = SqlSchema.findAll({
-        Request: Schema.Struct({
-          workspaceId: WorkspaceId,
-          tasks: Schema.Array(Task),
-        }),
+        Request: Schema.NonEmptyArray(Task),
         Result: Task,
-        execute: ({ workspaceId, tasks }) =>
-          db.drizzle
-            .insert(tasksTable)
-            .values(tasks.map((task) => ({ ...task, workspaceId })))
-            .returning(),
+        execute: (tasks) =>
+          db.drizzle.insert(tasksTable).values(tasks.map(_mapToDb)).returning(),
       });
 
       const UpdateTasks = SqlSchema.findAll({
-        Request: Schema.Struct({
-          workspaceId: WorkspaceId,
-          tasks: Schema.Array(Task),
-        }),
+        Request: Schema.NonEmptyArray(Task),
         Result: Task,
-        execute: ({ workspaceId, tasks }) =>
+        execute: (tasks) =>
           Effect.forEach(
             tasks,
             (task) =>
               db.drizzle
                 .update(tasksTable)
-                .set(task)
-                .where(
-                  and(
-                    eq(tasksTable.workspaceId, workspaceId),
-                    eq(tasksTable.id, task.id)
-                  )
-                )
+                .set(_mapToDb(task))
+                .where(eq(tasksTable.id, task.id))
                 .returning(),
             { concurrency: 5 }
           ).pipe(Effect.map((r) => r.flat())),
       });
 
-      const SoftDeleteTasks = SqlSchema.void({
-        Request: Schema.Struct({
-          workspaceId: WorkspaceId,
-          taskIds: Schema.Array(TaskId),
-        }),
-        execute: ({ workspaceId, taskIds }) =>
-          db.drizzle
-            .update(tasksTable)
-            .set({ deletedAt: new Date() })
-            .where(
-              and(
-                eq(tasksTable.workspaceId, workspaceId),
-                inArray(tasksTable.id, taskIds)
-              )
-            ),
-      });
-
       const HardDeleteTasks = SqlSchema.void({
-        Request: Schema.Struct({
-          workspaceId: WorkspaceId,
-          taskIds: Schema.Array(TaskId),
-        }),
-        execute: ({ workspaceId, taskIds }) =>
-          db.drizzle
-            .delete(tasksTable)
-            .where(
-              and(
-                eq(tasksTable.workspaceId, workspaceId),
-                inArray(tasksTable.id, taskIds)
-              )
-            ),
+        Request: Schema.NonEmptyArray(TaskId),
+        execute: (taskIds) =>
+          db.drizzle.delete(tasksTable).where(inArray(tasksTable.id, taskIds)),
       });
 
       // --- Queries ---
@@ -125,6 +91,7 @@ export class TaskRepository extends Context.Tag(
               projectIds: Schema.optional(Schema.Array(ProjectId)),
               _source: Schema.optional(Schema.Literal("float")),
               _externalIds: Schema.optional(Schema.Array(Schema.String)),
+              _includeDeleted: Schema.optional(Schema.Boolean),
             })
           ),
         }),
@@ -148,6 +115,9 @@ export class TaskRepository extends Context.Tag(
                   sql`, `
                 )})`
               : undefined,
+            query?._includeDeleted
+              ? undefined
+              : isNotNull(tasksTable.deletedAt),
           ].filter(Boolean);
 
           return db.drizzle.query.tasksTable.findMany({
@@ -157,35 +127,20 @@ export class TaskRepository extends Context.Tag(
       });
 
       return TaskRepository.of({
-        insert: Effect.fn("@mason/project/TaskRepo.insert")(
-          ({ workspaceId, tasks }) =>
-            db.withWorkspace(workspaceId, InsertTasks({ workspaceId, tasks }))
+        insert: Effect.fn("@mason/project/TaskRepo.insert")((tasks) =>
+          InsertTasks(tasks)
         ),
 
-        update: Effect.fn("@mason/project/TaskRepo.update")(
-          ({ workspaceId, tasks }) =>
-            db.withWorkspace(workspaceId, UpdateTasks({ workspaceId, tasks }))
+        update: Effect.fn("@mason/project/TaskRepo.update")((tasks) =>
+          UpdateTasks(tasks)
         ),
 
-        softDelete: Effect.fn("@mason/project/TaskRepo.softDelete")(
-          ({ workspaceId, taskIds }) =>
-            db.withWorkspace(
-              workspaceId,
-              SoftDeleteTasks({ workspaceId, taskIds })
-            )
+        hardDelete: Effect.fn("@mason/project/TaskRepo.hardDelete")((taskIds) =>
+          HardDeleteTasks(taskIds)
         ),
 
-        hardDelete: Effect.fn("@mason/project/TaskRepo.hardDelete")(
-          ({ workspaceId, taskIds }) =>
-            db.withWorkspace(
-              workspaceId,
-              HardDeleteTasks({ workspaceId, taskIds })
-            )
-        ),
-
-        list: Effect.fn("@mason/project/TaskRepo.list")(
-          ({ workspaceId, query }) =>
-            db.withWorkspace(workspaceId, ListTasks({ workspaceId, query }))
+        list: Effect.fn("@mason/project/TaskRepo.list")((params) =>
+          ListTasks(params)
         ),
       });
     })

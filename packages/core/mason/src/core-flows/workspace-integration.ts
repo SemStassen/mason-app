@@ -5,8 +5,8 @@ import {
   WorkspaceIntegrationResponse,
 } from "@mason/api-contract/dto/workspace-integration.dto";
 import {
-  ApiKey,
   type MemberId,
+  PlainApiKey,
   type WorkspaceId,
   WorkspaceIntegrationId,
 } from "@mason/framework/types";
@@ -14,7 +14,7 @@ import {
   IntegrationService,
   WorkspaceIntegrationToCreate,
 } from "@mason/integration";
-import { Effect } from "effect";
+import { Effect, Redacted } from "effect";
 import { InternalError } from "../errors";
 
 export const createWorkspaceIntegration: (params: {
@@ -26,29 +26,37 @@ export const createWorkspaceIntegration: (params: {
   InternalError,
   IntegrationService
 > = Effect.fn("@mason/core-flows/createWorkspaceIntegration")(
-  function* (params) {
-    const workspaceIntegrationService = yield* IntegrationService;
+  function* ({ workspaceId, createdByMemberId, request }) {
+    const integrationService = yield* IntegrationService;
 
     yield* Effect.flatMap(TimeTrackingIntegrationAdapter, (adapter) =>
       adapter.testIntegration({
-        apiKey: ApiKey.make(params.request.apiKeyUnencrypted),
+        apiKey: Redacted.make(PlainApiKey.from.make(request.apiKeyUnencrypted)),
       })
     ).pipe(
-      Effect.provide(
-        TimeTrackingIntegrationAdapter.getLayer(params.request.kind)
-      )
+      Effect.provide(TimeTrackingIntegrationAdapter.getLayer(request.kind))
     );
 
-    return yield* workspaceIntegrationService
-      .createWorkspaceIntegration({
-        workspaceId: params.workspaceId,
-        createdByMemberId: params.createdByMemberId,
-        workspaceIntegration: WorkspaceIntegrationToCreate.make({
-          kind: params.request.kind,
-          apiKeyUnencrypted: params.request.apiKeyUnencrypted,
-        }),
+    return yield* integrationService
+      .createWorkspaceIntegrations({
+        workspaceId,
+        createdByMemberId,
+        workspaceIntegrations: [
+          WorkspaceIntegrationToCreate.make({
+            kind: request.kind,
+            plainApiKey: Redacted.make(
+              PlainApiKey.from.make(request.apiKeyUnencrypted)
+            ),
+          }),
+        ],
       })
-      .pipe(Effect.map(WorkspaceIntegrationResponse.make));
+      .pipe(
+        Effect.map((integrations) =>
+          integrations.map((integration) =>
+            WorkspaceIntegrationResponse.make(integration)
+          )
+        )
+      );
   },
   Effect.mapError((e) => new InternalError({ cause: e }))
 );
@@ -59,13 +67,14 @@ export const deleteWorkspaceIntegration: (params: {
 }) => Effect.Effect<void, InternalError, IntegrationService> = Effect.fn(
   "@mason/core-flows/deleteWorkspaceIntegration"
 )(
-  function* (params) {
-    const workspaceIntegrationService = yield* IntegrationService;
-    return yield* workspaceIntegrationService.hardDeleteWorkspaceIntegration({
-      workspaceId: params.workspaceId,
-      workspaceIntegrationId: WorkspaceIntegrationId.make(
-        params.workspaceIntegrationId.id
-      ),
+  function* ({ workspaceId, workspaceIntegrationId }) {
+    const integrationService = yield* IntegrationService;
+
+    return yield* integrationService.hardDeleteWorkspaceIntegrations({
+      workspaceId,
+      workspaceIntegrationIds: [
+        WorkspaceIntegrationId.make(workspaceIntegrationId.id),
+      ],
     });
   },
   Effect.mapError((e) => new InternalError({ cause: e }))
@@ -79,8 +88,9 @@ export const listWorkspaceIntegrations: (params: {
   IntegrationService
 > = Effect.fn("@mason/core-flows/listWorkspaceIntegrations")(
   function* (params) {
-    const workspaceIntegrationService = yield* IntegrationService;
-    return yield* workspaceIntegrationService
+    const integrationService = yield* IntegrationService;
+
+    return yield* integrationService
       .listWorkspaceIntegrations({
         workspaceId: params.workspaceId,
       })

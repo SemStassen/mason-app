@@ -29,7 +29,7 @@ export const workspaceIntegrationsTable = pgTable(
       .notNull(),
     // General
     kind: varchar({ enum: ["float"] }).notNull(),
-    apiKeyEncrypted: varchar("api_key_encrypted").notNull(),
+    encryptedApiKey: varchar("encrypted_api_key").notNull(),
     // Metadata
     _metadata: jsonb("metadata").$type<Record<string, unknown>>(),
     ...tableMetadata,
@@ -97,7 +97,6 @@ export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
 }));
 
 export type DbProject = typeof projectsTable.$inferSelect;
-export type DbProjectInsert = typeof projectsTable.$inferInsert;
 
 export const tasksTable = pgTable(
   "tasks",

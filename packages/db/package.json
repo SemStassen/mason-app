@@ -23,7 +23,7 @@
   "devDependencies": {
     "@faker-js/faker": "^10.1.0",
     "@mason/config": "workspace:*",
-    "@types/pg": "^8.15.6",
+    "@types/pg": "^8.16.0",
     "drizzle-kit": "catalog:dev",
     "drizzle-seed": "^0.3.1",
     "typescript": "catalog:dev"

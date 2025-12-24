@@ -1,28 +1,24 @@
 import { Schema } from "effect";
 
 export type UserId = typeof UserId.Type;
-export const UserId = Schema.NonEmptyString.pipe(Schema.brand("UserId"));
+export const UserId = Schema.UUID.pipe(Schema.brand("UserId"));
 
 export type MemberId = typeof MemberId.Type;
-export const MemberId = Schema.NonEmptyString.pipe(Schema.brand("MemberId"));
+export const MemberId = Schema.UUID.pipe(Schema.brand("MemberId"));
 
 export type ProjectId = typeof ProjectId.Type;
-export const ProjectId = Schema.NonEmptyString.pipe(Schema.brand("ProjectId"));
+export const ProjectId = Schema.UUID.pipe(Schema.brand("ProjectId"));
 
 export type TaskId = typeof TaskId.Type;
-export const TaskId = Schema.NonEmptyString.pipe(Schema.brand("TaskId"));
+export const TaskId = Schema.UUID.pipe(Schema.brand("TaskId"));
 
 export type TimeEntryId = typeof TimeEntryId.Type;
-export const TimeEntryId = Schema.NonEmptyString.pipe(
-  Schema.brand("TimeEntryId")
-);
+export const TimeEntryId = Schema.UUID.pipe(Schema.brand("TimeEntryId"));
 
 export type WorkspaceId = typeof WorkspaceId.Type;
-export const WorkspaceId = Schema.NonEmptyString.pipe(
-  Schema.brand("WorkspaceId")
-);
+export const WorkspaceId = Schema.UUID.pipe(Schema.brand("WorkspaceId"));
 
 export type WorkspaceIntegrationId = typeof WorkspaceIntegrationId.Type;
-export const WorkspaceIntegrationId = Schema.NonEmptyString.pipe(
+export const WorkspaceIntegrationId = Schema.UUID.pipe(
   Schema.brand("WorkspaceIntegrationId")
 );

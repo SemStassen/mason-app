@@ -1,39 +1,50 @@
 import { SqlSchema } from "@effect/sql";
-import { and, eq, gte, inArray, lte } from "@mason/db/operators";
-import { timeEntriesTable } from "@mason/db/schema";
+import { and, eq, gte, inArray, isNotNull, lte } from "@mason/db/operators";
+import { type DbTimeEntry, timeEntriesTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
 import type { RepositoryError } from "@mason/framework/errors/database";
 import { TimeEntryId, WorkspaceId } from "@mason/framework/types";
 import { Context, Effect, Layer, Schema } from "effect";
+import type { NonEmptyReadonlyArray } from "effect/Array";
 import { TimeEntry } from "../models/time-entry.model";
+
+const _mapToDb = (
+  timeEntry: typeof TimeEntry.Encoded
+): Omit<DbTimeEntry, "createdAt" | "updatedAt"> => {
+  return {
+    id: timeEntry.id,
+    workspaceId: timeEntry.workspaceId,
+    memberId: timeEntry.memberId,
+    projectId: timeEntry.projectId,
+    taskId: timeEntry.taskId,
+    startedAt: timeEntry.startedAt,
+    stoppedAt: timeEntry.stoppedAt,
+    notes: timeEntry.notes,
+    deletedAt: timeEntry.deletedAt,
+  };
+};
 
 export class TimeEntryRepository extends Context.Tag(
   "@mason/time-tracking/TimeEntryRepository"
 )<
   TimeEntryRepository,
   {
-    insert: (params: {
-      workspaceId: WorkspaceId;
-      timeEntries: Array<TimeEntry>;
-    }) => Effect.Effect<ReadonlyArray<TimeEntry>, RepositoryError>;
-    update: (params: {
-      workspaceId: WorkspaceId;
-      timeEntries: Array<TimeEntry>;
-    }) => Effect.Effect<ReadonlyArray<TimeEntry>, RepositoryError>;
-    softDelete: (params: {
-      workspaceId: WorkspaceId;
-      timeEntryIds: Array<TimeEntryId>;
-    }) => Effect.Effect<void, RepositoryError>;
-    hardDelete: (params: {
-      workspaceId: WorkspaceId;
-      timeEntryIds: Array<TimeEntryId>;
-    }) => Effect.Effect<void, RepositoryError>;
+    insert: (
+      timeEntries: NonEmptyReadonlyArray<TimeEntry>
+    ) => Effect.Effect<ReadonlyArray<TimeEntry>, RepositoryError>;
+    update: (
+      timeEntries: NonEmptyReadonlyArray<TimeEntry>
+    ) => Effect.Effect<ReadonlyArray<TimeEntry>, RepositoryError>;
+    hardDelete: (
+      timeEntryIds: NonEmptyReadonlyArray<TimeEntryId>
+    ) => Effect.Effect<void, RepositoryError>;
     list: (params: {
       workspaceId: WorkspaceId;
       query?: {
-        ids?: Array<TimeEntryId>;
+        ids?: ReadonlyArray<TimeEntryId>;
         startedAt?: Date;
         stoppedAt?: Date;
+        _includeDeleted?: boolean;
       };
     }) => Effect.Effect<ReadonlyArray<TimeEntry>, RepositoryError>;
   }
@@ -45,75 +56,37 @@ export class TimeEntryRepository extends Context.Tag(
 
       // --- Mutations / Commands ---
       const InsertTimeEntries = SqlSchema.findAll({
-        Request: Schema.Struct({
-          workspaceId: WorkspaceId,
-          timeEntries: Schema.Array(TimeEntry),
-        }),
+        Request: Schema.NonEmptyArray(TimeEntry),
         Result: TimeEntry,
-        execute: ({ workspaceId, timeEntries }) =>
+        execute: (timeEntries) =>
           db.drizzle
             .insert(timeEntriesTable)
-            .values(
-              timeEntries.map((timeEntry) => ({ ...timeEntry, workspaceId }))
-            )
+            .values(timeEntries.map(_mapToDb))
             .returning(),
       });
 
       const UpdateTimeEntries = SqlSchema.findAll({
-        Request: Schema.Struct({
-          workspaceId: WorkspaceId,
-          timeEntries: Schema.Array(TimeEntry),
-        }),
+        Request: Schema.NonEmptyArray(TimeEntry),
         Result: TimeEntry,
-        execute: ({ workspaceId, timeEntries }) =>
+        execute: (timeEntries) =>
           Effect.forEach(
             timeEntries,
             (timeEntry) =>
               db.drizzle
                 .update(timeEntriesTable)
-                .set(timeEntry)
-                .where(
-                  and(
-                    eq(timeEntriesTable.workspaceId, workspaceId),
-                    eq(timeEntriesTable.id, timeEntry.id)
-                  )
-                )
+                .set(_mapToDb(timeEntry))
+                .where(eq(timeEntriesTable.id, timeEntry.id))
                 .returning(),
             { concurrency: 5 }
-          ),
-      });
-
-      const SoftDeleteTimeEntries = SqlSchema.void({
-        Request: Schema.Struct({
-          workspaceId: WorkspaceId,
-          timeEntryIds: Schema.Array(TimeEntryId),
-        }),
-        execute: ({ workspaceId, timeEntryIds }) =>
-          db.drizzle
-            .update(timeEntriesTable)
-            .set({ deletedAt: new Date() })
-            .where(
-              and(
-                eq(timeEntriesTable.workspaceId, workspaceId),
-                inArray(timeEntriesTable.id, timeEntryIds)
-              )
-            ),
+          ).pipe(Effect.map((r) => r.flat())),
       });
 
       const HardDeleteTimeEntries = SqlSchema.void({
-        Request: Schema.Struct({
-          workspaceId: WorkspaceId,
-          timeEntryIds: Schema.Array(TimeEntryId),
-        }),
-        execute: ({ workspaceId, timeEntryIds }) =>
+        Request: Schema.NonEmptyArray(TimeEntryId),
+        execute: (timeEntryIds) =>
           db.drizzle
             .delete(timeEntriesTable)
-            .where(
-              and(
-                eq(timeEntriesTable.workspaceId, workspaceId),
-                inArray(timeEntriesTable.id, timeEntryIds)
-              )
-            ),
+            .where(inArray(timeEntriesTable.id, timeEntryIds)),
       });
 
       // --- Queries ---
@@ -125,6 +98,7 @@ export class TimeEntryRepository extends Context.Tag(
               ids: Schema.optional(Schema.Array(TimeEntryId)),
               startedAt: Schema.optional(Schema.DateFromSelf),
               stoppedAt: Schema.optional(Schema.DateFromSelf),
+              _includeDeleted: Schema.optional(Schema.Boolean),
             })
           ),
         }),
@@ -139,6 +113,9 @@ export class TimeEntryRepository extends Context.Tag(
             query?.stoppedAt
               ? lte(timeEntriesTable.stoppedAt, query.stoppedAt)
               : undefined,
+            query?._includeDeleted
+              ? undefined
+              : isNotNull(timeEntriesTable.deletedAt),
           ].filter(Boolean);
 
           return db.drizzle.query.timeEntriesTable.findMany({
@@ -149,43 +126,19 @@ export class TimeEntryRepository extends Context.Tag(
 
       return TimeEntryRepository.of({
         insert: Effect.fn("@mason/time-tracking/TimeEntryRepo.insert")(
-          ({ workspaceId, timeEntries }) =>
-            db.withWorkspace(
-              workspaceId,
-              InsertTimeEntries({ workspaceId, timeEntries })
-            )
+          (timeEntries) => InsertTimeEntries(timeEntries)
         ),
 
         update: Effect.fn("@mason/time-tracking/TimeEntryRepo.update")(
-          ({ workspaceId, timeEntries }) =>
-            db.withWorkspace(
-              workspaceId,
-              UpdateTimeEntries({ workspaceId, timeEntries })
-            )
-        ),
-
-        softDelete: Effect.fn("@mason/time-tracking/TimeEntryRepo.softDelete")(
-          ({ workspaceId, timeEntryIds }) =>
-            db.withWorkspace(
-              workspaceId,
-              SoftDeleteTimeEntries({ workspaceId, timeEntryIds })
-            )
+          (timeEntries) => UpdateTimeEntries(timeEntries)
         ),
 
         hardDelete: Effect.fn("@mason/time-tracking/TimeEntryRepo.hardDelete")(
-          ({ workspaceId, timeEntryIds }) =>
-            db.withWorkspace(
-              workspaceId,
-              HardDeleteTimeEntries({ workspaceId, timeEntryIds })
-            )
+          (timeEntryIds) => HardDeleteTimeEntries(timeEntryIds)
         ),
 
-        list: Effect.fn("@mason/time-tracking/TimeEntryRepo.list")(
-          ({ workspaceId, query }) =>
-            db.withWorkspace(
-              workspaceId,
-              ListTimeEntries({ workspaceId, query })
-            )
+        list: Effect.fn("@mason/time-tracking/TimeEntryRepo.list")((params) =>
+          ListTimeEntries(params)
         ),
       });
     })

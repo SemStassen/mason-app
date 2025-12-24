@@ -1,8 +1,10 @@
 import {
+  EncryptedApiKey,
   MemberId,
   WorkspaceId,
   WorkspaceIntegrationId,
 } from "@mason/framework/types";
+import { generateUUID } from "@mason/framework/utils/uuid";
 import { Effect, Schema } from "effect";
 
 export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
@@ -15,7 +17,7 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
     createdByMemberId: MemberId,
     // General
     kind: Schema.Literal("float"),
-    apiKeyEncrypted: Schema.NonEmptyString,
+    encryptedApiKey: EncryptedApiKey,
     // Nullable
     _metadata: Schema.NullOr(
       Schema.Struct({
@@ -28,9 +30,32 @@ export class WorkspaceIntegration extends Schema.Class<WorkspaceIntegration>(
     createdAt: Schema.DateFromSelf,
   })
 ) {
+  static readonly Create = Schema.Struct({
+    kind: WorkspaceIntegration.fields.kind,
+    encryptedApiKey: WorkspaceIntegration.fields.encryptedApiKey,
+  });
+
+  static makeFromCreate(
+    input: typeof WorkspaceIntegration.Create.Type,
+    workspaceId: WorkspaceId,
+    createdByMemberId: MemberId
+  ) {
+    return Schema.decodeUnknown(WorkspaceIntegration.Create)(input).pipe(
+      Effect.map((validated) =>
+        WorkspaceIntegration.make({
+          ...validated,
+          id: WorkspaceIntegrationId.make(generateUUID()),
+          workspaceId: workspaceId,
+          createdByMemberId: createdByMemberId,
+          createdAt: new Date(),
+          _metadata: null,
+        })
+      )
+    );
+  }
   static readonly Patch = Schema.Struct({
-    apiKeyEncrypted: Schema.optionalWith(
-      WorkspaceIntegration.fields.apiKeyEncrypted,
+    encryptedApiKey: Schema.optionalWith(
+      WorkspaceIntegration.fields.encryptedApiKey,
       { exact: true }
     ),
     _metadata: Schema.optionalWith(WorkspaceIntegration.fields._metadata, {
