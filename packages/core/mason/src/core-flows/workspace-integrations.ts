@@ -5,29 +5,30 @@ import {
   WorkspaceIntegrationResponse,
 } from "@mason/api-contract/dto/workspace-integration.dto";
 import {
-  type MemberId,
+  type ExistingMemberId,
+  type ExistingWorkspaceId,
   PlainApiKey,
-  type WorkspaceId,
   WorkspaceIntegrationId,
 } from "@mason/framework";
-import {
-  IntegrationService,
-  WorkspaceIntegrationToCreate,
-} from "@mason/integration";
+import { IntegrationModuleService } from "@mason/integration";
 import { Effect, Redacted } from "effect";
-import { InternalError } from "../errors";
+import {
+  InternalError,
+  InvalidExternalApiKeyError,
+  type NotFoundError,
+} from "../errors";
 
 export const createWorkspaceIntegration: (params: {
-  workspaceId: WorkspaceId;
-  createdByMemberId: MemberId;
+  workspaceId: ExistingWorkspaceId;
+  createdByMemberId: ExistingMemberId;
   request: CreateWorkspaceIntegrationRequest;
 }) => Effect.Effect<
   WorkspaceIntegrationResponse,
-  InternalError,
-  IntegrationService
+  InternalError | InvalidExternalApiKeyError,
+  IntegrationModuleService
 > = Effect.fn("@mason/core-flows/createWorkspaceIntegration")(
   function* ({ workspaceId, createdByMemberId, request }) {
-    const integrationService = yield* IntegrationService;
+    const integrationService = yield* IntegrationModuleService;
 
     yield* Effect.flatMap(TimeTrackingIntegrationAdapter, (adapter) =>
       adapter.testIntegration({
@@ -42,33 +43,45 @@ export const createWorkspaceIntegration: (params: {
         workspaceId,
         createdByMemberId,
         workspaceIntegrations: [
-          WorkspaceIntegrationToCreate.make({
+          {
             kind: request.kind,
             plainApiKey: Redacted.make(
               PlainApiKey.from.make(request.apiKeyUnencrypted)
             ),
-          }),
+          },
         ],
       })
       .pipe(
-        Effect.map((integrations) =>
-          integrations.map((integration) =>
-            WorkspaceIntegrationResponse.make(integration)
-          )
-        )
+        Effect.flatMap((integrations) => {
+          const integration = integrations[0];
+          return integration
+            ? Effect.succeed(WorkspaceIntegrationResponse.make(integration))
+            : Effect.fail(
+                new InternalError({
+                  cause: "Failed to create workspace integration",
+                })
+              );
+        })
       );
   },
-  Effect.mapError((e) => new InternalError({ cause: e }))
+  Effect.mapError((e) => {
+    if (e._tag === "adapters/InvalidApiKeyError") {
+      return new InvalidExternalApiKeyError({ cause: e });
+    }
+    return new InternalError({ cause: e });
+  })
 );
 
 export const deleteWorkspaceIntegration: (params: {
-  workspaceId: WorkspaceId;
+  workspaceId: ExistingWorkspaceId;
   workspaceIntegrationId: DeleteWorkspaceIntegrationRequest;
-}) => Effect.Effect<void, InternalError, IntegrationService> = Effect.fn(
-  "@mason/core-flows/deleteWorkspaceIntegration"
-)(
+}) => Effect.Effect<
+  void,
+  InternalError | NotFoundError,
+  IntegrationModuleService
+> = Effect.fn("@mason/core-flows/deleteWorkspaceIntegration")(
   function* ({ workspaceId, workspaceIntegrationId }) {
-    const integrationService = yield* IntegrationService;
+    const integrationService = yield* IntegrationModuleService;
 
     return yield* integrationService.hardDeleteWorkspaceIntegrations({
       workspaceId,
@@ -77,18 +90,18 @@ export const deleteWorkspaceIntegration: (params: {
       ],
     });
   },
-  Effect.mapError((e) => new InternalError({ cause: e }))
+  Effect.catchAll((e) => new InternalError({ cause: e }))
 );
 
 export const listWorkspaceIntegrations: (params: {
-  workspaceId: WorkspaceId;
+  workspaceId: ExistingWorkspaceId;
 }) => Effect.Effect<
   ReadonlyArray<WorkspaceIntegrationResponse>,
   InternalError,
-  IntegrationService
+  IntegrationModuleService
 > = Effect.fn("@mason/core-flows/listWorkspaceIntegrations")(
   function* (params) {
-    const integrationService = yield* IntegrationService;
+    const integrationService = yield* IntegrationModuleService;
 
     return yield* integrationService
       .listWorkspaceIntegrations({

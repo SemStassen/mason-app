@@ -1,25 +1,41 @@
 import {
+  type DatabaseError,
+  ExistingProjectId,
+  ExistingTaskId,
+  ExistingWorkspaceId,
   ProjectId,
   processArray,
   TaskId,
-  type WorkspaceId,
 } from "@mason/framework";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Option } from "effect";
+import type { ParseError } from "effect/ParseResult";
 import type {
-  ProjectToCreate,
-  ProjectToUpdate,
-  TaskToCreate,
-  TaskToUpdate,
+  ProjectToCreateDTO,
+  ProjectToUpdateDTO,
+  TaskToCreateDTO,
+  TaskToUpdateDTO,
 } from "./dto";
 import {
   InternalProjectModuleError,
   ProjectNotFoundError,
   TaskNotFoundError,
 } from "./errors";
-import { Project } from "./models/project.model";
-import { Task } from "./models/task.model";
-import { ProjectRepository } from "./repositories/project.repo";
-import { TaskRepository } from "./repositories/task.repo";
+import {
+  createProject,
+  Project,
+  type Project as ProjectType,
+  softDeleteProject,
+  updateProject,
+} from "./project";
+import { ProjectRepository } from "./project.repo";
+import {
+  createTask,
+  softDeleteTask,
+  Task,
+  type Task as TaskType,
+  updateTask,
+} from "./task";
+import { TaskRepository } from "./task.repo";
 
 export class ProjectModuleService extends Context.Tag(
   "@mason/project/ProjectModuleService"
@@ -27,64 +43,67 @@ export class ProjectModuleService extends Context.Tag(
   ProjectModuleService,
   {
     createProjects: (params: {
-      workspaceId: WorkspaceId;
-      projects: ReadonlyArray<ProjectToCreate>;
-    }) => Effect.Effect<ReadonlyArray<Project>, InternalProjectModuleError>;
+      workspaceId: ExistingWorkspaceId;
+      projects: ReadonlyArray<ProjectToCreateDTO>;
+    }) => Effect.Effect<ReadonlyArray<ProjectType>, InternalProjectModuleError>;
     updateProjects: (params: {
-      workspaceId: WorkspaceId;
-      projects: ReadonlyArray<ProjectToUpdate>;
+      workspaceId: ExistingWorkspaceId;
+      projects: ReadonlyArray<ProjectToUpdateDTO>;
     }) => Effect.Effect<
-      ReadonlyArray<Project>,
+      ReadonlyArray<ProjectType>,
       InternalProjectModuleError | ProjectNotFoundError
     >;
     softDeleteProjects: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       projectIds: ReadonlyArray<ProjectId>;
     }) => Effect.Effect<void, InternalProjectModuleError>;
     hardDeleteProjects: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       projectIds: ReadonlyArray<ProjectId>;
     }) => Effect.Effect<void, InternalProjectModuleError>;
     listProjects: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       query?: {
         ids?: Array<ProjectId>;
         _source?: "float";
         _externalIds?: Array<string>;
       };
-    }) => Effect.Effect<ReadonlyArray<Project>, InternalProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<ProjectType>, InternalProjectModuleError>;
     createTasks: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       projectId: ProjectId;
-      tasks: ReadonlyArray<TaskToCreate>;
-    }) => Effect.Effect<ReadonlyArray<Task>, InternalProjectModuleError>;
-    updateTasks: (params: {
-      workspaceId: WorkspaceId;
-      projectId: ProjectId;
-      tasks: ReadonlyArray<TaskToUpdate>;
+      tasks: ReadonlyArray<TaskToCreateDTO>;
     }) => Effect.Effect<
-      ReadonlyArray<Task>,
+      ReadonlyArray<TaskType>,
+      InternalProjectModuleError | ProjectNotFoundError
+    >;
+    updateTasks: (params: {
+      workspaceId: ExistingWorkspaceId;
+      projectId: ProjectId;
+      tasks: ReadonlyArray<TaskToUpdateDTO>;
+    }) => Effect.Effect<
+      ReadonlyArray<TaskType>,
       InternalProjectModuleError | TaskNotFoundError
     >;
     softDeleteTasks: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       projectId: ProjectId;
       taskIds: ReadonlyArray<TaskId>;
     }) => Effect.Effect<void, InternalProjectModuleError>;
     hardDeleteTasks: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       projectId: ProjectId;
       taskIds: ReadonlyArray<TaskId>;
     }) => Effect.Effect<void, InternalProjectModuleError>;
     listTasks: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       projectId: ProjectId;
       query?: {
         ids?: Array<TaskId>;
         _source?: "float";
         _externalIds?: Array<string>;
       };
-    }) => Effect.Effect<ReadonlyArray<Task>, InternalProjectModuleError>;
+    }) => Effect.Effect<ReadonlyArray<TaskType>, InternalProjectModuleError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -103,16 +122,19 @@ export class ProjectModuleService extends Context.Tag(
             execute: (nea) =>
               Effect.gen(function* () {
                 const projectsToCreate = yield* Effect.forEach(nea, (p) =>
-                  Project.makeFromCreate(workspaceId, p)
+                  createProject({
+                    ...p,
+                    workspaceId: ExistingWorkspaceId.make(workspaceId),
+                  })
                 );
 
                 return yield* projectRepo.insert(projectsToCreate);
               }),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
             })
           )
@@ -129,24 +151,28 @@ export class ProjectModuleService extends Context.Tag(
                   workspaceId,
                   query: { ids: updates.map((p) => p.id) },
                 });
-                return new Map(existingProjects.map((e) => [e.id, e]));
+                return new Map(
+                  existingProjects.map((e) => [ProjectId.make(e.id), e])
+                );
               }),
             mapItem: (update, existingMap) =>
               Effect.gen(function* () {
                 const existing = existingMap.get(update.id);
+
                 if (!existing) {
                   return yield* Effect.fail(
                     new ProjectNotFoundError({ projectId: update.id })
                   );
                 }
-                return yield* existing.patch(update);
+                const { id, ...patchData } = update;
+                return yield* updateProject(existing, patchData);
               }),
             execute: (projectsToUpdate) => projectRepo.update(projectsToUpdate),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e: DatabaseError) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e: ParseError) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
             })
           )
@@ -167,9 +193,7 @@ export class ProjectModuleService extends Context.Tag(
                   },
                 });
 
-                const deletedProjects = existingProjects.map((existing) =>
-                  existing.softDelete()
-                );
+                const deletedProjects = existingProjects.map(softDeleteProject);
 
                 yield* processArray({
                   items: deletedProjects,
@@ -180,9 +204,9 @@ export class ProjectModuleService extends Context.Tag(
               }),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
             })
           )
@@ -205,16 +229,16 @@ export class ProjectModuleService extends Context.Tag(
 
                 yield* processArray({
                   items: existingProjects.map((existing) => existing.id),
-                  schema: ProjectId,
+                  schema: ExistingProjectId,
                   onEmpty: Effect.void,
                   execute: (nea) => projectRepo.hardDelete(nea),
                 });
               }),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
             })
           )
@@ -222,13 +246,12 @@ export class ProjectModuleService extends Context.Tag(
         listProjects: Effect.fn(
           "@mason/project/ProjectModuleService.listProjects"
         )((params) =>
-          projectRepo
-            .list(params)
-            .pipe(
-              Effect.mapError(
-                (e) => new InternalProjectModuleError({ cause: e })
-              )
-            )
+          projectRepo.list(params).pipe(
+            Effect.catchTags({
+              "@mason/framework/DatabaseError": (e) =>
+                Effect.fail(new InternalProjectModuleError({ cause: e })),
+            })
+          )
         ),
         createTasks: Effect.fn(
           "@mason/project/ProjectModuleService.createTasks"
@@ -238,17 +261,37 @@ export class ProjectModuleService extends Context.Tag(
             onEmpty: Effect.succeed([]),
             execute: (nea) =>
               Effect.gen(function* () {
+                const existingProjectId = yield* projectRepo
+                  .retrieve({
+                    workspaceId,
+                    projectId,
+                  })
+                  .pipe(
+                    Effect.flatMap((option) =>
+                      Option.match(option, {
+                        onNone: () =>
+                          Effect.fail(new ProjectNotFoundError({ projectId })),
+                        onSome: (project) => Effect.succeed(project.id),
+                      })
+                    )
+                  );
+
                 const tasksToCreate = yield* Effect.forEach(nea, (task) =>
-                  Task.makeFromCreate(task, { workspaceId, projectId })
+                  createTask({
+                    ...task,
+                    workspaceId: ExistingWorkspaceId.make(workspaceId),
+                    projectId: existingProjectId,
+                    _metadata: task._metadata ?? null,
+                  })
                 );
 
                 return yield* taskRepo.insert(tasksToCreate);
               }),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e: DatabaseError) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e: ParseError) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
             })
           )
@@ -268,7 +311,10 @@ export class ProjectModuleService extends Context.Tag(
                     projectIds: [projectId],
                   },
                 });
-                return new Map(existingTasks.map((e) => [e.id, e]));
+
+                return new Map(
+                  existingTasks.map((e) => [TaskId.make(e.id), e])
+                );
               }),
             mapItem: (update, existingMap) =>
               Effect.gen(function* () {
@@ -280,14 +326,15 @@ export class ProjectModuleService extends Context.Tag(
                     })
                   );
                 }
-                return yield* existing.patch(update);
+                const { id, ...patchData } = update;
+                return yield* updateTask(existing, patchData);
               }),
             execute: (tasksToUpdate) => taskRepo.update(tasksToUpdate),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e: DatabaseError) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e: ParseError) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
             })
           )
@@ -309,8 +356,9 @@ export class ProjectModuleService extends Context.Tag(
                   },
                 });
 
-                const deletedTasks = existingTasks.map((existing) =>
-                  existing.softDelete()
+                const deletedTasks = yield* Effect.forEach(
+                  existingTasks,
+                  softDeleteTask
                 );
 
                 yield* processArray({
@@ -322,9 +370,9 @@ export class ProjectModuleService extends Context.Tag(
               }),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
             })
           )
@@ -348,16 +396,16 @@ export class ProjectModuleService extends Context.Tag(
 
                 yield* processArray({
                   items: existingTasks.map((existing) => existing.id),
-                  schema: TaskId,
+                  schema: ExistingTaskId,
                   onEmpty: Effect.void,
                   execute: (nea) => taskRepo.hardDelete(nea),
                 });
               }),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e) =>
                 Effect.fail(new InternalProjectModuleError({ cause: e })),
             })
           )
@@ -373,9 +421,10 @@ export class ProjectModuleService extends Context.Tag(
                 },
               })
               .pipe(
-                Effect.mapError(
-                  (e) => new InternalProjectModuleError({ cause: e })
-                )
+                Effect.catchTags({
+                  "@mason/framework/DatabaseError": (e) =>
+                    Effect.fail(new InternalProjectModuleError({ cause: e })),
+                })
               )
         ),
       });

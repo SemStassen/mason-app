@@ -1,14 +1,35 @@
-import type { Project } from "./models/project.model";
-import type { Task } from "./models/task.model";
+import type { ProjectId, TaskId } from "@mason/framework";
+import type { CreateProject, PatchProject } from "./project";
+import type { CreateTask, PatchTask } from "./task";
 
-export type ProjectToCreate = typeof Project.Create.Type;
+export interface ProjectToCreateDTO {
+  name: typeof CreateProject.Type.name;
+  hexColor?: typeof CreateProject.Type.hexColor;
+  isBillable?: typeof CreateProject.Type.isBillable;
+  startDate?: typeof CreateProject.Type.startDate;
+  endDate?: typeof CreateProject.Type.endDate;
+  notes?: typeof CreateProject.Type.notes;
+  _metadata?: typeof CreateProject.Type._metadata;
+}
 
-export type ProjectToUpdate = typeof Project.Patch.Type & {
-  id: typeof Project.fields.id.Type;
-};
+export interface ProjectToUpdateDTO {
+  id: ProjectId;
+  name?: typeof PatchProject.Type.name;
+  hexColor?: typeof PatchProject.Type.hexColor;
+  isBillable?: typeof PatchProject.Type.isBillable;
+  startDate?: typeof PatchProject.Type.startDate;
+  endDate?: typeof PatchProject.Type.endDate;
+  notes?: typeof PatchProject.Type.notes;
+  _metadata?: typeof PatchProject.Type._metadata;
+}
 
-export type TaskToCreate = typeof Task.Create.Type;
+export interface TaskToCreateDTO {
+  name: typeof CreateTask.Type.name;
+  _metadata?: typeof CreateTask.Type._metadata;
+}
 
-export type TaskToUpdate = typeof Task.Patch.Type & {
-  id: typeof Task.fields.id.Type;
-};
+export interface TaskToUpdateDTO {
+  id: TaskId;
+  name?: typeof PatchTask.Type.name;
+  _metadata?: typeof PatchTask.Type._metadata;
+}

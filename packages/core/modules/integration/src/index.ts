@@ -1,11 +1,12 @@
 import { Layer } from "effect";
-import { IntegrationService } from "./integration.service";
-import { WorkspaceIntegrationRepository } from "./repositories/workspace-integration.repo";
+import { IntegrationModuleService } from "./integration-module.service";
+import { WorkspaceIntegrationRepository } from "./workspace-integration.repo";
 
 export * from "./dto";
 export * from "./errors";
-export { IntegrationService } from "./integration.service";
+export { IntegrationModuleService } from "./integration-module.service";
 
-export const IntegrationModuleLive = IntegrationService.live.pipe(
+// Module composition
+export const IntegrationModuleLive = IntegrationModuleService.live.pipe(
   Layer.provide(WorkspaceIntegrationRepository.live)
 );

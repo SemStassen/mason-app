@@ -2,24 +2,30 @@ import { SqlSchema } from "@effect/sql";
 import { and, eq, inArray, isNotNull, sql } from "@mason/db/operators";
 import { type DbProject, projectsTable } from "@mason/db/schema";
 import { DatabaseService } from "@mason/db/service";
-import { ProjectId, type RepositoryError, WorkspaceId } from "@mason/framework";
-import { Context, Effect, Layer, Schema } from "effect";
+import {
+  DatabaseError,
+  ExistingProjectId,
+  ExistingWorkspaceId,
+  ProjectId,
+} from "@mason/framework";
+import { Context, DateTime, Effect, Layer, type Option, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
-import { Project } from "../models/project.model";
+import { Project } from "./project";
 
 const _mapToDb = (
   project: typeof Project.Encoded
-): Omit<DbProject, "createdAt" | "updatedAt" | "deletedAt"> => {
+): Omit<DbProject, "createdAt" | "updatedAt"> => {
   return {
     id: project.id,
     workspaceId: project.workspaceId,
     name: project.name,
     hexColor: project.hexColor,
-    startDate: project.startDate,
-    endDate: project.endDate,
+    startDate: project.startDate ? DateTime.toDate(project.startDate) : null,
+    endDate: project.endDate ? DateTime.toDate(project.endDate) : null,
     isBillable: project.isBillable,
     notes: project.notes,
     _metadata: project._metadata,
+    deletedAt: project.deletedAt ? DateTime.toDate(project.deletedAt) : null,
   };
 };
 
@@ -30,22 +36,26 @@ export class ProjectRepository extends Context.Tag(
   {
     insert: (
       projects: NonEmptyReadonlyArray<Project>
-    ) => Effect.Effect<ReadonlyArray<Project>, RepositoryError>;
+    ) => Effect.Effect<ReadonlyArray<Project>, DatabaseError>;
     update: (
       projects: NonEmptyReadonlyArray<Project>
-    ) => Effect.Effect<ReadonlyArray<Project>, RepositoryError>;
+    ) => Effect.Effect<ReadonlyArray<Project>, DatabaseError>;
     hardDelete: (
-      projectIds: NonEmptyReadonlyArray<ProjectId>
-    ) => Effect.Effect<void, RepositoryError>;
+      projectIds: NonEmptyReadonlyArray<ExistingProjectId>
+    ) => Effect.Effect<void, DatabaseError>;
     list: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       query?: {
         ids?: ReadonlyArray<ProjectId>;
         _source?: "float";
         _externalIds?: ReadonlyArray<string>;
         _includeDeleted?: boolean;
       };
-    }) => Effect.Effect<ReadonlyArray<Project>, RepositoryError>;
+    }) => Effect.Effect<ReadonlyArray<Project>, DatabaseError>;
+    retrieve: (params: {
+      workspaceId: ExistingWorkspaceId;
+      projectId: ProjectId;
+    }) => Effect.Effect<Option.Option<Project>, DatabaseError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -81,7 +91,7 @@ export class ProjectRepository extends Context.Tag(
       });
 
       const HardDeleteProjects = SqlSchema.void({
-        Request: Schema.NonEmptyArray(ProjectId),
+        Request: Schema.NonEmptyArray(ExistingProjectId),
         execute: (projectIds) =>
           db.drizzle
             .delete(projectsTable)
@@ -91,7 +101,7 @@ export class ProjectRepository extends Context.Tag(
       // --- Queries ---
       const ListProjects = SqlSchema.findAll({
         Request: Schema.Struct({
-          workspaceId: WorkspaceId,
+          workspaceId: ExistingWorkspaceId,
           query: Schema.optional(
             Schema.Struct({
               ids: Schema.optional(Schema.Array(ProjectId)),
@@ -129,21 +139,51 @@ export class ProjectRepository extends Context.Tag(
         },
       });
 
+      const RetrieveProject = SqlSchema.findOne({
+        Request: Schema.Struct({
+          workspaceId: ExistingWorkspaceId,
+          projectId: ProjectId,
+        }),
+        Result: Project,
+        execute: ({ workspaceId, projectId }) =>
+          db.drizzle.query.projectsTable.findMany({
+            where: and(
+              eq(projectsTable.id, projectId),
+              eq(projectsTable.workspaceId, workspaceId)
+            ),
+          }),
+      });
+
       return ProjectRepository.of({
         insert: Effect.fn("@mason/project/ProjectRepo.insert")((projects) =>
-          InsertProjects(projects)
+          InsertProjects(projects).pipe(
+            Effect.mapError((e) => new DatabaseError({ cause: e }))
+          )
         ),
 
         update: Effect.fn("@mason/project/ProjectRepo.update")((projects) =>
-          UpdateProjects(projects)
+          UpdateProjects(projects).pipe(
+            Effect.mapError((e) => new DatabaseError({ cause: e }))
+          )
         ),
 
         hardDelete: Effect.fn("@mason/project/ProjectRepo.hardDelete")(
-          (projectIds) => HardDeleteProjects(projectIds)
+          (projectIds) =>
+            HardDeleteProjects(projectIds).pipe(
+              Effect.mapError((e) => new DatabaseError({ cause: e }))
+            )
         ),
 
         list: Effect.fn("@mason/project/ProjectRepo.list")((params) =>
-          ListProjects(params)
+          ListProjects(params).pipe(
+            Effect.mapError((e) => new DatabaseError({ cause: e }))
+          )
+        ),
+
+        retrieve: Effect.fn("@mason/project/ProjectRepo.retrieve")((params) =>
+          RetrieveProject(params).pipe(
+            Effect.mapError((e) => new DatabaseError({ cause: e }))
+          )
         ),
       });
     })

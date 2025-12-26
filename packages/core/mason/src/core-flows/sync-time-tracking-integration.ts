@@ -1,17 +1,8 @@
 import { TimeTrackingIntegrationAdapter } from "@mason/adapters";
 import { DatabaseService } from "@mason/db/service";
 import { ProjectId, TaskId, type WorkspaceId } from "@mason/framework";
-import {
-  IntegrationService,
-  WorkspaceIntegrationToUpdate,
-} from "@mason/integration";
-import {
-  ProjectModuleService,
-  ProjectToCreate,
-  ProjectToUpdate,
-  TaskToCreate,
-  TaskToUpdate,
-} from "@mason/project";
+import { IntegrationService } from "@mason/integration";
+import { ProjectModuleService } from "@mason/project";
 import { Effect, Either, Option, Schema } from "effect";
 import { InternalError } from "../errors";
 
@@ -74,12 +65,10 @@ const syncProjects = ({
             (existing) => existing._metadata?.externalId === p.externalId
           )
       )
-      .map((p) =>
-        ProjectToCreate.make({
-          ...p,
-          _metadata: { source: kind, externalId: p.externalId },
-        })
-      );
+      .map((p) => ({
+        ...p,
+        _metadata: { source: kind, externalId: p.externalId },
+      }));
 
     const projectsToUpdate = externalProjects.flatMap((p) => {
       const existing = existingProjects.find(

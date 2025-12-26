@@ -1,17 +1,16 @@
-import type { PlainApiKey } from "@mason/framework";
-import type { WorkspaceIntegration } from "./domain/workspace-integration.model";
+import type { PlainApiKey, WorkspaceIntegrationId } from "@mason/framework";
+import type {
+  CreateWorkspaceIntegration,
+  PatchWorkspaceIntegration,
+} from "./workspace-integration";
 
-export type WorkspaceIntegrationToCreate = Omit<
-  typeof WorkspaceIntegration.Create.Type,
-  "encryptedApiKey"
-> & {
+export interface WorkspaceIntegrationToCreateDTO {
+  kind: typeof CreateWorkspaceIntegration.Type.kind;
   plainApiKey: PlainApiKey;
-};
+}
 
-export type WorkspaceIntegrationToUpdate = Omit<
-  typeof WorkspaceIntegration.Patch.Type,
-  "encryptedApiKey"
-> & {
-  id: typeof WorkspaceIntegration.fields.id.Type;
+export interface WorkspaceIntegrationToUpdateDTO {
+  id: WorkspaceIntegrationId;
   plainApiKey?: PlainApiKey;
-};
+  _metadata?: typeof PatchWorkspaceIntegration.Type._metadata;
+}

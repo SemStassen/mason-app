@@ -1,4 +1,8 @@
-import type { SqlError } from "@effect/sql/SqlError";
-import type { ParseError } from "effect/ParseResult";
+import { Schema } from "effect";
 
-export type RepositoryError = SqlError | ParseError;
+export class DatabaseError extends Schema.TaggedError<DatabaseError>()(
+  "@mason/framework/DatabaseError",
+  {
+    cause: Schema.Unknown,
+  }
+) {}

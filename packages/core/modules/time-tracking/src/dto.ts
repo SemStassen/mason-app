@@ -1,17 +1,21 @@
-import { Schema } from "effect";
-import { TimeEntry } from "./models/time-entry.model";
+import type { TimeEntryId } from "@mason/framework";
+import type { CreateTimeEntry, PatchTimeEntry } from "./time-entry.model";
 
-export type TimeEntryToCreate = typeof TimeEntryToCreate.Type;
-export const TimeEntryToCreate = Schema.TaggedStruct(
-  "time-tracking/TimeEntryToCreate",
-  TimeEntry.Create.fields
-);
+export interface TimeEntryToCreateDTO {
+  workspaceId: typeof CreateTimeEntry.Type.workspaceId;
+  memberId: typeof CreateTimeEntry.Type.memberId;
+  projectId: typeof CreateTimeEntry.Type.projectId;
+  taskId?: typeof CreateTimeEntry.Type.taskId;
+  startedAt: typeof CreateTimeEntry.Type.startedAt;
+  stoppedAt: typeof CreateTimeEntry.Type.stoppedAt;
+  notes?: typeof CreateTimeEntry.Type.notes;
+}
 
-export type TimeEntryToUpdate = typeof TimeEntryToUpdate.Type;
-export const TimeEntryToUpdate = Schema.TaggedStruct(
-  "time-tracking/TimeEntryToUpdate",
-  {
-    id: TimeEntry.fields.id,
-    ...TimeEntry.Patch.fields,
-  }
-);
+export interface TimeEntryToUpdateDTO {
+  id: TimeEntryId;
+  projectId?: typeof PatchTimeEntry.Type.projectId;
+  taskId?: typeof PatchTimeEntry.Type.taskId;
+  startedAt?: typeof PatchTimeEntry.Type.startedAt;
+  stoppedAt?: typeof PatchTimeEntry.Type.stoppedAt;
+  notes?: typeof PatchTimeEntry.Type.notes;
+}

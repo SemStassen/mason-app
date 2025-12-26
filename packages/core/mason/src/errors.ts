@@ -13,3 +13,10 @@ export class NotFoundError extends Schema.TaggedError<NotFoundError>()(
     cause: Schema.Unknown,
   }
 ) {}
+
+export class InvalidExternalApiKeyError extends Schema.TaggedError<InvalidExternalApiKeyError>()(
+  "mason/InvalidExternalApiKeyError",
+  {
+    cause: Schema.Unknown,
+  }
+) {}

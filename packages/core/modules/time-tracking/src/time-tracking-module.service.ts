@@ -1,12 +1,23 @@
-import { processArray, TimeEntryId, type WorkspaceId } from "@mason/framework";
-import { Context, Effect, Layer } from "effect";
-import { TimeEntryToCreate, TimeEntryToUpdate } from "./dto";
+import {
+  ExistingTimeEntryId,
+  ExistingWorkspaceId,
+  processArray,
+  TimeEntryId,
+} from "@mason/framework";
+import { Context, type DateTime, Effect, Layer } from "effect";
+import type { ParseError } from "effect/ParseResult";
+import type { TimeEntryToCreateDTO, TimeEntryToUpdateDTO } from "./dto";
 import {
   InternalTimeTrackingModuleError,
   TimeEntryNotFoundError,
 } from "./errors";
-import { TimeEntry } from "./models/time-entry.model";
-import { TimeEntryRepository } from "./repositories/time-entry.repo";
+import {
+  createTimeEntry,
+  softDeleteTimeEntry,
+  TimeEntry,
+  updateTimeEntry,
+} from "./time-entry.model";
+import { TimeEntryRepository } from "./time-entry.repo";
 
 export class TimeTrackingModuleService extends Context.Tag(
   "@mason/time-tracking/TimeTrackingModuleService"
@@ -14,33 +25,33 @@ export class TimeTrackingModuleService extends Context.Tag(
   TimeTrackingModuleService,
   {
     createTimeEntries: (params: {
-      workspaceId: WorkspaceId;
-      timeEntries: ReadonlyArray<TimeEntryToCreate>;
+      workspaceId: ExistingWorkspaceId;
+      timeEntries: ReadonlyArray<TimeEntryToCreateDTO>;
     }) => Effect.Effect<
       ReadonlyArray<TimeEntry>,
       InternalTimeTrackingModuleError
     >;
     updateTimeEntries: (params: {
-      workspaceId: WorkspaceId;
-      timeEntries: ReadonlyArray<TimeEntryToUpdate>;
+      workspaceId: ExistingWorkspaceId;
+      timeEntries: ReadonlyArray<TimeEntryToUpdateDTO>;
     }) => Effect.Effect<
       ReadonlyArray<TimeEntry>,
       InternalTimeTrackingModuleError | TimeEntryNotFoundError
     >;
     softDeleteTimeEntries: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       timeEntryIds: ReadonlyArray<TimeEntryId>;
     }) => Effect.Effect<void, InternalTimeTrackingModuleError>;
     hardDeleteTimeEntries: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       timeEntryIds: ReadonlyArray<TimeEntryId>;
     }) => Effect.Effect<void, InternalTimeTrackingModuleError>;
     listTimeEntries: (params: {
-      workspaceId: WorkspaceId;
+      workspaceId: ExistingWorkspaceId;
       query?: {
         ids?: Array<TimeEntryId>;
-        startedAt?: Date;
-        stoppedAt?: Date;
+        startedAt?: DateTime.Utc;
+        stoppedAt?: DateTime.Utc;
       };
     }) => Effect.Effect<
       ReadonlyArray<TimeEntry>,
@@ -59,23 +70,26 @@ export class TimeTrackingModuleService extends Context.Tag(
         )(({ workspaceId, timeEntries }) =>
           processArray({
             items: timeEntries,
-            schema: TimeEntryToCreate,
             onEmpty: Effect.succeed([]),
             execute: (nea) =>
               Effect.gen(function* () {
                 const timeEntriesToCreate = yield* Effect.forEach(
                   nea,
                   (timeEntry) =>
-                    TimeEntry.makeFromCreate(workspaceId, timeEntry)
+                    createTimeEntry({
+                      ...timeEntry,
+                      workspaceId: workspaceId,
+                      taskId: timeEntry.taskId ?? null,
+                    })
                 );
 
                 return yield* timeEntryRepo.insert(timeEntriesToCreate);
               }),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e) =>
                 Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e: ParseError) =>
                 Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
             })
           )
@@ -85,35 +99,40 @@ export class TimeTrackingModuleService extends Context.Tag(
         )(({ workspaceId, timeEntries }) =>
           processArray({
             items: timeEntries,
-            schema: TimeEntryToUpdate,
             onEmpty: Effect.succeed([]),
             prepare: (updates) =>
               Effect.gen(function* () {
                 const existingTimeEntries = yield* timeEntryRepo.list({
-                  workspaceId,
+                  workspaceId: workspaceId,
                   query: {
                     ids: updates.map((timeEntry) => timeEntry.id),
                   },
                 });
-                return new Map(existingTimeEntries.map((e) => [e.id, e]));
+
+                return new Map(
+                  existingTimeEntries.map((e) => [TimeEntryId.make(e.id), e])
+                );
               }),
             mapItem: (update, existingMap) =>
               Effect.gen(function* () {
                 const existing = existingMap.get(update.id);
+
                 if (!existing) {
                   return yield* Effect.fail(
                     new TimeEntryNotFoundError({ timeEntryId: update.id })
                   );
                 }
-                return yield* existing.patch(update);
+                const { id, ...patchData } = update;
+
+                return yield* updateTimeEntry(existing, patchData);
               }),
             execute: (timeEntriesToUpdate) =>
               timeEntryRepo.update(timeEntriesToUpdate),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e) =>
                 Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e: ParseError) =>
                 Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
             })
           )
@@ -128,14 +147,15 @@ export class TimeTrackingModuleService extends Context.Tag(
             execute: (nea) =>
               Effect.gen(function* () {
                 const existingTimeEntries = yield* timeEntryRepo.list({
-                  workspaceId,
+                  workspaceId: workspaceId,
                   query: {
                     ids: nea,
                   },
                 });
 
-                const deletedTimeEntries = existingTimeEntries.map((existing) =>
-                  existing.softDelete()
+                const deletedTimeEntries = yield* Effect.forEach(
+                  existingTimeEntries,
+                  softDeleteTimeEntry
                 );
 
                 yield* processArray({
@@ -148,9 +168,9 @@ export class TimeTrackingModuleService extends Context.Tag(
               }),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e) =>
                 Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e: ParseError) =>
                 Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
             })
           )
@@ -165,7 +185,7 @@ export class TimeTrackingModuleService extends Context.Tag(
             execute: (nea) =>
               Effect.gen(function* () {
                 const existingTimeEntries = yield* timeEntryRepo.list({
-                  workspaceId,
+                  workspaceId: workspaceId,
                   query: {
                     ids: nea,
                   },
@@ -173,31 +193,54 @@ export class TimeTrackingModuleService extends Context.Tag(
 
                 yield* processArray({
                   items: existingTimeEntries.map((existing) => existing.id),
-                  schema: TimeEntryId,
+                  schema: ExistingTimeEntryId,
                   onEmpty: Effect.void,
                   execute: (nea) => timeEntryRepo.hardDelete(nea),
                 });
               }),
           }).pipe(
             Effect.catchTags({
-              ParseError: (e) =>
+              "@mason/framework/DatabaseError": (e) =>
                 Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
-              SqlError: (e) =>
+              ParseError: (e: ParseError) =>
                 Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
             })
           )
         ),
         listTimeEntries: Effect.fn(
           "@mason/time-tracking/TimeTrackingModuleService.listTimeEntries"
-        )((params) =>
-          timeEntryRepo
-            .list(params)
+        )((params) => {
+          const baseParams: {
+            workspaceId: ReturnType<typeof ExistingWorkspaceId.make>;
+            query?: {
+              ids?: ReadonlyArray<TimeEntryId>;
+              startedAt?: DateTime.Utc;
+              stoppedAt?: DateTime.Utc;
+            };
+          } = {
+            workspaceId: ExistingWorkspaceId.make(params.workspaceId),
+          };
+
+          if (params.query) {
+            baseParams.query = {
+              ...(params.query.ids && { ids: params.query.ids }),
+              ...(params.query.startedAt && {
+                startedAt: params.query.startedAt,
+              }),
+              ...(params.query.stoppedAt && {
+                stoppedAt: params.query.stoppedAt,
+              }),
+            };
+          }
+
+          return timeEntryRepo
+            .list(baseParams)
             .pipe(
               Effect.mapError(
                 (e) => new InternalTimeTrackingModuleError({ cause: e })
               )
-            )
-        ),
+            );
+        }),
       });
     })
   );
