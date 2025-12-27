@@ -1,33 +1,38 @@
+import { RpcMiddleware } from "@effect/rpc";
 import {
-  HttpApiError,
-  HttpApiMiddleware,
-  HttpApiSecurity,
-} from "@effect/platform";
+  ExistingMemberId,
+  ExistingUserId,
+  ExistingWorkspaceId,
+} from "@mason/types";
 import { Context, Schema } from "effect";
 
-// These are copied from core/src/models/shared.ts
-// because we don't want to depend on the core package in the api-contract package
-const UserId = Schema.NonEmptyString.pipe(Schema.brand("UserId"));
-const MemberId = Schema.NonEmptyString.pipe(Schema.brand("MemberId"));
-const WorkspaceId = Schema.NonEmptyString.pipe(Schema.brand("WorkspaceId"));
-
 export class SessionData extends Schema.Class<SessionData>(
-  "@mason/api-contract/sessionData"
+  "@mason/api-contract/SessionData"
 )({
-  userId: UserId,
-  memberId: MemberId,
-  workspaceId: WorkspaceId,
+  userId: ExistingUserId,
+  memberId: ExistingMemberId,
+  workspaceId: ExistingWorkspaceId,
 }) {}
 
+/**
+ * Context tag which represents the current workspace session.
+ * Requires AuthContext to be available first.
+ */
 export class SessionContext extends Context.Tag(
-  "@mason/api-contract/sessionContext"
+  "@mason/api-contract/SessionContext"
 )<SessionContext, SessionData>() {}
 
-export class SessionMiddleware extends HttpApiMiddleware.Tag<SessionMiddleware>()(
-  "@mason/api-contract/sessionMiddleware",
+/**
+ * RPC middleware for workspace session.
+ * Provides SessionContext to RPC handlers.
+ * Requires AuthContext to be available (should be applied after AuthMiddleware).
+ */
+export class SessionMiddleware extends RpcMiddleware.Tag<SessionMiddleware>()(
+  "@mason/api-contract/SessionMiddleware",
   {
-    failure: HttpApiError.Unauthorized,
+    // This middleware will provide the workspace session context
     provides: SessionContext,
-    optional: false,
+    // This middleware requires a client implementation too (for sending session info)
+    requiredForClient: true,
   }
 ) {}

@@ -128,6 +128,8 @@
       "name": "@mason/api-contract",
       "dependencies": {
         "@effect/platform": "catalog:",
+        "@effect/rpc": "catalog:",
+        "@mason/types": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
@@ -142,6 +144,7 @@
       "name": "@mason/framework",
       "dependencies": {
         "@effect/sql": "catalog:",
+        "@mason/types": "workspace:*",
         "effect": "catalog:",
         "uuid": "^13.0.0",
       },
@@ -200,6 +203,16 @@
         "@effect/sql": "catalog:",
         "@mason/db": "workspace:*",
         "@mason/framework": "workspace:*",
+        "effect": "catalog:",
+      },
+      "devDependencies": {
+        "@mason/config": "workspace:*",
+        "typescript": "catalog:dev",
+      },
+    },
+    "packages/core/types": {
+      "name": "@mason/types",
+      "dependencies": {
         "effect": "catalog:",
       },
       "devDependencies": {
@@ -285,6 +298,8 @@
   },
   "catalog": {
     "@effect/platform": "^0.93.0",
+    "@effect/rpc": "^0.73.0",
+    "@effect/rpc-http": "^0.73.0",
     "@effect/sql": "^0.49.0",
     "@effect/sql-drizzle": "^0.48.0",
     "@effect/sql-pg": "^0.50.0",
@@ -454,7 +469,7 @@
 
     "@effect/platform-node-shared": ["@effect/platform-node-shared@0.51.6", "", { "dependencies": { "@parcel/watcher": "^2.5.1", "multipasta": "^0.2.7", "ws": "^8.18.2" }, "peerDependencies": { "@effect/cluster": "^0.50.6", "@effect/platform": "^0.92.1", "@effect/rpc": "^0.71.1", "@effect/sql": "^0.46.0", "effect": "^3.18.4" } }, "sha512-0Px0qpKR6vwoSuTbHPap9FOcUvt9MPLyYR6ZrskXJny4wZYHt9MfF0xR8a4MPbBaJ3UtGH9z74ijQw2cmzYxEg=="],
 
-    "@effect/rpc": ["@effect/rpc@0.71.1", "", { "dependencies": { "msgpackr": "^1.11.4" }, "peerDependencies": { "@effect/platform": "^0.92.1", "effect": "^3.18.4" } }, "sha512-WgASRYmLBbCHM+3xfAGACVM8nOl8DJb+46znAN80hURVOzbPDd7/xjepj59idpIZYBsErv4ixRKfVLLtrGGPyg=="],
+    "@effect/rpc": ["@effect/rpc@0.73.0", "", { "dependencies": { "msgpackr": "^1.11.4" }, "peerDependencies": { "@effect/platform": "^0.94.0", "effect": "^3.19.13" } }, "sha512-iMPf6tTriz8sK0l5x4koFId8Hz5nFptHYg8WqyjHGIIVLTpZxuiSqhmXZG7FnAs5N2n6uCEws4wWGcIgXNUrFg=="],
 
     "@effect/sql": ["@effect/sql@0.49.0", "", { "dependencies": { "uuid": "^11.0.3" }, "peerDependencies": { "@effect/experimental": "^0.58.0", "@effect/platform": "^0.94.0", "effect": "^3.19.13" } }, "sha512-9UEKR+z+MrI/qMAmSvb/RiD9KlgIazjZUCDSpwNgm0lEK9/Q6ExEyfziiYFVCPiptp52cBw8uBHRic8hHnwqXA=="],
 
@@ -597,6 +612,8 @@
     "@mason/telemetry": ["@mason/telemetry@workspace:packages/telemetry"],
 
     "@mason/time-tracking": ["@mason/time-tracking@workspace:packages/core/modules/time-tracking"],
+
+    "@mason/types": ["@mason/types@workspace:packages/core/types"],
 
     "@mason/ui": ["@mason/ui@workspace:packages/ui"],
 
@@ -1485,8 +1502,6 @@
     "@effect/platform-bun/@effect/platform": ["@effect/platform@0.92.1", "", { "dependencies": { "find-my-way-ts": "^0.1.6", "msgpackr": "^1.11.4", "multipasta": "^0.2.7" }, "peerDependencies": { "effect": "^3.18.1" } }, "sha512-XXWCBVwyhaKZISN7aM1fv/3fWDGyxr84ObywnUrL8aHvJLoIeskWFAP/fqw3c5MFCrJ3ZV97RWLbv6JiBQugdg=="],
 
     "@effect/platform-node-shared/@effect/platform": ["@effect/platform@0.92.1", "", { "dependencies": { "find-my-way-ts": "^0.1.6", "msgpackr": "^1.11.4", "multipasta": "^0.2.7" }, "peerDependencies": { "effect": "^3.18.1" } }, "sha512-XXWCBVwyhaKZISN7aM1fv/3fWDGyxr84ObywnUrL8aHvJLoIeskWFAP/fqw3c5MFCrJ3ZV97RWLbv6JiBQugdg=="],
-
-    "@effect/rpc/@effect/platform": ["@effect/platform@0.92.1", "", { "dependencies": { "find-my-way-ts": "^0.1.6", "msgpackr": "^1.11.4", "multipasta": "^0.2.7" }, "peerDependencies": { "effect": "^3.18.1" } }, "sha512-XXWCBVwyhaKZISN7aM1fv/3fWDGyxr84ObywnUrL8aHvJLoIeskWFAP/fqw3c5MFCrJ3ZV97RWLbv6JiBQugdg=="],
 
     "@effect/sql/uuid": ["uuid@11.1.0", "", { "bin": { "uuid": "dist/esm/bin/uuid" } }, "sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A=="],
 

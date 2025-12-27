@@ -1,5 +1,5 @@
 {
-  "name": "@mason/api-contract",
+  "name": "@mason/types",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,10 +9,6 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@effect/platform": "catalog:",
-    "@effect/rpc": "catalog:",
-    "@mason/project": "workspace:*",
-    "@mason/types": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
@@ -20,9 +16,6 @@
     "typescript": "catalog:dev"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./dto/*": "./src/dto/*.ts",
-    "./middleware/*": "./src/middleware/*.ts",
-    "./rpc": "./src/rpc/index.ts"
+    ".": "./src/index.ts"
   }
 }

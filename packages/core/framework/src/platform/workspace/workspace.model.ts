@@ -1,5 +1,5 @@
+import { WorkspaceId } from "@mason/types";
 import { Schema } from "effect";
-import { WorkspaceId } from "../../types/ids";
 import { generateUUID } from "../../utils/uuid";
 
 export const Workspace = Schema.Struct({

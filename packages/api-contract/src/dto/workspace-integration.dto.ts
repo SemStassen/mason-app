@@ -1,9 +1,10 @@
+import { WorkspaceId, WorkspaceIntegrationId } from "@mason/types";
 import { Schema } from "effect";
 
 const WorkspaceIntegration = Schema.Struct({
-  id: Schema.NonEmptyString,
+  id: WorkspaceIntegrationId,
   // References
-  workspaceId: Schema.NonEmptyString,
+  workspaceId: WorkspaceId,
   // General
   kind: Schema.Literal("float"),
   // Optional

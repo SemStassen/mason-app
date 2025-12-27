@@ -1,7 +1,8 @@
+import { UserId } from "@mason/types";
 import { Schema } from "effect";
 
 const User = Schema.Struct({
-  id: Schema.NonEmptyString,
+  id: UserId,
   // General
   displayName: Schema.NonEmptyString,
   email: Schema.NonEmptyString,

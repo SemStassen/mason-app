@@ -1,18 +1,20 @@
+import type { ProjectToCreateDTO, ProjectToUpdateDTO } from "@mason/project";
+import { HexColor, ProjectId, WorkspaceId } from "@mason/types";
 import { Schema } from "effect";
+import type { SchemaForDTO } from "../rpc/utils";
 import { JsonRecord } from "./data-types";
 
 const Project = Schema.Struct({
-  id: Schema.NonEmptyString,
+  id: ProjectId,
   // References
-  workspaceId: Schema.NonEmptyString,
+  workspaceId: WorkspaceId,
   // General
   name: Schema.NonEmptyString,
-  hexColor: Schema.NonEmptyString.annotations({
-    description: "Hex + alpha",
-    examples: ["#C8102E", "#FFFFFF", "#003DA5", "#D4AF3740"],
-  }),
+  hexColor: HexColor,
   isBillable: Schema.Boolean,
   // Optional
+  startDate: Schema.NullOr(Schema.DateFromSelf),
+  endDate: Schema.NullOr(Schema.DateFromSelf),
   notes: JsonRecord,
   _metadata: Schema.Struct({
     source: Schema.optionalWith(Schema.Literal("float"), {
@@ -24,7 +26,7 @@ const Project = Schema.Struct({
   }),
 });
 
-export const CreateProjectRequest = Schema.Struct({
+const _CreateProjectRequest = Schema.Struct({
   // General
   name: Project.fields.name,
   hexColor: Schema.optionalWith(Project.fields.hexColor, {
@@ -34,22 +36,44 @@ export const CreateProjectRequest = Schema.Struct({
     exact: true,
   }),
   // Optional
+  startDate: Schema.optionalWith(Project.fields.startDate, {
+    exact: true,
+  }),
+  endDate: Schema.optionalWith(Project.fields.endDate, {
+    exact: true,
+  }),
   notes: Schema.optionalWith(Project.fields.notes, {
+    exact: true,
+  }),
+  _metadata: Schema.optionalWith(Project.fields._metadata, {
     exact: true,
   }),
 });
 
-export const UpdateProjectRequest = Schema.Struct({
+export const CreateProjectRequest: SchemaForDTO<
+  typeof _CreateProjectRequest,
+  ProjectToCreateDTO
+> = _CreateProjectRequest;
+
+const _UpdateProjectRequest = Schema.Struct({
   id: Project.fields.id,
   // General
   name: Schema.optionalWith(Project.fields.name, { exact: true }),
   hexColor: Schema.optionalWith(Project.fields.hexColor, { exact: true }),
   isBillable: Schema.optionalWith(Project.fields.isBillable, { exact: true }),
   // Optional
+  startDate: Schema.optionalWith(Project.fields.startDate, { exact: true }),
+  endDate: Schema.optionalWith(Project.fields.endDate, { exact: true }),
   notes: Schema.optionalWith(Schema.NullOr(Project.fields.notes), {
     exact: true,
   }),
+  _metadata: Schema.optionalWith(Project.fields._metadata, { exact: true }),
 });
+
+export const UpdateProjectRequest: SchemaForDTO<
+  typeof _UpdateProjectRequest,
+  ProjectToUpdateDTO
+> = _UpdateProjectRequest;
 
 export const ProjectResponse = Schema.TaggedStruct("ProjectResponse", {
   ...Project.fields,

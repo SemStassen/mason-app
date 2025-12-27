@@ -1,10 +1,11 @@
 import { Schema } from "effect";
+import { ProjectId, TaskId, WorkspaceId } from "../../../core/types/src";
 
 const Task = Schema.Struct({
-  id: Schema.NonEmptyString,
+  id: TaskId,
   // References
-  workspaceId: Schema.NonEmptyString,
-  projectId: Schema.NonEmptyString,
+  workspaceId: WorkspaceId,
+  projectId: ProjectId,
   // General
   name: Schema.NonEmptyString,
   // Optional

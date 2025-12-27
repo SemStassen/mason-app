@@ -1,12 +1,13 @@
+import { MemberId, TaskId, TimeEntryId, WorkspaceId } from "@mason/types";
 import { Schema } from "effect";
 import { JsonRecord } from "./data-types";
 
 const TimeEntry = Schema.Struct({
-  id: Schema.NonEmptyString,
+  id: TimeEntryId,
   // References
-  workspaceId: Schema.NonEmptyString,
-  memberId: Schema.NonEmptyString,
-  taskId: Schema.NonEmptyString,
+  workspaceId: WorkspaceId,
+  memberId: MemberId,
+  taskId: TaskId,
   // General
   startedAt: Schema.DateFromSelf,
   stoppedAt: Schema.DateFromSelf,
@@ -34,7 +35,9 @@ export const UpdateTimeEntryRequest = Schema.Struct({
   startedAt: Schema.optionalWith(TimeEntry.fields.startedAt, { exact: true }),
   stoppedAt: Schema.optionalWith(TimeEntry.fields.stoppedAt, { exact: true }),
   // Optional
-  notes: Schema.optionalWith(Schema.NullOr(TimeEntry.fields.notes), { exact: true }),
+  notes: Schema.optionalWith(Schema.NullOr(TimeEntry.fields.notes), {
+    exact: true,
+  }),
 });
 
 export const TimeEntryResponse = Schema.Struct({

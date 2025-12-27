@@ -1,5 +1,5 @@
+import { UserId } from "@mason/types";
 import { Schema } from "effect";
-import { UserId } from "../../types/ids";
 import { generateUUID } from "../../utils/uuid";
 
 export const User = Schema.Struct({

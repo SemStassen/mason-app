@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@effect/sql": "catalog:",
+    "@mason/types": "workspace:*",
     "effect": "catalog:",
     "uuid": "^13.0.0"
   },

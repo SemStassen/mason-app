@@ -1,32 +1,32 @@
-import {
-  HttpApiError,
-  HttpApiMiddleware,
-  HttpApiSecurity,
-} from "@effect/platform";
+import { RpcMiddleware } from "@effect/rpc";
+import { ExistingUserId } from "@mason/types";
 import { Context, Schema } from "effect";
-
-// These are copied from core/src/models/shared.ts
-// because we don't want to depend on the core package in the api-contract package
-const UserId = Schema.NonEmptyString.pipe(Schema.brand("UserId"));
 
 export class AuthData extends Schema.Class<AuthData>(
   "@mason/api-contract/authData"
 )({
-  userId: UserId,
+  userId: ExistingUserId,
 }) {}
 
-export class AuthContext extends Context.Tag(
-  "@mason/api-contract/authContext"
-)<AuthContext, AuthData>() {}
+/**
+ * Context tag which represents the authenticated user.
+ */
+export class AuthContext extends Context.Tag("@mason/api-contract/AuthContext")<
+  AuthContext,
+  AuthData
+>() {}
 
-export class AuthMiddleware extends HttpApiMiddleware.Tag<AuthMiddleware>()(
-  "@mason/api-contract/authMiddleware",
+/**
+ * RPC middleware for authentication.
+ * Provides AuthContext to RPC handlers.
+ * Requires client implementation for sending auth tokens.
+ */
+export class AuthMiddleware extends RpcMiddleware.Tag<AuthMiddleware>()(
+  "@mason/api-contract/AuthMiddleware",
   {
-    failure: HttpApiError.Unauthorized,
+    // This middleware will provide the authenticated user context
     provides: AuthContext,
-    security: {
-      bearer: HttpApiSecurity.bearer,
-    },
-    optional: false,
+    // This middleware requires a client implementation too (for sending auth tokens)
+    requiredForClient: true,
   }
 ) {}

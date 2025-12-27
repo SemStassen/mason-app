@@ -1,7 +1,8 @@
+import { WorkspaceId } from "@mason/types";
 import { Schema } from "effect";
 
 const Workspace = Schema.Struct({
-  id: Schema.NonEmptyString,
+  id: WorkspaceId,
   // General
   name: Schema.NonEmptyString,
   slug: Schema.NonEmptyString,
