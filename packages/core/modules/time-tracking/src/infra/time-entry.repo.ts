@@ -8,27 +8,23 @@ import {
   ExistingWorkspaceId,
   TimeEntryId,
 } from "@mason/framework";
-import { Context, DateTime, Effect, Layer, Schema } from "effect";
+import { Context, DateTime, Effect, Layer, Option, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
-import { TimeEntry } from "./time-entry.model";
+import { TimeEntry } from "../domain";
 
 const _mapToDb = (
-  timeEntry: typeof TimeEntry.Encoded
-): Omit<DbTimeEntry, "createdAt" | "updatedAt"> => {
-  return {
-    id: timeEntry.id,
-    workspaceId: timeEntry.workspaceId,
-    memberId: timeEntry.memberId,
-    projectId: timeEntry.projectId,
-    taskId: timeEntry.taskId,
-    startedAt: DateTime.toDate(timeEntry.startedAt),
-    stoppedAt: DateTime.toDate(timeEntry.stoppedAt),
-    notes: timeEntry.notes,
-    deletedAt: timeEntry.deletedAt
-      ? DateTime.toDate(timeEntry.deletedAt)
-      : null,
-  };
-};
+  timeEntry: typeof TimeEntry.TimeEntry.Encoded
+): Omit<DbTimeEntry, "createdAt" | "updatedAt"> => ({
+  id: timeEntry.id,
+  workspaceId: timeEntry.workspaceId,
+  memberId: timeEntry.memberId,
+  projectId: timeEntry.projectId,
+  taskId: Option.getOrNull(timeEntry.taskId),
+  startedAt: DateTime.toDate(timeEntry.startedAt),
+  stoppedAt: DateTime.toDate(timeEntry.stoppedAt),
+  notes: Option.getOrNull(timeEntry.notes),
+  deletedAt: Option.getOrNull(Option.map(timeEntry.deletedAt, DateTime.toDate)),
+});
 
 export class TimeEntryRepository extends Context.Tag(
   "@mason/time-tracking/TimeEntryRepository"
@@ -36,11 +32,11 @@ export class TimeEntryRepository extends Context.Tag(
   TimeEntryRepository,
   {
     insert: (
-      timeEntries: NonEmptyReadonlyArray<TimeEntry>
-    ) => Effect.Effect<ReadonlyArray<TimeEntry>, DatabaseError>;
+      timeEntries: NonEmptyReadonlyArray<TimeEntry.TimeEntry>
+    ) => Effect.Effect<ReadonlyArray<TimeEntry.TimeEntry>, DatabaseError>;
     update: (
-      timeEntries: NonEmptyReadonlyArray<TimeEntry>
-    ) => Effect.Effect<ReadonlyArray<TimeEntry>, DatabaseError>;
+      timeEntries: NonEmptyReadonlyArray<TimeEntry.TimeEntry>
+    ) => Effect.Effect<ReadonlyArray<TimeEntry.TimeEntry>, DatabaseError>;
     hardDelete: (
       timeEntryIds: NonEmptyReadonlyArray<ExistingTimeEntryId>
     ) => Effect.Effect<void, DatabaseError>;
@@ -52,7 +48,7 @@ export class TimeEntryRepository extends Context.Tag(
         stoppedAt?: DateTime.Utc;
         _includeDeleted?: boolean;
       };
-    }) => Effect.Effect<ReadonlyArray<TimeEntry>, DatabaseError>;
+    }) => Effect.Effect<ReadonlyArray<TimeEntry.TimeEntry>, DatabaseError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -62,8 +58,8 @@ export class TimeEntryRepository extends Context.Tag(
 
       // --- Mutations / Commands ---
       const InsertTimeEntries = SqlSchema.findAll({
-        Request: Schema.NonEmptyArray(TimeEntry),
-        Result: TimeEntry,
+        Request: Schema.NonEmptyArray(TimeEntry.TimeEntry),
+        Result: TimeEntry.TimeEntry,
         execute: (timeEntries) =>
           db.drizzle
             .insert(timeEntriesTable)
@@ -72,8 +68,8 @@ export class TimeEntryRepository extends Context.Tag(
       });
 
       const UpdateTimeEntries = SqlSchema.findAll({
-        Request: Schema.NonEmptyArray(TimeEntry),
-        Result: TimeEntry,
+        Request: Schema.NonEmptyArray(TimeEntry.TimeEntry),
+        Result: TimeEntry.TimeEntry,
         execute: (timeEntries) =>
           Effect.forEach(
             timeEntries,
@@ -108,7 +104,7 @@ export class TimeEntryRepository extends Context.Tag(
             })
           ),
         }),
-        Result: TimeEntry,
+        Result: TimeEntry.TimeEntry,
         execute: ({ workspaceId, query }) => {
           const whereConditions = [
             eq(timeEntriesTable.workspaceId, workspaceId),

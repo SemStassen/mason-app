@@ -1,6 +1,11 @@
-import { MemberId, TaskId, TimeEntryId, WorkspaceId } from "@mason/types";
+import {
+  JsonRecord,
+  MemberId,
+  TaskId,
+  TimeEntryId,
+  WorkspaceId,
+} from "@mason/types";
 import { Schema } from "effect";
-import { JsonRecord } from "./data-types";
 
 const TimeEntry = Schema.Struct({
   id: TimeEntryId,

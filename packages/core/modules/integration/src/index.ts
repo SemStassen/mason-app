@@ -1,7 +1,8 @@
 import { Layer } from "effect";
+import { WorkspaceIntegrationRepository } from "./infra/workspace-integration.repo";
 import { IntegrationModuleService } from "./integration-module.service";
-import { WorkspaceIntegrationRepository } from "./workspace-integration.repo";
 
+export { WorkspaceIntegration } from "./domain/workspace-integration/model";
 export * from "./dto";
 export * from "./errors";
 export { IntegrationModuleService } from "./integration-module.service";

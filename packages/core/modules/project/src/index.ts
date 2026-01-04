@@ -1,7 +1,7 @@
 import { Layer } from "effect";
-import { ProjectRepository } from "./project.repo";
+import { ProjectRepository } from "./infra/project.repo";
+import { TaskRepository } from "./infra/task.repo";
 import { ProjectModuleService } from "./project-module.service";
-import { TaskRepository } from "./task.repo";
 
 export * from "./dto";
 export * from "./errors";

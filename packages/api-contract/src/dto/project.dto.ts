@@ -1,8 +1,7 @@
 import type { ProjectToCreateDTO, ProjectToUpdateDTO } from "@mason/project";
-import { HexColor, ProjectId, WorkspaceId } from "@mason/types";
+import { HexColor, JsonRecord, ProjectId, WorkspaceId } from "@mason/types";
 import { Schema } from "effect";
 import type { SchemaForDTO } from "../rpc/utils";
-import { JsonRecord } from "./data-types";
 
 const Project = Schema.Struct({
   id: ProjectId,

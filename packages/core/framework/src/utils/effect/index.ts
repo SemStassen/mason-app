@@ -1,29 +1,9 @@
-import { Effect, Option, Schema } from "effect";
+import { Array as Arr, Effect } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
-import type { ProcessArray, WithNonEmptyArray } from "./types";
+import type { ProcessArray } from "./types";
 
 /**
- * @internal
- * Internal utility function used by processArray.
- * Validates an array and ensures it's non-empty, then applies a function to it.
- * If the array is empty or invalid, returns the `onEmpty` effect.
- */
-const withNonEmptyArray: WithNonEmptyArray = (params) => {
-  return Schema.decodeUnknown(Schema.NonEmptyArray(params.schema))(
-    params.arr
-  ).pipe(
-    Effect.option,
-    Effect.flatMap((maybe) =>
-      Option.match(maybe, {
-        onNone: () => params.onEmpty,
-        onSome: params.execute,
-      })
-    )
-  );
-};
-
-/**
- * Processes a batch of items: validates, optionally prepares context, optionally transforms, and executes a final action.
+ * Processes a batch of items: optionally prepares context, optionally transforms, and executes a final action.
  * Returns the result of `onEmpty` if the input array is empty, otherwise returns the result of executing.
  *
  * `prepare` (optional) runs once on the entire array and provides context to `mapItem`.
@@ -31,23 +11,20 @@ const withNonEmptyArray: WithNonEmptyArray = (params) => {
  * `execute` (required) performs the final action (insert, update, delete, etc.).
  *
  * Type flow:
- * - `prepare` input: `NonEmptyReadonlyArray<Schema.Schema.Type<In>>` (optional)
+ * - `prepare` input: `NonEmptyReadonlyArray<Items[number]>` (optional)
  * - `prepare` output: `Context` (if present)
- * - `mapItem` input: `Schema.Schema.Type<In>` and optionally `Context` (if `prepare` present)
+ * - `mapItem` input: `Items[number]` and optionally `Context` (if `prepare` present)
  * - `mapItem` output: `OutFinal` (if present, otherwise uses input type)
- * - `execute` input: `NonEmptyReadonlyArray<OutFinal>` or `NonEmptyReadonlyArray<Schema.Schema.Type<In>>`
+ * - `execute` input: `NonEmptyReadonlyArray<OutFinal>` or `NonEmptyReadonlyArray<Items[number]>`
  *
  * @example
  * ```ts
- * import { Effect, Schema } from "effect";
+ * import { Effect } from "effect";
  * import { processArray } from "@mason/framework";
  *
  * // Example 1: Simple execution without mapItem
- * const UserSchema = Schema.Struct({ name: Schema.String });
- *
  * processArray({
  *   items: [{ name: "Alice" }, { name: "Bob" }],
- *   schema: UserSchema,
  *   execute: (items) => {
  *     // items is inferred as NonEmptyReadonlyArray<{ name: string }>
  *     return repository.insert(items);
@@ -57,15 +34,12 @@ const withNonEmptyArray: WithNonEmptyArray = (params) => {
  *
  * @example
  * ```ts
- * import { Effect, Schema } from "effect";
+ * import { Effect } from "effect";
  * import { processArray } from "@mason/framework";
  *
  * // Example 2: With mapItem
- * const UserSchema = Schema.Struct({ name: Schema.String });
- *
  * processArray({
  *   items: [{ name: "Alice" }, { name: "Bob" }],
- *   schema: UserSchema,
  *   mapItem: (item) => {
  *     // item is inferred as { name: string }
  *     return Effect.succeed({ ...item, id: crypto.randomUUID() });
@@ -79,15 +53,12 @@ const withNonEmptyArray: WithNonEmptyArray = (params) => {
  *
  * @example
  * ```ts
- * import { Effect, Schema } from "effect";
+ * import { Effect } from "effect";
  * import { processArray } from "@mason/framework";
  *
  * // Example 3: With prepare and mapItem
- * const UpdateSchema = Schema.Struct({ id: Schema.String });
- *
  * processArray({
  *   items: [{ id: "1" }, { id: "2" }],
- *   schema: UpdateSchema,
  *   prepare: (updates) =>
  *     Effect.gen(function* () {
  *       const existing = yield* fetchExisting(updates.map((u) => u.id));
@@ -105,11 +76,9 @@ const withNonEmptyArray: WithNonEmptyArray = (params) => {
  *
  * @category utilities
  */
-
 export const processArray = ((params: Parameters<ProcessArray>[0]) => {
   const hasPrepare = "prepare" in params && params.prepare;
   const hasMapItem = "mapItem" in params && params.mapItem;
-  const hasSchema = "schema" in params && params.schema;
 
   // Helper to call mapItem with proper typing based on whether prepare exists
   const callMapItem = (
@@ -118,7 +87,6 @@ export const processArray = ((params: Parameters<ProcessArray>[0]) => {
     context: unknown
   ): Effect.Effect<unknown, unknown, unknown> => {
     if (hasPrepare && context !== undefined) {
-      // TypeScript can't narrow this, but we know the signature matches
       return (
         mapItem as (
           item: unknown,
@@ -147,25 +115,14 @@ export const processArray = ((params: Parameters<ProcessArray>[0]) => {
       return yield* params.execute(itemsToExecute);
     });
 
-  if (hasSchema) {
-    return withNonEmptyArray({
-      arr: params.items,
-      schema: params.schema,
-      onEmpty: params.onEmpty ?? Effect.succeed(undefined as never),
-      execute: executeFn,
-    });
+  // Check if array is non-empty
+  const maybeNonEmpty = Arr.isNonEmptyReadonlyArray(params.items)
+    ? params.items
+    : undefined;
+
+  if (maybeNonEmpty) {
+    return executeFn(maybeNonEmpty);
   }
 
-  // No schema: validate non-empty array structure without element validation
-  return Schema.decodeUnknown(Schema.NonEmptyArray(Schema.Unknown))(
-    params.items
-  ).pipe(
-    Effect.option,
-    Effect.flatMap((maybe) =>
-      Option.match(maybe, {
-        onNone: () => params.onEmpty ?? Effect.succeed(undefined as never),
-        onSome: executeFn,
-      })
-    )
-  );
+  return params.onEmpty ?? Effect.succeed(undefined as never);
 }) as ProcessArray;

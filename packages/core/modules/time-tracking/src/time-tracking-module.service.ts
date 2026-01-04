@@ -1,23 +1,17 @@
 import {
-  ExistingTimeEntryId,
   ExistingWorkspaceId,
   processArray,
   TimeEntryId,
 } from "@mason/framework";
-import { Context, type DateTime, Effect, Layer } from "effect";
+import { Context, type DateTime, Effect, Layer, Option } from "effect";
 import type { ParseError } from "effect/ParseResult";
+import { TimeEntry } from "./domain";
 import type { TimeEntryToCreateDTO, TimeEntryToUpdateDTO } from "./dto";
 import {
   InternalTimeTrackingModuleError,
   TimeEntryNotFoundError,
 } from "./errors";
-import {
-  createTimeEntry,
-  softDeleteTimeEntry,
-  TimeEntry,
-  updateTimeEntry,
-} from "./time-entry.model";
-import { TimeEntryRepository } from "./time-entry.repo";
+import { TimeEntryRepository } from "./infra/time-entry.repo";
 
 export class TimeTrackingModuleService extends Context.Tag(
   "@mason/time-tracking/TimeTrackingModuleService"
@@ -28,14 +22,14 @@ export class TimeTrackingModuleService extends Context.Tag(
       workspaceId: ExistingWorkspaceId;
       timeEntries: ReadonlyArray<TimeEntryToCreateDTO>;
     }) => Effect.Effect<
-      ReadonlyArray<TimeEntry>,
+      ReadonlyArray<TimeEntry.TimeEntry>,
       InternalTimeTrackingModuleError
     >;
     updateTimeEntries: (params: {
       workspaceId: ExistingWorkspaceId;
       timeEntries: ReadonlyArray<TimeEntryToUpdateDTO>;
     }) => Effect.Effect<
-      ReadonlyArray<TimeEntry>,
+      ReadonlyArray<TimeEntry.TimeEntry>,
       InternalTimeTrackingModuleError | TimeEntryNotFoundError
     >;
     softDeleteTimeEntries: (params: {
@@ -54,7 +48,7 @@ export class TimeTrackingModuleService extends Context.Tag(
         stoppedAt?: DateTime.Utc;
       };
     }) => Effect.Effect<
-      ReadonlyArray<TimeEntry>,
+      ReadonlyArray<TimeEntry.TimeEntry>,
       InternalTimeTrackingModuleError
     >;
   }
@@ -76,11 +70,19 @@ export class TimeTrackingModuleService extends Context.Tag(
                 const timeEntriesToCreate = yield* Effect.forEach(
                   nea,
                   (timeEntry) =>
-                    createTimeEntry({
-                      ...timeEntry,
-                      workspaceId: workspaceId,
-                      taskId: timeEntry.taskId ?? null,
-                    })
+                    TimeEntry.create(
+                      {
+                        projectId: timeEntry.projectId,
+                        startedAt: timeEntry.startedAt,
+                        stoppedAt: timeEntry.stoppedAt,
+                        taskId: timeEntry.taskId ?? Option.none(),
+                        notes: timeEntry.notes ?? Option.none(),
+                      },
+                      {
+                        workspaceId,
+                        memberId: timeEntry.memberId,
+                      }
+                    )
                 );
 
                 return yield* timeEntryRepo.insert(timeEntriesToCreate);
@@ -124,7 +126,7 @@ export class TimeTrackingModuleService extends Context.Tag(
                 }
                 const { id, ...patchData } = update;
 
-                return yield* updateTimeEntry(existing, patchData);
+                return yield* TimeEntry.update(existing, patchData);
               }),
             execute: (timeEntriesToUpdate) =>
               timeEntryRepo.update(timeEntriesToUpdate),
@@ -142,7 +144,6 @@ export class TimeTrackingModuleService extends Context.Tag(
         )(({ workspaceId, timeEntryIds }) =>
           processArray({
             items: timeEntryIds,
-            schema: TimeEntryId,
             onEmpty: Effect.void,
             execute: (nea) =>
               Effect.gen(function* () {
@@ -155,12 +156,11 @@ export class TimeTrackingModuleService extends Context.Tag(
 
                 const deletedTimeEntries = yield* Effect.forEach(
                   existingTimeEntries,
-                  softDeleteTimeEntry
+                  TimeEntry.softDelete
                 );
 
                 yield* processArray({
                   items: deletedTimeEntries,
-                  schema: TimeEntry,
                   onEmpty: Effect.void,
                   execute: (nea) =>
                     timeEntryRepo.update(nea).pipe(Effect.asVoid),
@@ -180,7 +180,6 @@ export class TimeTrackingModuleService extends Context.Tag(
         )(({ workspaceId, timeEntryIds }) =>
           processArray({
             items: timeEntryIds,
-            schema: TimeEntryId,
             onEmpty: Effect.void,
             execute: (nea) =>
               Effect.gen(function* () {
@@ -193,7 +192,6 @@ export class TimeTrackingModuleService extends Context.Tag(
 
                 yield* processArray({
                   items: existingTimeEntries.map((existing) => existing.id),
-                  schema: ExistingTimeEntryId,
                   onEmpty: Effect.void,
                   execute: (nea) => timeEntryRepo.hardDelete(nea),
                 });
@@ -201,8 +199,6 @@ export class TimeTrackingModuleService extends Context.Tag(
           }).pipe(
             Effect.catchTags({
               "@mason/framework/DatabaseError": (e) =>
-                Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
-              ParseError: (e: ParseError) =>
                 Effect.fail(new InternalTimeTrackingModuleError({ cause: e })),
             })
           )

@@ -1,4 +1,5 @@
-import { Effect, Layer, Schema } from "effect";
+import type { PlainApiKey } from "@mason/framework";
+import { Effect, Layer, Redacted, Schema } from "effect";
 import { TimeTrackingIntegrationAdapter } from "../adapter";
 import { InternalAdapterError, InvalidApiKeyError } from "../errors";
 import { ExternalProject, ExternalTask } from "../models";
@@ -48,13 +49,13 @@ const BASE_URL = "https://api.float.com/v3";
 const CURRENT_PAGE_HEADER = "X-Pagination-Current-Page";
 const TOTAL_PAGES_HEADER = "X-Pagination-Page-Count";
 
-const floatFetch = ({ apiKey, path }: { apiKey: string; path: string }) =>
+const floatFetch = ({ apiKey, path }: { apiKey: PlainApiKey; path: string }) =>
   Effect.gen(function* () {
     const res = yield* Effect.tryPromise({
       try: () =>
         fetch(`${BASE_URL}${path}`, {
           headers: {
-            Authorization: `Bearer ${apiKey}`,
+            Authorization: `Bearer ${Redacted.value(apiKey)}`,
             "User-Agent": "Mason app - private demo (semstassen@gmail.com)",
           },
         }),
@@ -131,24 +132,28 @@ export const floatLive = Layer.effect(
                 path: buildUrl("/projects", { page }),
               }),
             getNextPage: floatGetNextPage,
-            extractItems: (body) =>
-              (body as Array<FloatProject>).map((p) =>
-                Schema.decodeUnknownSync(ExternalProject)({
-                  externalId: String(p.project_id),
-                  name: p.name,
-                  ...(p.color && { hexColor: `#${p.color}` }),
-                  ...(p.non_billable !== undefined && {
-                    isBillable: p.non_billable === 0,
-                  }),
-                  ...(p.start_date && { startDate: p.start_date }),
-                  ...(p.end_date && { endDate: p.end_date }),
-                  ...(p.notes && { notes: stringToTiptapJSON(p.notes) }),
-                })
-              ),
+            extractItems: (body) => body as Array<FloatProject>,
           });
 
-          return floatProjects;
-        }),
+          return yield* Effect.forEach(floatProjects, (p) =>
+            Schema.decodeUnknown(ExternalProject)({
+              externalId: String(p.project_id),
+              name: p.name,
+              ...(p.color && { hexColor: `#${p.color}` }),
+              ...(p.non_billable !== undefined && {
+                isBillable: p.non_billable === 0,
+              }),
+              ...(p.start_date && { startDate: p.start_date }),
+              ...(p.end_date && { endDate: p.end_date }),
+              ...(p.notes && { notes: stringToTiptapJSON(p.notes) }),
+            })
+          );
+        }).pipe(
+          Effect.catchTags({
+            ParseError: (e) =>
+              Effect.fail(new InternalAdapterError({ cause: e })),
+          })
+        ),
 
       listTasks: ({ apiKey }) =>
         Effect.gen(function* () {
@@ -159,18 +164,22 @@ export const floatLive = Layer.effect(
                 path: buildUrl("/project-tasks", { page, "per-page": 100 }),
               }),
             getNextPage: floatGetNextPage,
-            extractItems: (body) =>
-              (body as Array<FloatProjectTask>).map((t) =>
-                Schema.decodeUnknownSync(ExternalTask)({
-                  externalId: String(t.task_meta_id),
-                  externalProjectId: String(t.project_id),
-                  name: t.task_name,
-                })
-              ),
+            extractItems: (body) => body as Array<FloatProjectTask>,
           });
 
-          return floatTasks;
-        }),
+          return yield* Effect.forEach(floatTasks, (t) =>
+            Schema.decodeUnknown(ExternalTask)({
+              externalId: String(t.task_meta_id),
+              externalProjectId: String(t.project_id),
+              name: t.task_name,
+            })
+          );
+        }).pipe(
+          Effect.catchTags({
+            ParseError: (e) =>
+              Effect.fail(new InternalAdapterError({ cause: e })),
+          })
+        ),
     });
   })
 );

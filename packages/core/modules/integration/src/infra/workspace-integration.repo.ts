@@ -11,9 +11,9 @@ import {
   ExistingWorkspaceIntegrationId,
   WorkspaceIntegrationId,
 } from "@mason/framework";
-import { Context, Effect, Layer, type Option, Schema } from "effect";
+import { Context, Effect, Layer, Option, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
-import { WorkspaceIntegration } from "./workspace-integration";
+import { WorkspaceIntegration } from "../domain/workspace-integration/model";
 
 const _mapToDb = (
   workspaceIntegration: typeof WorkspaceIntegration.Encoded
@@ -24,7 +24,7 @@ const _mapToDb = (
     createdByMemberId: workspaceIntegration.createdByMemberId,
     kind: workspaceIntegration.kind,
     encryptedApiKey: workspaceIntegration.encryptedApiKey,
-    _metadata: workspaceIntegration._metadata,
+    _metadata: Option.getOrNull(workspaceIntegration._metadata),
   };
 };
 

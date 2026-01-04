@@ -1,16 +1,21 @@
-import type { PlainApiKey, WorkspaceIntegrationId } from "@mason/framework";
-import type {
-  CreateWorkspaceIntegration,
-  PatchWorkspaceIntegration,
-} from "./workspace-integration";
+import { PlainApiKey, WorkspaceIntegrationId } from "@mason/framework";
+import { Schema } from "effect";
+import { WorkspaceIntegration } from "./domain";
 
-export interface WorkspaceIntegrationToCreateDTO {
-  kind: typeof CreateWorkspaceIntegration.Type.kind;
-  plainApiKey: PlainApiKey;
-}
+export type WorkspaceIntegrationToCreateDTO =
+  typeof WorkspaceIntegrationToCreateDTO.Type;
+export const WorkspaceIntegrationToCreateDTO = Schema.Struct({
+  kind: WorkspaceIntegration.WorkspaceIntegrationFields.fields.kind,
+  plainApiKey: PlainApiKey,
+});
 
-export interface WorkspaceIntegrationToUpdateDTO {
-  id: WorkspaceIntegrationId;
-  plainApiKey?: PlainApiKey;
-  _metadata?: typeof PatchWorkspaceIntegration.Type._metadata;
-}
+export type WorkspaceIntegrationToUpdateDTO =
+  typeof WorkspaceIntegrationToUpdateDTO.Type;
+export const WorkspaceIntegrationToUpdateDTO = Schema.Struct({
+  id: WorkspaceIntegrationId,
+  plainApiKey: Schema.optionalWith(PlainApiKey, { exact: true }),
+  _metadata: Schema.optionalWith(
+    WorkspaceIntegration.WorkspaceIntegrationFields.fields._metadata,
+    { exact: true }
+  ),
+});

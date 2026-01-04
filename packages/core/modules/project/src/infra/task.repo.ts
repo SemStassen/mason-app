@@ -9,22 +9,20 @@ import {
   ProjectId,
   TaskId,
 } from "@mason/framework";
-import { Context, DateTime, Effect, Layer, Schema } from "effect";
+import { Context, DateTime, Effect, Layer, Option, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
-import { Task } from "./task";
+import { Task } from "../domain";
 
 const _mapToDb = (
-  task: typeof Task.Encoded
-): Omit<DbTask, "createdAt" | "updatedAt"> => {
-  return {
-    id: task.id,
-    workspaceId: task.workspaceId,
-    projectId: task.projectId,
-    name: task.name,
-    _metadata: task._metadata,
-    deletedAt: task.deletedAt ? DateTime.toDate(task.deletedAt) : null,
-  };
-};
+  task: typeof Task.Task.Encoded
+): Omit<DbTask, "createdAt" | "updatedAt"> => ({
+  id: task.id,
+  workspaceId: task.workspaceId,
+  projectId: task.projectId,
+  name: task.name,
+  _metadata: Option.getOrNull(task._metadata),
+  deletedAt: Option.getOrNull(Option.map(task.deletedAt, DateTime.toDate)),
+});
 
 export class TaskRepository extends Context.Tag(
   "@mason/project/TaskRepository"
@@ -32,11 +30,11 @@ export class TaskRepository extends Context.Tag(
   TaskRepository,
   {
     insert: (
-      tasks: NonEmptyReadonlyArray<Task>
-    ) => Effect.Effect<ReadonlyArray<Task>, DatabaseError>;
+      tasks: NonEmptyReadonlyArray<Task.Task>
+    ) => Effect.Effect<ReadonlyArray<Task.Task>, DatabaseError>;
     update: (
-      tasks: NonEmptyReadonlyArray<Task>
-    ) => Effect.Effect<ReadonlyArray<Task>, DatabaseError>;
+      tasks: NonEmptyReadonlyArray<Task.Task>
+    ) => Effect.Effect<ReadonlyArray<Task.Task>, DatabaseError>;
     hardDelete: (
       taskIds: NonEmptyReadonlyArray<ExistingTaskId>
     ) => Effect.Effect<void, DatabaseError>;
@@ -49,7 +47,7 @@ export class TaskRepository extends Context.Tag(
         _externalIds?: ReadonlyArray<string>;
         _includeDeleted?: boolean;
       };
-    }) => Effect.Effect<ReadonlyArray<Task>, DatabaseError>;
+    }) => Effect.Effect<ReadonlyArray<Task.Task>, DatabaseError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -59,15 +57,15 @@ export class TaskRepository extends Context.Tag(
 
       // --- Mutations / Commands ---
       const InsertTasks = SqlSchema.findAll({
-        Request: Schema.NonEmptyArray(Task),
-        Result: Task,
+        Request: Schema.NonEmptyArray(Task.Task),
+        Result: Task.Task,
         execute: (tasks) =>
           db.drizzle.insert(tasksTable).values(tasks.map(_mapToDb)).returning(),
       });
 
       const UpdateTasks = SqlSchema.findAll({
-        Request: Schema.NonEmptyArray(Task),
-        Result: Task,
+        Request: Schema.NonEmptyArray(Task.Task),
+        Result: Task.Task,
         execute: (tasks) =>
           Effect.forEach(
             tasks,
@@ -101,7 +99,7 @@ export class TaskRepository extends Context.Tag(
             })
           ),
         }),
-        Result: Task,
+        Result: Task.Task,
         execute: ({ workspaceId, query }) => {
           const whereConditions = [
             eq(tasksTable.workspaceId, workspaceId),

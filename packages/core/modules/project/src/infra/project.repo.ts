@@ -8,26 +8,24 @@ import {
   ExistingWorkspaceId,
   ProjectId,
 } from "@mason/framework";
-import { Context, DateTime, Effect, Layer, type Option, Schema } from "effect";
+import { Context, DateTime, Effect, Layer, Option, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
-import { Project } from "./project";
+import { Project } from "../domain";
 
 const _mapToDb = (
-  project: typeof Project.Encoded
-): Omit<DbProject, "createdAt" | "updatedAt"> => {
-  return {
-    id: project.id,
-    workspaceId: project.workspaceId,
-    name: project.name,
-    hexColor: project.hexColor,
-    startDate: project.startDate ? DateTime.toDate(project.startDate) : null,
-    endDate: project.endDate ? DateTime.toDate(project.endDate) : null,
-    isBillable: project.isBillable,
-    notes: project.notes,
-    _metadata: project._metadata,
-    deletedAt: project.deletedAt ? DateTime.toDate(project.deletedAt) : null,
-  };
-};
+  project: typeof Project.Project.Encoded
+): Omit<DbProject, "createdAt" | "updatedAt"> => ({
+  id: project.id,
+  workspaceId: project.workspaceId,
+  name: project.name,
+  hexColor: project.hexColor,
+  startDate: Option.getOrNull(Option.map(project.startDate, DateTime.toDate)),
+  endDate: Option.getOrNull(Option.map(project.endDate, DateTime.toDate)),
+  isBillable: project.isBillable,
+  notes: Option.getOrNull(project.notes),
+  _metadata: Option.getOrNull(project._metadata),
+  deletedAt: Option.getOrNull(Option.map(project.deletedAt, DateTime.toDate)),
+});
 
 export class ProjectRepository extends Context.Tag(
   "@mason/project/ProjectRepository"
@@ -35,11 +33,11 @@ export class ProjectRepository extends Context.Tag(
   ProjectRepository,
   {
     insert: (
-      projects: NonEmptyReadonlyArray<Project>
-    ) => Effect.Effect<ReadonlyArray<Project>, DatabaseError>;
+      projects: NonEmptyReadonlyArray<Project.Project>
+    ) => Effect.Effect<ReadonlyArray<Project.Project>, DatabaseError>;
     update: (
-      projects: NonEmptyReadonlyArray<Project>
-    ) => Effect.Effect<ReadonlyArray<Project>, DatabaseError>;
+      projects: NonEmptyReadonlyArray<Project.Project>
+    ) => Effect.Effect<ReadonlyArray<Project.Project>, DatabaseError>;
     hardDelete: (
       projectIds: NonEmptyReadonlyArray<ExistingProjectId>
     ) => Effect.Effect<void, DatabaseError>;
@@ -51,11 +49,11 @@ export class ProjectRepository extends Context.Tag(
         _externalIds?: ReadonlyArray<string>;
         _includeDeleted?: boolean;
       };
-    }) => Effect.Effect<ReadonlyArray<Project>, DatabaseError>;
+    }) => Effect.Effect<ReadonlyArray<Project.Project>, DatabaseError>;
     retrieve: (params: {
       workspaceId: ExistingWorkspaceId;
       projectId: ProjectId;
-    }) => Effect.Effect<Option.Option<Project>, DatabaseError>;
+    }) => Effect.Effect<Option.Option<Project.Project>, DatabaseError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -65,8 +63,8 @@ export class ProjectRepository extends Context.Tag(
 
       // --- Mutations / Commands ---
       const InsertProjects = SqlSchema.findAll({
-        Request: Schema.NonEmptyArray(Project),
-        Result: Project,
+        Request: Schema.NonEmptyArray(Project.Project),
+        Result: Project.Project,
         execute: (projects) =>
           db.drizzle
             .insert(projectsTable)
@@ -75,8 +73,8 @@ export class ProjectRepository extends Context.Tag(
       });
 
       const UpdateProjects = SqlSchema.findAll({
-        Request: Schema.NonEmptyArray(Project),
-        Result: Project,
+        Request: Schema.NonEmptyArray(Project.Project),
+        Result: Project.Project,
         execute: (projects) =>
           Effect.forEach(
             projects,
@@ -111,7 +109,7 @@ export class ProjectRepository extends Context.Tag(
             })
           ),
         }),
-        Result: Project,
+        Result: Project.Project,
         execute: ({ workspaceId, query }) => {
           const whereConditions = [
             eq(projectsTable.workspaceId, workspaceId),
@@ -144,7 +142,7 @@ export class ProjectRepository extends Context.Tag(
           workspaceId: ExistingWorkspaceId,
           projectId: ProjectId,
         }),
-        Result: Project,
+        Result: Project.Project,
         execute: ({ workspaceId, projectId }) =>
           db.drizzle.query.projectsTable.findMany({
             where: and(

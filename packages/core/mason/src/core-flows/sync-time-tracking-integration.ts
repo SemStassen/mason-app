@@ -1,9 +1,18 @@
 import { TimeTrackingIntegrationAdapter } from "@mason/adapters";
 import { DatabaseService } from "@mason/db/service";
-import { ProjectId, TaskId, type WorkspaceId } from "@mason/framework";
-import { IntegrationService } from "@mason/integration";
-import { ProjectModuleService } from "@mason/project";
-import { Effect, Either, Option, Schema } from "effect";
+import type { ExistingWorkspaceId } from "@mason/framework";
+import {
+  IntegrationModuleService,
+  WorkspaceIntegrationToUpdateDTO,
+} from "@mason/integration";
+import {
+  ProjectModuleService,
+  ProjectToCreateDTO,
+  ProjectToUpdateDTO,
+  TaskToCreateDTO,
+  TaskToUpdateDTO,
+} from "@mason/project";
+import { DateTime, Effect, Either, Option, Schema } from "effect";
 import { InternalError } from "../errors";
 
 export class TaskProjectNotFoundError extends Schema.TaggedError<TaskProjectNotFoundError>()(
@@ -20,11 +29,11 @@ const syncProjects = ({
   workspaceId,
   kind,
 }: {
-  workspaceId: WorkspaceId;
+  workspaceId: ExistingWorkspaceId;
   kind: "float";
 }) =>
   Effect.gen(function* () {
-    const integrationService = yield* IntegrationService;
+    const integrationService = yield* IntegrationModuleService;
     const projectsService = yield* ProjectModuleService;
 
     const apiKey = yield* integrationService.retrieveWorkspaceApiKey({
@@ -40,7 +49,22 @@ const syncProjects = ({
       Effect.flatMap((projects) =>
         Effect.partition(projects, (p) =>
           Option.match(p.name, {
-            onSome: (n) => Either.left({ ...p, name: n }),
+            onSome: (name) =>
+              Either.left({
+                externalId: p.externalId,
+                name,
+                ...Option.match(p.hexColor, {
+                  onSome: (hexColor) => ({ hexColor }),
+                  onNone: () => ({}),
+                }),
+                ...Option.match(p.isBillable, {
+                  onSome: (isBillable) => ({ isBillable }),
+                  onNone: () => ({}),
+                }),
+                startDate: p.startDate,
+                endDate: p.endDate,
+                notes: p.notes,
+              }),
             onNone: () => Either.right(p),
           })
         )
@@ -62,28 +86,39 @@ const syncProjects = ({
       .filter(
         (p) =>
           !existingProjects.some(
-            (existing) => existing._metadata?.externalId === p.externalId
+            (existing) =>
+              Option.getOrUndefined(existing._metadata)?.externalId ===
+              p.externalId
           )
       )
-      .map((p) => ({
-        ...p,
-        _metadata: { source: kind, externalId: p.externalId },
-      }));
+      .map((p) =>
+        ProjectToCreateDTO.make({
+          ...p,
+          _metadata: Option.some({ source: kind, externalId: p.externalId }),
+        })
+      );
 
     const projectsToUpdate = externalProjects.flatMap((p) => {
       const existing = existingProjects.find(
-        (e) => e._metadata?.externalId === p.externalId
+        (e) => Option.getOrUndefined(e._metadata)?.externalId === p.externalId
       );
       if (!existing) {
         return [];
       }
-      return [ProjectToUpdate.make({ ...p, id: existing.id })];
+      return [
+        ProjectToUpdateDTO.make({
+          ...p,
+          id: existing.id,
+        }),
+      ];
     });
 
     const projectsToDelete = existingProjects.filter(
       (existing) =>
         !externalProjects.some(
-          (p) => p.externalId === existing._metadata?.externalId
+          (p) =>
+            p.externalId ===
+            Option.getOrUndefined(existing._metadata)?.externalId
         )
     );
 
@@ -98,7 +133,7 @@ const syncProjects = ({
       }),
       projectsService.softDeleteProjects({
         workspaceId,
-        projectIds: projectsToDelete.map((p) => ProjectId.make(p.id)),
+        projectIds: projectsToDelete.map((p) => p.id),
       }),
     ]);
   });
@@ -107,11 +142,11 @@ const syncTasks = ({
   workspaceId,
   kind,
 }: {
-  workspaceId: WorkspaceId;
+  workspaceId: ExistingWorkspaceId;
   kind: "float";
 }) =>
   Effect.gen(function* () {
-    const integrationService = yield* IntegrationService;
+    const integrationService = yield* IntegrationModuleService;
     const projectsService = yield* ProjectModuleService;
 
     const apiKey = yield* integrationService.retrieveWorkspaceApiKey({
@@ -127,7 +162,12 @@ const syncTasks = ({
       Effect.flatMap((tasks) =>
         Effect.partition(tasks, (t) =>
           Option.match(t.name, {
-            onSome: (n) => Either.left({ ...t, name: n }),
+            onSome: (name) =>
+              Either.left({
+                externalId: t.externalId,
+                externalProjectId: t.externalProjectId,
+                name,
+              }),
             onNone: () => Either.right(t),
           })
         )
@@ -149,21 +189,33 @@ const syncTasks = ({
       },
     });
 
-    const existingTasks = yield* projectsService.listTasks({
-      workspaceId,
-      query: { _source: kind },
-    });
-
-    const projectsByExternalId = new Map(
-      existingProjects.map((p) => [p._metadata?.externalId, p])
+    // Query tasks per project (service requires projectId)
+    const existingTasks = yield* Effect.flatMap(
+      Effect.forEach(existingProjects, (project) =>
+        projectsService.listTasks({
+          workspaceId,
+          projectId: project.id,
+          query: { _source: kind },
+        })
+      ),
+      (taskArrays) => Effect.succeed(taskArrays.flat())
     );
 
-    // Use Effect.forEach to handle potential failures properly
-    const tasksToCreate = yield* Effect.forEach(
+    const projectsByExternalId = new Map(
+      existingProjects.map((p) => [
+        Option.getOrUndefined(p._metadata)?.externalId,
+        p,
+      ])
+    );
+
+    // Group tasks by projectId for batch operations
+    const tasksToCreateByProject = yield* Effect.forEach(
       externalTasks.filter(
         (t) =>
           !existingTasks.some(
-            (existing) => existing._metadata?.externalId === t.externalId
+            (existing) =>
+              Option.getOrUndefined(existing._metadata)?.externalId ===
+              t.externalId
           )
       ),
       (t) => {
@@ -176,20 +228,20 @@ const syncTasks = ({
             })
           );
         }
-        return Effect.succeed(
-          TaskToCreate.make({
+        return Effect.succeed({
+          projectId: project.id,
+          task: TaskToCreateDTO.make({
             ...t,
-            projectId: project.id,
-            _metadata: { source: kind, externalId: t.externalId },
-          })
-        );
+            _metadata: Option.some({ source: kind, externalId: t.externalId }),
+          }),
+        });
       }
     );
 
-    const tasksToUpdate = yield* Effect.forEach(
+    const tasksToUpdateByProject = yield* Effect.forEach(
       externalTasks.flatMap((t) => {
         const existing = existingTasks.find(
-          (e) => e._metadata?.externalId === t.externalId
+          (e) => Option.getOrUndefined(e._metadata)?.externalId === t.externalId
         );
         return existing ? [{ external: t, existing }] : [];
       }),
@@ -203,45 +255,74 @@ const syncTasks = ({
             })
           );
         }
-        return Effect.succeed(
-          TaskToUpdate.make({
+        return Effect.succeed({
+          projectId: project.id,
+          task: TaskToUpdateDTO.make({
             ...external,
             id: existing.id,
-          })
-        );
+          }),
+        });
       }
     );
 
     const tasksToDelete = existingTasks.filter(
       (existing) =>
         !externalTasks.some(
-          (t) => t.externalId === existing._metadata?.externalId
+          (t) =>
+            t.externalId ===
+            Option.getOrUndefined(existing._metadata)?.externalId
         )
     );
 
+    // Group by projectId for batch service calls
+    const createByProject = Map.groupBy(
+      tasksToCreateByProject,
+      (t) => t.projectId
+    );
+    const updateByProject = Map.groupBy(
+      tasksToUpdateByProject,
+      (t) => t.projectId
+    );
+    const deleteByProject = Map.groupBy(tasksToDelete, (t) => t.projectId);
+
     yield* Effect.all([
-      projectsService.createTasks({ workspaceId, tasks: tasksToCreate }),
-      projectsService.updateTasks({ workspaceId, tasks: tasksToUpdate }),
-      projectsService.softDeleteTasks({
-        workspaceId,
-        taskIds: tasksToDelete.map((t) => TaskId.make(t.id)),
-      }),
+      Effect.forEach(createByProject, ([projectId, tasks]) =>
+        projectsService.createTasks({
+          workspaceId,
+          projectId,
+          tasks: tasks.map((t) => t.task),
+        })
+      ),
+      Effect.forEach(updateByProject, ([projectId, tasks]) =>
+        projectsService.updateTasks({
+          workspaceId,
+          projectId,
+          tasks: tasks.map((t) => t.task),
+        })
+      ),
+      Effect.forEach(deleteByProject, ([projectId, tasks]) =>
+        projectsService.softDeleteTasks({
+          workspaceId,
+          projectId,
+          taskIds: tasks.map((t) => t.id),
+        })
+      ),
     ]);
   });
 
 // ============ Public core flow ============
 
 export const syncTimeTrackingIntegration: (params: {
-  workspaceId: WorkspaceId;
+  workspaceId: ExistingWorkspaceId;
   kind: "float";
 }) => Effect.Effect<
   void,
   InternalError,
-  IntegrationService | DatabaseService | ProjectModuleService
+  IntegrationModuleService | DatabaseService | ProjectModuleService
 > = Effect.fn("@mason/core-flows/syncWorkspaceIntegration")(
-  function* (params: { workspaceId: WorkspaceId; kind: "float" }) {
+  function* (params) {
     const db = yield* DatabaseService;
-    const integrationService = yield* IntegrationService;
+    const integrationService = yield* IntegrationModuleService;
 
     const workspaceIntegration =
       yield* integrationService.retrieveWorkspaceIntegration({
@@ -249,18 +330,20 @@ export const syncTimeTrackingIntegration: (params: {
         query: { kind: params.kind },
       });
 
+    const lastSyncedAt = yield* DateTime.now;
+
     yield* db.withTransaction(
       Effect.gen(function* () {
         yield* syncProjects(params);
         yield* syncTasks(params);
-        yield* integrationService.updateWorkspaceIntegrations({
+        yield* integrationService.updateWorkspaceIntegration({
           workspaceId: params.workspaceId,
-          workspaceIntegrations: [
-            WorkspaceIntegrationToUpdate.make({
-              id: workspaceIntegration.id,
-              _metadata: { lastSyncedAt: new Date() },
+          workspaceIntegration: WorkspaceIntegrationToUpdateDTO.make({
+            id: workspaceIntegration.id,
+            _metadata: Option.some({
+              lastSyncedAt: lastSyncedAt,
             }),
-          ],
+          }),
         });
       })
     );
