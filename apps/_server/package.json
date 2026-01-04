@@ -1,5 +1,5 @@
 {
-  "name": "@mason/server",
+  "name": "@mason/_server",
   "private": true,
   "type": "module",
   "scripts": {
