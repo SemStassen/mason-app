@@ -13,7 +13,7 @@ export const TimeEntryCommands = {
     notes: Schema.optionalWith(TimeEntryFields.notes, { exact: true }),
   }),
   Update: Schema.Struct({
-    id: TimeEntryFields.id,
+    timeEntryId: TimeEntryFields.id,
     projectId: Schema.optionalWith(TimeEntryFields.projectId, { exact: true }),
     taskId: Schema.optionalWith(TimeEntryFields.taskId, { exact: true }),
     startedAt: Schema.optionalWith(TimeEntryFields.startedAt, { exact: true }),

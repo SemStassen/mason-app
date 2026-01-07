@@ -22,11 +22,11 @@ export class TimeDomainService extends Context.Tag(
   {
     createTimeEntries: (params: {
       workspaceId: WorkspaceId;
-      timeEntries: ReadonlyArray<CreateTimeEntryCommand>;
+      commands: ReadonlyArray<CreateTimeEntryCommand>;
     }) => Effect.Effect<ReadonlyArray<TimeEntry>, TimeDomainError>;
     updateTimeEntries: (params: {
       workspaceId: WorkspaceId;
-      timeEntries: ReadonlyArray<UpdateTimeEntryCommand>;
+      commands: ReadonlyArray<UpdateTimeEntryCommand>;
     }) => Effect.Effect<
       ReadonlyArray<TimeEntry>,
       AuthorizationError | TimeDomainError | TimeEntryNotFoundError
@@ -57,9 +57,9 @@ export class TimeDomainService extends Context.Tag(
       return TimeDomainService.of({
         createTimeEntries: Effect.fn(
           "time/TimeDomainService.createTimeEntries"
-        )(({ workspaceId, timeEntries }) =>
+        )(({ workspaceId, commands }) =>
           processArray({
-            items: timeEntries,
+            items: commands,
             onEmpty: Effect.succeed([]),
             mapItem: (timeEntry) =>
               TimeEntryFns.create(timeEntry, {
@@ -77,15 +77,15 @@ export class TimeDomainService extends Context.Tag(
         ),
         updateTimeEntries: Effect.fn(
           "time/TimeDomainService.updateTimeEntries"
-        )(({ workspaceId, timeEntries }) =>
+        )(({ workspaceId, commands }) =>
           processArray({
-            items: timeEntries,
+            items: commands,
             onEmpty: Effect.succeed([]),
             prepare: (updates) =>
               Effect.gen(function* () {
                 const existingTimeEntries = yield* timeEntryRepo.list({
                   workspaceId,
-                  query: { ids: updates.map((t) => t.id) },
+                  query: { ids: updates.map((t) => t.timeEntryId) },
                 });
 
                 yield* authorization.ensureWorkspaceMatches({
@@ -97,7 +97,7 @@ export class TimeDomainService extends Context.Tag(
               }),
             mapItem: (update, existingMap) =>
               Effect.gen(function* () {
-                const existing = existingMap.get(update.id);
+                const existing = existingMap.get(update.timeEntryId);
 
                 if (!existing) {
                   return yield* Effect.fail(new TimeEntryNotFoundError());

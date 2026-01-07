@@ -18,11 +18,11 @@ export class MemberDomainService extends Context.Tag(
   {
     createMembers: (params: {
       workspaceId: WorkspaceId;
-      members: ReadonlyArray<CreateMemberCommand>;
+      commands: ReadonlyArray<CreateMemberCommand>;
     }) => Effect.Effect<ReadonlyArray<Member>, MemberDomainError>;
     updateMembers: (params: {
       workspaceId: WorkspaceId;
-      members: ReadonlyArray<UpdateMemberCommand>;
+      commands: ReadonlyArray<UpdateMemberCommand>;
     }) => Effect.Effect<
       ReadonlyArray<Member>,
       AuthorizationError | MemberDomainError | MemberNotFoundError
@@ -54,9 +54,9 @@ export class MemberDomainService extends Context.Tag(
 
       return MemberDomainService.of({
         createMembers: Effect.fn("member/MemberDomainService.createMembers")(
-          ({ workspaceId, members }) =>
+          ({ workspaceId, commands }) =>
             processArray({
-              items: members,
+              items: commands,
               onEmpty: Effect.succeed([]),
               mapItem: (member) => MemberFns.create(member, { workspaceId }),
               execute: (members) => memberRepo.insert({ workspaceId, members }),
@@ -70,15 +70,15 @@ export class MemberDomainService extends Context.Tag(
             )
         ),
         updateMembers: Effect.fn("member/MemberDomainService.updateMembers")(
-          ({ workspaceId, members }) =>
+          ({ workspaceId, commands }) =>
             processArray({
-              items: members,
+              items: commands,
               onEmpty: Effect.succeed([]),
               prepare: (updates) =>
                 Effect.gen(function* () {
                   const existingMembers = yield* memberRepo.list({
                     workspaceId,
-                    query: { ids: updates.map((m) => m.id) },
+                    query: { ids: updates.map((m) => m.memberId) },
                   });
 
                   yield* authorization.ensureWorkspaceMatches({
@@ -90,7 +90,7 @@ export class MemberDomainService extends Context.Tag(
                 }),
               mapItem: (update, existingMap) =>
                 Effect.gen(function* () {
-                  const existing = existingMap.get(update.id);
+                  const existing = existingMap.get(update.memberId);
 
                   if (!existing) {
                     return yield* Effect.fail(new MemberNotFoundError());

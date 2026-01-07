@@ -33,11 +33,11 @@ export class IntegrationDomainService extends Context.Tag(
     createWorkspaceIntegration: (params: {
       workspaceId: WorkspaceId;
       createdByMemberId: MemberId;
-      workspaceIntegration: CreateWorkspaceIntegrationCommand;
+      command: CreateWorkspaceIntegrationCommand;
     }) => Effect.Effect<WorkspaceIntegration, IntegrationDomainError>;
     updateWorkspaceIntegration: (params: {
       workspaceId: WorkspaceId;
-      workspaceIntegration: UpdateWorkspaceIntegrationCommand;
+      command: UpdateWorkspaceIntegrationCommand;
     }) => Effect.Effect<
       WorkspaceIntegration,
       | AuthorizationError
@@ -115,14 +115,14 @@ export class IntegrationDomainService extends Context.Tag(
         createWorkspaceIntegration: Effect.fn(
           "integration/IntegrationDomainService.createWorkspaceIntegration"
         )(
-          function* ({ workspaceId, createdByMemberId, workspaceIntegration }) {
+          function* ({ workspaceId, createdByMemberId, command }) {
             const created = yield* Effect.gen(function* () {
               const encryptedApiKey = yield* _encryptApiKey(
-                workspaceIntegration.plainApiKey
+                command.plainApiKey
               );
 
               return yield* WorkspaceIntegrationFns.create(
-                { kind: workspaceIntegration.kind, encryptedApiKey },
+                { kind: command.kind, encryptedApiKey },
                 { workspaceId, createdByMemberId }
               );
             });
@@ -145,11 +145,11 @@ export class IntegrationDomainService extends Context.Tag(
         updateWorkspaceIntegration: Effect.fn(
           "integration/IntegrationDomainService.updateWorkspaceIntegration"
         )(
-          function* ({ workspaceId, workspaceIntegration }) {
+          function* ({ workspaceId, command }) {
             const existing = yield* workspaceIntegrationRepo
               .retrieve({
                 workspaceId,
-                query: { id: workspaceIntegration.id },
+                query: { id: command.workspaceIntegrationId },
               })
               .pipe(
                 Effect.flatMap(
@@ -167,13 +167,13 @@ export class IntegrationDomainService extends Context.Tag(
             });
 
             const updated = yield* Effect.gen(function* () {
-              const encryptedApiKey = workspaceIntegration.plainApiKey
-                ? yield* _encryptApiKey(workspaceIntegration.plainApiKey)
+              const encryptedApiKey = command.plainApiKey
+                ? yield* _encryptApiKey(command.plainApiKey)
                 : existing.encryptedApiKey;
 
               return yield* WorkspaceIntegrationFns.update(existing, {
                 encryptedApiKey,
-                ...workspaceIntegration,
+                ...command,
               });
             });
 

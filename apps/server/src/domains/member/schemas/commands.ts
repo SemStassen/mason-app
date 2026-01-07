@@ -9,7 +9,7 @@ export const MemberCommands = {
     role: MemberFields.role,
   }),
   Update: Schema.Struct({
-    id: MemberFields.id,
+    memberId: MemberFields.id,
     role: Schema.optionalWith(MemberFields.role, { exact: true }),
   }),
 };

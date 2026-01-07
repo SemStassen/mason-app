@@ -10,16 +10,16 @@ export const UserCommands = {
     imageUrl: Schema.optionalWith(UserFields.imageUrl, { exact: true }),
   }),
   Update: Schema.Struct({
-    id: UserFields.id,
+    userId: UserFields.id,
     displayName: Schema.optionalWith(UserFields.displayName, { exact: true }),
     imageUrl: Schema.optionalWith(UserFields.imageUrl, { exact: true }),
   }),
   UpdateEmail: Schema.Struct({
-    id: UserFields.id,
+    userId: UserFields.id,
     email: UserFields.email,
   }),
   MarkEmailAsVerified: Schema.Struct({
-    id: UserFields.id,
+    userId: UserFields.id,
   }),
 };
 

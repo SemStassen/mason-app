@@ -9,7 +9,7 @@ export const WorkspaceInvitationCommands = {
     role: workspaceInvitationFields.role,
   }),
   Update: Schema.Struct({
-    id: workspaceInvitationFields.id,
+    workspaceInvitationId: workspaceInvitationFields.id,
     role: Schema.optionalWith(workspaceInvitationFields.role, { exact: true }),
   }),
 };

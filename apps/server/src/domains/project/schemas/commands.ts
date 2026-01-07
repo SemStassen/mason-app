@@ -10,7 +10,7 @@ export const TaskCommands = {
     name: TaskFields.name,
   }),
   Update: Schema.Struct({
-    id: TaskFields.id,
+    taskId: TaskFields.id,
     name: Schema.optionalWith(TaskFields.name, { exact: true }),
   }),
 };
@@ -25,7 +25,7 @@ export const ProjectCommands = {
     notes: Schema.optionalWith(ProjectFields.notes, { exact: true }),
   }),
   Update: Schema.Struct({
-    id: ProjectFields.id,
+    projectId: ProjectFields.id,
     name: Schema.optionalWith(ProjectFields.name, { exact: true }),
     hexColor: Schema.optionalWith(ProjectFields.hexColor, { exact: true }),
     isBillable: Schema.optionalWith(ProjectFields.isBillable, { exact: true }),

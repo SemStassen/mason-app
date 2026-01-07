@@ -30,11 +30,11 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
     createWorkspaceInvitation: (params: {
       workspaceId: WorkspaceId;
       inviterId: MemberId;
-      workspaceInvitation: CreateWorkspaceInvitationCommand;
+      command: CreateWorkspaceInvitationCommand;
     }) => Effect.Effect<WorkspaceInvitation, WorkspaceInvitationDomainError>;
     updateWorkspaceInvitation: (params: {
       workspaceId: WorkspaceId;
-      workspaceInvitation: UpdateWorkspaceInvitationCommand;
+      command: UpdateWorkspaceInvitationCommand;
     }) => Effect.Effect<
       WorkspaceInvitation,
       | AuthorizationError
@@ -78,12 +78,12 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
       return WorkspaceInvitationDomainService.of({
         createWorkspaceInvitation: Effect.fn(
           "workspace-invitation/WorkspaceInvitationDomainService.createWorkspaceInvitation"
-        )(({ workspaceId, inviterId, workspaceInvitation }) =>
+        )(({ workspaceId, inviterId, command }) =>
           Effect.gen(function* () {
-            const created = yield* WorkspaceInvitationFns.create(
-              workspaceInvitation,
-              { workspaceId, inviterId }
-            );
+            const created = yield* WorkspaceInvitationFns.create(command, {
+              workspaceId,
+              inviterId,
+            });
 
             const [inserted] = yield* workspaceInvitationRepo.insert({
               workspaceInvitations: [created],
@@ -101,12 +101,12 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
         ),
         updateWorkspaceInvitation: Effect.fn(
           "workspace-invitation/WorkspaceInvitationDomainService.updateWorkspaceInvitation"
-        )(({ workspaceId, workspaceInvitation }) =>
+        )(({ workspaceId, command }) =>
           Effect.gen(function* () {
             const existing = yield* workspaceInvitationRepo
               .retrieve({
                 workspaceId,
-                workspaceInvitationId: workspaceInvitation.id,
+                workspaceInvitationId: command.workspaceInvitationId,
               })
               .pipe(
                 Effect.flatMap(
@@ -125,7 +125,7 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
 
             const updated = yield* WorkspaceInvitationFns.update(
               existing,
-              workspaceInvitation
+              command
             );
 
             const [result] = yield* workspaceInvitationRepo.update({

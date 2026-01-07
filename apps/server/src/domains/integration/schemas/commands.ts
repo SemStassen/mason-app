@@ -10,7 +10,7 @@ export const WorkspaceIntegrationCommands = {
     plainApiKey: PlainApiKey,
   }),
   Update: Schema.Struct({
-    id: WorkspaceIntegrationFields.id,
+    workspaceIntegrationId: WorkspaceIntegrationFields.id,
     plainApiKey: PlainApiKey,
   }),
 } as const;

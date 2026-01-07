@@ -28,11 +28,11 @@ export class ProjectDomainService extends Context.Tag(
   {
     createProjects: (params: {
       workspaceId: WorkspaceId;
-      projects: ReadonlyArray<CreateProjectCommand>;
+      commands: ReadonlyArray<CreateProjectCommand>;
     }) => Effect.Effect<ReadonlyArray<Project>, ProjectDomainError>;
     updateProjects: (params: {
       workspaceId: WorkspaceId;
-      projects: ReadonlyArray<UpdateProjectCommand>;
+      commands: ReadonlyArray<UpdateProjectCommand>;
     }) => Effect.Effect<
       ReadonlyArray<Project>,
       AuthorizationError | ProjectDomainError | ProjectNotFoundError
@@ -53,14 +53,14 @@ export class ProjectDomainService extends Context.Tag(
     createTasks: (params: {
       workspaceId: WorkspaceId;
       projectId: ProjectId;
-      tasks: ReadonlyArray<CreateTaskCommand>;
+      commands: ReadonlyArray<CreateTaskCommand>;
     }) => Effect.Effect<
       ReadonlyArray<Task>,
       AuthorizationError | ProjectDomainError | ProjectNotFoundError
     >;
     updateTasks: (params: {
       workspaceId: WorkspaceId;
-      tasks: ReadonlyArray<UpdateTaskCommand>;
+      commands: ReadonlyArray<UpdateTaskCommand>;
     }) => Effect.Effect<
       ReadonlyArray<Task>,
       AuthorizationError | ProjectDomainError | TaskNotFoundError
@@ -91,9 +91,9 @@ export class ProjectDomainService extends Context.Tag(
       return ProjectDomainService.of({
         createProjects: Effect.fn(
           "project/ProjectModuleService.createProjects"
-        )(({ workspaceId, projects }) =>
+        )(({ workspaceId, commands }) =>
           processArray({
-            items: projects,
+            items: commands,
             onEmpty: Effect.succeed([]),
             mapItem: (project) => ProjectFns.create(project, { workspaceId }),
             execute: (projects) =>
@@ -109,15 +109,15 @@ export class ProjectDomainService extends Context.Tag(
         ),
         updateProjects: Effect.fn(
           "project/ProjectModuleService.updateProjects"
-        )(({ workspaceId, projects }) =>
+        )(({ workspaceId, commands }) =>
           processArray({
-            items: projects,
+            items: commands,
             onEmpty: Effect.succeed([]),
             prepare: (updates) =>
               Effect.gen(function* () {
                 const existingProjects = yield* projectRepo.list({
                   workspaceId,
-                  query: { ids: updates.map((p) => p.id) },
+                  query: { ids: updates.map((p) => p.projectId) },
                 });
 
                 yield* authorization.ensureWorkspaceMatches({
@@ -129,7 +129,7 @@ export class ProjectDomainService extends Context.Tag(
               }),
             mapItem: (update, existingMap) =>
               Effect.gen(function* () {
-                const existing = existingMap.get(update.id);
+                const existing = existingMap.get(update.projectId);
 
                 if (!existing) {
                   return yield* Effect.fail(new ProjectNotFoundError());
@@ -208,9 +208,9 @@ export class ProjectDomainService extends Context.Tag(
               )
         ),
         createTasks: Effect.fn("project/ProjectModuleService.createTasks")(
-          ({ workspaceId, projectId, tasks }) =>
+          ({ workspaceId, projectId, commands }) =>
             processArray({
-              items: tasks,
+              items: commands,
               onEmpty: Effect.succeed([]),
               prepare: () =>
                 Effect.gen(function* () {
@@ -251,15 +251,15 @@ export class ProjectDomainService extends Context.Tag(
             )
         ),
         updateTasks: Effect.fn("project/ProjectModuleService.updateTasks")(
-          ({ workspaceId, tasks }) =>
+          ({ workspaceId, commands }) =>
             processArray({
-              items: tasks,
+              items: commands,
               onEmpty: Effect.succeed([]),
               prepare: (updates) =>
                 Effect.gen(function* () {
                   const existingTasks = yield* taskRepo.list({
                     workspaceId,
-                    query: { ids: updates.map((t) => t.id) },
+                    query: { ids: updates.map((t) => t.taskId) },
                   });
 
                   yield* authorization.ensureWorkspaceMatches({
@@ -271,7 +271,7 @@ export class ProjectDomainService extends Context.Tag(
                 }),
               mapItem: (update, existingMap) =>
                 Effect.gen(function* () {
-                  const existing = existingMap.get(update.id);
+                  const existing = existingMap.get(update.taskId);
 
                   if (!existing) {
                     return yield* Effect.fail(new TaskNotFoundError());

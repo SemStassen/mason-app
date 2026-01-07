@@ -9,7 +9,7 @@ export const WorkspaceCommands = {
     slug: WorkspaceFields.slug,
   }),
   Update: Schema.Struct({
-    id: WorkspaceFields.id,
+    workspaceId: WorkspaceFields.id,
     name: Schema.optionalWith(WorkspaceFields.name, { exact: true }),
     slug: Schema.optionalWith(WorkspaceFields.slug, { exact: true }),
     logoUrl: Schema.optionalWith(WorkspaceFields.logoUrl, { exact: true }),

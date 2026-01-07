@@ -18,11 +18,11 @@ export class WorkspaceDomainService extends Context.Tag(
   WorkspaceDomainService,
   {
     createWorkspace: (params: {
-      workspace: CreateWorkspaceCommand;
+      command: CreateWorkspaceCommand;
     }) => Effect.Effect<Workspace, WorkspaceDomainError>;
     updateWorkspace: (params: {
       memberId: MemberId;
-      workspace: UpdateWorkspaceCommand;
+      command: UpdateWorkspaceCommand;
     }) => Effect.Effect<
       Workspace,
       WorkspaceDomainError | WorkspaceNotFoundError
@@ -48,9 +48,9 @@ export class WorkspaceDomainService extends Context.Tag(
       return WorkspaceDomainService.of({
         createWorkspace: Effect.fn(
           "workspace/WorkspaceDomainService.createWorkspace"
-        )(({ workspace }) =>
+        )(({ command }) =>
           Effect.gen(function* () {
-            const created = yield* WorkspaceFns.create(workspace);
+            const created = yield* WorkspaceFns.create(command);
 
             const [inserted] = yield* workspaceRepo.insert({
               workspaces: [created],
@@ -68,12 +68,12 @@ export class WorkspaceDomainService extends Context.Tag(
         ),
         updateWorkspace: Effect.fn(
           "workspace/WorkspaceDomainService.updateWorkspace"
-        )(({ memberId, workspace }) =>
+        )(({ memberId, command }) =>
           Effect.gen(function* () {
             const existing = yield* workspaceRepo
               .retrieve({
                 memberId,
-                workspaceId: workspace.id,
+                workspaceId: command.workspaceId,
               })
               .pipe(
                 Effect.flatMap(
@@ -84,7 +84,7 @@ export class WorkspaceDomainService extends Context.Tag(
                 )
               );
 
-            const updated = yield* WorkspaceFns.update(existing, workspace);
+            const updated = yield* WorkspaceFns.update(existing, command);
 
             const [result] = yield* workspaceRepo.update({
               memberId,

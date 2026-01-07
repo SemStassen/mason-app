@@ -85,7 +85,6 @@ const updateEmail = dual<
     ...self,
     email,
     emailVerified: false,
-    id: self.id,
   })
 );
 
@@ -99,7 +98,6 @@ const markEmailAsVerified = (self: User) =>
   _make({
     ...self,
     emailVerified: true,
-    id: self.id,
   });
 
 export const UserFns = {
