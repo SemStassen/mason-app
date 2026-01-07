@@ -1,5 +1,5 @@
 {
-  "name": "@mason/server",
+  "name": "@mason/_server",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,19 +13,13 @@
   "dependencies": {
     "@effect/platform": "catalog:",
     "@effect/platform-bun": "^0.81.1",
-    "@effect/sql": "catalog:",
-    "@effect/sql-drizzle": "catalog:",
-    "@effect/sql-pg": "catalog:",
     "@mason/api-contract": "workspace:*",
-    "better-auth": "^1.4.10",
-    "drizzle-orm": "catalog:server",
-    "effect": "catalog:",
-    "uuid": "^13.0.0"
+    "@mason/mason": "workspace:*",
+    "@mason/use-cases": "workspace:*",
+    "effect": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
-    "drizzle-kit": "catalog:dev",
-    "drizzle-seed": "^0.3.1",
     "typescript": "catalog:dev"
   }
 }

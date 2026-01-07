@@ -1,10 +1,14 @@
 {
   "extends": "@mason/config/base.tsconfig.json",
-  "include": ["src", "../../packages/core/src/services/auth.service.ts"],
+  "include": ["src"],
   "exclude": ["dist"],
   "compilerOptions": {
     "paths": {
-      "~/*": ["./src/*"]
+      "~/api/*": ["./src/api/*"],
+      "~/application/*": ["./src/application/*"],
+      "~/domains/*": ["./src/domains/*"],
+      "~/infra/*": ["./src/infra/*"],
+      "~/shared/*": ["./src/shared/*"]
     }
   }
 }
