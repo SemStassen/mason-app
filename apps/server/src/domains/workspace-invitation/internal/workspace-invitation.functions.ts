@@ -1,4 +1,4 @@
-import { DateTime, Duration, Effect, type ParseResult, Schema } from "effect";
+import { DateTime, Duration, Effect, Schema } from "effect";
 import { dual } from "effect/Function";
 import {
   type MemberId,
@@ -7,16 +7,40 @@ import {
 } from "~/shared/schemas";
 import { generateUUID } from "~/shared/utils";
 import { WorkspaceInvitation } from "../schemas/workspace-invitation.model";
+import { WorkspaceInvitationDomainError } from "./errors";
+
+// =============================================================================
+// Helpers
+// =============================================================================
+
+const _checkExpiration = (
+  input: WorkspaceInvitation
+): Effect.Effect<WorkspaceInvitation> =>
+  Effect.gen(function* () {
+    const now = yield* DateTime.now;
+    const isExpired = DateTime.lessThan(input.expiresAt, now);
+    const shouldExpire = isExpired && input.status === "pending";
+    return shouldExpire ? { ...input, status: "expired" } : input;
+  });
 
 // =============================================================================
 // Constructors
 // =============================================================================
 
 /** Internal: validates and constructs a WorkspaceInvitation via Schema. */
-const _make = (
+const _validate = (
   input: WorkspaceInvitation
-): Effect.Effect<WorkspaceInvitation, ParseResult.ParseError> =>
-  Schema.validate(WorkspaceInvitation)(input);
+): Effect.Effect<WorkspaceInvitation, WorkspaceInvitationDomainError> =>
+  Effect.gen(function* () {
+    const validated = yield* Schema.validate(WorkspaceInvitation)(input);
+
+    return yield* _checkExpiration(validated);
+  }).pipe(
+    Effect.catchTags({
+      ParseError: (e) =>
+        Effect.fail(new WorkspaceInvitationDomainError({ cause: e })),
+    })
+  );
 
 /** Default values for new workspace invitations. */
 const makeDefaults = Effect.gen(function* () {
@@ -45,11 +69,11 @@ const createWorkspaceInvitation = (
     workspaceId: WorkspaceId;
     inviterId: MemberId;
   }
-): Effect.Effect<WorkspaceInvitation, ParseResult.ParseError> =>
+): Effect.Effect<WorkspaceInvitation, WorkspaceInvitationDomainError> =>
   Effect.gen(function* () {
     const defaults = yield* makeDefaults;
 
-    return yield* _make({
+    return yield* _validate({
       ...defaults,
       ...input,
       workspaceId: system.workspaceId,
@@ -78,20 +102,27 @@ const updateWorkspaceInvitation = dual<
     patch: PatchWorkspaceInvitation
   ) => (
     self: WorkspaceInvitation
-  ) => Effect.Effect<WorkspaceInvitation, ParseResult.ParseError>,
+  ) => Effect.Effect<WorkspaceInvitation, WorkspaceInvitationDomainError>,
   (
     self: WorkspaceInvitation,
     patch: PatchWorkspaceInvitation
-  ) => Effect.Effect<WorkspaceInvitation, ParseResult.ParseError>
+  ) => Effect.Effect<WorkspaceInvitation, WorkspaceInvitationDomainError>
 >(2, (self, patch) =>
-  _make({
+  _validate({
     ...self,
     ...patch,
     id: self.id,
   })
 );
 
+const markWorkspaceInvitationAsAccepted = (self: WorkspaceInvitation) =>
+  _validate({
+    ...self,
+    status: "accepted",
+  });
+
 export const WorkspaceInvitationFns = {
   create: createWorkspaceInvitation,
   update: updateWorkspaceInvitation,
+  markAsAccepted: markWorkspaceInvitationAsAccepted,
 } as const;

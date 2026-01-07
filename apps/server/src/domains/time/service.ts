@@ -71,7 +71,6 @@ export class TimeDomainService extends Context.Tag(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
                 Effect.fail(new TimeDomainError({ cause: e })),
-              ParseError: (e) => Effect.fail(new TimeDomainError({ cause: e })),
             })
           )
         ),
@@ -114,7 +113,6 @@ export class TimeDomainService extends Context.Tag(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
                 Effect.fail(new TimeDomainError({ cause: e })),
-              ParseError: (e) => Effect.fail(new TimeDomainError({ cause: e })),
             })
           )
         ),
@@ -158,7 +156,6 @@ export class TimeDomainService extends Context.Tag(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
                 Effect.fail(new TimeDomainError({ cause: e })),
-              ParseError: (e) => Effect.fail(new TimeDomainError({ cause: e })),
             })
           )
         ),

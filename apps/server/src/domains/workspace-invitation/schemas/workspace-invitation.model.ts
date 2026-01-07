@@ -12,7 +12,8 @@ export const WorkspaceInvitationStatus = Schema.Literal(
   "pending",
   "accepted",
   "rejected",
-  "canceled"
+  "canceled",
+  "expired"
 );
 
 /**

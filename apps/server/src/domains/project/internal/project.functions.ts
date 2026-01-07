@@ -1,4 +1,4 @@
-import { type Effect, Option, type ParseResult, Schema } from "effect";
+import { DateTime, Effect, Option, Schema } from "effect";
 import { dual } from "effect/Function";
 import { HexColor, ProjectId, type WorkspaceId } from "~/shared/schemas";
 import {
@@ -8,16 +8,46 @@ import {
   makeSoftDelete,
 } from "~/shared/utils";
 import { Project } from "../schemas/project.model";
+import { ProjectDomainError } from "./errors";
+
+// =============================================================================
+// Helpers
+// =============================================================================
+
+const _validateDates = (
+  input: Project
+): Effect.Effect<Project, ProjectDomainError> =>
+  Effect.gen(function* () {
+    const startDate = Option.getOrNull(input.startDate);
+    const endDate = Option.getOrNull(input.endDate);
+    if (startDate && endDate && DateTime.lessThan(endDate, startDate)) {
+      return yield* Effect.fail(
+        new ProjectDomainError({
+          cause: "End date must be after start date",
+        })
+      );
+    }
+
+    return input;
+  });
 
 // =============================================================================
 // Constructors
 // =============================================================================
 
 /** Internal: validates and constructs a Project via Schema. */
-const _make = (
+const _validate = (
   input: Project
-): Effect.Effect<Project, ParseResult.ParseError> =>
-  Schema.validate(Project)(input);
+): Effect.Effect<Project, ProjectDomainError> =>
+  Effect.gen(function* () {
+    const validated = yield* Schema.validate(Project)(input);
+
+    return yield* _validateDates(validated);
+  }).pipe(
+    Effect.catchTags({
+      ParseError: (e) => Effect.fail(new ProjectDomainError({ cause: e })),
+    })
+  );
 
 /** Default values for new projects. */
 const defaults = {
@@ -47,8 +77,8 @@ const createProject = (
   system: {
     workspaceId: WorkspaceId;
   }
-): Effect.Effect<Project, ParseResult.ParseError> =>
-  _make({
+): Effect.Effect<Project, ProjectDomainError> =>
+  _validate({
     ...defaults,
     ...input,
     workspaceId: system.workspaceId,
@@ -90,13 +120,13 @@ interface PatchProject {
 const updateProject = dual<
   (
     patch: PatchProject
-  ) => (self: Project) => Effect.Effect<Project, ParseResult.ParseError>,
+  ) => (self: Project) => Effect.Effect<Project, ProjectDomainError>,
   (
     self: Project,
     patch: PatchProject
-  ) => Effect.Effect<Project, ParseResult.ParseError>
+  ) => Effect.Effect<Project, ProjectDomainError>
 >(2, (self, patch) =>
-  _make({
+  _validate({
     ...self,
     ...patch,
     id: self.id,
@@ -109,7 +139,7 @@ const updateProject = dual<
  * @category Transformations
  * @since 0.1.0
  */
-const softDeleteProject = makeSoftDelete(_make);
+const softDeleteProject = makeSoftDelete(_validate);
 
 /**
  * Restore a soft-deleted project.
@@ -117,7 +147,7 @@ const softDeleteProject = makeSoftDelete(_make);
  * @category Transformations
  * @since 0.1.0
  */
-const restoreProject = makeRestore(_make);
+const restoreProject = makeRestore(_validate);
 
 export const ProjectFns = {
   create: createProject,

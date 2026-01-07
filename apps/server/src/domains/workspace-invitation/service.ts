@@ -50,6 +50,15 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
       | WorkspaceInvitationDomainError
       | WorkspaceInvitationNotFoundError
     >;
+    markWorkspaceInvitationAsAccepted: (params: {
+      workspaceId: WorkspaceId;
+      workspaceInvitationId: WorkspaceInvitationId;
+    }) => Effect.Effect<
+      void,
+      | AuthorizationError
+      | WorkspaceInvitationDomainError
+      | WorkspaceInvitationNotFoundError
+    >;
     retrieveWorkspaceInvitation: (params: {
       workspaceId: WorkspaceId;
       workspaceInvitationId: WorkspaceInvitationId;
@@ -94,8 +103,6 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
                 Effect.fail(new WorkspaceInvitationDomainError({ cause: e })),
-              ParseError: (e) =>
-                Effect.fail(new WorkspaceInvitationDomainError({ cause: e })),
             })
           )
         ),
@@ -137,8 +144,6 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
           }).pipe(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
-                Effect.fail(new WorkspaceInvitationDomainError({ cause: e })),
-              ParseError: (e) =>
                 Effect.fail(new WorkspaceInvitationDomainError({ cause: e })),
             })
           )
@@ -182,6 +187,46 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
                 workspaceId,
                 workspaceInvitationIds: invitationIdsToDelete,
               }),
+          }).pipe(
+            Effect.catchTags({
+              "shared/DatabaseError": (e) =>
+                Effect.fail(new WorkspaceInvitationDomainError({ cause: e })),
+            })
+          )
+        ),
+        markWorkspaceInvitationAsAccepted: Effect.fn(
+          "workspace-invitation/WorkspaceInvitationDomainService.markWorkspaceInvitationAsAccepted"
+        )(({ workspaceId, workspaceInvitationId }) =>
+          Effect.gen(function* () {
+            const existing = yield* workspaceInvitationRepo
+              .retrieve({
+                workspaceId,
+                workspaceInvitationId,
+              })
+              .pipe(
+                Effect.flatMap(
+                  Option.match({
+                    onNone: () =>
+                      Effect.fail(new WorkspaceInvitationNotFoundError()),
+                    onSome: Effect.succeed,
+                  })
+                )
+              );
+
+            yield* authorization.ensureWorkspaceMatches({
+              workspaceId,
+              model: [existing],
+            });
+
+            const updated =
+              yield* WorkspaceInvitationFns.markAsAccepted(existing);
+
+            const [result] = yield* workspaceInvitationRepo.update({
+              workspaceId,
+              workspaceInvitations: [updated],
+            });
+
+            return result;
           }).pipe(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>

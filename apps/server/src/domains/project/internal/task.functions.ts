@@ -1,4 +1,4 @@
-import { type Effect, Option, type ParseResult, Schema } from "effect";
+import { Effect, Option, Schema } from "effect";
 import { dual } from "effect/Function";
 import { type ProjectId, TaskId, type WorkspaceId } from "~/shared/schemas";
 import {
@@ -8,15 +8,21 @@ import {
   makeSoftDelete,
 } from "~/shared/utils";
 import { Task } from "../schemas/task.model";
+import { ProjectDomainError } from "./errors";
 
 // =============================================================================
 // Constructors
 // =============================================================================
 
 /** Internal: validates and constructs a Task via Schema. */
-const _make = (
+const _validate = (
   input: typeof Task.Type
-): Effect.Effect<Task, ParseResult.ParseError> => Schema.validate(Task)(input);
+): Effect.Effect<Task, ProjectDomainError> =>
+  Schema.validate(Task)(input).pipe(
+    Effect.catchTags({
+      ParseError: (e) => Effect.fail(new ProjectDomainError({ cause: e })),
+    })
+  );
 
 /** Default values for new tasks. */
 const defaults = {
@@ -38,8 +44,8 @@ const createTask = (
     workspaceId: WorkspaceId;
     projectId: ProjectId;
   }
-): Effect.Effect<Task, ParseResult.ParseError> =>
-  _make({
+): Effect.Effect<Task, ProjectDomainError> =>
+  _validate({
     ...defaults,
     ...input,
     workspaceId: system.workspaceId,
@@ -74,12 +80,10 @@ interface PatchTask {
  * @since 0.1.0
  */
 const updateTask = dual<
-  (
-    patch: PatchTask
-  ) => (self: Task) => Effect.Effect<Task, ParseResult.ParseError>,
-  (self: Task, patch: PatchTask) => Effect.Effect<Task, ParseResult.ParseError>
+  (patch: PatchTask) => (self: Task) => Effect.Effect<Task, ProjectDomainError>,
+  (self: Task, patch: PatchTask) => Effect.Effect<Task, ProjectDomainError>
 >(2, (self, patch) =>
-  _make({
+  _validate({
     ...self,
     ...patch,
     id: self.id,
@@ -92,7 +96,7 @@ const updateTask = dual<
  * @category Transformations
  * @since 0.1.0
  */
-const softDeleteTask = makeSoftDelete(_make);
+const softDeleteTask = makeSoftDelete(_validate);
 
 /**
  * Restore a soft-deleted task.
@@ -100,7 +104,7 @@ const softDeleteTask = makeSoftDelete(_make);
  * @category Transformations
  * @since 0.1.0
  */
-const restoreTask = makeRestore(_make);
+const restoreTask = makeRestore(_validate);
 
 export const TaskFns = {
   create: createTask,

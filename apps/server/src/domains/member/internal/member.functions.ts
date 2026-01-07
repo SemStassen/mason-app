@@ -1,4 +1,4 @@
-import { type Effect, Option, type ParseResult, Schema } from "effect";
+import { Effect, Option, Schema } from "effect";
 import { dual } from "effect/Function";
 import { MemberId, type UserId, type WorkspaceId } from "~/shared/schemas";
 import {
@@ -8,14 +8,19 @@ import {
   makeSoftDelete,
 } from "~/shared/utils";
 import { Member } from "../schemas/member.model";
+import { MemberDomainError } from "./errors";
 
 // =============================================================================
 // Constructors
 // =============================================================================
 
 /** Internal: validates and constructs a Member via Schema. */
-const _make = (input: Member): Effect.Effect<Member, ParseResult.ParseError> =>
-  Schema.validate(Member)(input);
+const _validate = (input: Member): Effect.Effect<Member, MemberDomainError> =>
+  Schema.validate(Member)(input).pipe(
+    Effect.catchTags({
+      ParseError: (e) => Effect.fail(new MemberDomainError({ cause: e })),
+    })
+  );
 
 /** Default values for new members. */
 const defaults = {
@@ -28,19 +33,14 @@ const defaults = {
  * @category Constructors
  * @since 0.1.0
  */
-const createMember = (
-  input: {
-    userId: UserId;
-    role: Member["role"];
-  },
-  system: {
-    workspaceId: WorkspaceId;
-  }
-): Effect.Effect<Member, ParseResult.ParseError> =>
-  _make({
+const createMember = (input: {
+  userId: UserId;
+  workspaceId: WorkspaceId;
+  role: Member["role"];
+}): Effect.Effect<Member, MemberDomainError> =>
+  _validate({
     ...defaults,
     ...input,
-    workspaceId: system.workspaceId,
     id: MemberId.make(generateUUID()),
     _tag: "Member",
   });
@@ -74,13 +74,10 @@ interface PatchMember {
 const updateMember = dual<
   (
     patch: PatchMember
-  ) => (self: Member) => Effect.Effect<Member, ParseResult.ParseError>,
-  (
-    self: Member,
-    patch: PatchMember
-  ) => Effect.Effect<Member, ParseResult.ParseError>
+  ) => (self: Member) => Effect.Effect<Member, MemberDomainError>,
+  (self: Member, patch: PatchMember) => Effect.Effect<Member, MemberDomainError>
 >(2, (self, patch) =>
-  _make({
+  _validate({
     ...self,
     ...patch,
     id: self.id,
@@ -93,7 +90,7 @@ const updateMember = dual<
  * @category Transformations
  * @since 0.1.0
  */
-const softDeleteMember = makeSoftDelete(_make);
+const softDeleteMember = makeSoftDelete(_validate);
 
 /**
  * Restore a soft-deleted member.
@@ -101,7 +98,7 @@ const softDeleteMember = makeSoftDelete(_make);
  * @category Transformations
  * @since 0.1.0
  */
-const restoreMember = makeRestore(_make);
+const restoreMember = makeRestore(_validate);
 
 export const MemberFns = {
   create: createMember,

@@ -1,5 +1,4 @@
 import { Context, Effect, Layer, Option } from "effect";
-import type { ParseError } from "effect/ParseResult";
 import { AuthorizationService } from "~/application/authorization";
 import type { AuthorizationError } from "~/shared/errors/authorization";
 import type { UserId } from "~/shared/schemas";
@@ -67,8 +66,6 @@ export class IdentityDomainService extends Context.Tag(
           Effect.catchTags({
             "shared/DatabaseError": (e) =>
               Effect.fail(new IdentityDomainError({ cause: e })),
-            ParseError: (e: ParseError) =>
-              Effect.fail(new IdentityDomainError({ cause: e })),
           })
         ),
         updateUser: Effect.fn("identity/IdentityDomainService.updateUser")(
@@ -99,8 +96,6 @@ export class IdentityDomainService extends Context.Tag(
           },
           Effect.catchTags({
             "shared/DatabaseError": (e) =>
-              Effect.fail(new IdentityDomainError({ cause: e })),
-            ParseError: (e: ParseError) =>
               Effect.fail(new IdentityDomainError({ cause: e })),
           })
         ),
@@ -136,8 +131,6 @@ export class IdentityDomainService extends Context.Tag(
           Effect.catchTags({
             "shared/DatabaseError": (e) =>
               Effect.fail(new IdentityDomainError({ cause: e })),
-            ParseError: (e: ParseError) =>
-              Effect.fail(new IdentityDomainError({ cause: e })),
           })
         ),
         markUserEmailAsVerified: Effect.fn(
@@ -168,8 +161,6 @@ export class IdentityDomainService extends Context.Tag(
           },
           Effect.catchTags({
             "shared/DatabaseError": (e) =>
-              Effect.fail(new IdentityDomainError({ cause: e })),
-            ParseError: (e: ParseError) =>
               Effect.fail(new IdentityDomainError({ cause: e })),
           })
         ),

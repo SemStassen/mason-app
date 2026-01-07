@@ -61,8 +61,6 @@ export class WorkspaceDomainService extends Context.Tag(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
                 Effect.fail(new WorkspaceDomainError({ cause: e })),
-              ParseError: (e) =>
-                Effect.fail(new WorkspaceDomainError({ cause: e })),
             })
           )
         ),
@@ -95,8 +93,6 @@ export class WorkspaceDomainService extends Context.Tag(
           }).pipe(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
-                Effect.fail(new WorkspaceDomainError({ cause: e })),
-              ParseError: (e) =>
                 Effect.fail(new WorkspaceDomainError({ cause: e })),
             })
           )

@@ -102,8 +102,6 @@ export class ProjectDomainService extends Context.Tag(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
                 Effect.fail(new ProjectDomainError({ cause: e })),
-              ParseError: (e) =>
-                Effect.fail(new ProjectDomainError({ cause: e })),
             })
           )
         ),
@@ -141,8 +139,6 @@ export class ProjectDomainService extends Context.Tag(
           }).pipe(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
-                Effect.fail(new ProjectDomainError({ cause: e })),
-              ParseError: (e) =>
                 Effect.fail(new ProjectDomainError({ cause: e })),
             })
           )
@@ -187,8 +183,6 @@ export class ProjectDomainService extends Context.Tag(
           }).pipe(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
-                Effect.fail(new ProjectDomainError({ cause: e })),
-              ParseError: (e) =>
                 Effect.fail(new ProjectDomainError({ cause: e })),
             })
           )
@@ -245,8 +239,6 @@ export class ProjectDomainService extends Context.Tag(
               Effect.catchTags({
                 "shared/DatabaseError": (e) =>
                   Effect.fail(new ProjectDomainError({ cause: e })),
-                ParseError: (e) =>
-                  Effect.fail(new ProjectDomainError({ cause: e })),
               })
             )
         ),
@@ -283,8 +275,6 @@ export class ProjectDomainService extends Context.Tag(
             }).pipe(
               Effect.catchTags({
                 "shared/DatabaseError": (e) =>
-                  Effect.fail(new ProjectDomainError({ cause: e })),
-                ParseError: (e) =>
                   Effect.fail(new ProjectDomainError({ cause: e })),
               })
             )
@@ -329,8 +319,6 @@ export class ProjectDomainService extends Context.Tag(
           }).pipe(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
-                Effect.fail(new ProjectDomainError({ cause: e })),
-              ParseError: (e) =>
                 Effect.fail(new ProjectDomainError({ cause: e })),
             })
           )

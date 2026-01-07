@@ -1,5 +1,4 @@
 import { Context, Effect, Layer, Option, Redacted } from "effect";
-import type { ParseError } from "effect/ParseResult";
 import { AuthorizationService } from "~/application/authorization";
 import { CryptoService } from "~/infra/crypto";
 import type { AuthorizationError } from "~/shared/errors/authorization";
@@ -137,8 +136,6 @@ export class IntegrationDomainService extends Context.Tag(
           Effect.catchTags({
             "shared/DatabaseError": (e) =>
               Effect.fail(new IntegrationDomainError({ cause: e })),
-            ParseError: (e: ParseError) =>
-              Effect.fail(new IntegrationDomainError({ cause: e })),
           })
         ),
 
@@ -186,8 +183,6 @@ export class IntegrationDomainService extends Context.Tag(
           },
           Effect.catchTags({
             "shared/DatabaseError": (e) =>
-              Effect.fail(new IntegrationDomainError({ cause: e })),
-            ParseError: (e: ParseError) =>
               Effect.fail(new IntegrationDomainError({ cause: e })),
           })
         ),

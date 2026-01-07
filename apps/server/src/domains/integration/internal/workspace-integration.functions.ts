@@ -1,4 +1,4 @@
-import { DateTime, Effect, Option, type ParseResult, Schema } from "effect";
+import { DateTime, Effect, Option, Schema } from "effect";
 import { dual } from "effect/Function";
 import {
   type MemberId,
@@ -7,16 +7,21 @@ import {
 } from "~/shared/schemas";
 import { generateUUID, safeMerge } from "~/shared/utils";
 import { WorkspaceIntegration } from "../schemas/workspace-integration.model";
+import { IntegrationDomainError } from "./errors";
 
 // =============================================================================
 // Constructors
 // =============================================================================
 
 /** Internal: validates and constructs a Workspace Integration via Schema. */
-const _make = (
+const _validate = (
   input: WorkspaceIntegration
-): Effect.Effect<WorkspaceIntegration, ParseResult.ParseError> =>
-  Schema.validate(WorkspaceIntegration)(input);
+): Effect.Effect<WorkspaceIntegration, IntegrationDomainError> =>
+  Schema.validate(WorkspaceIntegration)(input).pipe(
+    Effect.catchTags({
+      ParseError: (e) => Effect.fail(new IntegrationDomainError({ cause: e })),
+    })
+  );
 
 /** Default values for new workspace integrations. */
 const makeDefaults = Effect.gen(function* () {
@@ -42,11 +47,11 @@ const createWorkspaceIntegration = (
     workspaceId: WorkspaceId;
     createdByMemberId: MemberId;
   }
-): Effect.Effect<WorkspaceIntegration, ParseResult.ParseError> =>
+): Effect.Effect<WorkspaceIntegration, IntegrationDomainError> =>
   Effect.gen(function* () {
     const defaults = yield* makeDefaults;
 
-    return yield* _make({
+    return yield* _validate({
       ...defaults,
       ...input,
       workspaceId: system.workspaceId,
@@ -76,13 +81,13 @@ const updateWorkspaceIntegration = dual<
     patch: PatchWorkspaceIntegration
   ) => (
     self: WorkspaceIntegration
-  ) => Effect.Effect<WorkspaceIntegration, ParseResult.ParseError>,
+  ) => Effect.Effect<WorkspaceIntegration, IntegrationDomainError>,
   (
     self: WorkspaceIntegration,
     patch: PatchWorkspaceIntegration
-  ) => Effect.Effect<WorkspaceIntegration, ParseResult.ParseError>
+  ) => Effect.Effect<WorkspaceIntegration, IntegrationDomainError>
 >(2, (self, patch) =>
-  _make({
+  _validate({
     ...self,
     ...patch,
     id: self.id,

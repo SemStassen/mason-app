@@ -1,4 +1,4 @@
-import { type Effect, Option, type ParseResult, Schema } from "effect";
+import { Effect, Option, Schema } from "effect";
 import { dual } from "effect/Function";
 import { TimeEntryId, type WorkspaceId } from "~/shared/schemas";
 import {
@@ -8,16 +8,21 @@ import {
   makeSoftDelete,
 } from "~/shared/utils";
 import { TimeEntry } from "../schemas/time-entry.model";
+import { TimeDomainError } from "./errors";
 
 // =============================================================================
 // Constructors
 // =============================================================================
 
 /** Internal: validates and constructs a TimeEntry via Schema. */
-const _make = (
+const _validate = (
   input: TimeEntry
-): Effect.Effect<TimeEntry, ParseResult.ParseError> =>
-  Schema.validate(TimeEntry)(input);
+): Effect.Effect<TimeEntry, TimeDomainError> =>
+  Schema.validate(TimeEntry)(input).pipe(
+    Effect.catchTags({
+      ParseError: (e) => Effect.fail(new TimeDomainError({ cause: e })),
+    })
+  );
 
 /** Default values for new time entries. */
 const defaults = {
@@ -44,8 +49,8 @@ const createTimeEntry = (
   system: {
     workspaceId: WorkspaceId;
   }
-): Effect.Effect<TimeEntry, ParseResult.ParseError> =>
-  _make({
+): Effect.Effect<TimeEntry, TimeDomainError> =>
+  _validate({
     ...defaults,
     ...input,
     workspaceId: system.workspaceId,
@@ -86,13 +91,13 @@ interface PatchTimeEntry {
 const updateTimeEntry = dual<
   (
     patch: PatchTimeEntry
-  ) => (self: TimeEntry) => Effect.Effect<TimeEntry, ParseResult.ParseError>,
+  ) => (self: TimeEntry) => Effect.Effect<TimeEntry, TimeDomainError>,
   (
     self: TimeEntry,
     patch: PatchTimeEntry
-  ) => Effect.Effect<TimeEntry, ParseResult.ParseError>
+  ) => Effect.Effect<TimeEntry, TimeDomainError>
 >(2, (self, patch) =>
-  _make({
+  _validate({
     ...self,
     ...patch,
     id: self.id,
@@ -105,7 +110,7 @@ const updateTimeEntry = dual<
  * @category Transformations
  * @since 0.1.0
  */
-const softDeleteTimeEntry = makeSoftDelete(_make);
+const softDeleteTimeEntry = makeSoftDelete(_validate);
 
 /**
  * Restore a soft-deleted time entry.
@@ -113,7 +118,7 @@ const softDeleteTimeEntry = makeSoftDelete(_make);
  * @category Transformations
  * @since 0.1.0
  */
-const restoreTimeEntry = makeRestore(_make);
+const restoreTimeEntry = makeRestore(_validate);
 
 export const TimeEntryFns = {
   create: createTimeEntry,

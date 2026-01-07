@@ -11,3 +11,8 @@ export class MemberNotFoundError extends Schema.TaggedError<MemberNotFoundError>
   "member/MemberNotFoundError",
   {}
 ) {}
+
+export class MemberAlreadyExistsError extends Schema.TaggedError<MemberAlreadyExistsError>()(
+  "member/MemberAlreadyExistsError",
+  {}
+) {}

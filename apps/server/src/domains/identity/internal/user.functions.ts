@@ -1,16 +1,21 @@
-import { type Effect, Option, type ParseResult, Schema } from "effect";
+import { Effect, Option, Schema } from "effect";
 import { dual } from "effect/Function";
 import { UserId } from "~/shared/schemas";
 import { generateUUID } from "~/shared/utils";
 import { User } from "../schemas/user.model";
+import { IdentityDomainError } from "./errors";
 
 // =============================================================================
 // Constructors
 // =============================================================================
 
 /** Internal: validates and constructs a User via Schema. */
-const _make = (input: User): Effect.Effect<User, ParseResult.ParseError> =>
-  Schema.validate(User)(input);
+const _validate = (input: User): Effect.Effect<User, IdentityDomainError> =>
+  Schema.validate(User)(input).pipe(
+    Effect.catchTags({
+      ParseError: (e) => Effect.fail(new IdentityDomainError({ cause: e })),
+    })
+  );
 
 /** Default values for new users. */
 const defaults = {
@@ -29,8 +34,8 @@ const createUser = (input: {
   email: User["email"];
   emailVerified?: User["emailVerified"];
   imageUrl?: User["imageUrl"];
-}): Effect.Effect<User, ParseResult.ParseError> =>
-  _make({
+}): Effect.Effect<User, IdentityDomainError> =>
+  _validate({
     ...defaults,
     ...input,
     id: UserId.make(generateUUID()),
@@ -55,10 +60,10 @@ interface PatchUser {
 const updateUser = dual<
   (
     patch: PatchUser
-  ) => (self: User) => Effect.Effect<User, ParseResult.ParseError>,
-  (self: User, patch: PatchUser) => Effect.Effect<User, ParseResult.ParseError>
+  ) => (self: User) => Effect.Effect<User, IdentityDomainError>,
+  (self: User, patch: PatchUser) => Effect.Effect<User, IdentityDomainError>
 >(2, (self, patch) =>
-  _make({
+  _validate({
     ...self,
     ...patch,
     id: self.id,
@@ -75,13 +80,10 @@ const updateUser = dual<
 const updateEmail = dual<
   (
     email: User["email"]
-  ) => (self: User) => Effect.Effect<User, ParseResult.ParseError>,
-  (
-    self: User,
-    email: User["email"]
-  ) => Effect.Effect<User, ParseResult.ParseError>
+  ) => (self: User) => Effect.Effect<User, IdentityDomainError>,
+  (self: User, email: User["email"]) => Effect.Effect<User, IdentityDomainError>
 >(2, (self, email) =>
-  _make({
+  _validate({
     ...self,
     email,
     emailVerified: false,
@@ -95,7 +97,7 @@ const updateEmail = dual<
  * @since 0.1.0
  */
 const markEmailAsVerified = (self: User) =>
-  _make({
+  _validate({
     ...self,
     emailVerified: true,
   });

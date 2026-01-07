@@ -1,18 +1,23 @@
-import { type Effect, Option, type ParseResult, Schema } from "effect";
+import { Effect, Option, Schema } from "effect";
 import { dual } from "effect/Function";
 import { WorkspaceId } from "~/shared/schemas";
 import { generateUUID } from "~/shared/utils";
 import { Workspace } from "../schemas/workspace.model";
+import { WorkspaceDomainError } from "./errors";
 
 // =============================================================================
 // Constructors
 // =============================================================================
 
 /** Internal: validates and constructs a Workspace via Schema. */
-const _make = (
+const _validate = (
   input: typeof Workspace.Type
-): Effect.Effect<Workspace, ParseResult.ParseError> =>
-  Schema.validate(Workspace)(input);
+): Effect.Effect<Workspace, WorkspaceDomainError> =>
+  Schema.validate(Workspace)(input).pipe(
+    Effect.catchTags({
+      ParseError: (e) => Effect.fail(new WorkspaceDomainError({ cause: e })),
+    })
+  );
 
 /** Default values for new workspaces. */
 const defaults = {
@@ -31,8 +36,8 @@ const createWorkspace = (input: {
   slug: Workspace["slug"];
   logoUrl?: Workspace["logoUrl"];
   metadata?: Workspace["metadata"];
-}): Effect.Effect<Workspace, ParseResult.ParseError> =>
-  _make({
+}): Effect.Effect<Workspace, WorkspaceDomainError> =>
+  _validate({
     ...defaults,
     ...input,
     id: WorkspaceId.make(generateUUID()),
@@ -59,13 +64,13 @@ interface PatchWorkspace {
 const updateWorkspace = dual<
   (
     patch: PatchWorkspace
-  ) => (self: Workspace) => Effect.Effect<Workspace, ParseResult.ParseError>,
+  ) => (self: Workspace) => Effect.Effect<Workspace, WorkspaceDomainError>,
   (
     self: Workspace,
     patch: PatchWorkspace
-  ) => Effect.Effect<Workspace, ParseResult.ParseError>
+  ) => Effect.Effect<Workspace, WorkspaceDomainError>
 >(2, (self, patch) =>
-  _make({
+  _validate({
     ...self,
     ...patch,
     id: self.id,

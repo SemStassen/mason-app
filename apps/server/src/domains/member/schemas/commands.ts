@@ -4,8 +4,9 @@ import { Member } from "./member.model";
 const MemberFields = Member.from.fields;
 
 export const MemberCommands = {
-  Create: Schema.Struct({
+  AddUserToWorkspace: Schema.Struct({
     userId: MemberFields.userId,
+    workspaceId: MemberFields.workspaceId,
     role: MemberFields.role,
   }),
   Update: Schema.Struct({
@@ -14,5 +15,6 @@ export const MemberCommands = {
   }),
 };
 
-export type CreateMemberCommand = typeof MemberCommands.Create.Type;
+export type AddUserToWorkspaceCommand =
+  typeof MemberCommands.AddUserToWorkspace.Type;
 export type UpdateMemberCommand = typeof MemberCommands.Update.Type;

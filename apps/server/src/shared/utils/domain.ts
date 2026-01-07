@@ -18,7 +18,9 @@ export interface SoftDeletable {
  * @category Types
  * @since 0.1.0
  */
-export type MakeFn<T> = (input: T) => Effect.Effect<T, ParseResult.ParseError>;
+export type MakeFn<T, E = ParseResult.ParseError> = (
+  input: T
+) => Effect.Effect<T, E>;
 
 /**
  * Check if a soft-deletable entity is deleted.
@@ -65,8 +67,8 @@ export const isDeleted = <T extends SoftDeletable>(self: T): boolean =>
  * @since 0.1.0
  */
 export const makeSoftDelete =
-  <T extends SoftDeletable>(make: MakeFn<T>) =>
-  (self: T): Effect.Effect<T, ParseResult.ParseError> =>
+  <T extends SoftDeletable, E>(make: MakeFn<T, E>) =>
+  (self: T): Effect.Effect<T, E> =>
     Effect.gen(function* () {
       if (isDeleted(self)) {
         return self;
@@ -97,6 +99,6 @@ export const makeSoftDelete =
  * @since 0.1.0
  */
 export const makeRestore =
-  <T extends SoftDeletable>(make: MakeFn<T>) =>
-  (self: T): Effect.Effect<T, ParseResult.ParseError> =>
+  <T extends SoftDeletable, E>(make: MakeFn<T, E>) =>
+  (self: T): Effect.Effect<T, E> =>
     make({ ...self, deletedAt: Option.none() });

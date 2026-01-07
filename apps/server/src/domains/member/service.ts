@@ -1,12 +1,17 @@
-import { Context, Effect, Layer, type Option } from "effect";
+import { Context, Effect, Layer, Option } from "effect";
 import { AuthorizationService } from "~/application/authorization";
 import type { AuthorizationError } from "~/shared/errors/authorization";
 import type { MemberId, WorkspaceId } from "~/shared/schemas";
 import { processArray } from "~/shared/utils";
-import { MemberDomainError, MemberFns, MemberNotFoundError } from "./internal";
+import {
+  MemberAlreadyExistsError,
+  MemberDomainError,
+  MemberFns,
+  MemberNotFoundError,
+} from "./internal";
 import { MemberRepository } from "./repositories/member.repo";
 import type {
-  CreateMemberCommand,
+  AddUserToWorkspaceCommand,
   UpdateMemberCommand,
 } from "./schemas/commands";
 import type { Member } from "./schemas/member.model";
@@ -16,10 +21,9 @@ export class MemberDomainService extends Context.Tag(
 )<
   MemberDomainService,
   {
-    createMembers: (params: {
-      workspaceId: WorkspaceId;
-      commands: ReadonlyArray<CreateMemberCommand>;
-    }) => Effect.Effect<ReadonlyArray<Member>, MemberDomainError>;
+    addUserToWorkspace: (params: {
+      command: AddUserToWorkspaceCommand;
+    }) => Effect.Effect<Member, MemberDomainError | MemberAlreadyExistsError>;
     updateMembers: (params: {
       workspaceId: WorkspaceId;
       commands: ReadonlyArray<UpdateMemberCommand>;
@@ -53,21 +57,40 @@ export class MemberDomainService extends Context.Tag(
       const memberRepo = yield* MemberRepository;
 
       return MemberDomainService.of({
-        createMembers: Effect.fn("member/MemberDomainService.createMembers")(
-          ({ workspaceId, commands }) =>
-            processArray({
-              items: commands,
-              onEmpty: Effect.succeed([]),
-              mapItem: (member) => MemberFns.create(member, { workspaceId }),
-              execute: (members) => memberRepo.insert({ workspaceId, members }),
-            }).pipe(
-              Effect.catchTags({
-                "shared/DatabaseError": (e) =>
-                  Effect.fail(new MemberDomainError({ cause: e })),
-                ParseError: (e) =>
-                  Effect.fail(new MemberDomainError({ cause: e })),
+        addUserToWorkspace: Effect.fn(
+          "member/MemberDomainService.addUserToWorkspace"
+        )(({ command }) =>
+          Effect.gen(function* () {
+            // Check if user is already a member of the workspace
+            yield* memberRepo
+              .retrieve({
+                workspaceId: command.workspaceId,
+                query: {
+                  userId: command.userId,
+                },
               })
-            )
+              .pipe(
+                Effect.flatMap(
+                  Option.match({
+                    onNone: () => Effect.succeedNone,
+                    onSome: () => Effect.fail(new MemberAlreadyExistsError()),
+                  })
+                )
+              );
+
+            const created = yield* MemberFns.create(command);
+
+            const [inserted] = yield* memberRepo.insert({
+              members: [created],
+            });
+
+            return inserted;
+          }).pipe(
+            Effect.catchTags({
+              "shared/DatabaseError": (e) =>
+                Effect.fail(new MemberDomainError({ cause: e })),
+            })
+          )
         ),
         updateMembers: Effect.fn("member/MemberDomainService.updateMembers")(
           ({ workspaceId, commands }) =>
@@ -102,8 +125,6 @@ export class MemberDomainService extends Context.Tag(
             }).pipe(
               Effect.catchTags({
                 "shared/DatabaseError": (e) =>
-                  Effect.fail(new MemberDomainError({ cause: e })),
-                ParseError: (e) =>
                   Effect.fail(new MemberDomainError({ cause: e })),
               })
             )
@@ -149,14 +170,12 @@ export class MemberDomainService extends Context.Tag(
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
                 Effect.fail(new MemberDomainError({ cause: e })),
-              ParseError: (e) =>
-                Effect.fail(new MemberDomainError({ cause: e })),
             })
           )
         ),
         retrieveMember: Effect.fn("member/MemberDomainService.retrieveMember")(
           ({ workspaceId, memberId }) =>
-            memberRepo.retrieve({ workspaceId, memberId }).pipe(
+            memberRepo.retrieve({ workspaceId, query: { id: memberId } }).pipe(
               Effect.catchTags({
                 "shared/DatabaseError": (e) =>
                   Effect.fail(new MemberDomainError({ cause: e })),
