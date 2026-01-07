@@ -1,7 +1,7 @@
 import { Schema } from "effect";
 import { TimeEntry } from "./time-entry.model";
 
-const TimeEntryFields = TimeEntry.from.from.fields;
+const TimeEntryFields = TimeEntry.from.fields;
 
 export const TimeEntryCommands = {
   Create: Schema.Struct({

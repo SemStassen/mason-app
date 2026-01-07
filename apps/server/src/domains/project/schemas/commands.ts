@@ -3,7 +3,7 @@ import { Project } from "./project.model";
 import { Task } from "./task.model";
 
 const TaskFields = Task.from.fields;
-const ProjectFields = Project.from.from.fields;
+const ProjectFields = Project.from.fields;
 
 export const TaskCommands = {
   Create: Schema.Struct({

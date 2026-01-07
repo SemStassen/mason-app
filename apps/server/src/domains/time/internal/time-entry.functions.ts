@@ -1,4 +1,4 @@
-import { Effect, Option, Schema } from "effect";
+import { DateTime, Effect, Option, Schema } from "effect";
 import { dual } from "effect/Function";
 import { TimeEntryId, type WorkspaceId } from "~/shared/schemas";
 import {
@@ -11,6 +11,25 @@ import { TimeEntry } from "../schemas/time-entry.model";
 import { TimeDomainError } from "./errors";
 
 // =============================================================================
+// Helpers
+// =============================================================================
+
+const _validateDates = (
+  input: TimeEntry
+): Effect.Effect<TimeEntry, TimeDomainError> =>
+  Effect.gen(function* () {
+    if (DateTime.lessThan(input.stoppedAt, input.startedAt)) {
+      return yield* Effect.fail(
+        new TimeDomainError({
+          cause: "Stopped at must be after started at",
+        })
+      );
+    }
+
+    return input;
+  });
+
+// =============================================================================
 // Constructors
 // =============================================================================
 
@@ -18,7 +37,11 @@ import { TimeDomainError } from "./errors";
 const _validate = (
   input: TimeEntry
 ): Effect.Effect<TimeEntry, TimeDomainError> =>
-  Schema.validate(TimeEntry)(input).pipe(
+  Effect.gen(function* () {
+    const validated = yield* Schema.validate(TimeEntry)(input);
+
+    return yield* _validateDates(validated);
+  }).pipe(
     Effect.catchTags({
       ParseError: (e) => Effect.fail(new TimeDomainError({ cause: e })),
     })

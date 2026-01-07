@@ -1,4 +1,4 @@
-import { DateTime, Option, Schema } from "effect";
+import { Schema } from "effect";
 import { HexColor, JsonRecord, ProjectId, WorkspaceId } from "~/shared/schemas";
 
 export type ProjectName = typeof ProjectName.Type;
@@ -23,14 +23,6 @@ export const Project = Schema.TaggedStruct("Project", {
   deletedAt: Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf),
 }).pipe(
   Schema.Data,
-  Schema.filter((input) => {
-    const startDate = Option.getOrNull(input.startDate);
-    const endDate = Option.getOrNull(input.endDate);
-    if (startDate && endDate) {
-      return DateTime.greaterThan(endDate, startDate);
-    }
-    return true;
-  }, {}),
   Schema.annotations({
     identifier: "Project",
     title: "Project",

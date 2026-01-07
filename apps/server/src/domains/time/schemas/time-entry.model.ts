@@ -1,4 +1,4 @@
-import { DateTime, Schema } from "effect";
+import { Schema } from "effect";
 import {
   JsonRecord,
   MemberId,
@@ -29,11 +29,6 @@ export const TimeEntry = Schema.TaggedStruct("TimeEntry", {
   deletedAt: Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf),
 }).pipe(
   Schema.Data,
-  Schema.filter((input) => {
-    const startedAt = input.startedAt;
-    const stoppedAt = input.stoppedAt;
-    return DateTime.greaterThan(stoppedAt, startedAt);
-  }, {}),
   Schema.annotations({
     identifier: "TimeEntry",
     title: "Time Entry",
