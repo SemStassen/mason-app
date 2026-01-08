@@ -1,6 +1,11 @@
 import { Schema } from "effect";
-import { ProjectId, TaskId, WorkspaceId } from "~/shared/schemas";
+import { WorkspaceId } from "~/domains/workspace";
+import { ProjectId } from "./project.model";
 
+export type TaskId = typeof TaskId.Type;
+export const TaskId = Schema.UUID.pipe(Schema.brand("TaskId"));
+
+export type TaskName = typeof TaskName.Type;
 export const TaskName = Schema.NonEmptyString.pipe(Schema.maxLength(255));
 
 /**

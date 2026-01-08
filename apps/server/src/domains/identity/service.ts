@@ -42,8 +42,8 @@ export class IdentityDomainService extends Context.Tag(
       AuthorizationError | UserNotFoundError | IdentityDomainError
     >;
     retrieveUser: (params: {
-      currentuserId: UserId;
-    }) => Effect.Effect<User, UserNotFoundError | IdentityDomainError>;
+      userId: UserId;
+    }) => Effect.Effect<Option.Option<User>, IdentityDomainError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -165,24 +165,13 @@ export class IdentityDomainService extends Context.Tag(
           })
         ),
         retrieveUser: Effect.fn("identity/IdentityDomainService.retrieveUser")(
-          function* ({ currentuserId }) {
-            const existing = yield* userRepo
-              .retrieve({ userId: currentuserId })
-              .pipe(
-                Effect.flatMap(
-                  Option.match({
-                    onNone: () => Effect.fail(new UserNotFoundError()),
-                    onSome: Effect.succeed,
-                  })
-                )
-              );
-
-            return existing;
-          },
-          Effect.catchTags({
-            "shared/DatabaseError": (e) =>
-              Effect.fail(new IdentityDomainError({ cause: e })),
-          })
+          ({ userId }) =>
+            userRepo.retrieve({ userId }).pipe(
+              Effect.catchTags({
+                "shared/DatabaseError": (e) =>
+                  Effect.fail(new IdentityDomainError({ cause: e })),
+              })
+            )
         ),
       });
     })

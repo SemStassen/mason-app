@@ -9,21 +9,6 @@ import { generateUUID } from "~/shared/utils";
 import { WorkspaceInvitation } from "../schemas/workspace-invitation.model";
 import { WorkspaceInvitationDomainError } from "./errors";
 
-// =============================================================================
-// Helpers
-// =============================================================================
-
-const _checkExpiration = (
-  input: WorkspaceInvitation
-): Effect.Effect<WorkspaceInvitation> =>
-  Effect.gen(function* () {
-    const now = yield* DateTime.now;
-    const isExpired = DateTime.lessThan(input.expiresAt, now);
-    const shouldExpire = isExpired && input.status === "pending";
-    return shouldExpire ? { ...input, status: "expired" } : input;
-  });
-
-// =============================================================================
 // Constructors
 // =============================================================================
 
@@ -32,9 +17,7 @@ const _validate = (
   input: WorkspaceInvitation
 ): Effect.Effect<WorkspaceInvitation, WorkspaceInvitationDomainError> =>
   Effect.gen(function* () {
-    const validated = yield* Schema.validate(WorkspaceInvitation)(input);
-
-    return yield* _checkExpiration(validated);
+    return yield* Schema.validate(WorkspaceInvitation)(input);
   }).pipe(
     Effect.catchTags({
       ParseError: (e) =>
@@ -121,8 +104,22 @@ const markWorkspaceInvitationAsAccepted = (self: WorkspaceInvitation) =>
     status: "accepted",
   });
 
+const markWorkspaceInvitationAsRejected = (self: WorkspaceInvitation) =>
+  _validate({
+    ...self,
+    status: "rejected",
+  });
+
+const markWorkspaceInvitationAsCanceled = (self: WorkspaceInvitation) =>
+  _validate({
+    ...self,
+    status: "canceled",
+  });
+
 export const WorkspaceInvitationFns = {
   create: createWorkspaceInvitation,
   update: updateWorkspaceInvitation,
   markAsAccepted: markWorkspaceInvitationAsAccepted,
+  markAsRejected: markWorkspaceInvitationAsRejected,
+  markAsCanceled: markWorkspaceInvitationAsCanceled,
 } as const;

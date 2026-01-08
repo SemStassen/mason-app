@@ -1,1 +1,1 @@
-export type { WorkspaceIntegration } from "./schemas/workspace-integration.model";
+export * from "./schemas";

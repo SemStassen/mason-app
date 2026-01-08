@@ -1,10 +1,12 @@
 import { Schema } from "effect";
-import {
-  EncryptedApiKey,
-  MemberId,
-  WorkspaceId,
-  WorkspaceIntegrationId,
-} from "~/shared/schemas";
+import { MemberId } from "~/domains/member";
+import { WorkspaceId } from "~/domains/workspace";
+import { EncryptedApiKey } from "~/shared/schemas";
+
+export type WorkspaceIntegrationId = typeof WorkspaceIntegrationId.Type;
+export const WorkspaceIntegrationId = Schema.UUID.pipe(
+  Schema.brand("WorkspaceIntegrationId")
+);
 
 export type WorkspaceIntegrationKind = typeof WorkspaceIntegrationKind.Type;
 export const WorkspaceIntegrationKind = Schema.Literal("float").pipe(

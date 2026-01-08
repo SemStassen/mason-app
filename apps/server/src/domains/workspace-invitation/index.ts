@@ -1,1 +1,1 @@
-export type { WorkspaceInvitation } from "./schemas/workspace-invitation.model";
+export * from "./schemas";

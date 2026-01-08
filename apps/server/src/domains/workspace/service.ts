@@ -35,8 +35,8 @@ export class WorkspaceDomainService extends Context.Tag(
       memberId: MemberId;
       workspaceId: WorkspaceId;
     }) => Effect.Effect<
-      Option.Option<Workspace>,
-      WorkspaceDomainError | WorkspaceNotFoundError
+      Workspace,
+      WorkspaceNotFoundError | WorkspaceDomainError
     >;
   }
 >() {
@@ -116,6 +116,12 @@ export class WorkspaceDomainService extends Context.Tag(
           "workspace/WorkspaceDomainService.retrieveWorkspace"
         )(({ memberId, workspaceId }) =>
           workspaceRepo.retrieve({ memberId, workspaceId }).pipe(
+            Effect.flatMap(
+              Option.match({
+                onNone: () => Effect.fail(new WorkspaceNotFoundError()),
+                onSome: Effect.succeed,
+              })
+            ),
             Effect.catchTags({
               "shared/DatabaseError": (e) =>
                 Effect.fail(new WorkspaceDomainError({ cause: e })),

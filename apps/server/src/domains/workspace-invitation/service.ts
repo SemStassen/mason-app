@@ -11,6 +11,7 @@ import {
   WorkspaceInvitationDomainError,
   WorkspaceInvitationFns,
   WorkspaceInvitationNotFoundError,
+  type WorkspaceMemberAlreadyExistsError,
 } from "./internal";
 import { WorkspaceInvitationRepository } from "./repositories/workspace-invitation.repo";
 import type {
@@ -31,7 +32,10 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
       workspaceId: WorkspaceId;
       inviterId: MemberId;
       command: CreateWorkspaceInvitationCommand;
-    }) => Effect.Effect<WorkspaceInvitation, WorkspaceInvitationDomainError>;
+    }) => Effect.Effect<
+      WorkspaceInvitation,
+      WorkspaceInvitationDomainError | WorkspaceMemberAlreadyExistsError
+    >;
     updateWorkspaceInvitation: (params: {
       workspaceId: WorkspaceId;
       command: UpdateWorkspaceInvitationCommand;
@@ -63,8 +67,8 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
       workspaceId: WorkspaceId;
       workspaceInvitationId: WorkspaceInvitationId;
     }) => Effect.Effect<
-      Option.Option<WorkspaceInvitation>,
-      WorkspaceInvitationDomainError
+      WorkspaceInvitation,
+      WorkspaceInvitationDomainError | WorkspaceInvitationNotFoundError
     >;
     listWorkspaceInvitations: (params: {
       workspaceId: WorkspaceId;
@@ -240,6 +244,13 @@ export class WorkspaceInvitationDomainService extends Context.Tag(
           workspaceInvitationRepo
             .retrieve({ workspaceId, workspaceInvitationId })
             .pipe(
+              Effect.flatMap(
+                Option.match({
+                  onNone: () =>
+                    Effect.fail(new WorkspaceInvitationNotFoundError()),
+                  onSome: Effect.succeed,
+                })
+              ),
               Effect.catchTags({
                 "shared/DatabaseError": (e) =>
                   Effect.fail(new WorkspaceInvitationDomainError({ cause: e })),

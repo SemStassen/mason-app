@@ -1,5 +1,7 @@
 import { Schema } from "effect";
-import { WorkspaceId } from "~/shared/schemas";
+
+export type WorkspaceId = typeof WorkspaceId.Type;
+export const WorkspaceId = Schema.UUID.pipe(Schema.brand("WorkspaceId"));
 
 export type WorkspaceName = typeof WorkspaceName.Type;
 export const WorkspaceName = Schema.NonEmptyString.pipe(Schema.maxLength(100));

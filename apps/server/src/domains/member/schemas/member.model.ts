@@ -1,5 +1,10 @@
 import { Schema } from "effect";
-import { MemberId, UserId, WorkspaceId, WorkspaceRole } from "~/shared/schemas";
+import { UserId } from "~/domains/identity";
+import { WorkspaceId } from "~/domains/workspace";
+import { WorkspaceRole } from "~/shared/schemas";
+
+export type MemberId = typeof MemberId.Type;
+export const MemberId = Schema.UUID.pipe(Schema.brand("MemberId"));
 
 /**
  * Member domain model.

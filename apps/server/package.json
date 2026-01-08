@@ -12,13 +12,15 @@
   },
   "dependencies": {
     "@effect/platform": "catalog:",
-    "@effect/platform-bun": "^0.81.1",
+    "@effect/platform-bun": "^0.87.0",
+    "@effect/rpc": "catalog:",
     "@effect/sql": "catalog:",
     "@effect/sql-drizzle": "catalog:",
     "@effect/sql-pg": "catalog:",
     "@mason/api-contract": "workspace:*",
     "better-auth": "^1.4.10",
-    "drizzle-orm": "catalog:server",
+    "drizzle": "^1.4.0",
+    "drizzle-orm": "^0.45.1",
     "effect": "catalog:",
     "uuid": "^13.0.0"
   },

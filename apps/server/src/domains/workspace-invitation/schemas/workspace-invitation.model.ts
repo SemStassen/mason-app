@@ -1,19 +1,19 @@
 import { Schema } from "effect";
-import {
-  Email,
-  MemberId,
-  WorkspaceId,
-  WorkspaceInvitationId,
-  WorkspaceRole,
-} from "~/shared/schemas";
+import { MemberId } from "~/domains/member";
+import { WorkspaceId } from "~/domains/workspace";
+import { Email, WorkspaceRole } from "~/shared/schemas";
+
+export type WorkspaceInvitationId = typeof WorkspaceInvitationId.Type;
+export const WorkspaceInvitationId = Schema.UUID.pipe(
+  Schema.brand("WorkspaceInvitationId")
+);
 
 export type WorkspaceInvitationStatus = typeof WorkspaceInvitationStatus.Type;
 export const WorkspaceInvitationStatus = Schema.Literal(
   "pending",
   "accepted",
   "rejected",
-  "canceled",
-  "expired"
+  "canceled"
 );
 
 /**

@@ -1,1 +1,1 @@
-export type { Member } from "./schemas/member.model";
+export * from "./schemas";

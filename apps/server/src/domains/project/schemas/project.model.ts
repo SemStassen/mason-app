@@ -1,5 +1,9 @@
 import { Schema } from "effect";
-import { HexColor, JsonRecord, ProjectId, WorkspaceId } from "~/shared/schemas";
+import { WorkspaceId } from "~/domains/workspace";
+import { HexColor, JsonRecord } from "~/shared/schemas";
+
+export type ProjectId = typeof ProjectId.Type;
+export const ProjectId = Schema.UUID.pipe(Schema.brand("ProjectId"));
 
 export type ProjectName = typeof ProjectName.Type;
 export const ProjectName = Schema.NonEmptyString.pipe(Schema.maxLength(255));

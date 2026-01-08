@@ -1,12 +1,11 @@
 import { Schema } from "effect";
-import {
-  JsonRecord,
-  MemberId,
-  ProjectId,
-  TaskId,
-  TimeEntryId,
-  WorkspaceId,
-} from "~/shared/schemas";
+import { MemberId } from "~/domains/member";
+import { ProjectId, TaskId } from "~/domains/project";
+import { WorkspaceId } from "~/domains/workspace";
+import { JsonRecord } from "~/shared/schemas";
+
+export type TimeEntryId = typeof TimeEntryId.Type;
+export const TimeEntryId = Schema.UUID.pipe(Schema.brand("TimeEntryId"));
 
 /**
  * Time entry domain model.

@@ -1,1 +1,1 @@
-export type { Workspace } from "./schemas/workspace.model";
+export * from "./schemas";

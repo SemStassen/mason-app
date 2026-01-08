@@ -41,7 +41,7 @@ export class MemberDomainService extends Context.Tag(
     retrieveMember: (params: {
       workspaceId: WorkspaceId;
       memberId: MemberId;
-    }) => Effect.Effect<Option.Option<Member>, MemberDomainError>;
+    }) => Effect.Effect<Member, MemberNotFoundError | MemberDomainError>;
     listMembers: (params: {
       workspaceId: WorkspaceId;
       query?: {
@@ -176,6 +176,12 @@ export class MemberDomainService extends Context.Tag(
         retrieveMember: Effect.fn("member/MemberDomainService.retrieveMember")(
           ({ workspaceId, memberId }) =>
             memberRepo.retrieve({ workspaceId, query: { id: memberId } }).pipe(
+              Effect.flatMap(
+                Option.match({
+                  onNone: () => Effect.fail(new MemberNotFoundError()),
+                  onSome: Effect.succeed,
+                })
+              ),
               Effect.catchTags({
                 "shared/DatabaseError": (e) =>
                   Effect.fail(new MemberDomainError({ cause: e })),

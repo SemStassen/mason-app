@@ -3,6 +3,7 @@ import PgDrizzle from "@effect/sql-drizzle/Pg";
 import type { PgRemoteDatabase } from "drizzle-orm/pg-proxy";
 import { Context, Effect, Layer } from "effect";
 import { DatabaseError } from "~/shared/errors";
+// import type { relations } from "./_relations";
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "./schema";
 
@@ -33,7 +34,7 @@ export class DatabaseService extends Context.Tag("@mason/db/DatabaseService")<
     DatabaseService,
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient;
-      const drizzle = yield* PgDrizzle.make({ schema });
+      const drizzle = yield* PgDrizzle.make({ schema: schema });
 
       return DatabaseService.of({
         drizzle,
