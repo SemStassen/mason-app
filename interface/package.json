@@ -17,7 +17,6 @@
     "@effect/platform": "catalog:",
     "@electric-sql/pglite": "^0.3.14",
     "@electric-sql/pglite-repl": "^0.2.32",
-    "@mason/api-contract": "workspace:*",
     "@mason/ui": "workspace:*",
     "@tanstack/react-form": "catalog:frontend",
     "@tanstack/react-router": "^1.134.17",
@@ -41,7 +40,6 @@
     "@types/react": "catalog:dev",
     "@types/react-dom": "catalog:dev",
     "@types/slug": "^5.0.9",
-    "drizzle-kit": "catalog:dev",
     "typescript": "catalog:dev"
   },
   "exports": {
