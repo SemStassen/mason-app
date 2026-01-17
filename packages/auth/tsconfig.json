@@ -1,0 +1,10 @@
+{
+  "extends": "@mason/config/package.tsconfig.json",
+  "include": ["src", "../___db"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  }
+}

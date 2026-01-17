@@ -7,7 +7,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { tableId, tableMetadata, tableSoftDelete } from "../utils";
+import { tableArchive, tableId, tableMetadata } from "../utils";
 import {
   projectIntegrationsTable,
   taskIntegrationsTable,
@@ -38,7 +38,7 @@ export const projectsTable = pgTable("projects", {
     [key: string]: unknown;
   }>(),
   // Metadata
-  ...tableSoftDelete,
+  ...tableArchive,
   ...tableMetadata,
 });
 export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
@@ -62,7 +62,7 @@ export const tasksTable = pgTable("tasks", {
     .notNull(),
   // General
   name: varchar("name").notNull(),
-  ...tableSoftDelete,
+  ...tableArchive,
   ...tableMetadata,
 });
 export const tasksRelations = relations(tasksTable, ({ one, many }) => ({

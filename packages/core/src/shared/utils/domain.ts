@@ -1,41 +1,32 @@
-import { DateTime, Effect, Option, type ParseResult } from "effect";
+import { DateTime, Effect, Option } from "effect";
 
 /**
  * Represents any entity that supports soft deletion.
- * Entities with a `deletedAt` field of `Option<DateTime.Utc>` can use the
- * soft-deletable utilities.
  *
  * @category Types
  * @since 0.1.0
  */
-export interface SoftDeletable {
+interface SoftDeletable {
   readonly deletedAt: Option.Option<DateTime.Utc>;
 }
 
 /**
- * A make function that validates and constructs an entity via Schema.
+ * A validate function that constructs an entity from input.
  *
  * @category Types
  * @since 0.1.0
  */
-export type MakeFn<T, E = ParseResult.ParseError> = (
-  input: T
-) => Effect.Effect<T, E>;
+type ValidateFn<T, E> = (input: T) => Effect.Effect<T, E>;
 
 /**
  * Check if a soft-deletable entity is deleted.
  *
  * @example
  * ```ts
- * import { SoftDeletable } from "@mason/framework";
- *
- * // Use directly
- * if (SoftDeletable.isDeleted(project)) {
- *   console.log("Project is deleted");
+ * // In your TaggedClass:
+ * isDeleted() {
+ *   return SoftDeletable.isDeleted(this);
  * }
- *
- * // Or re-export from your domain
- * export const isDeleted = SoftDeletable.isDeleted;
  * ```
  *
  * @category Predicates
@@ -45,60 +36,50 @@ export const isDeleted = <T extends SoftDeletable>(self: T): boolean =>
   Option.isSome(self.deletedAt);
 
 /**
- * Creates a soft delete function for an entity.
+ * Soft delete an entity using its validate function.
  *
  * Returns the entity unchanged if already deleted,
  * otherwise sets `deletedAt` to the current time.
  *
  * @example
  * ```ts
- * import { SoftDeletable } from "@mason/framework";
- *
- * // In your domain functions file:
- * const make = (input: Project) => Schema.decodeUnknown(Project)(input);
- *
- * export const softDelete = SoftDeletable.makeSoftDelete(make);
- *
- * // Usage:
- * const deletedProject = yield* softDelete(project);
+ * // In your TaggedClass:
+ * softDelete() {
+ *   return SoftDeletable.softDelete(this, Member._validate);
+ * }
  * ```
  *
  * @category Transformations
  * @since 0.1.0
  */
-export const makeSoftDelete =
-  <T extends SoftDeletable, E>(make: MakeFn<T, E>) =>
-  (self: T): Effect.Effect<T, E> =>
-    Effect.gen(function* () {
-      if (isDeleted(self)) {
-        return self;
-      }
-      const deletedAt = yield* DateTime.now;
-      return yield* make({ ...self, deletedAt: Option.some(deletedAt) });
-    });
+export const softDelete = <T extends SoftDeletable, E>(
+  self: T,
+  validate: ValidateFn<T, E>
+): Effect.Effect<T, E> =>
+  isDeleted(self)
+    ? Effect.succeed(self)
+    : Effect.gen(function* () {
+        const deletedAt = yield* DateTime.now;
+        return yield* validate({ ...self, deletedAt: Option.some(deletedAt) });
+      });
 
 /**
- * Creates a restore function for a soft-deleted entity.
+ * Restore a soft-deleted entity using its validate function.
  *
  * Sets `deletedAt` to `Option.none()`, making the entity active again.
  *
  * @example
  * ```ts
- * import { SoftDeletable } from "@mason/framework";
- *
- * // In your domain functions file:
- * const make = (input: Project) => Schema.decodeUnknown(Project)(input);
- *
- * export const restore = SoftDeletable.makeRestore(make);
- *
- * // Usage:
- * const restoredProject = yield* restore(deletedProject);
+ * // In your TaggedClass:
+ * restore() {
+ *   return SoftDeletable.restore(this, Member._validate);
+ * }
  * ```
  *
  * @category Transformations
  * @since 0.1.0
  */
-export const makeRestore =
-  <T extends SoftDeletable, E>(make: MakeFn<T, E>) =>
-  (self: T): Effect.Effect<T, E> =>
-    make({ ...self, deletedAt: Option.none() });
+export const restore = <T extends SoftDeletable, E>(
+  self: T,
+  validate: ValidateFn<T, E>
+): Effect.Effect<T, E> => validate({ ...self, deletedAt: Option.none() });

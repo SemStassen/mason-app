@@ -18,14 +18,19 @@ export const workspaceIntegrationsTable = pgTable(
       { onDelete: "set null" }
     ),
     // General
-    kind: varchar({ enum: WorkspaceIntegrationKind.from.literals }).notNull(),
+    provider: varchar({
+      enum: ["float"],
+    }).notNull(),
     encryptedApiKey: varchar("encrypted_api_key").notNull(),
     // Metadata
     _metadata: jsonb("metadata").$type<Record<string, unknown>>(),
     ...tableMetadata,
   },
   (table) => [
-    unique("unique_workspace_id_kind").on(table.workspaceId, table.kind),
+    unique("unique_workspace_id_provider").on(
+      table.workspaceId,
+      table.provider
+    ),
   ]
 );
 export const workspaceIntegrationsRelations = relations(
@@ -52,7 +57,9 @@ export const projectIntegrationsTable = pgTable("project_integrations", {
     .references(() => projectsTable.id)
     .notNull(),
   // General
-  source: varchar({ enum: WorkspaceIntegrationKind.from.literals }).notNull(),
+  source: varchar({
+    enum: WorkspaceIntegrationprovider.from.literals,
+  }).notNull(),
   externalId: varchar("external_id").notNull(),
   ...tableMetadata,
 });
@@ -81,7 +88,9 @@ export const taskIntegrationsTable = pgTable("task_integrations", {
     .references(() => tasksTable.id)
     .notNull(),
   // General
-  source: varchar({ enum: WorkspaceIntegrationKind.from.literals }).notNull(),
+  source: varchar({
+    enum: WorkspaceIntegrationprovider.from.literals,
+  }).notNull(),
   externalId: varchar("external_id").notNull(),
   ...tableMetadata,
 });

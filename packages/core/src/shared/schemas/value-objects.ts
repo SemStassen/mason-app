@@ -28,6 +28,3 @@ export const Email = Schema.NonEmptyString.pipe(
   Schema.pattern(regex.email),
   Schema.brand("Email")
 );
-
-export type WorkspaceRole = typeof WorkspaceRole.Type;
-export const WorkspaceRole = Schema.Literal("owner");

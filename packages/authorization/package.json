@@ -1,0 +1,21 @@
+{
+  "name": "@mason/authorization",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf node_modules",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
+  },
+  "dependencies": {
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "typescript": "catalog:dev"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

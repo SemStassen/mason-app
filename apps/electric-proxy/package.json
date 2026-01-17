@@ -1,0 +1,23 @@
+{
+  "name": "@mason/electric-proxy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build --outdir=dist src/index.ts",
+    "clean": "git clean -xdf node_modules",
+    "dev": "bun run --hot src/index.ts",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
+  },
+  "dependencies": {
+    "@effect/platform": "catalog:",
+    "@effect/platform-bun": "^0.87.0",
+    "@electric-sql/client": "^1.4.0",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "typescript": "catalog:dev"
+  }
+}

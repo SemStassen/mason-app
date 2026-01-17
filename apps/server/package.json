@@ -11,12 +11,9 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@effect/platform": "catalog:",
-    "@effect/platform-bun": "^0.87.0",
     "@effect/rpc": "catalog:",
-    "better-auth": "^1.4.10",
-    "effect": "catalog:",
-    "uuid": "^13.0.0"
+    "@mason/core": "workspace:*",
+    "effect": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",

@@ -22,7 +22,7 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const workspaceIntegrations = useAtomValue(workspaceIntegrationsAtom);
-  const integration = workspaceIntegrations.find((i) => i.kind === "float");
+  const integration = workspaceIntegrations.find((i) => i.provider === "float");
 
   const [isPending, startTransition] = useTransition();
   const syncProjects = useAtomSet(
@@ -59,7 +59,7 @@ function RouteComponent() {
         </FrameHeader>
         {!integration && (
           <FramePanel>
-            <CreateWorkspaceIntegrationForm kind="float" />
+            <CreateWorkspaceIntegrationForm provider="float" />
           </FramePanel>
         )}
       </Frame>

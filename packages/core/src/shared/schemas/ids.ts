@@ -3,6 +3,9 @@ import { Schema } from "effect";
 export type UserId = typeof UserId.Type;
 export const UserId = Schema.UUID.pipe(Schema.brand("UserId"));
 
+export type SessionId = typeof SessionId.Type;
+export const SessionId = Schema.UUID.pipe(Schema.brand("SessionId"));
+
 export type WorkspaceIntegrationId = typeof WorkspaceIntegrationId.Type;
 export const WorkspaceIntegrationId = Schema.UUID.pipe(
   Schema.brand("WorkspaceIntegrationId")

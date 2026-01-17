@@ -2,13 +2,12 @@ import PgDrizzle from "@effect/sql-drizzle/Pg";
 import PgClient from "@effect/sql-pg/PgClient";
 import type { PgRemoteDatabase } from "drizzle-orm/pg-proxy/driver";
 import { Config, Context, Effect, Layer } from "effect";
-// biome-ignore lint/performance/noNamespaceImport: Needed for schema
-import * as schema from "./schema";
+import { schema } from ".";
 
 /**
  * PostgreSQL client layer configured from DATABASE_URL environment variable.
  */
-export const PgLive = PgClient.layerConfig({
+const PgLive = PgClient.layerConfig({
   password: Config.redacted("POSTGRES_PW"),
   username: Config.succeed("postgres"),
   database: Config.succeed("postgres"),

@@ -12,15 +12,15 @@ export class MissingIntegrationAdapterError extends Schema.TaggedError<MissingIn
 ) {}
 
 export class TimeTrackingIntegrationAdapter extends TimeTrackingIntegrationAdapterBase {
-  static getLayer(kind: "float") {
-    switch (kind) {
+  static getLayer(provider: "float") {
+    switch (provider) {
       case "float":
         return floatLive;
       default:
         /** This should basically never happen */
         return Layer.fail(
           new MissingIntegrationAdapterError({
-            cause: `Integration adapter for kind "${kind}" is not supported`,
+            cause: `Integration adapter for provider "${provider}" is not supported`,
           })
         );
     }

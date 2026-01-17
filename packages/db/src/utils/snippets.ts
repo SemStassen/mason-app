@@ -19,6 +19,13 @@ export const tableMetadata = {
     .notNull(),
 };
 
+export const tableArchive = {
+  archivedAt: timestamp("archived_at", {
+    withTimezone: true,
+    precision: 0,
+  }),
+};
+
 export const tableSoftDelete = {
   deletedAt: timestamp("deleted_at", {
     withTimezone: true,

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.5/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
   "extends": ["ultracite/core"],
   "linter": {
     "rules": {
@@ -33,9 +33,23 @@
         },
         "useConsistentObjectDefinitions": "off",
         "noMagicNumbers": "off",
-        "useNodejsImportProtocol": "off"
+        "useNodejsImportProtocol": "off",
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "patterns": [
+              {
+                "group": ["!~/domains/*", "~/domains/*/**"],
+                "message": "Import from the domain's public index.ts (e.g., ~/domains/workspace) instead of internal paths"
+              }
+            ]
+          }
+        }
       },
       "suspicious": {
+        "noConfusingVoidType": {
+          "level": "info"
+        },
         "noShadowRestrictedNames": {
           "level": "info",
           "options": {}

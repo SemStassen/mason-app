@@ -1,8 +1,12 @@
 import { PingRpc } from "./ping";
-import { WorkspaceRpc } from "./workspace";
+import { WorkspaceRpcs } from "./workspace";
+import { WorkspaceInvitationRpcs } from "./workspace-invitation";
+
+export * from "./ping";
+export * from "./workspace";
+export * from "./workspace-invitation";
 
 const PublicRpc = PingRpc;
+const PrivateRpc = WorkspaceRpcs.merge(WorkspaceInvitationRpcs);
 
-const privateRpc = WorkspaceRpc;
-
-export const MasonRpc = PublicRpc.merge(privateRpc);
+export const MasonRpc = PublicRpc.merge(PrivateRpc);

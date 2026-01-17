@@ -16,7 +16,7 @@ export const membersTable = pgTable("members", {
     .references(() => workspacesTable.id, { onDelete: "cascade" })
     .notNull(),
   // General
-  role: varchar("role").$type<WorkspaceRole>().notNull(),
+  role: varchar("role").notNull(),
   // Metadata
   ...tableSoftDelete,
   ...tableMetadata,

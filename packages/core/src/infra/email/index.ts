@@ -1,27 +1,22 @@
 import { Context, type Effect } from "effect";
-import type { UserDisplayName } from "~/domains/identity";
-import type { WorkspaceName } from "~/domains/workspace";
+import type { User } from "~/modules/identity";
+import type { Workspace } from "~/modules/workspace";
 import type {
   Email,
   WorkspaceId,
   WorkspaceInvitationId,
 } from "~/shared/schemas";
 
-export class EmailService extends Context.Tag("@mason/shared/EmailService")<
+export class EmailService extends Context.Tag("@mason/infra/EmailService")<
   EmailService,
   {
-    sendVerificationOTP: (params: {
-      email: Email;
-      otp: string;
-      type: "sign-in" | "email-verification" | "forget-password";
-    }) => Effect.Effect<void>;
     sendWorkspaceInvitation: (params: {
       email: Email;
       workspace: {
-        name: WorkspaceName;
+        name: Workspace["name"];
         id: WorkspaceId;
       };
-      inviterName: UserDisplayName;
+      inviterName: User["displayName"];
       invitationId: WorkspaceInvitationId;
     }) => Effect.Effect<void>;
   }

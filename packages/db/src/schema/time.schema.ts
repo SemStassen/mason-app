@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import { jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
-import { tableId, tableMetadata, tableSoftDelete } from "../utils";
+import { tableId, tableMetadata } from "../utils";
 import { membersTable } from "./member.schema";
 import { projectsTable, tasksTable } from "./project.schema";
 import { workspacesTable } from "./workspace.schema";
@@ -34,7 +34,6 @@ export const timeEntriesTable = pgTable("time_entries", {
     [key: string]: unknown;
   }>(),
   // Metadata
-  ...tableSoftDelete,
   ...tableMetadata,
 });
 export const timeEntriesRelations = relations(timeEntriesTable, ({ one }) => ({

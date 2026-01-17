@@ -1,7 +1,7 @@
 import { Context, type Effect, Schema } from "effect";
 
 export class DatabaseError extends Schema.TaggedError<DatabaseError>()(
-  "shared/DatabaseError",
+  "infra/DatabaseError",
   {
     cause: Schema.Unknown,
   }
