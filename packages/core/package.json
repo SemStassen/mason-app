@@ -1,5 +1,5 @@
 {
-  "name": "@mason/db",
+  "name": "@mason/core",
   "private": true,
   "type": "module",
   "scripts": {
