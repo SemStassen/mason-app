@@ -28,7 +28,7 @@ export const CreateOrRenewPendingWorkspaceInvitationAction = Effect.fn(
     .pipe(
       Effect.flatMap(
         Option.match({
-          onNone: () => WorkspaceInvitation.create(input),
+          onNone: () => WorkspaceInvitation.fromInput(input),
           onSome: (invitation) => invitation.renew(),
         })
       )

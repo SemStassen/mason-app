@@ -1,20 +1,31 @@
 import { DateTime, Effect, Option, Schema } from "effect";
-import { HexColor, JsonRecord, ProjectId, WorkspaceId } from "~/shared/schemas";
-import { generateUUID, type SchemaFields } from "~/shared/utils";
+import {
+  HexColor,
+  JsonRecord,
+  Model,
+  ProjectId,
+  WorkspaceId,
+} from "~/shared/schemas";
+import { generateUUID } from "~/shared/utils";
 import { ProjectTransitionError } from "./errors";
 
-export class Project extends Schema.TaggedClass<Project>("Project")(
-  "Project",
+export class Project extends Model.Class<Project>("Project")(
   {
-    id: ProjectId,
-    workspaceId: WorkspaceId,
-    name: Schema.NonEmptyString.pipe(Schema.maxLength(255)),
-    hexColor: HexColor,
-    isBillable: Schema.Boolean,
-    startDate: Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf),
-    endDate: Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf),
-    notes: Schema.OptionFromSelf(JsonRecord),
-    archivedAt: Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf),
+    id: Model.DomainManaged(ProjectId),
+    workspaceId: Model.SystemImmutable(WorkspaceId),
+    name: Model.Mutable(Schema.NonEmptyString.pipe(Schema.maxLength(255))),
+    hexColor: Model.OptionalMutable(HexColor),
+    isBillable: Model.OptionalMutable(Schema.Boolean),
+    startDate: Model.OptionalMutable(
+      Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf)
+    ),
+    endDate: Model.OptionalMutable(
+      Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf)
+    ),
+    notes: Model.OptionalMutable(Schema.OptionFromSelf(JsonRecord)),
+    archivedAt: Model.DomainManaged(
+      Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf)
+    ),
   },
   {
     identifier: "Project",
@@ -22,27 +33,23 @@ export class Project extends Schema.TaggedClass<Project>("Project")(
     description: "A project within a workspace",
   }
 ) {
-  private static _validate = (input: SchemaFields<typeof Project>) =>
-    Schema.decodeUnknown(Project)(input);
+  private static _validate = (input: typeof Project.model.Type) =>
+    Schema.validate(Project)(input);
 
-  private static _defaultValues = {
-    hexColor: HexColor.make("#000000"),
-    isBillable: false,
-    startDate: Option.none(),
-    endDate: Option.none(),
-    notes: Option.none(),
-    archivedAt: Option.none(),
-  };
-
-  static create = (input: CreateProject) =>
+  static fromInput = (input: typeof Project.create.Type) =>
     Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(CreateProject)(input);
+      const safeInput = yield* Schema.decodeUnknown(Project.create)(input);
 
       const project = yield* Project._validate({
-        ...Project._defaultValues,
-        ...safeInput,
+        name: safeInput.name,
+        workspaceId: safeInput.workspaceId,
+        hexColor: safeInput.hexColor ?? HexColor.make("#000000"),
+        isBillable: safeInput.isBillable ?? false,
+        startDate: safeInput.startDate ?? Option.none(),
+        endDate: safeInput.endDate ?? Option.none(),
+        notes: safeInput.notes ?? Option.none(),
         id: ProjectId.make(generateUUID()),
-        _tag: "Project",
+        archivedAt: Option.none(),
       });
 
       yield* project.assertValidDates();
@@ -50,9 +57,9 @@ export class Project extends Schema.TaggedClass<Project>("Project")(
       return project;
     });
 
-  patch = (patch: PatchProject) =>
+  patch = (patch: typeof Project.patch.Type) =>
     Effect.gen(this, function* () {
-      const safePatch = yield* Schema.decodeUnknown(PatchProject)(patch);
+      const safePatch = yield* Schema.decodeUnknown(Project.patch)(patch);
 
       const patched = yield* Project._validate({
         ...this,
@@ -102,46 +109,3 @@ export class Project extends Schema.TaggedClass<Project>("Project")(
       }
     });
 }
-
-export type CreateProject = typeof CreateProject.Type;
-export const CreateProject = Schema.Struct({
-  workspaceId: WorkspaceId,
-  name: Project.fields.name,
-  hexColor: Schema.optionalWith(Project.fields.hexColor, {
-    exact: true,
-  }),
-  isBillable: Schema.optionalWith(Project.fields.isBillable, {
-    exact: true,
-  }),
-  startDate: Schema.optionalWith(Project.fields.startDate, {
-    exact: true,
-  }),
-  endDate: Schema.optionalWith(Project.fields.endDate, {
-    exact: true,
-  }),
-  notes: Schema.optionalWith(Project.fields.notes, {
-    exact: true,
-  }),
-});
-
-export type PatchProject = typeof PatchProject.Type;
-export const PatchProject = Schema.Struct({
-  name: Schema.optionalWith(Project.fields.name, {
-    exact: true,
-  }),
-  hexColor: Schema.optionalWith(Project.fields.hexColor, {
-    exact: true,
-  }),
-  isBillable: Schema.optionalWith(Project.fields.isBillable, {
-    exact: true,
-  }),
-  startDate: Schema.optionalWith(Project.fields.startDate, {
-    exact: true,
-  }),
-  endDate: Schema.optionalWith(Project.fields.endDate, {
-    exact: true,
-  }),
-  notes: Schema.optionalWith(Project.fields.notes, {
-    exact: true,
-  }),
-});

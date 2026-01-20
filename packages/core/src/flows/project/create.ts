@@ -1,10 +1,9 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect } from "effect";
-import { ProjectActionsService } from "~/modules/project";
-import { CreateProject } from "~/modules/project/domain";
+import { Project, ProjectActionsService } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 
-export const CreateProjectRequest = CreateProject.omit("workspaceId");
+export const CreateProjectRequest = Project.createInput;
 
 export const CreateProjectFlow = Effect.fn("flows/CreateProjectFlow")(
   function* (request: typeof CreateProjectRequest.Type) {

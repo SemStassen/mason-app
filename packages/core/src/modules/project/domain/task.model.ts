@@ -1,15 +1,16 @@
 import { DateTime, Effect, Option, Schema } from "effect";
-import { ProjectId, TaskId, WorkspaceId } from "~/shared/schemas";
-import { generateUUID, type SchemaFields } from "~/shared/utils";
+import { Model, ProjectId, TaskId, WorkspaceId } from "~/shared/schemas";
+import { generateUUID } from "~/shared/utils";
 
-export class Task extends Schema.TaggedClass<Task>("Task")(
-  "Task",
+export class Task extends Model.Class<Task>("Task")(
   {
-    id: TaskId,
-    workspaceId: WorkspaceId,
-    projectId: ProjectId,
-    name: Schema.NonEmptyString.pipe(Schema.maxLength(255)),
-    archivedAt: Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf),
+    id: Model.DomainManaged(TaskId),
+    workspaceId: Model.SystemImmutable(WorkspaceId),
+    projectId: Model.UserImmutable(ProjectId),
+    name: Model.Mutable(Schema.NonEmptyString.pipe(Schema.maxLength(255))),
+    archivedAt: Model.DomainManaged(
+      Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf)
+    ),
   },
   {
     identifier: "Task",
@@ -17,28 +18,23 @@ export class Task extends Schema.TaggedClass<Task>("Task")(
     description: "A task within a project",
   }
 ) {
-  private static _validate = (input: SchemaFields<typeof Task>) =>
-    Schema.decodeUnknown(Task)(input);
+  private static _validate = (input: typeof Task.model.Type) =>
+    Schema.validate(Task)(input);
 
-  private static _defaultValues = {
-    archivedAt: Option.none(),
-  } as const;
-
-  static create = (input: CreateTask) =>
+  static fromInput = (input: typeof Task.create.Type) =>
     Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(CreateTask)(input);
+      const safeInput = yield* Schema.decodeUnknown(Task.create)(input);
 
       return yield* Task._validate({
-        ...Task._defaultValues,
         ...safeInput,
         id: TaskId.make(generateUUID()),
-        _tag: "Task",
+        archivedAt: Option.none(),
       });
     });
 
-  patch = (patch: PatchTask) =>
+  patch = (patch: typeof Task.patch.Type) =>
     Effect.gen(this, function* () {
-      const safePatch = yield* Schema.decodeUnknown(PatchTask)(patch);
+      const safePatch = yield* Schema.decodeUnknown(Task.patch)(patch);
 
       return yield* Task._validate({
         ...this,
@@ -68,15 +64,3 @@ export class Task extends Schema.TaggedClass<Task>("Task")(
 
   readonly isArchived = () => Option.isSome(this.archivedAt);
 }
-
-export type CreateTask = typeof CreateTask.Type;
-export const CreateTask = Schema.Struct({
-  workspaceId: WorkspaceId,
-  projectId: ProjectId,
-  name: Task.fields.name,
-});
-
-export type PatchTask = typeof PatchTask.Type;
-export const PatchTask = Schema.Struct({
-  name: Schema.optional(Task.fields.name),
-});

@@ -1,22 +1,22 @@
 import { WorkspaceRole } from "@mason/authorization";
 import { Effect, Option, Schema } from "effect";
-import { MemberId, UserId, WorkspaceId } from "~/shared/schemas";
+import { MemberId, Model, UserId, WorkspaceId } from "~/shared/schemas";
 import {
   isDeleted as checkIsDeleted,
   generateUUID,
   restore,
-  type SchemaFields,
   softDelete,
 } from "~/shared/utils";
 
-export class Member extends Schema.TaggedClass<Member>("Member")(
-  "Member",
+export class Member extends Model.Class<Member>("Member")(
   {
-    id: MemberId,
-    userId: UserId,
-    workspaceId: WorkspaceId,
-    role: WorkspaceRole,
-    deletedAt: Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf),
+    id: Model.DomainManaged(MemberId),
+    userId: Model.SystemImmutable(UserId),
+    workspaceId: Model.SystemImmutable(WorkspaceId),
+    role: Model.Mutable(WorkspaceRole),
+    deletedAt: Model.DomainManaged(
+      Schema.OptionFromSelf(Schema.DateTimeUtcFromSelf)
+    ),
   },
   {
     identifier: "Member",
@@ -24,32 +24,27 @@ export class Member extends Schema.TaggedClass<Member>("Member")(
     description: "A member of a workspace",
   }
 ) {
-  private static _validate = (input: SchemaFields<typeof Member>) =>
-    Schema.decodeUnknown(Member)(input);
+  private static _validate = (input: typeof Member.model.Type) =>
+    Schema.validate(Member)(input);
 
-  private static _defaults = {
-    deletedAt: Option.none(),
-  };
-
-  static create = (input: CreateMember) =>
+  static fromInput = (input: typeof Member.create.Type) =>
     Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(CreateMember)(input);
+      const safeInput = yield* Schema.decodeUnknown(Member.create)(input);
 
       return yield* Member._validate({
-        ...Member._defaults,
         ...safeInput,
         id: MemberId.make(generateUUID()),
-        _tag: "Member",
+        deletedAt: Option.none(),
       });
     });
 
-  patch = (input: PatchMember) =>
+  patch = (patch: typeof Member.patch.Type) =>
     Effect.gen(this, function* () {
-      const safeInput = yield* Schema.decodeUnknown(PatchMember)(input);
+      const safePatch = yield* Schema.decodeUnknown(Member.patch)(patch);
 
       return yield* Member._validate({
         ...this,
-        ...safeInput,
+        ...safePatch,
       });
     });
 
@@ -61,15 +56,3 @@ export class Member extends Schema.TaggedClass<Member>("Member")(
 
   isDeleted = () => checkIsDeleted(this);
 }
-
-export type CreateMember = typeof CreateMember.Type;
-export const CreateMember = Schema.Struct({
-  userId: UserId,
-  workspaceId: WorkspaceId,
-  role: WorkspaceRole,
-});
-
-export type PatchMember = typeof PatchMember.Type;
-export const PatchMember = Schema.Struct({
-  role: WorkspaceRole,
-});

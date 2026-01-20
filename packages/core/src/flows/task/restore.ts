@@ -8,22 +8,22 @@ export const RestoreTaskRequest = Schema.Struct({
   id: TaskId,
 });
 
-export const RestoreTaskFlow = Effect.fn("flows/RestoreTaskFlow")(
-  function* (request: typeof RestoreTaskRequest.Type) {
-    const { member, workspace } = yield* WorkspaceContext;
+export const RestoreTaskFlow = Effect.fn("flows/RestoreTaskFlow")(function* (
+  request: typeof RestoreTaskRequest.Type
+) {
+  const { member, workspace } = yield* WorkspaceContext;
 
-    const authz = yield* AuthorizationService;
+  const authz = yield* AuthorizationService;
 
-    const projectActions = yield* ProjectActionsService;
+  const projectActions = yield* ProjectActionsService;
 
-    yield* authz.ensureAllowed({
-      action: "project:restore_task",
-      role: member.role,
-    });
+  yield* authz.ensureAllowed({
+    action: "project:restore_task",
+    role: member.role,
+  });
 
-    yield* projectActions.restoreTask({
-      id: request.id,
-      workspaceId: workspace.id,
-    });
-  }
-);
+  yield* projectActions.restoreTask({
+    id: request.id,
+    workspaceId: workspace.id,
+  });
+});

@@ -21,9 +21,7 @@ const getKey = Effect.gen(function* () {
   })
 );
 
-export class CryptoService extends Context.Tag(
-  "@mason/framework/CryptoService"
-)<
+export class CryptoService extends Context.Tag("@mason/infra/CryptoService")<
   CryptoService,
   {
     readonly encrypt: (payload: string) => Effect.Effect<string>;

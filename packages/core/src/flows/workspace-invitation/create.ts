@@ -3,14 +3,11 @@ import { Effect, Option } from "effect";
 import { EmailService } from "~/infra/email";
 import { IdentityActionsService } from "~/modules/identity";
 import { InvitationActionsService } from "~/modules/invitation";
-import { CreateWorkspaceInvitation } from "~/modules/invitation/domain";
+import { WorkspaceInvitation } from "~/modules/invitation/domain";
 import { MemberActionsService } from "~/modules/member";
 import { SessionContext, WorkspaceContext } from "~/shared/auth";
 
-export const CreateWorkspaceInvitationRequest = CreateWorkspaceInvitation.omit(
-  "workspaceId",
-  "inviterId"
-);
+export const CreateWorkspaceInvitationRequest = WorkspaceInvitation.createInput;
 
 export const CreateWorkspaceInvitationFlow = Effect.fn(
   "flows/CreateWorkspaceInvitationFlow"

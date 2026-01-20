@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import {
   assertUniqueWorkspaceIntegrationProvider,
-  type CreateWorkspaceIntegration,
   WorkspaceIntegration,
 } from "../domain";
 import { WorkspaceIntegrationRepository } from "../repositories";
 
-export type CreateWorkspaceIntegrationInput = CreateWorkspaceIntegration;
+export type CreateWorkspaceIntegrationInput =
+  typeof WorkspaceIntegration.create.Type;
 
 export type CreateWorkspaceIntegrationOutput = void;
 
@@ -17,7 +17,8 @@ export const CreateWorkspaceIntegrationAction = Effect.fn(
 
   yield* assertUniqueWorkspaceIntegrationProvider(input);
 
-  const createdWorkspaceIntegration = yield* WorkspaceIntegration.create(input);
+  const createdWorkspaceIntegration =
+    yield* WorkspaceIntegration.fromInput(input);
 
   yield* workspaceIntegrationRepo.insert({
     workspaceIntegrations: [createdWorkspaceIntegration],

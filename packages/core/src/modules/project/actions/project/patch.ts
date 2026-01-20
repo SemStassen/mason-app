@@ -1,13 +1,13 @@
 import { Effect, Option } from "effect";
 import type { ProjectId, WorkspaceId } from "~/shared/schemas";
-import type { PatchProject } from "../../domain";
+import type { Project } from "../../domain";
 import { ProjectNotFoundError } from "../../errors";
 import { ProjectRepository } from "../../repositories";
 
 export interface PatchProjectInput {
   id: ProjectId;
   workspaceId: WorkspaceId;
-  patch: PatchProject;
+  patch: typeof Project.patch.Type;
 }
 
 export type PatchProjectOutput = void;

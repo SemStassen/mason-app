@@ -1,10 +1,10 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { PatchTask, ProjectActionsService } from "~/modules/project";
+import { ProjectActionsService, Task } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
-import {  TaskId } from "~/shared/schemas";
+import { TaskId } from "~/shared/schemas";
 
-export const PatchTaskRequest = PatchTask.pipe(
+export const PatchTaskRequest = Task.patchInput.pipe(
   Schema.extend(Schema.Struct({ id: TaskId }))
 );
 

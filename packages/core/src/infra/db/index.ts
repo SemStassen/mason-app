@@ -7,7 +7,9 @@ export class DatabaseError extends Schema.TaggedError<DatabaseError>()(
   }
 ) {}
 
-export class DatabaseService extends Context.Tag("@mason/db/DatabaseService")<
+export class DatabaseService extends Context.Tag(
+  "@mason/infra/DatabaseService"
+)<
   DatabaseService,
   {
     /**

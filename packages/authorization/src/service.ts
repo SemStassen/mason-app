@@ -28,6 +28,8 @@ export class AuthorizationService extends Context.Tag(
         "workspace:cancel_invite": ["owner"],
         "workspace:patch": ["owner"],
         "workspace:delete": ["owner"],
+        "workspace:create_integration": ["owner"],
+        "workspace:delete_integration": ["owner"],
         "project:create": ["owner"],
         "project:patch": ["owner"],
         "project:archive": ["owner"],

@@ -4,7 +4,9 @@ const WorkspaceAction = Schema.Literal(
   "workspace:invite_user",
   "workspace:cancel_invite",
   "workspace:patch",
-  "workspace:delete"
+  "workspace:delete",
+  "workspace:create_integration",
+  "workspace:delete_integration"
 );
 
 const ProjectAction = Schema.Literal(
@@ -15,7 +17,7 @@ const ProjectAction = Schema.Literal(
   "project:create_task",
   "project:patch_task",
   "project:archive_task",
-  "project:restore_task",
+  "project:restore_task"
 );
 
 export type Action = typeof Action.Type;

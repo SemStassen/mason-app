@@ -81,7 +81,7 @@ export class AuthService extends Effect.Service<AuthService>()(
             //     emailService.sendVerificationOTP({ email, otp, type })
             //   );
             // },
-            // ts-ignore-any
+            // biome-ignore lint/suspicious/useAwait: fine
             sendVerificationOTP: async () => {
               return;
             },

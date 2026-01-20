@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import { type CreateWorkspace, Workspace } from "../domain";
+import { Workspace } from "../domain";
 import { WorkspaceRepository } from "../repositories";
 import { AssertWorkspaceSlugUniqueAction } from "./assert-slug-unique";
 
-export type CreateWorkspaceInput = CreateWorkspace;
+export type CreateWorkspaceInput = typeof Workspace.create.Type;
 
 export type CreateWorkspaceOutput = Workspace;
 
@@ -14,7 +14,7 @@ export const CreateWorkspaceAction = Effect.fn(
 
   yield* AssertWorkspaceSlugUniqueAction({ slug: input.slug });
 
-  const createdWorkspace = yield* Workspace.create(input);
+  const createdWorkspace = yield* Workspace.fromInput(input);
 
   const [insertedWorkspace] = yield* workspaceRepo.insert({
     workspaces: [createdWorkspace],

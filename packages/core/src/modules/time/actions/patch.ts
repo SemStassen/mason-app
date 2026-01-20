@@ -1,13 +1,13 @@
 import { Effect, Option } from "effect";
 import type { TimeEntryId, WorkspaceId } from "~/shared/schemas";
-import type { PatchTimeEntry } from "../domain";
+import type { TimeEntry } from "../domain";
 import { TimeEntryNotFoundError } from "../errors";
 import { TimeEntryRepository } from "../repositories/time-entry.repo";
 
 export interface PatchTimeEntryInput {
   id: TimeEntryId;
   workspaceId: WorkspaceId;
-  patch: PatchTimeEntry;
+  patch: typeof TimeEntry.patch.Type;
 }
 
 export type PatchTimeEntryOutput = void;

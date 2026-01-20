@@ -1,9 +1,9 @@
 import { Effect, Option } from "effect";
-import { AssertProjectNotArchived, type CreateTask, Task } from "../../domain";
-import { ProjectRepository, TaskRepository } from "../../repositories";
+import { AssertProjectNotArchived, Task } from "../../domain";
 import { ProjectNotFoundError } from "../../errors";
+import { ProjectRepository, TaskRepository } from "../../repositories";
 
-export type CreateTaskInput = CreateTask;
+export type CreateTaskInput = typeof Task.create.Type;
 
 export type CreateTaskOutput = void;
 
@@ -17,12 +17,13 @@ export const CreateTaskAction = Effect.fn("project/CreateTaskAction")(
         workspaceId: input.workspaceId,
         query: { id: input.projectId },
       })
-      .pipe(Effect.map(Option.getOrThrowWith(() => new ProjectNotFoundError())));
-
+      .pipe(
+        Effect.map(Option.getOrThrowWith(() => new ProjectNotFoundError()))
+      );
 
     yield* AssertProjectNotArchived(project);
 
-    const task = yield* Task.create(input);
+    const task = yield* Task.fromInput(input);
 
     yield* taskRepo.insert({ tasks: [task] });
   }

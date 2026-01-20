@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import { type CreateMember, Member } from "../domain";
+import { Member } from "../domain";
 import { MemberRepository } from "../repositories";
 import { AssertUserNotWorkspaceMemberAction } from "./assert-user-not-workspace-member";
 
-export type CreateMemberInput = CreateMember;
+export type CreateMemberInput = typeof Member.create.Type;
 
 export type CreateMemberOutput = void;
 
@@ -16,7 +16,7 @@ export const CreateMemberAction = Effect.fn("member/CreateMemberAction")(
       workspaceId: input.workspaceId,
     });
 
-    const createdMember = yield* Member.create(input);
+    const createdMember = yield* Member.fromInput(input);
 
     yield* memberRepo.insert({
       members: [createdMember],

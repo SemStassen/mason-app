@@ -1,16 +1,12 @@
-import { Schema } from "effect";
-import { SessionId, UserId, WorkspaceId } from "~/shared/schemas";
-import type { SchemaFields } from "~/shared/utils";
+import { Effect, Option, Schema } from "effect";
+import { Model, SessionId, UserId, WorkspaceId } from "~/shared/schemas";
+import { generateUUID } from "~/shared/utils";
 
-export type SessionActiveWorkspaceId = typeof SessionActiveWorkspaceId.Type;
-export const SessionActiveWorkspaceId = Schema.OptionFromSelf(WorkspaceId);
-
-export class Session extends Schema.TaggedClass<Session>("Session")(
-  "Session",
+export class Session extends Model.Class<Session>("Session")(
   {
-    id: SessionId,
-    userId: UserId,
-    activeWorkspaceId: SessionActiveWorkspaceId,
+    id: Model.DomainManaged(SessionId),
+    userId: Model.SystemImmutable(UserId),
+    activeWorkspaceId: Model.Mutable(Schema.OptionFromSelf(WorkspaceId)),
   },
   {
     identifier: "Session",
@@ -18,13 +14,34 @@ export class Session extends Schema.TaggedClass<Session>("Session")(
     description: "A session",
   }
 ) {
-  private static _validate = (input: SchemaFields<typeof Session>) =>
-    Schema.decodeUnknown(Session)(input);
+  private static _validate = (input: typeof Session.model.Type) =>
+    Schema.validate(Session)(input);
 
-  setActiveWorkspace = (activeWorkspaceId: Session["activeWorkspaceId"]) => {
-    return Session._validate({
-      ...this,
-      activeWorkspaceId,
+  static fromInput = (input: typeof Session.create.Type) =>
+    Effect.gen(function* () {
+      const safeInput = yield* Schema.decodeUnknown(Session.create)(input);
+
+      return yield* Session._validate({
+        id: SessionId.make(generateUUID()),
+        ...safeInput,
+      });
     });
-  };
+
+  patch = (patch: typeof Session.patch.Type) =>
+    Effect.gen(this, function* () {
+      const safePatch = yield* Schema.decodeUnknown(Session.patch)(patch);
+
+      return yield* Session._validate({
+        ...this,
+        ...safePatch,
+      });
+    });
+
+  setActiveWorkspace = (workspaceId: Session["activeWorkspaceId"]) =>
+    Effect.gen(this, function* () {
+      return yield* Session._validate({
+        ...this,
+        activeWorkspaceId: Option.some(workspaceId),
+      });
+    });
 }

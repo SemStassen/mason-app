@@ -1,17 +1,18 @@
 import { Effect, Option, Schema } from "effect";
-import { WorkspaceId } from "~/shared/schemas";
-import { generateUUID, type SchemaFields } from "~/shared/utils";
+import { Model, WorkspaceId } from "~/shared/schemas";
+import { generateUUID } from "~/shared/utils";
 
-export class Workspace extends Schema.TaggedClass<Workspace>("Workspace")(
-  "Workspace",
+export class Workspace extends Model.Class<Workspace>("Workspace")(
   {
-    id: WorkspaceId,
-    // General
-    name: Schema.NonEmptyString.pipe(Schema.maxLength(100)),
-    slug: Schema.NonEmptyString.pipe(Schema.maxLength(100)),
-    // Optional
-    logoUrl: Schema.OptionFromSelf(Schema.NonEmptyString),
-    metadata: Schema.OptionFromSelf(Schema.NonEmptyString),
+    id: Model.DomainManaged(WorkspaceId),
+    name: Model.Mutable(Schema.NonEmptyString.pipe(Schema.maxLength(100))),
+    slug: Model.Mutable(Schema.NonEmptyString.pipe(Schema.maxLength(100))),
+    logoUrl: Model.OptionalMutable(
+      Schema.OptionFromSelf(Schema.NonEmptyString)
+    ),
+    metadata: Model.OptionalMutable(
+      Schema.OptionFromSelf(Schema.NonEmptyString)
+    ),
   },
   {
     identifier: "Workspace",
@@ -19,47 +20,28 @@ export class Workspace extends Schema.TaggedClass<Workspace>("Workspace")(
     description: "A workspace",
   }
 ) {
-  private static _validate = (input: SchemaFields<typeof Workspace>) =>
-    Schema.decodeUnknown(Workspace)(input);
+  private static _validate = (input: typeof Workspace.model.Type) =>
+    Schema.validate(Workspace)(input);
 
-  private static _defaults = {
-    logoUrl: Option.none(),
-    metadata: Option.none(),
-  };
-
-  static create = (input: CreateWorkspace) =>
+  static fromInput = (input: typeof Workspace.create.Type) =>
     Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(CreateWorkspace)(input);
+      const safeInput = yield* Schema.decodeUnknown(Workspace.create)(input);
 
       return yield* Workspace._validate({
-        ...Workspace._defaults,
         ...safeInput,
         id: WorkspaceId.make(generateUUID()),
-        _tag: "Workspace",
+        logoUrl: safeInput.logoUrl ?? Option.none(),
+        metadata: safeInput.metadata ?? Option.none(),
       });
     });
 
-  patch = (input: PatchWorkspace) =>
+  patch = (patch: typeof Workspace.patch.Type) =>
     Effect.gen(this, function* () {
-      const safeInput = yield* Schema.decodeUnknown(PatchWorkspace)(input);
+      const safePatch = yield* Schema.decodeUnknown(Workspace.patch)(patch);
 
       return yield* Workspace._validate({
         ...this,
-        ...safeInput,
+        ...safePatch,
       });
     });
 }
-
-export type CreateWorkspace = typeof CreateWorkspace.Type;
-export const CreateWorkspace = Schema.Struct({
-  name: Workspace.fields.name,
-  slug: Workspace.fields.slug,
-});
-
-export type PatchWorkspace = typeof PatchWorkspace.Type;
-export const PatchWorkspace = Schema.Struct({
-  name: Schema.optionalWith(Workspace.fields.name, { exact: true }),
-  slug: Schema.optionalWith(Workspace.fields.slug, { exact: true }),
-  logoUrl: Schema.optionalWith(Workspace.fields.logoUrl, { exact: true }),
-  metadata: Schema.optionalWith(Workspace.fields.metadata, { exact: true }),
-});

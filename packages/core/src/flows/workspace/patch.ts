@@ -1,9 +1,9 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect } from "effect";
-import { PatchWorkspace, WorkspaceActionsService } from "~/modules/workspace";
+import { Workspace, WorkspaceActionsService } from "~/modules/workspace";
 import { WorkspaceContext } from "~/shared/auth";
 
-export const PatchWorkspaceRequest = PatchWorkspace;
+export const PatchWorkspaceRequest = Workspace.patchInput;
 
 export const PatchWorkspaceFlow = Effect.fn("flows/PatchWorkspaceFlow")(
   function* (request: typeof PatchWorkspaceRequest.Type) {

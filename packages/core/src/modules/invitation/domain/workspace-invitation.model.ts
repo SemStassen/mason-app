@@ -3,29 +3,29 @@ import { DateTime, Duration, Effect, Schema } from "effect";
 import {
   Email,
   MemberId,
+  Model,
   WorkspaceId,
   WorkspaceInvitationId,
 } from "~/shared/schemas";
-import { generateUUID, type SchemaFields } from "~/shared/utils";
+import { generateUUID } from "~/shared/utils";
 import {
   WorkspaceInvitationExpiredError,
   WorkspaceInvitationTransitionError,
 } from "./errors";
 
-export class WorkspaceInvitation extends Schema.TaggedClass<WorkspaceInvitation>(
+export class WorkspaceInvitation extends Model.Class<WorkspaceInvitation>(
   "WorkspaceInvitation"
 )(
-  "WorkspaceInvitation",
   {
-    id: WorkspaceInvitationId,
-    // References
-    inviterId: MemberId,
-    workspaceId: WorkspaceId,
-    // General
-    email: Email,
-    role: WorkspaceRole,
-    status: Schema.Literal("pending", "accepted", "rejected", "canceled"),
-    expiresAt: Schema.DateTimeUtcFromSelf,
+    id: Model.DomainManaged(WorkspaceInvitationId),
+    inviterId: Model.SystemImmutable(MemberId),
+    workspaceId: Model.SystemImmutable(WorkspaceId),
+    email: Model.UserImmutable(Email),
+    role: Model.UserImmutable(WorkspaceRole),
+    status: Model.DomainManaged(
+      Schema.Literal("pending", "accepted", "rejected", "canceled")
+    ),
+    expiresAt: Model.DomainManaged(Schema.DateTimeUtcFromSelf),
   },
   {
     identifier: "WorkspaceInvitation",
@@ -33,9 +33,8 @@ export class WorkspaceInvitation extends Schema.TaggedClass<WorkspaceInvitation>
     description: "A workspace invitation",
   }
 ) {
-  private static _validate = (
-    input: SchemaFields<typeof WorkspaceInvitation>
-  ) => Schema.decodeUnknown(WorkspaceInvitation)(input);
+  private static _validate = (input: typeof WorkspaceInvitation.model.Type) =>
+    Schema.validate(WorkspaceInvitation)(input);
 
   private static _defaultExpiration = DateTime.now.pipe(
     Effect.map((dt) => DateTime.addDuration(dt, Duration.days(30)))
@@ -45,24 +44,23 @@ export class WorkspaceInvitation extends Schema.TaggedClass<WorkspaceInvitation>
     const expiresAt = yield* WorkspaceInvitation._defaultExpiration;
 
     return {
-      status: "pending",
+      status: "pending" as const,
       expiresAt,
-    } as const;
+    };
   });
 
-  static create = (input: CreateWorkspaceInvitation) =>
+  static fromInput = (input: typeof WorkspaceInvitation.create.Type) =>
     Effect.gen(function* () {
       const defaults = yield* WorkspaceInvitation._makeDefaults;
 
-      const safeInput = yield* Schema.decodeUnknown(CreateWorkspaceInvitation)(
+      const safeInput = yield* Schema.decodeUnknown(WorkspaceInvitation.create)(
         input
       );
 
       return yield* WorkspaceInvitation._validate({
         ...defaults,
-        ...safeInput,
         id: WorkspaceInvitationId.make(generateUUID()),
-        _tag: "WorkspaceInvitation",
+        ...safeInput,
       });
     });
 
@@ -119,11 +117,3 @@ export class WorkspaceInvitation extends Schema.TaggedClass<WorkspaceInvitation>
           })
         );
 }
-
-export type CreateWorkspaceInvitation = typeof CreateWorkspaceInvitation.Type;
-export const CreateWorkspaceInvitation = Schema.Struct({
-  workspaceId: WorkspaceId,
-  inviterId: MemberId,
-  email: WorkspaceInvitation.fields.email,
-  role: WorkspaceInvitation.fields.role,
-});

@@ -1,15 +1,16 @@
-import { Effect, Option, Schema } from "effect";
-import { Email, UserId } from "~/shared/schemas";
-import { generateUUID, type SchemaFields } from "~/shared/utils";
+import { Effect, Schema } from "effect";
+import { Email, Model, UserId } from "~/shared/schemas";
+import { generateUUID } from "~/shared/utils";
 
-export class User extends Schema.TaggedClass<User>("User")(
-  "User",
+export class User extends Model.Class<User>("User")(
   {
-    id: UserId,
-    displayName: Schema.NonEmptyString.pipe(Schema.maxLength(100)),
-    email: Email,
-    emailVerified: Schema.Boolean,
-    imageUrl: Schema.OptionFromSelf(Schema.NonEmptyString),
+    id: Model.DomainManaged(UserId),
+    displayName: Model.Mutable(
+      Schema.NonEmptyString.pipe(Schema.maxLength(100))
+    ),
+    email: Model.UserImmutable(Email),
+    emailVerified: Model.DomainManaged(Schema.Boolean),
+    imageUrl: Model.Mutable(Schema.OptionFromSelf(Schema.NonEmptyString)),
   },
   {
     identifier: "User",
@@ -17,46 +18,29 @@ export class User extends Schema.TaggedClass<User>("User")(
     description: "A user",
   }
 ) {
-  private static _validate = (input: SchemaFields<typeof User>) =>
-    Schema.decodeUnknown(User)(input);
+  private static _validate = (input: typeof User.model.Type) =>
+    Schema.validate(User)(input);
 
-  private static _defaults = {
-    emailVerified: false,
-    imageUrl: Option.none(),
-  };
-
-  static create = (input: CreateUser) =>
+  static fromInput = (input: typeof User.create.Type) =>
     Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(CreateUser)(input);
+      const safeInput = yield* Schema.decodeUnknown(User.create)(input);
 
       return yield* User._validate({
-        ...User._defaults,
-        ...safeInput,
         id: UserId.make(generateUUID()),
-        _tag: "User",
+        emailVerified: false,
+        ...safeInput,
       });
     });
 
-  patch = (input: PatchUser) =>
+  patch = (patch: typeof User.patch.Type) =>
     Effect.gen(this, function* () {
-      const safeInput = yield* Schema.decodeUnknown(PatchUser)(input);
+      const safePatch = yield* Schema.decodeUnknown(User.patch)(patch);
 
-      return yield* User._validate({
-        ...this,
-        ...safeInput,
-      });
+      return yield* User._validate({ ...this, ...safePatch });
+    });
+
+  verifyEmail = () =>
+    Effect.gen(this, function* () {
+      return yield* User._validate({ ...this, emailVerified: true });
     });
 }
-
-export type CreateUser = typeof CreateUser.Type;
-export const CreateUser = Schema.Struct({
-  displayName: User.fields.displayName,
-  email: User.fields.email,
-  imageUrl: Schema.optionalWith(User.fields.imageUrl, { exact: true }),
-});
-
-export type PatchUser = typeof PatchUser.Type;
-export const PatchUser = Schema.Struct({
-  displayName: Schema.optionalWith(User.fields.displayName, { exact: true }),
-  imageUrl: Schema.optionalWith(User.fields.imageUrl, { exact: true }),
-});

@@ -2,25 +2,25 @@ import { DateTime, Effect, Option, Schema } from "effect";
 import {
   JsonRecord,
   MemberId,
+  Model,
   ProjectId,
   TaskId,
   TimeEntryId,
   WorkspaceId,
 } from "~/shared/schemas";
-import { generateUUID, type SchemaFields } from "~/shared/utils";
+import { generateUUID } from "~/shared/utils";
 import { TimeEntryTransitionError } from "./errors";
 
-export class TimeEntry extends Schema.TaggedClass<TimeEntry>("TimeEntry")(
-  "TimeEntry",
+export class TimeEntry extends Model.Class<TimeEntry>("TimeEntry")(
   {
-    id: TimeEntryId,
-    workspaceId: WorkspaceId,
-    memberId: MemberId,
-    projectId: ProjectId,
-    taskId: Schema.OptionFromSelf(TaskId),
-    startedAt: Schema.DateTimeUtcFromSelf,
-    stoppedAt: Schema.DateTimeUtcFromSelf,
-    notes: Schema.OptionFromSelf(JsonRecord),
+    id: Model.DomainManaged(TimeEntryId),
+    workspaceId: Model.SystemImmutable(WorkspaceId),
+    memberId: Model.SystemImmutable(MemberId),
+    projectId: Model.Mutable(ProjectId),
+    taskId: Model.OptionalMutable(Schema.OptionFromSelf(TaskId)),
+    startedAt: Model.Mutable(Schema.DateTimeUtcFromSelf),
+    stoppedAt: Model.Mutable(Schema.DateTimeUtcFromSelf),
+    notes: Model.OptionalMutable(Schema.OptionFromSelf(JsonRecord)),
   },
   {
     identifier: "TimeEntry",
@@ -28,23 +28,18 @@ export class TimeEntry extends Schema.TaggedClass<TimeEntry>("TimeEntry")(
     description: "A time entry tracking work on a project",
   }
 ) {
-  private static _validate = (input: SchemaFields<typeof TimeEntry>) =>
-    Schema.decodeUnknown(TimeEntry)(input);
+  private static _validate = (input: typeof TimeEntry.model.Type) =>
+    Schema.validate(TimeEntry)(input);
 
-  private static _defaults = {
-    taskId: Option.none(),
-    notes: Option.none(),
-  };
-
-  static create = (input: CreateTimeEntry) =>
+  static fromInput = (input: typeof TimeEntry.create.Type) =>
     Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(CreateTimeEntry)(input);
+      const safeInput = yield* Schema.decodeUnknown(TimeEntry.create)(input);
 
       const timeEntry = yield* TimeEntry._validate({
-        ...TimeEntry._defaults,
         ...safeInput,
         id: TimeEntryId.make(generateUUID()),
-        _tag: "TimeEntry",
+        taskId: safeInput.taskId ?? Option.none(),
+        notes: safeInput.notes ?? Option.none(),
       });
 
       yield* timeEntry.assertValidDates();
@@ -52,9 +47,9 @@ export class TimeEntry extends Schema.TaggedClass<TimeEntry>("TimeEntry")(
       return timeEntry;
     });
 
-  patch = (patch: PatchTimeEntry) =>
+  patch = (patch: typeof TimeEntry.patch.Type) =>
     Effect.gen(this, function* () {
-      const safePatch = yield* Schema.decodeUnknown(PatchTimeEntry)(patch);
+      const safePatch = yield* Schema.decodeUnknown(TimeEntry.patch)(patch);
 
       const patched = yield* TimeEntry._validate({
         ...this,
@@ -79,26 +74,3 @@ export class TimeEntry extends Schema.TaggedClass<TimeEntry>("TimeEntry")(
       }
     });
 }
-
-export type CreateTimeEntry = typeof CreateTimeEntry.Type;
-export const CreateTimeEntry = Schema.Struct({
-  workspaceId: WorkspaceId,
-  memberId: MemberId,
-  projectId: ProjectId,
-  startedAt: TimeEntry.fields.startedAt,
-  stoppedAt: TimeEntry.fields.stoppedAt,
-  taskId: Schema.optionalWith(TimeEntry.fields.taskId, { exact: true }),
-  notes: Schema.optionalWith(TimeEntry.fields.notes, { exact: true }),
-});
-
-export type PatchTimeEntry = typeof PatchTimeEntry.Type;
-export const PatchTimeEntry = Schema.partialWith(
-  Schema.Struct({
-    projectId: TimeEntry.fields.projectId,
-    taskId: TimeEntry.fields.taskId,
-    startedAt: TimeEntry.fields.startedAt,
-    stoppedAt: TimeEntry.fields.stoppedAt,
-    notes: TimeEntry.fields.notes,
-  }),
-  { exact: true }
-);

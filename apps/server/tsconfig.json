@@ -1,5 +1,10 @@
 {
   "extends": "@mason/config/base.tsconfig.json",
-  "include": ["src"],
-  "exclude": ["dist"]
+  "include": ["src", "../../packages/core/src"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["../../packages/core/src/*"]
+    }
+  }
 }

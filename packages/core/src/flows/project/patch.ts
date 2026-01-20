@@ -1,11 +1,10 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { ProjectActionsService } from "~/modules/project";
-import { PatchProject } from "~/modules/project/domain";
+import { Project, ProjectActionsService } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 import { ProjectId } from "~/shared/schemas";
 
-export const PatchProjectRequest = PatchProject.pipe(
+export const PatchProjectRequest = Project.patchInput.pipe(
   Schema.extend(Schema.Struct({ id: ProjectId }))
 );
 

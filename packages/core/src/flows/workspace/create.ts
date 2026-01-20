@@ -2,11 +2,10 @@ import { Effect, Option } from "effect";
 import { DatabaseService } from "~/infra/db";
 import { IdentityActionsService } from "~/modules/identity";
 import { MemberActionsService } from "~/modules/member";
-import { CreateWorkspace, WorkspaceActionsService } from "~/modules/workspace";
+import { Workspace, WorkspaceActionsService } from "~/modules/workspace";
 import { SessionContext } from "~/shared/auth";
-import { MasonError } from "~/shared/errors";
 
-export const CreateWorkspaceRequest = CreateWorkspace;
+export const CreateWorkspaceRequest = Workspace.createInput;
 
 export const CreateWorkspaceFlow = Effect.fn("flows/CreateWorkspaceFlow")(
   function* (request: typeof CreateWorkspaceRequest.Type) {
@@ -35,8 +34,5 @@ export const CreateWorkspaceFlow = Effect.fn("flows/CreateWorkspaceFlow")(
         });
       })
     );
-  },
-  Effect.mapError((e) => new MasonError({
-    cause: e
-  }))
+  }
 );

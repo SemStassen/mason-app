@@ -1,12 +1,12 @@
 import { Effect, Option } from "effect";
 import type { UserId } from "~/shared/schemas";
-import type { PatchUser } from "../../domain";
+import type { User } from "../../domain";
 import { UserNotFoundError } from "../../errors";
 import { UserRepository } from "../../repositories";
 
 export interface PatchUserInput {
   id: UserId;
-  patch: PatchUser;
+  patch: typeof User.patch.Type;
 }
 
 export type PatchUserOutput = void;

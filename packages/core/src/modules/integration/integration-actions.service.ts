@@ -22,7 +22,7 @@ import type { WorkspaceIntegrationNotFoundError } from "./errors";
 import { WorkspaceIntegrationRepository } from "./repositories";
 
 export class IntegrationActionsService extends Context.Tag(
-  "@mason/invitation/IntegrationActionsService"
+  "@mason/integration/IntegrationActionsService"
 )<
   IntegrationActionsService,
   {

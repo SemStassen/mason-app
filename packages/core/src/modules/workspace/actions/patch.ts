@@ -1,13 +1,13 @@
 import { Effect, Option } from "effect";
 import type { WorkspaceId } from "~/shared/schemas";
-import type { PatchWorkspace } from "../domain";
+import type { Workspace } from "../domain";
 import { WorkspaceNotFoundError } from "../errors";
 import { WorkspaceRepository } from "../repositories";
 import { AssertWorkspaceSlugUniqueAction } from "./assert-slug-unique";
 
 export interface PatchWorkspaceInput {
   id: WorkspaceId;
-  patch: PatchWorkspace;
+  patch: typeof Workspace.patch.Type;
 }
 
 export type PatchWorkspaceOutput = void;

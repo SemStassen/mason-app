@@ -1,32 +1,35 @@
-import { DateTime, Effect, Option, Schema } from "effect";
+import { DateTime, Effect, Schema } from "effect";
 import {
   EncryptedApiKey,
   MemberId,
+  Model,
+  PlainApiKey,
   WorkspaceId,
   WorkspaceIntegrationId,
 } from "~/shared/schemas";
-import { generateUUID, type SchemaFields } from "~/shared/utils";
+import { generateUUID } from "~/shared/utils";
 
-export class WorkspaceIntegration extends Schema.TaggedClass<WorkspaceIntegration>(
+export class WorkspaceIntegration extends Model.Class<WorkspaceIntegration>(
   "WorkspaceIntegration"
 )(
-  "WorkspaceIntegration",
   {
-    id: WorkspaceIntegrationId,
-    workspaceId: WorkspaceId,
-    createdByMemberId: MemberId,
-    provider: Schema.Literal("float").pipe(
-      Schema.brand("WorkspaceIntegrationProvider")
+    id: Model.DomainManaged(WorkspaceIntegrationId),
+    workspaceId: Model.SystemImmutable(WorkspaceId),
+    createdByMemberId: Model.SystemImmutable(MemberId),
+    provider: Model.UserImmutable(
+      Schema.Literal("float").pipe(Schema.brand("WorkspaceIntegrationProvider"))
     ),
-    encryptedApiKey: EncryptedApiKey,
-    _metadata: Schema.OptionFromSelf(
-      Schema.Struct({
-        lastSyncedAt: Schema.optionalWith(Schema.DateTimeUtcFromSelf, {
-          exact: true,
-        }),
-      })
+    apiKey: Model.TransformedImmutable(EncryptedApiKey, PlainApiKey),
+    _metadata: Model.Mutable(
+      Schema.OptionFromSelf(
+        Schema.Struct({
+          lastSyncedAt: Schema.optionalWith(Schema.DateTimeUtcFromSelf, {
+            exact: true,
+          }),
+        })
+      )
     ),
-    createdAt: Schema.DateTimeUtcFromSelf,
+    createdAt: Model.DomainManaged(Schema.DateTimeUtcFromSelf),
   },
   {
     identifier: "WorkspaceIntegration",
@@ -34,59 +37,32 @@ export class WorkspaceIntegration extends Schema.TaggedClass<WorkspaceIntegratio
     description: "An integration connecting a workspace to an external service",
   }
 ) {
-  private static _validate = (
-    input: SchemaFields<typeof WorkspaceIntegration>
-  ) => Schema.decodeUnknown(WorkspaceIntegration)(input);
+  private static _validate = (input: typeof WorkspaceIntegration.model.Type) =>
+    Schema.validate(WorkspaceIntegration)(input);
 
-  private static _makeDefaults = () =>
+  static fromInput = (input: typeof WorkspaceIntegration.create.Type) =>
     Effect.gen(function* () {
-      const currentDate = yield* DateTime.now;
+      const safeInput = yield* Schema.decodeUnknown(
+        WorkspaceIntegration.create
+      )(input);
 
-      return {
-        _metadata: Option.none(),
-        createdAt: currentDate,
-      };
-    });
-
-  static create = (input: CreateWorkspaceIntegration) =>
-    Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(CreateWorkspaceIntegration)(
-        input
-      );
-
-      const defaults = yield* WorkspaceIntegration._makeDefaults();
+      const now = yield* DateTime.now;
 
       return yield* WorkspaceIntegration._validate({
-        ...defaults,
-        ...safeInput,
         id: WorkspaceIntegrationId.make(generateUUID()),
-        _tag: "WorkspaceIntegration",
+        createdAt: now,
+        ...safeInput,
       });
     });
 
-  patch = (input: PatchWorkspaceIntegration) =>
+  patch = (patch: typeof WorkspaceIntegration.patch.Type) =>
     Effect.gen(this, function* () {
-      const safeInput = yield* Schema.decodeUnknown(PatchWorkspaceIntegration)(
-        input
+      const safePatch = yield* Schema.decodeUnknown(WorkspaceIntegration.patch)(
+        patch
       );
       return yield* WorkspaceIntegration._validate({
         ...this,
-        ...safeInput,
-        id: this.id,
-        _tag: "WorkspaceIntegration",
+        ...safePatch,
       });
     });
 }
-
-export type CreateWorkspaceIntegration = typeof CreateWorkspaceIntegration.Type;
-export const CreateWorkspaceIntegration = Schema.Struct({
-  createdByMemberId: MemberId,
-  workspaceId: WorkspaceId,
-  provider: WorkspaceIntegration.fields.provider,
-  encryptedApiKey: EncryptedApiKey,
-});
-
-export type PatchWorkspaceIntegration = typeof PatchWorkspaceIntegration.Type;
-export const PatchWorkspaceIntegration = Schema.Struct({
-  encryptedApiKey: EncryptedApiKey,
-});
