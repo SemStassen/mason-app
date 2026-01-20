@@ -21,6 +21,7 @@ import {
   type PatchTaskOutput,
   type RestoreProjectInput,
   type RestoreProjectOutput,
+  RestoreProjectAction,
   RestoreTaskAction,
   type RestoreTaskInput,
   type RestoreTaskOutput,
@@ -105,7 +106,7 @@ export class ProjectActionsService extends Context.Tag(
           ),
 
         restoreProject: (params) =>
-          ArchiveProjectAction(params).pipe(
+          RestoreProjectAction(params).pipe(
             Effect.provide(services),
             Effect.catchTags({
               ParseError: (e) => Effect.fail(new MasonError({ cause: e })),
