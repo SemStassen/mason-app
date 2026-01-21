@@ -14,7 +14,7 @@
     "@effect/sql-pg": "^0.50.1",
     "drizzle-orm": "^0.45.1",
     "effect": "catalog:",
-    "pg": "^8.16.3"
+    "pg": "^8.17.2"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",

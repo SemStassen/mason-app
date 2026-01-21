@@ -1,8 +1,11 @@
+import { SqlError } from "@effect/sql/SqlError";
 import PgDrizzle from "@effect/sql-drizzle/Pg";
 import PgClient from "@effect/sql-pg/PgClient";
-import type { PgRemoteDatabase } from "drizzle-orm/pg-proxy/driver";
 import { Config, Context, Effect, Layer } from "effect";
-import { schema } from ".";
+// biome-ignore lint/performance/noNamespaceImport: Needed for schema
+import * as schema from "./schema";
+
+export type { SqlError } from "@effect/sql/SqlError";
 
 /**
  * PostgreSQL client layer configured from DATABASE_URL environment variable.
@@ -16,28 +19,45 @@ const PgLive = PgClient.layerConfig({
 });
 
 /**
- * Drizzle service tag that provides a Drizzle client instance with the schema.
- * Requires PgLive to be provided in the layer hierarchy.
+ * Drizzle database type - inferred from what PgDrizzle.make returns.
+ */
+type DrizzleDb = Effect.Effect.Success<
+  ReturnType<typeof PgDrizzle.make<typeof schema>>
+>;
+
+/**
+ * Drizzle service that provides a fluent API for running queries.
  *
  * Usage:
  * ```ts
  * const drizzle = yield* DrizzleService;
+ * const users = yield* drizzle.use(d => d.select().from(schema.usersTable));
  * ```
  */
 export class DrizzleService extends Context.Tag("@mason/db/DrizzleService")<
   DrizzleService,
   {
-    readonly drizzle: PgRemoteDatabase<typeof schema>;
+    /**
+     * Execute a Drizzle query wrapped in Effect.tryPromise.
+     */
+    readonly use: <T>(
+      fn: (db: DrizzleDb) => PromiseLike<T>
+    ) => Effect.Effect<T, SqlError>;
   }
 >() {
   static readonly live = Layer.effect(
     DrizzleService,
     Effect.gen(function* () {
-      const drizzle = yield* PgDrizzle.make({ schema });
+      const db = yield* PgDrizzle.make({ schema });
 
-      return DrizzleService.of({
-        drizzle: drizzle as unknown as PgRemoteDatabase<typeof schema>,
-      });
+      return {
+        use: <T>(fn: (db: DrizzleDb) => PromiseLike<T>) =>
+          Effect.tryPromise({
+            try: () => fn(db),
+            catch: (cause) =>
+              new SqlError({ cause, message: "Drizzle query failed" }),
+          }),
+      };
     })
   ).pipe(Layer.provide(PgLive));
 }

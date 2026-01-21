@@ -1,9 +1,63 @@
-import { Context, type DateTime, type Effect, type Option } from "effect";
+import { SqlSchema } from "@effect/sql";
+import { DrizzleService, schema } from "@mason/db";
+import { and, eq, gte, inArray, lte, type SQL } from "drizzle-orm";
+import { Context, DateTime, Effect, Layer, Option, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
 import type { DatabaseError } from "~/infra/db";
+import { wrapSqlError } from "~/infra/db";
 import type { TimeEntryId, WorkspaceId } from "~/shared/schemas";
 import type { AtLeastOne } from "~/shared/utils";
-import type { TimeEntry } from "../domain";
+import { TimeEntry } from "../domain";
+
+/**
+ * Schema representing a database row from the time_entries table.
+ * Includes all fields including metadata (createdAt, updatedAt).
+ */
+const TimeEntryDbRow = Schema.Struct({
+  id: Schema.String,
+  workspaceId: Schema.String,
+  memberId: Schema.String,
+  projectId: Schema.String,
+  taskId: Schema.NullOr(Schema.String),
+  startedAt: Schema.Date,
+  stoppedAt: Schema.NullOr(Schema.Date),
+  notes: Schema.NullOr(
+    Schema.Record({ key: Schema.String, value: Schema.Unknown })
+  ),
+  createdAt: Schema.Date,
+  updatedAt: Schema.Date,
+});
+type TimeEntryDbRow = typeof TimeEntryDbRow.Type;
+
+/**
+ * Convert database row to TimeEntry domain entity.
+ * Pure function - no Effect wrapping needed.
+ */
+const rowToTimeEntry = (row: TimeEntryDbRow): TimeEntry =>
+  Schema.decodeUnknownSync(TimeEntry)({
+    id: row.id,
+    workspaceId: row.workspaceId,
+    memberId: row.memberId,
+    projectId: row.projectId,
+    taskId: Option.fromNullable(row.taskId),
+    startedAt: row.startedAt,
+    stoppedAt: row.stoppedAt,
+    notes: Option.fromNullable(row.notes),
+  });
+
+/**
+ * Maps domain model to database format (Option<T> -> T | null).
+ */
+const timeEntryToDb = (timeEntry: typeof TimeEntry.Encoded) => ({
+  id: timeEntry.id,
+  workspaceId: timeEntry.workspaceId,
+  memberId: timeEntry.memberId,
+  projectId: timeEntry.projectId,
+  taskId: Option.getOrNull(timeEntry.taskId),
+  startedAt: timeEntry.startedAt,
+  stoppedAt: timeEntry.stoppedAt,
+  notes: Option.getOrNull(timeEntry.notes),
+});
 
 export class TimeEntryRepository extends Context.Tag(
   "@mason/time/TimeEntryRepository"
@@ -27,8 +81,8 @@ export class TimeEntryRepository extends Context.Tag(
       workspaceId: WorkspaceId;
       query: {
         ids?: ReadonlyArray<TimeEntryId>;
-        startedAt?: DateTime.Utc;
-        stoppedAt?: DateTime.Utc;
+        startedAt?: DateTime.DateTime;
+        stoppedAt?: DateTime.DateTime;
       };
     }) => Effect.Effect<ReadonlyArray<TimeEntry>, DatabaseError>;
     hardDelete: (params: {
@@ -36,4 +90,184 @@ export class TimeEntryRepository extends Context.Tag(
       timeEntryIds: NonEmptyReadonlyArray<TimeEntryId>;
     }) => Effect.Effect<void, DatabaseError>;
   }
->() {}
+>() {
+  static readonly live = Layer.effect(
+    TimeEntryRepository,
+    Effect.gen(function* () {
+      const drizzle = yield* DrizzleService;
+
+      const insertQuery = SqlSchema.findAll({
+        Request: Schema.Struct({
+          timeEntries: Schema.Array(TimeEntry.model),
+        }),
+        Result: TimeEntryDbRow,
+        execute: (request) =>
+          drizzle.use((d) =>
+            d
+              .insert(schema.timeEntriesTable)
+              .values(request.timeEntries.map(timeEntryToDb))
+              .returning()
+          ),
+      });
+
+      const updateQuery = SqlSchema.findAll({
+        Request: Schema.Struct({ timeEntry: TimeEntry.model }),
+        Result: TimeEntryDbRow,
+        execute: (request) =>
+          drizzle.use((d) =>
+            d
+              .update(schema.timeEntriesTable)
+              .set(timeEntryToDb(request.timeEntry))
+              .where(
+                and(
+                  eq(schema.timeEntriesTable.id, request.timeEntry.id),
+                  eq(
+                    schema.timeEntriesTable.workspaceId,
+                    request.timeEntry.workspaceId
+                  )
+                )
+              )
+              .returning()
+          ),
+      });
+
+      const retrieveQuery = SqlSchema.findOne({
+        Request: Schema.Struct({
+          workspaceId: Schema.String,
+          id: Schema.String,
+        }),
+        Result: TimeEntryDbRow,
+        execute: (request) =>
+          drizzle.use((d) =>
+            d
+              .select()
+              .from(schema.timeEntriesTable)
+              .where(
+                and(
+                  eq(schema.timeEntriesTable.workspaceId, request.workspaceId),
+                  eq(schema.timeEntriesTable.id, request.id)
+                )
+              )
+              .limit(1)
+          ),
+      });
+
+      const listQuery = SqlSchema.findAll({
+        Request: Schema.Struct({
+          workspaceId: Schema.String,
+          ids: Schema.optional(Schema.Array(Schema.String)),
+          startedAt: Schema.optional(Schema.Date),
+          stoppedAt: Schema.optional(Schema.Date),
+        }),
+        Result: TimeEntryDbRow,
+        execute: (request) => {
+          const whereConditions: Array<SQL> = [
+            eq(schema.timeEntriesTable.workspaceId, request.workspaceId),
+          ];
+
+          if (request.ids && request.ids.length > 0) {
+            whereConditions.push(
+              inArray(schema.timeEntriesTable.id, request.ids)
+            );
+          }
+
+          if (request.startedAt) {
+            whereConditions.push(
+              gte(schema.timeEntriesTable.startedAt, request.startedAt)
+            );
+          }
+
+          if (request.stoppedAt) {
+            whereConditions.push(
+              lte(schema.timeEntriesTable.stoppedAt, request.stoppedAt)
+            );
+          }
+
+          return drizzle.use((d) =>
+            d
+              .select()
+              .from(schema.timeEntriesTable)
+              .where(and(...whereConditions))
+          );
+        },
+      });
+
+      const hardDeleteQuery = SqlSchema.void({
+        Request: Schema.Struct({
+          workspaceId: Schema.String,
+          timeEntryIds: Schema.Array(Schema.String),
+        }),
+        execute: (request) =>
+          drizzle.use((d) =>
+            d
+              .delete(schema.timeEntriesTable)
+              .where(
+                and(
+                  eq(schema.timeEntriesTable.workspaceId, request.workspaceId),
+                  inArray(schema.timeEntriesTable.id, request.timeEntryIds)
+                )
+              )
+          ),
+      });
+
+      return TimeEntryRepository.of({
+        insert: Effect.fn("@mason/time/TimeEntryRepo.insert")(function* ({
+          timeEntries,
+        }) {
+          const rows = yield* insertQuery({ timeEntries });
+
+          return rows.map(rowToTimeEntry);
+        }, wrapSqlError),
+
+        update: Effect.fn("@mason/time/TimeEntryRepo.update")(function* ({
+          workspaceId,
+          timeEntries,
+        }) {
+          const results = yield* Effect.forEach(
+            timeEntries,
+            (timeEntry) => updateQuery({ timeEntry }),
+            { concurrency: 5 }
+          );
+
+          return results.flat().map(rowToTimeEntry);
+        }, wrapSqlError),
+
+        retrieve: Effect.fn("@mason/time/TimeEntryRepo.retrieve")(function* ({
+          workspaceId,
+          query,
+        }) {
+          const maybeRow = yield* retrieveQuery({
+            workspaceId,
+            id: query.id,
+          });
+
+          return Option.map(maybeRow, rowToTimeEntry);
+        }, wrapSqlError),
+
+        list: Effect.fn("@mason/time/TimeEntryRepo.list")(function* ({
+          workspaceId,
+          query,
+        }) {
+          const rows = yield* listQuery({
+            workspaceId,
+            ids: query.ids,
+            startedAt: query.startedAt,
+            stoppedAt: query.stoppedAt,
+          });
+
+          return rows.map(rowToTimeEntry);
+        }, wrapSqlError),
+
+        hardDelete: Effect.fn("@mason/time/TimeEntryRepo.hardDelete")(
+          function* ({ workspaceId, timeEntryIds }) {
+            return yield* hardDeleteQuery({
+              workspaceId,
+              timeEntryIds: timeEntryIds,
+            });
+          },
+          wrapSqlError
+        ),
+      });
+    })
+  );
+}

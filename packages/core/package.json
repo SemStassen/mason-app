@@ -13,6 +13,7 @@
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@mason/db": "workspace:*",
     "@mason/config": "workspace:*",
     "typescript": "catalog:dev"
   },

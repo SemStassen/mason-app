@@ -18,9 +18,7 @@ export const workspaceIntegrationsTable = pgTable(
       { onDelete: "set null" }
     ),
     // General
-    provider: varchar({
-      enum: ["float"],
-    }).notNull(),
+    provider: varchar().notNull(),
     encryptedApiKey: varchar("encrypted_api_key").notNull(),
     // Metadata
     _metadata: jsonb("metadata").$type<Record<string, unknown>>(),
@@ -57,9 +55,7 @@ export const projectIntegrationsTable = pgTable("project_integrations", {
     .references(() => projectsTable.id)
     .notNull(),
   // General
-  source: varchar({
-    enum: WorkspaceIntegrationprovider.from.literals,
-  }).notNull(),
+  source: varchar().notNull(),
   externalId: varchar("external_id").notNull(),
   ...tableMetadata,
 });
@@ -88,9 +84,7 @@ export const taskIntegrationsTable = pgTable("task_integrations", {
     .references(() => tasksTable.id)
     .notNull(),
   // General
-  source: varchar({
-    enum: WorkspaceIntegrationprovider.from.literals,
-  }).notNull(),
+  source: varchar().notNull(),
   externalId: varchar("external_id").notNull(),
   ...tableMetadata,
 });

@@ -24,7 +24,6 @@
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.12",
     "date-fns": "^4.1.0",
-    "drizzle-orm": "catalog:frontend",
     "effect": "catalog:",
     "motion": "^12.23.12",
     "react": "catalog:frontend",

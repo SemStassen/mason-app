@@ -1,4 +1,4 @@
-import { Context, type Effect, Schema } from "effect";
+import { Context, Effect, Schema } from "effect";
 
 export class DatabaseError extends Schema.TaggedError<DatabaseError>()(
   "infra/DatabaseError",
@@ -6,6 +6,15 @@ export class DatabaseError extends Schema.TaggedError<DatabaseError>()(
     cause: Schema.Unknown,
   }
 ) {}
+
+/**
+ * Wraps SQL and parse errors in DatabaseError for consistent error handling.
+ * Use this helper to ensure all database operations return DatabaseError.
+ */
+export const wrapSqlError = <A, E, R>(
+  effect: Effect.Effect<A, E, R>
+): Effect.Effect<A, DatabaseError, R> =>
+  effect.pipe(Effect.mapError((error) => new DatabaseError({ cause: error })));
 
 export class DatabaseService extends Context.Tag(
   "@mason/infra/DatabaseService"

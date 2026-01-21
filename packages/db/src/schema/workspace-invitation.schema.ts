@@ -16,8 +16,8 @@ export const workspaceInvitationsTable = pgTable("workspace_invitations", {
     .notNull(),
   // General
   email: varchar("email").notNull(),
-  role: varchar("role").$type<WorkspaceRole>().notNull(),
-  status: varchar("status").$type<WorkspaceInvitationStatus>().notNull(),
+  role: varchar("role").notNull(),
+  status: varchar("status").notNull(),
   expiresAt: timestamp("expires_at", {
     withTimezone: true,
     precision: 0,
