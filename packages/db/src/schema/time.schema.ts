@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import { jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata } from "../utils";
 import { membersTable } from "./member.schema";
@@ -36,17 +35,3 @@ export const timeEntriesTable = pgTable("time_entries", {
   // Metadata
   ...tableMetadata,
 });
-export const timeEntriesRelations = relations(timeEntriesTable, ({ one }) => ({
-  member: one(membersTable, {
-    fields: [timeEntriesTable.memberId],
-    references: [membersTable.userId],
-  }),
-  project: one(projectsTable, {
-    fields: [timeEntriesTable.projectId],
-    references: [projectsTable.id],
-  }),
-  task: one(tasksTable, {
-    fields: [timeEntriesTable.taskId],
-    references: [tasksTable.id],
-  }),
-}));

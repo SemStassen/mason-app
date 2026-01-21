@@ -1,7 +1,7 @@
-import { SqlError } from "@effect/sql/SqlError";
-import PgDrizzle from "@effect/sql-drizzle/Pg";
-import PgClient from "@effect/sql-pg/PgClient";
+import { layerConfig, PgClient } from "@effect/sql-pg/PgClient";
+import { drizzle } from "drizzle-orm/effect-postgres";
 import { Config, Context, Effect, Layer } from "effect";
+import { relations } from "./relations";
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "./schema";
 
@@ -10,7 +10,7 @@ export type { SqlError } from "@effect/sql/SqlError";
 /**
  * PostgreSQL client layer configured from DATABASE_URL environment variable.
  */
-const PgLive = PgClient.layerConfig({
+const PgLive = layerConfig({
   password: Config.redacted("POSTGRES_PW"),
   username: Config.succeed("postgres"),
   database: Config.succeed("postgres"),
@@ -19,11 +19,9 @@ const PgLive = PgClient.layerConfig({
 });
 
 /**
- * Drizzle database type - inferred from what PgDrizzle.make returns.
+ * Drizzle database type - inferred from what drizzle() returns.
  */
-type DrizzleDb = Effect.Effect.Success<
-  ReturnType<typeof PgDrizzle.make<typeof schema>>
->;
+type DrizzleDb = ReturnType<typeof drizzle<typeof schema, typeof relations>>;
 
 /**
  * Drizzle service that provides a fluent API for running queries.
@@ -36,28 +34,15 @@ type DrizzleDb = Effect.Effect.Success<
  */
 export class DrizzleService extends Context.Tag("@mason/db/DrizzleService")<
   DrizzleService,
-  {
-    /**
-     * Execute a Drizzle query wrapped in Effect.tryPromise.
-     */
-    readonly use: <T>(
-      fn: (db: DrizzleDb) => PromiseLike<T>
-    ) => Effect.Effect<T, SqlError>;
-  }
+  DrizzleDb
 >() {
   static readonly live = Layer.effect(
     DrizzleService,
     Effect.gen(function* () {
-      const db = yield* PgDrizzle.make({ schema });
+      const pgClient = yield* PgClient;
+      const drizzleDb = drizzle(pgClient, { schema, relations });
 
-      return {
-        use: <T>(fn: (db: DrizzleDb) => PromiseLike<T>) =>
-          Effect.tryPromise({
-            try: () => fn(db),
-            catch: (cause) =>
-              new SqlError({ cause, message: "Drizzle query failed" }),
-          }),
-      };
+      return drizzleDb;
     })
   ).pipe(Layer.provide(PgLive));
 }

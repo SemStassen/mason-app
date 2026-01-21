@@ -6,7 +6,6 @@ import type { NonEmptyReadonlyArray } from "effect/Array";
 import type { DatabaseError } from "~/infra/db";
 import { wrapSqlError } from "~/infra/db";
 import type { TimeEntryId, WorkspaceId } from "~/shared/schemas";
-import type { AtLeastOne } from "~/shared/utils";
 import { TimeEntry } from "../domain";
 
 /**
@@ -46,7 +45,7 @@ const rowToTimeEntry = (row: TimeEntryDbRow): TimeEntry =>
   });
 
 /**
- * Maps domain model to database format (Option<T> -> T | null).
+ * Maps domain model to database format (DateTime.Utc -> Date, Option<T> -> T | null).
  */
 const timeEntryToDb = (timeEntry: typeof TimeEntry.Encoded) => ({
   id: timeEntry.id,
@@ -54,8 +53,8 @@ const timeEntryToDb = (timeEntry: typeof TimeEntry.Encoded) => ({
   memberId: timeEntry.memberId,
   projectId: timeEntry.projectId,
   taskId: Option.getOrNull(timeEntry.taskId),
-  startedAt: timeEntry.startedAt,
-  stoppedAt: timeEntry.stoppedAt,
+  startedAt: DateTime.toDate(timeEntry.startedAt),
+  stoppedAt: DateTime.toDate(timeEntry.stoppedAt),
   notes: Option.getOrNull(timeEntry.notes),
 });
 
@@ -73,16 +72,16 @@ export class TimeEntryRepository extends Context.Tag(
     }) => Effect.Effect<ReadonlyArray<TimeEntry>, DatabaseError>;
     retrieve: (params: {
       workspaceId: WorkspaceId;
-      query: AtLeastOne<{
+      query: {
         id: TimeEntryId;
-      }>;
+      };
     }) => Effect.Effect<Option.Option<TimeEntry>, DatabaseError>;
     list: (params: {
       workspaceId: WorkspaceId;
       query: {
         ids?: ReadonlyArray<TimeEntryId>;
-        startedAt?: DateTime.DateTime;
-        stoppedAt?: DateTime.DateTime;
+        startedAt?: DateTime.Utc;
+        stoppedAt?: DateTime.Utc;
       };
     }) => Effect.Effect<ReadonlyArray<TimeEntry>, DatabaseError>;
     hardDelete: (params: {
@@ -102,33 +101,31 @@ export class TimeEntryRepository extends Context.Tag(
         }),
         Result: TimeEntryDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .insert(schema.timeEntriesTable)
-              .values(request.timeEntries.map(timeEntryToDb))
-              .returning()
-          ),
+          drizzle
+            .insert(schema.timeEntriesTable)
+            .values(request.timeEntries.map(timeEntryToDb))
+            .returning()
+            .execute(),
       });
 
       const updateQuery = SqlSchema.findAll({
-        Request: Schema.Struct({ timeEntry: TimeEntry.model }),
+        Request: Schema.Struct({
+          workspaceId: Schema.String,
+          timeEntry: TimeEntry.model,
+        }),
         Result: TimeEntryDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .update(schema.timeEntriesTable)
-              .set(timeEntryToDb(request.timeEntry))
-              .where(
-                and(
-                  eq(schema.timeEntriesTable.id, request.timeEntry.id),
-                  eq(
-                    schema.timeEntriesTable.workspaceId,
-                    request.timeEntry.workspaceId
-                  )
-                )
+          drizzle
+            .update(schema.timeEntriesTable)
+            .set(timeEntryToDb(request.timeEntry))
+            .where(
+              and(
+                eq(schema.timeEntriesTable.id, request.timeEntry.id),
+                eq(schema.timeEntriesTable.workspaceId, request.workspaceId)
               )
-              .returning()
-          ),
+            )
+            .returning()
+            .execute(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -138,18 +135,17 @@ export class TimeEntryRepository extends Context.Tag(
         }),
         Result: TimeEntryDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.timeEntriesTable)
-              .where(
-                and(
-                  eq(schema.timeEntriesTable.workspaceId, request.workspaceId),
-                  eq(schema.timeEntriesTable.id, request.id)
-                )
+          drizzle
+            .select()
+            .from(schema.timeEntriesTable)
+            .where(
+              and(
+                eq(schema.timeEntriesTable.workspaceId, request.workspaceId),
+                eq(schema.timeEntriesTable.id, request.id)
               )
-              .limit(1)
-          ),
+            )
+            .limit(1)
+            .execute(),
       });
 
       const listQuery = SqlSchema.findAll({
@@ -173,22 +169,27 @@ export class TimeEntryRepository extends Context.Tag(
 
           if (request.startedAt) {
             whereConditions.push(
-              gte(schema.timeEntriesTable.startedAt, request.startedAt)
+              gte(
+                schema.timeEntriesTable.startedAt,
+                request.startedAt as unknown as Date
+              )
             );
           }
 
           if (request.stoppedAt) {
             whereConditions.push(
-              lte(schema.timeEntriesTable.stoppedAt, request.stoppedAt)
+              lte(
+                schema.timeEntriesTable.stoppedAt,
+                request.stoppedAt as unknown as Date
+              )
             );
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.timeEntriesTable)
-              .where(and(...whereConditions))
-          );
+          return drizzle
+            .select()
+            .from(schema.timeEntriesTable)
+            .where(and(...whereConditions))
+            .execute();
         },
       });
 
@@ -198,16 +199,15 @@ export class TimeEntryRepository extends Context.Tag(
           timeEntryIds: Schema.Array(Schema.String),
         }),
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .delete(schema.timeEntriesTable)
-              .where(
-                and(
-                  eq(schema.timeEntriesTable.workspaceId, request.workspaceId),
-                  inArray(schema.timeEntriesTable.id, request.timeEntryIds)
-                )
+          drizzle
+            .delete(schema.timeEntriesTable)
+            .where(
+              and(
+                eq(schema.timeEntriesTable.workspaceId, request.workspaceId),
+                inArray(schema.timeEntriesTable.id, request.timeEntryIds)
               )
-          ),
+            )
+            .execute(),
       });
 
       return TimeEntryRepository.of({
@@ -225,7 +225,7 @@ export class TimeEntryRepository extends Context.Tag(
         }) {
           const results = yield* Effect.forEach(
             timeEntries,
-            (timeEntry) => updateQuery({ timeEntry }),
+            (timeEntry) => updateQuery({ workspaceId, timeEntry }),
             { concurrency: 5 }
           );
 
@@ -251,8 +251,12 @@ export class TimeEntryRepository extends Context.Tag(
           const rows = yield* listQuery({
             workspaceId,
             ids: query.ids,
-            startedAt: query.startedAt,
-            stoppedAt: query.stoppedAt,
+            startedAt: query.startedAt
+              ? DateTime.toDate(query.startedAt)
+              : undefined,
+            stoppedAt: query.stoppedAt
+              ? DateTime.toDate(query.stoppedAt)
+              : undefined,
           });
 
           return rows.map(rowToTimeEntry);

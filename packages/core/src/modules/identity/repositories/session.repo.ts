@@ -73,13 +73,12 @@ export class SessionRepository extends Context.Tag(
         Request: Session,
         Result: SessionDbRow,
         execute: (session) =>
-          drizzle.use((d) =>
-            d
-              .update(schema.sessionsTable)
-              .set(sessionToDb(session))
-              .where(eq(schema.sessionsTable.id, session.id))
-              .returning()
-          ),
+          drizzle
+            .update(schema.sessionsTable)
+            .set(sessionToDb(session))
+            .where(eq(schema.sessionsTable.id, session.id))
+            .returning()
+            .execute(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -101,15 +100,14 @@ export class SessionRepository extends Context.Tag(
             );
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.sessionsTable)
-              .where(
-                whereConditions.length > 0 ? and(...whereConditions) : undefined
-              )
-              .limit(1)
-          );
+          return drizzle
+            .select()
+            .from(schema.sessionsTable)
+            .where(
+              whereConditions.length > 0 ? and(...whereConditions) : undefined
+            )
+            .limit(1)
+            .execute();
         },
       });
 

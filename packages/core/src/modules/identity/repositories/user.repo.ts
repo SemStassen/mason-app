@@ -79,25 +79,23 @@ export class UserRepository extends Context.Tag(
         Request: Schema.Struct({ users: Schema.Array(User) }),
         Result: UserDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .insert(schema.usersTable)
-              .values(request.users.map(userToDb))
-              .returning()
-          ),
+          drizzle
+            .insert(schema.usersTable)
+            .values(request.users.map(userToDb))
+            .returning()
+            .execute(),
       });
 
       const updateQuery = SqlSchema.findAll({
         Request: Schema.Struct({ user: User.model }),
         Result: UserDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .update(schema.usersTable)
-              .set(userToDb(request.user))
-              .where(eq(schema.usersTable.id, request.user.id))
-              .returning()
-          ),
+          drizzle
+            .update(schema.usersTable)
+            .set(userToDb(request.user))
+            .where(eq(schema.usersTable.id, request.user.id))
+            .returning()
+            .execute(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -117,15 +115,14 @@ export class UserRepository extends Context.Tag(
             whereConditions.push(eq(schema.usersTable.email, request.email));
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.usersTable)
-              .where(
-                whereConditions.length > 0 ? and(...whereConditions) : undefined
-              )
-              .limit(1)
-          );
+          return drizzle
+            .select()
+            .from(schema.usersTable)
+            .where(
+              whereConditions.length > 0 ? and(...whereConditions) : undefined
+            )
+            .limit(1)
+            .execute();
         },
       });
 
@@ -134,11 +131,10 @@ export class UserRepository extends Context.Tag(
           userIds: Schema.Array(Schema.String),
         }),
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .delete(schema.usersTable)
-              .where(inArray(schema.usersTable.id, request.userIds))
-          ),
+          drizzle
+            .delete(schema.usersTable)
+            .where(inArray(schema.usersTable.id, request.userIds))
+            .execute(),
       });
 
       return UserRepository.of({

@@ -1,7 +1,7 @@
 import { SqlSchema } from "@effect/sql";
 import { DrizzleService, schema } from "@mason/db";
 import { and, eq, type SQL } from "drizzle-orm";
-import { Context, Effect, Layer, Option, Schema } from "effect";
+import { Context, DateTime, Effect, Layer, Option, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
 import type { DatabaseError } from "~/infra/db";
 import { wrapSqlError } from "~/infra/db";
@@ -38,14 +38,14 @@ const rowToMember = (row: MemberDbRow): Member =>
   });
 
 /**
- * Maps domain model to database format (Option<Date> -> Date | null).
+ * Maps domain model to database format (Option<DateTime.Utc> -> Date | null).
  */
 const memberToDb = (member: typeof Member.Encoded) => ({
   id: member.id,
   userId: member.userId,
   workspaceId: member.workspaceId,
   role: member.role,
-  deletedAt: Option.getOrNull(member.deletedAt),
+  deletedAt: Option.getOrNull(Option.map(member.deletedAt, DateTime.toDate)),
 });
 
 export class MemberRepository extends Context.Tag(
@@ -63,8 +63,8 @@ export class MemberRepository extends Context.Tag(
     retrieve: (params: {
       workspaceId: WorkspaceId;
       query: AtLeastOne<{
-        id: MemberId;
-        userId: UserId;
+        id?: MemberId;
+        userId?: UserId;
       }>;
     }) => Effect.Effect<Option.Option<Member>, DatabaseError>;
   }
@@ -80,30 +80,31 @@ export class MemberRepository extends Context.Tag(
         }),
         Result: MemberDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .insert(schema.membersTable)
-              .values(request.members.map(memberToDb))
-              .returning()
-          ),
+          drizzle
+            .insert(schema.membersTable)
+            .values(request.members.map(memberToDb))
+            .returning()
+            .execute(),
       });
 
       const updateQuery = SqlSchema.findAll({
-        Request: Schema.Struct({ member: Member.model }),
+        Request: Schema.Struct({
+          workspaceId: Schema.String,
+          member: Member.model,
+        }),
         Result: MemberDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .update(schema.membersTable)
-              .set(memberToDb(request.member))
-              .where(
-                and(
-                  eq(schema.membersTable.id, request.member.id),
-                  eq(schema.membersTable.workspaceId, request.member.workspaceId)
-                )
+          drizzle
+            .update(schema.membersTable)
+            .set(memberToDb(request.member))
+            .where(
+              and(
+                eq(schema.membersTable.id, request.member.id),
+                eq(schema.membersTable.workspaceId, request.workspaceId)
               )
-              .returning()
-          ),
+            )
+            .returning()
+            .execute(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -123,16 +124,17 @@ export class MemberRepository extends Context.Tag(
           }
 
           if (request.userId) {
-            whereConditions.push(eq(schema.membersTable.userId, request.userId));
+            whereConditions.push(
+              eq(schema.membersTable.userId, request.userId)
+            );
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.membersTable)
-              .where(and(...whereConditions))
-              .limit(1)
-          );
+          return drizzle
+            .select()
+            .from(schema.membersTable)
+            .where(and(...whereConditions))
+            .limit(1)
+            .execute();
         },
       });
 
@@ -151,7 +153,7 @@ export class MemberRepository extends Context.Tag(
         }) {
           const results = yield* Effect.forEach(
             members,
-            (member) => updateQuery({ member }),
+            (member) => updateQuery({ workspaceId, member }),
             { concurrency: 5 }
           );
 

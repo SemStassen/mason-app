@@ -1,9 +1,4 @@
 import {
-  type InferInsertModel,
-  type InferSelectModel,
-  relations,
-} from "drizzle-orm";
-import {
   boolean,
   pgTable,
   timestamp,
@@ -11,10 +6,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata } from "../utils";
-import { membersTable } from "./member.schema";
 
-export type DbSelectUser = InferSelectModel<typeof usersTable>;
-export type DbInsertUser = InferInsertModel<typeof usersTable>;
 export const usersTable = pgTable("users", {
   id: tableId,
   // General
@@ -25,11 +17,6 @@ export const usersTable = pgTable("users", {
   // Metadata
   ...tableMetadata,
 });
-export const usersRelations = relations(usersTable, ({ many }) => ({
-  sessions: many(sessionsTable),
-  accounts: many(accountsTable),
-  memberships: many(membersTable),
-}));
 
 export const sessionsTable = pgTable("sessions", {
   id: tableId,
@@ -49,12 +36,6 @@ export const sessionsTable = pgTable("sessions", {
   // Metadata
   ...tableMetadata,
 });
-export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [sessionsTable.userId],
-    references: [usersTable.id],
-  }),
-}));
 
 export const accountsTable = pgTable("accounts", {
   id: tableId,
@@ -81,12 +62,6 @@ export const accountsTable = pgTable("accounts", {
   // Metadata
   ...tableMetadata,
 });
-export const accountsRelations = relations(accountsTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [accountsTable.userId],
-    references: [usersTable.id],
-  }),
-}));
 
 export const verificationsTable = pgTable("verifications", {
   id: tableId,
@@ -100,4 +75,3 @@ export const verificationsTable = pgTable("verifications", {
   // Metadata
   ...tableMetadata,
 });
-export const verificationsRelations = relations(verificationsTable, () => ({}));

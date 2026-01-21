@@ -1,7 +1,5 @@
-import { relations } from "drizzle-orm";
 import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata } from "../utils";
-import { usersTable } from "./identity.schema";
 import { membersTable } from "./member.schema";
 import { workspacesTable } from "./workspace.schema";
 
@@ -25,16 +23,3 @@ export const workspaceInvitationsTable = pgTable("workspace_invitations", {
   // Metadata
   ...tableMetadata,
 });
-export const invitationsRelations = relations(
-  workspaceInvitationsTable,
-  ({ one }) => ({
-    inviter: one(usersTable, {
-      fields: [workspaceInvitationsTable.inviterId],
-      references: [usersTable.id],
-    }),
-    workspace: one(workspacesTable, {
-      fields: [workspaceInvitationsTable.workspaceId],
-      references: [workspacesTable.id],
-    }),
-  })
-);

@@ -1,10 +1,7 @@
-import { relations } from "drizzle-orm";
 import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata, tableSoftDelete } from "../utils";
 import { usersTable } from "./identity.schema";
-import { timeEntriesTable } from "./time.schema";
 import { workspacesTable } from "./workspace.schema";
-import { workspaceInvitationsTable } from "./workspace-invitation.schema";
 
 export const membersTable = pgTable("members", {
   id: tableId,
@@ -21,15 +18,3 @@ export const membersTable = pgTable("members", {
   ...tableSoftDelete,
   ...tableMetadata,
 });
-export const membersRelations = relations(membersTable, ({ one, many }) => ({
-  user: one(usersTable, {
-    fields: [membersTable.userId],
-    references: [usersTable.id],
-  }),
-  workspace: one(workspacesTable, {
-    fields: [membersTable.workspaceId],
-    references: [workspacesTable.id],
-  }),
-  sentWorkspaceInvitations: many(workspaceInvitationsTable),
-  timeEntries: many(timeEntriesTable),
-}));

@@ -48,7 +48,7 @@ const rowToWorkspaceInvitation = (
   });
 
 /**
- * Maps domain model to database format.
+ * Maps domain model to database format (DateTime.Utc -> Date).
  */
 const workspaceInvitationToDb = (
   workspaceInvitation: typeof WorkspaceInvitation.Encoded
@@ -59,7 +59,7 @@ const workspaceInvitationToDb = (
   email: workspaceInvitation.email,
   role: workspaceInvitation.role,
   status: workspaceInvitation.status,
-  expiresAt: workspaceInvitation.expiresAt,
+  expiresAt: DateTime.toDate(workspaceInvitation.expiresAt),
 });
 
 export class WorkspaceInvitationRepository extends Context.Tag(
@@ -112,65 +112,68 @@ export class WorkspaceInvitationRepository extends Context.Tag(
         }),
         Result: WorkspaceInvitationDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .insert(schema.workspaceInvitationsTable)
-              .values(
-                request.workspaceInvitations.map(workspaceInvitationToDb)
-              )
-              .returning()
-          ),
+          drizzle
+            .insert(schema.workspaceInvitationsTable)
+            .values(request.workspaceInvitations.map(workspaceInvitationToDb))
+            .returning()
+            .execute(),
       });
 
       const updateQuery = SqlSchema.findAll({
         Request: Schema.Struct({
+          workspaceId: Schema.String,
           workspaceInvitation: WorkspaceInvitation.model,
         }),
         Result: WorkspaceInvitationDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .update(schema.workspaceInvitationsTable)
-              .set(workspaceInvitationToDb(request.workspaceInvitation))
-              .where(
-                and(
-                  eq(
-                    schema.workspaceInvitationsTable.id,
-                    request.workspaceInvitation.id
-                  ),
-                  eq(
-                    schema.workspaceInvitationsTable.workspaceId,
-                    request.workspaceInvitation.workspaceId
-                  )
+          drizzle
+            .update(schema.workspaceInvitationsTable)
+            .set(workspaceInvitationToDb(request.workspaceInvitation))
+            .where(
+              and(
+                eq(
+                  schema.workspaceInvitationsTable.id,
+                  request.workspaceInvitation.id
+                ),
+                eq(
+                  schema.workspaceInvitationsTable.workspaceId,
+                  request.workspaceId
                 )
               )
-              .returning()
-          ),
+            )
+            .returning()
+            .execute(),
       });
 
       const upsertQuery = SqlSchema.findAll({
-        Request: WorkspaceInvitation,
+        Request: Schema.Struct({
+          workspaceId: Schema.String,
+          workspaceInvitation: WorkspaceInvitation.model,
+        }),
         Result: WorkspaceInvitationDbRow,
-        execute: (workspaceInvitation) =>
-          drizzle.use((d) =>
-            d
-              .insert(schema.workspaceInvitationsTable)
-              .values(workspaceInvitationToDb(workspaceInvitation))
-              .onConflictDoUpdate({
-                target: [
-                  schema.workspaceInvitationsTable.workspaceId,
-                  schema.workspaceInvitationsTable.email,
-                ],
-                set: {
-                  inviterId: schema.workspaceInvitationsTable.inviterId,
-                  role: schema.workspaceInvitationsTable.role,
-                  status: schema.workspaceInvitationsTable.status,
-                  expiresAt: schema.workspaceInvitationsTable.expiresAt,
-                  updatedAt: new Date(),
-                },
-              })
-              .returning()
-          ),
+        execute: (request) =>
+          drizzle
+            .insert(schema.workspaceInvitationsTable)
+            .values(workspaceInvitationToDb(request.workspaceInvitation))
+            .onConflictDoUpdate({
+              targetWhere: eq(
+                schema.workspaceInvitationsTable.workspaceId,
+                request.workspaceId
+              ),
+              target: [
+                schema.workspaceInvitationsTable.workspaceId,
+                schema.workspaceInvitationsTable.email,
+              ],
+              set: {
+                inviterId: schema.workspaceInvitationsTable.inviterId,
+                role: schema.workspaceInvitationsTable.role,
+                status: schema.workspaceInvitationsTable.status,
+                expiresAt: schema.workspaceInvitationsTable.expiresAt,
+                updatedAt: new Date(),
+              },
+            })
+            .returning()
+            .execute(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -219,15 +222,14 @@ export class WorkspaceInvitationRepository extends Context.Tag(
             );
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.workspaceInvitationsTable)
-              .where(
-                whereConditions.length > 0 ? and(...whereConditions) : undefined
-              )
-              .limit(1)
-          );
+          return drizzle
+            .select()
+            .from(schema.workspaceInvitationsTable)
+            .where(
+              whereConditions.length > 0 ? and(...whereConditions) : undefined
+            )
+            .limit(1)
+            .execute();
         },
       });
 
@@ -241,7 +243,10 @@ export class WorkspaceInvitationRepository extends Context.Tag(
         Result: WorkspaceInvitationDbRow,
         execute: (request) => {
           const whereConditions: Array<SQL> = [
-            eq(schema.workspaceInvitationsTable.workspaceId, request.workspaceId),
+            eq(
+              schema.workspaceInvitationsTable.workspaceId,
+              request.workspaceId
+            ),
           ];
 
           if (request.ids && request.ids.length > 0) {
@@ -263,12 +268,11 @@ export class WorkspaceInvitationRepository extends Context.Tag(
             );
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.workspaceInvitationsTable)
-              .where(and(...whereConditions))
-          );
+          return drizzle
+            .select()
+            .from(schema.workspaceInvitationsTable)
+            .where(and(...whereConditions))
+            .execute();
         },
       });
 
@@ -278,56 +282,60 @@ export class WorkspaceInvitationRepository extends Context.Tag(
           workspaceInvitationIds: Schema.Array(Schema.String),
         }),
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .delete(schema.workspaceInvitationsTable)
-              .where(
-                and(
-                  eq(
-                    schema.workspaceInvitationsTable.workspaceId,
-                    request.workspaceId
-                  ),
-                  inArray(
-                    schema.workspaceInvitationsTable.id,
-                    request.workspaceInvitationIds
-                  )
+          drizzle
+            .delete(schema.workspaceInvitationsTable)
+            .where(
+              and(
+                eq(
+                  schema.workspaceInvitationsTable.workspaceId,
+                  request.workspaceId
+                ),
+                inArray(
+                  schema.workspaceInvitationsTable.id,
+                  request.workspaceInvitationIds
                 )
               )
-          ),
+            )
+            .execute(),
       });
 
       return WorkspaceInvitationRepository.of({
-        insert: Effect.fn(
-          "@mason/invitation/WorkspaceInvitationRepo.insert"
-        )(function* ({ workspaceInvitations }) {
-          const rows = yield* insertQuery({ workspaceInvitations });
+        insert: Effect.fn("@mason/invitation/WorkspaceInvitationRepo.insert")(
+          function* ({ workspaceInvitations }) {
+            const rows = yield* insertQuery({ workspaceInvitations });
 
-          return rows.map(rowToWorkspaceInvitation);
-        }, wrapSqlError),
+            return rows.map(rowToWorkspaceInvitation);
+          },
+          wrapSqlError
+        ),
 
-        update: Effect.fn(
-          "@mason/invitation/WorkspaceInvitationRepo.update"
-        )(function* ({ workspaceId, workspaceInvitations }) {
-          const results = yield* Effect.forEach(
-            workspaceInvitations,
-            (workspaceInvitation) => updateQuery({ workspaceInvitation }),
-            { concurrency: 5 }
-          );
+        update: Effect.fn("@mason/invitation/WorkspaceInvitationRepo.update")(
+          function* ({ workspaceId, workspaceInvitations }) {
+            const results = yield* Effect.forEach(
+              workspaceInvitations,
+              (workspaceInvitation) =>
+                updateQuery({ workspaceId, workspaceInvitation }),
+              { concurrency: 5 }
+            );
 
-          return results.flat().map(rowToWorkspaceInvitation);
-        }, wrapSqlError),
+            return results.flat().map(rowToWorkspaceInvitation);
+          },
+          wrapSqlError
+        ),
 
-        upsert: Effect.fn(
-          "@mason/invitation/WorkspaceInvitationRepo.upsert"
-        )(function* ({ workspaceId, workspaceInvitations }) {
-          const results = yield* Effect.forEach(
-            workspaceInvitations,
-            (workspaceInvitation) => upsertQuery(workspaceInvitation),
-            { concurrency: 5 }
-          );
+        upsert: Effect.fn("@mason/invitation/WorkspaceInvitationRepo.upsert")(
+          function* ({ workspaceId, workspaceInvitations }) {
+            const results = yield* Effect.forEach(
+              workspaceInvitations,
+              (workspaceInvitation) =>
+                upsertQuery({ workspaceId, workspaceInvitation }),
+              { concurrency: 5 }
+            );
 
-          return results.flat().map(rowToWorkspaceInvitation);
-        }, wrapSqlError),
+            return results.flat().map(rowToWorkspaceInvitation);
+          },
+          wrapSqlError
+        ),
 
         retrieve: Effect.fn(
           "@mason/invitation/WorkspaceInvitationRepo.retrieve"
@@ -337,7 +345,7 @@ export class WorkspaceInvitationRepository extends Context.Tag(
             workspaceId: query.workspaceId,
             status: query.status,
             email: query.email,
-            includeExpired: query.includeExpired,
+            includeExpired: query.includeExpired ?? false,
           });
 
           return Option.map(maybeRow, rowToWorkspaceInvitation);
@@ -359,15 +367,12 @@ export class WorkspaceInvitationRepository extends Context.Tag(
 
         hardDelete: Effect.fn(
           "@mason/invitation/WorkspaceInvitationRepo.hardDelete"
-        )(
-          function* ({ workspaceId, workspaceInvitationIds }) {
-            return yield* hardDeleteQuery({
-              workspaceId,
-              workspaceInvitationIds: workspaceInvitationIds,
-            });
-          },
-          wrapSqlError
-        ),
+        )(function* ({ workspaceId, workspaceInvitationIds }) {
+          return yield* hardDeleteQuery({
+            workspaceId,
+            workspaceInvitationIds: workspaceInvitationIds,
+          });
+        }, wrapSqlError),
       });
     })
   );

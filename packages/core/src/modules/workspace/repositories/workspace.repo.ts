@@ -61,8 +61,8 @@ export class WorkspaceRepository extends Context.Tag(
     }) => Effect.Effect<ReadonlyArray<Workspace>, DatabaseError>;
     retrieve: (params: {
       query: AtLeastOne<{
-        id: WorkspaceId;
-        slug: string;
+        id?: WorkspaceId;
+        slug?: string;
       }>;
     }) => Effect.Effect<Option.Option<Workspace>, DatabaseError>;
     hardDelete: (params: {
@@ -81,25 +81,23 @@ export class WorkspaceRepository extends Context.Tag(
         }),
         Result: WorkspaceDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .insert(schema.workspacesTable)
-              .values(request.workspaces.map(workspaceToDb))
-              .returning()
-          ),
+          drizzle
+            .insert(schema.workspacesTable)
+            .values(request.workspaces.map(workspaceToDb))
+            .returning()
+            .execute(),
       });
 
       const updateQuery = SqlSchema.findAll({
         Request: Schema.Struct({ workspace: Workspace.model }),
         Result: WorkspaceDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .update(schema.workspacesTable)
-              .set(workspaceToDb(request.workspace))
-              .where(eq(schema.workspacesTable.id, request.workspace.id))
-              .returning()
-          ),
+          drizzle
+            .update(schema.workspacesTable)
+            .set(workspaceToDb(request.workspace))
+            .where(eq(schema.workspacesTable.id, request.workspace.id))
+            .returning()
+            .execute(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -119,15 +117,14 @@ export class WorkspaceRepository extends Context.Tag(
             whereConditions.push(eq(schema.workspacesTable.slug, request.slug));
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.workspacesTable)
-              .where(
-                whereConditions.length > 0 ? and(...whereConditions) : undefined
-              )
-              .limit(1)
-          );
+          return drizzle
+            .select()
+            .from(schema.workspacesTable)
+            .where(
+              whereConditions.length > 0 ? and(...whereConditions) : undefined
+            )
+            .limit(1)
+            .execute();
         },
       });
 
@@ -136,11 +133,10 @@ export class WorkspaceRepository extends Context.Tag(
           workspaceIds: Schema.Array(Schema.String),
         }),
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .delete(schema.workspacesTable)
-              .where(inArray(schema.workspacesTable.id, request.workspaceIds))
-          ),
+          drizzle
+            .delete(schema.workspacesTable)
+            .where(inArray(schema.workspacesTable.id, request.workspaceIds))
+            .execute(),
       });
 
       return WorkspaceRepository.of({

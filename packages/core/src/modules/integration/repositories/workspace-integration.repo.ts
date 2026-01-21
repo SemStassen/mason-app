@@ -73,8 +73,8 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
     retrieve: (params: {
       workspaceId: WorkspaceId;
       query: AtLeastOne<{
-        id: WorkspaceIntegrationId;
-        provider: WorkspaceIntegration["provider"];
+        id?: WorkspaceIntegrationId;
+        provider?: WorkspaceIntegration["provider"];
       }>;
     }) => Effect.Effect<Option.Option<WorkspaceIntegration>, DatabaseError>;
     list: (params: {
@@ -100,14 +100,11 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
         }),
         Result: WorkspaceIntegrationDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .insert(schema.workspaceIntegrationsTable)
-              .values(
-                request.workspaceIntegrations.map(workspaceIntegrationToDb)
-              )
-              .returning()
-          ),
+          drizzle
+            .insert(schema.workspaceIntegrationsTable)
+            .values(request.workspaceIntegrations.map(workspaceIntegrationToDb))
+            .returning()
+            .execute(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -117,24 +114,23 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
         }),
         Result: WorkspaceIntegrationDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .update(schema.workspaceIntegrationsTable)
-              .set(workspaceIntegrationToDb(request.workspaceIntegration))
-              .where(
-                and(
-                  eq(
-                    schema.workspaceIntegrationsTable.id,
-                    request.workspaceIntegration.id
-                  ),
-                  eq(
-                    schema.workspaceIntegrationsTable.workspaceId,
-                    request.workspaceId
-                  )
+          drizzle
+            .update(schema.workspaceIntegrationsTable)
+            .set(workspaceIntegrationToDb(request.workspaceIntegration))
+            .where(
+              and(
+                eq(
+                  schema.workspaceIntegrationsTable.id,
+                  request.workspaceIntegration.id
+                ),
+                eq(
+                  schema.workspaceIntegrationsTable.workspaceId,
+                  request.workspaceId
                 )
               )
-              .returning()
-          ),
+            )
+            .returning()
+            .execute(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -164,13 +160,12 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
             );
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.workspaceIntegrationsTable)
-              .where(and(...whereConditions))
-              .limit(1)
-          );
+          return drizzle
+            .select()
+            .from(schema.workspaceIntegrationsTable)
+            .where(and(...whereConditions))
+            .limit(1)
+            .execute();
         },
       });
 
@@ -194,12 +189,11 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
             );
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.workspaceIntegrationsTable)
-              .where(and(...whereConditions))
-          );
+          return drizzle
+            .select()
+            .from(schema.workspaceIntegrationsTable)
+            .where(and(...whereConditions))
+            .execute();
         },
       });
 
@@ -209,19 +203,18 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
           ids: Schema.Array(Schema.String),
         }),
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .delete(schema.workspaceIntegrationsTable)
-              .where(
-                and(
-                  eq(
-                    schema.workspaceIntegrationsTable.workspaceId,
-                    request.workspaceId
-                  ),
-                  inArray(schema.workspaceIntegrationsTable.id, request.ids)
-                )
+          drizzle
+            .delete(schema.workspaceIntegrationsTable)
+            .where(
+              and(
+                eq(
+                  schema.workspaceIntegrationsTable.workspaceId,
+                  request.workspaceId
+                ),
+                inArray(schema.workspaceIntegrationsTable.id, request.ids)
               )
-          ),
+            )
+            .execute(),
       });
 
       return WorkspaceIntegrationRepository.of({
@@ -253,8 +246,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
         )(function* ({ workspaceId, query }) {
           const maybeRow = yield* retrieveQuery({
             workspaceId,
-            id: query.id,
-            provider: query.provider,
+            ...query,
           });
 
           return Option.map(maybeRow, rowToWorkspaceIntegration);

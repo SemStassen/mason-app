@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import {
   boolean,
   jsonb,
@@ -8,11 +7,6 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { tableArchive, tableId, tableMetadata } from "../utils";
-import {
-  projectIntegrationsTable,
-  taskIntegrationsTable,
-} from "./integration.schema";
-import { timeEntriesTable } from "./time.schema";
 import { workspacesTable } from "./workspace.schema";
 
 export const projectsTable = pgTable("projects", {
@@ -41,15 +35,6 @@ export const projectsTable = pgTable("projects", {
   ...tableArchive,
   ...tableMetadata,
 });
-export const projectsRelations = relations(projectsTable, ({ one, many }) => ({
-  workspace: one(workspacesTable, {
-    fields: [projectsTable.workspaceId],
-    references: [workspacesTable.id],
-  }),
-  tasks: many(tasksTable),
-  timeEntries: many(timeEntriesTable),
-  integrations: many(projectIntegrationsTable),
-}));
 
 export const tasksTable = pgTable("tasks", {
   id: tableId,
@@ -65,11 +50,3 @@ export const tasksTable = pgTable("tasks", {
   ...tableArchive,
   ...tableMetadata,
 });
-export const tasksRelations = relations(tasksTable, ({ one, many }) => ({
-  project: one(projectsTable, {
-    fields: [tasksTable.projectId],
-    references: [projectsTable.id],
-  }),
-  timeEntries: many(timeEntriesTable),
-  integrations: many(taskIntegrationsTable),
-}));

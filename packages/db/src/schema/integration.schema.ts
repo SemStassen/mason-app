@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import { jsonb, pgTable, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata } from "../utils";
 import { membersTable } from "./member.schema";
@@ -31,19 +30,6 @@ export const workspaceIntegrationsTable = pgTable(
     ),
   ]
 );
-export const workspaceIntegrationsRelations = relations(
-  workspaceIntegrationsTable,
-  ({ one }) => ({
-    workspace: one(workspacesTable, {
-      fields: [workspaceIntegrationsTable.workspaceId],
-      references: [workspacesTable.id],
-    }),
-    createdByMember: one(membersTable, {
-      fields: [workspaceIntegrationsTable.createdByMemberId],
-      references: [membersTable.id],
-    }),
-  })
-);
 
 export const projectIntegrationsTable = pgTable("project_integrations", {
   id: tableId,
@@ -60,20 +46,6 @@ export const projectIntegrationsTable = pgTable("project_integrations", {
   ...tableMetadata,
 });
 
-export const projectIntegrationsRelations = relations(
-  projectIntegrationsTable,
-  ({ one }) => ({
-    workspace: one(workspacesTable, {
-      fields: [projectIntegrationsTable.workspaceId],
-      references: [workspacesTable.id],
-    }),
-    project: one(projectsTable, {
-      fields: [projectIntegrationsTable.projectId],
-      references: [projectsTable.id],
-    }),
-  })
-);
-
 export const taskIntegrationsTable = pgTable("task_integrations", {
   id: tableId,
   // References
@@ -88,17 +60,3 @@ export const taskIntegrationsTable = pgTable("task_integrations", {
   externalId: varchar("external_id").notNull(),
   ...tableMetadata,
 });
-
-export const taskIntegrationsRelations = relations(
-  taskIntegrationsTable,
-  ({ one }) => ({
-    workspace: one(workspacesTable, {
-      fields: [taskIntegrationsTable.workspaceId],
-      references: [workspacesTable.id],
-    }),
-    task: one(tasksTable, {
-      fields: [taskIntegrationsTable.taskId],
-      references: [tasksTable.id],
-    }),
-  })
-);

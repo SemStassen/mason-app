@@ -85,55 +85,48 @@ export class TaskRepository extends Context.Tag(
         }),
         Result: TaskDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .insert(schema.tasksTable)
-              .values(request.tasks.map(taskToDb))
-              .returning()
-          ),
+          drizzle
+            .insert(schema.tasksTable)
+            .values(request.tasks.map(taskToDb))
+            .returning()
+            .execute(),
       });
 
       const updateQuery = SqlSchema.findAll({
         Request: Schema.Struct({ workspaceId: WorkspaceId, task: Task.model }),
         Result: TaskDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .update(schema.tasksTable)
-              .set(taskToDb(request.task))
-              .where(
-                and(
-                  eq(schema.tasksTable.id, request.task.id),
-                  eq(schema.tasksTable.workspaceId, request.workspaceId)
-                )
+          drizzle
+            .update(schema.tasksTable)
+            .set(taskToDb(request.task))
+            .where(
+              and(
+                eq(schema.tasksTable.id, request.task.id),
+                eq(schema.tasksTable.workspaceId, request.workspaceId)
               )
-              .returning()
-          ),
+            )
+            .returning()
+            .execute(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
         Request: Schema.Struct({
           workspaceId: Schema.String,
-          id: Schema.optional(Schema.String),
+          id: Schema.String,
         }),
         Result: TaskDbRow,
-        execute: (request) => {
-          const whereConditions: Array<SQL> = [
-            eq(schema.tasksTable.workspaceId, request.workspaceId),
-          ];
-
-          if (request.id) {
-            whereConditions.push(eq(schema.tasksTable.id, request.id));
-          }
-
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.tasksTable)
-              .where(and(...whereConditions))
-              .limit(1)
-          );
-        },
+        execute: (request) =>
+          drizzle
+            .select()
+            .from(schema.tasksTable)
+            .where(
+              and(
+                eq(schema.tasksTable.workspaceId, request.workspaceId),
+                eq(schema.tasksTable.id, request.id)
+              )
+            )
+            .limit(1)
+            .execute(),
       });
 
       const listQuery = SqlSchema.findAll({
@@ -159,12 +152,11 @@ export class TaskRepository extends Context.Tag(
             );
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.tasksTable)
-              .where(and(...whereConditions))
-          );
+          return drizzle
+            .select()
+            .from(schema.tasksTable)
+            .where(and(...whereConditions))
+            .execute();
         },
       });
 

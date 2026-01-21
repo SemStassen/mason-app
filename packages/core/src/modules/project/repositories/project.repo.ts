@@ -99,12 +99,11 @@ export class ProjectRepository extends Context.Tag(
         }),
         Result: ProjectDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .insert(schema.projectsTable)
-              .values(request.projects.map(projectToDb))
-              .returning()
-          ),
+          drizzle
+            .insert(schema.projectsTable)
+            .values(request.projects.map(projectToDb))
+            .returning()
+            .execute(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -114,18 +113,17 @@ export class ProjectRepository extends Context.Tag(
         }),
         Result: ProjectDbRow,
         execute: (request) =>
-          drizzle.use((d) =>
-            d
-              .update(schema.projectsTable)
-              .set(projectToDb(request.project))
-              .where(
-                and(
-                  eq(schema.projectsTable.id, request.project.id),
-                  eq(schema.projectsTable.workspaceId, request.workspaceId)
-                )
+          drizzle
+            .update(schema.projectsTable)
+            .set(projectToDb(request.project))
+            .where(
+              and(
+                eq(schema.projectsTable.id, request.project.id),
+                eq(schema.projectsTable.workspaceId, request.workspaceId)
               )
-              .returning()
-          ),
+            )
+            .returning()
+            .execute(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -147,13 +145,12 @@ export class ProjectRepository extends Context.Tag(
             whereConditions.push(isNull(schema.projectsTable.archivedAt));
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.projectsTable)
-              .where(and(...whereConditions))
-              .limit(1)
-          );
+          return drizzle
+            .select()
+            .from(schema.projectsTable)
+            .where(and(...whereConditions))
+            .limit(1)
+            .execute();
         },
       });
 
@@ -173,12 +170,11 @@ export class ProjectRepository extends Context.Tag(
             whereConditions.push(inArray(schema.projectsTable.id, request.ids));
           }
 
-          return drizzle.use((d) =>
-            d
-              .select()
-              .from(schema.projectsTable)
-              .where(and(...whereConditions))
-          );
+          return drizzle
+            .select()
+            .from(schema.projectsTable)
+            .where(and(...whereConditions))
+            .execute();
         },
       });
 
