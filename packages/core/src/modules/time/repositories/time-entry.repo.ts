@@ -104,8 +104,7 @@ export class TimeEntryRepository extends Context.Tag(
           drizzle
             .insert(schema.timeEntriesTable)
             .values(request.timeEntries.map(timeEntryToDb))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -124,8 +123,7 @@ export class TimeEntryRepository extends Context.Tag(
                 eq(schema.timeEntriesTable.workspaceId, request.workspaceId)
               )
             )
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -144,8 +142,7 @@ export class TimeEntryRepository extends Context.Tag(
                 eq(schema.timeEntriesTable.id, request.id)
               )
             )
-            .limit(1)
-            .execute(),
+            .limit(1),
       });
 
       const listQuery = SqlSchema.findAll({
@@ -188,8 +185,7 @@ export class TimeEntryRepository extends Context.Tag(
           return drizzle
             .select()
             .from(schema.timeEntriesTable)
-            .where(and(...whereConditions))
-            .execute();
+            .where(and(...whereConditions));
         },
       });
 
@@ -206,8 +202,7 @@ export class TimeEntryRepository extends Context.Tag(
                 eq(schema.timeEntriesTable.workspaceId, request.workspaceId),
                 inArray(schema.timeEntriesTable.id, request.timeEntryIds)
               )
-            )
-            .execute(),
+            ),
       });
 
       return TimeEntryRepository.of({

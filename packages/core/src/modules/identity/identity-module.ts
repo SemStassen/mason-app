@@ -17,10 +17,10 @@ import {
 import type { SessionNotFoundError, UserNotFoundError } from "./errors";
 import { SessionRepository, UserRepository } from "./repositories";
 
-export class IdentityActionsService extends Context.Tag(
-  "@mason/identity/IdentityActionsService"
+export class IdentityModuleService extends Context.Tag(
+  "@mason/identity/IdentityModuleService"
 )<
-  IdentityActionsService,
+  IdentityModuleService,
   {
     setActiveWorkspace: (
       params: SetActiveWorkspaceInput
@@ -40,7 +40,7 @@ export class IdentityActionsService extends Context.Tag(
   }
 >() {
   static readonly live = Layer.effect(
-    IdentityActionsService,
+    IdentityModuleService,
     Effect.gen(function* () {
       const sessionRepo = yield* SessionRepository;
       const userRepo = yield* UserRepository;
@@ -49,7 +49,7 @@ export class IdentityActionsService extends Context.Tag(
         Context.add(UserRepository, userRepo)
       );
 
-      return IdentityActionsService.of({
+      return IdentityModuleService.of({
         setActiveWorkspace: (params) =>
           SetActiveWorkspaceAction(params).pipe(
             Effect.provide(services),

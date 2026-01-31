@@ -82,8 +82,7 @@ export class UserRepository extends Context.Tag(
           drizzle
             .insert(schema.usersTable)
             .values(request.users.map(userToDb))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -94,8 +93,7 @@ export class UserRepository extends Context.Tag(
             .update(schema.usersTable)
             .set(userToDb(request.user))
             .where(eq(schema.usersTable.id, request.user.id))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -121,8 +119,7 @@ export class UserRepository extends Context.Tag(
             .where(
               whereConditions.length > 0 ? and(...whereConditions) : undefined
             )
-            .limit(1)
-            .execute();
+            .limit(1);
         },
       });
 
@@ -133,8 +130,7 @@ export class UserRepository extends Context.Tag(
         execute: (request) =>
           drizzle
             .delete(schema.usersTable)
-            .where(inArray(schema.usersTable.id, request.userIds))
-            .execute(),
+            .where(inArray(schema.usersTable.id, request.userIds)),
       });
 
       return UserRepository.of({

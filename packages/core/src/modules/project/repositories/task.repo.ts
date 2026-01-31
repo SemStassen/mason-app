@@ -88,8 +88,7 @@ export class TaskRepository extends Context.Tag(
           drizzle
             .insert(schema.tasksTable)
             .values(request.tasks.map(taskToDb))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -105,8 +104,7 @@ export class TaskRepository extends Context.Tag(
                 eq(schema.tasksTable.workspaceId, request.workspaceId)
               )
             )
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -125,8 +123,7 @@ export class TaskRepository extends Context.Tag(
                 eq(schema.tasksTable.id, request.id)
               )
             )
-            .limit(1)
-            .execute(),
+            .limit(1),
       });
 
       const listQuery = SqlSchema.findAll({
@@ -155,8 +152,7 @@ export class TaskRepository extends Context.Tag(
           return drizzle
             .select()
             .from(schema.tasksTable)
-            .where(and(...whereConditions))
-            .execute();
+            .where(and(...whereConditions));
         },
       });
 

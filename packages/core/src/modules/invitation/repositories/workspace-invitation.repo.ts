@@ -115,8 +115,7 @@ export class WorkspaceInvitationRepository extends Context.Tag(
           drizzle
             .insert(schema.workspaceInvitationsTable)
             .values(request.workspaceInvitations.map(workspaceInvitationToDb))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -141,8 +140,7 @@ export class WorkspaceInvitationRepository extends Context.Tag(
                 )
               )
             )
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const upsertQuery = SqlSchema.findAll({
@@ -172,8 +170,7 @@ export class WorkspaceInvitationRepository extends Context.Tag(
                 updatedAt: new Date(),
               },
             })
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -228,8 +225,7 @@ export class WorkspaceInvitationRepository extends Context.Tag(
             .where(
               whereConditions.length > 0 ? and(...whereConditions) : undefined
             )
-            .limit(1)
-            .execute();
+            .limit(1);
         },
       });
 
@@ -271,8 +267,7 @@ export class WorkspaceInvitationRepository extends Context.Tag(
           return drizzle
             .select()
             .from(schema.workspaceInvitationsTable)
-            .where(and(...whereConditions))
-            .execute();
+            .where(and(...whereConditions));
         },
       });
 
@@ -295,8 +290,7 @@ export class WorkspaceInvitationRepository extends Context.Tag(
                   request.workspaceInvitationIds
                 )
               )
-            )
-            .execute(),
+            ),
       });
 
       return WorkspaceInvitationRepository.of({

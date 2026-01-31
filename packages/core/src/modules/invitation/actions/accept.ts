@@ -1,6 +1,9 @@
 import { Effect, Option } from "effect";
 import type { WorkspaceInvitationId } from "~/shared/schemas";
-import type { WorkspaceInvitation } from "../domain";
+import {
+  changeWorkspaceInvitationStatus,
+  type WorkspaceInvitation,
+} from "../domain";
 import { WorkspaceInvitationNotFoundError } from "../errors";
 import { WorkspaceInvitationRepository } from "../repositories";
 
@@ -30,8 +33,10 @@ export const AcceptWorkspaceInvitationAction = Effect.fn(
       )
     );
 
-  const acceptedWorkspaceInvitation =
-    yield* workspaceInvitation.changeStatus("accepted");
+  const acceptedWorkspaceInvitation = yield* changeWorkspaceInvitationStatus(
+    workspaceInvitation,
+    "accepted"
+  );
 
   const [updatedWorkspaceInvitation] = yield* workspaceInvitationRepo.update({
     workspaceId: acceptedWorkspaceInvitation.workspaceId,

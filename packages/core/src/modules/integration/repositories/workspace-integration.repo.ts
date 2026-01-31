@@ -103,8 +103,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
           drizzle
             .insert(schema.workspaceIntegrationsTable)
             .values(request.workspaceIntegrations.map(workspaceIntegrationToDb))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -129,8 +128,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
                 )
               )
             )
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -164,8 +162,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
             .select()
             .from(schema.workspaceIntegrationsTable)
             .where(and(...whereConditions))
-            .limit(1)
-            .execute();
+            .limit(1);
         },
       });
 
@@ -192,8 +189,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
           return drizzle
             .select()
             .from(schema.workspaceIntegrationsTable)
-            .where(and(...whereConditions))
-            .execute();
+            .where(and(...whereConditions));
         },
       });
 
@@ -213,8 +209,7 @@ export class WorkspaceIntegrationRepository extends Context.Tag(
                 ),
                 inArray(schema.workspaceIntegrationsTable.id, request.ids)
               )
-            )
-            .execute(),
+            ),
       });
 
       return WorkspaceIntegrationRepository.of({

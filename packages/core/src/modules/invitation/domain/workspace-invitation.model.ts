@@ -1,5 +1,6 @@
 import { WorkspaceRole } from "@mason/authorization";
 import { DateTime, Duration, Effect, Schema } from "effect";
+import type { ParseError } from "effect/ParseResult";
 import {
   Email,
   MemberId,
@@ -8,6 +9,7 @@ import {
   WorkspaceInvitationId,
 } from "~/shared/schemas";
 import { generateUUID } from "~/shared/utils";
+import { assert, assertEffect } from "~/shared/utils/assert";
 import {
   WorkspaceInvitationExpiredError,
   WorkspaceInvitationTransitionError,
@@ -33,87 +35,92 @@ export class WorkspaceInvitation extends Model.Class<WorkspaceInvitation>(
     description: "A workspace invitation",
   }
 ) {
-  private static _validate = (input: typeof WorkspaceInvitation.model.Type) =>
+  static validate = (input: typeof WorkspaceInvitation.model.Type) =>
     Schema.validate(WorkspaceInvitation)(input);
 
-  private static _defaultExpiration = DateTime.now.pipe(
+  static defaultExpiration = DateTime.now.pipe(
     Effect.map((dt) => DateTime.addDuration(dt, Duration.days(30)))
   );
+}
 
-  private static _makeDefaults = Effect.gen(function* () {
-    const expiresAt = yield* WorkspaceInvitation._defaultExpiration;
+const assertPending: (
+  self: WorkspaceInvitation
+) => Effect.Effect<void, WorkspaceInvitationTransitionError> = (self) =>
+  assert(
+    self.status === "pending",
+    new WorkspaceInvitationTransitionError({
+      cause: "Workspace invitation is not pending",
+    })
+  );
 
-    return {
-      status: "pending" as const,
-      expiresAt,
-    };
-  });
+const assertNotExpired: (
+  self: WorkspaceInvitation
+) => Effect.Effect<void, WorkspaceInvitationExpiredError> = (self) =>
+  assertEffect(
+    DateTime.isFuture(self.expiresAt),
+    new WorkspaceInvitationExpiredError({
+      cause: "Workspace invitation has expired",
+    })
+  );
 
-  static fromInput = (input: typeof WorkspaceInvitation.create.Type) =>
-    Effect.gen(function* () {
-      const defaults = yield* WorkspaceInvitation._makeDefaults;
-
-      const safeInput = yield* Schema.decodeUnknown(WorkspaceInvitation.create)(
-        input
-      );
-
-      return yield* WorkspaceInvitation._validate({
-        ...defaults,
-        id: WorkspaceInvitationId.make(generateUUID()),
-        ...safeInput,
-      });
-    });
-
-  changeStatus = (status: WorkspaceInvitation["status"]) =>
-    Effect.gen(this, function* () {
-      yield* this.assertNotExpired();
-      yield* this.assertPending();
-
-      return yield* WorkspaceInvitation._validate({
-        ...this,
-        status,
-      });
-    });
-
-  renew = () =>
-    Effect.gen(this, function* () {
-      yield* this.assertNotExpired();
-      yield* this.assertPending();
-
-      const expiresAt = yield* WorkspaceInvitation._defaultExpiration;
-
-      return yield* WorkspaceInvitation._validate({
-        ...this,
-        expiresAt,
-      });
-    });
-
-  /** Predicates */
-
-  private readonly isPending = () => this.status === "pending";
-
-  private readonly isExpiredEffect = () => DateTime.isPast(this.expiresAt);
-
-  /** Assertions */
-
-  private readonly assertNotExpired = () =>
-    this.isExpiredEffect().pipe(
-      Effect.filterOrFail(
-        (expired) => !expired,
-        () =>
-          new WorkspaceInvitationExpiredError({
-            cause: "Workspace invitation has expired",
-          })
-      ),
-      Effect.asVoid
+const makeWorkspaceInvitation = (
+  input: typeof WorkspaceInvitation.create.Type
+) =>
+  Effect.gen(function* () {
+    const safeInput = yield* Schema.decodeUnknown(WorkspaceInvitation.create)(
+      input
     );
 
-  private readonly assertPending = () =>
-    this.isPending()
-      ? Effect.void
-      : Effect.fail(
-          new WorkspaceInvitationTransitionError({
-            cause: "Workspace invitation is not pending",
-          })
-        );
-}
+    const expiresAt = yield* WorkspaceInvitation.defaultExpiration;
+
+    return yield* WorkspaceInvitation.validate({
+      id: WorkspaceInvitationId.make(generateUUID()),
+      status: "pending",
+      expiresAt: expiresAt,
+      ...safeInput,
+    });
+  });
+
+const changeWorkspaceInvitationStatus: (
+  self: WorkspaceInvitation,
+  status: WorkspaceInvitation["status"]
+) => Effect.Effect<
+  WorkspaceInvitation,
+  | ParseError
+  | WorkspaceInvitationTransitionError
+  | WorkspaceInvitationExpiredError,
+  never
+> = (self, status) =>
+  Effect.gen(function* () {
+    yield* assertPending(self);
+    yield* assertNotExpired(self);
+
+    return yield* WorkspaceInvitation.validate({ ...self, status });
+  });
+
+const renewWorkspaceInvitation: (
+  self: WorkspaceInvitation
+) => Effect.Effect<
+  WorkspaceInvitation,
+  | ParseError
+  | WorkspaceInvitationTransitionError
+  | WorkspaceInvitationExpiredError,
+  never
+> = (self) =>
+  Effect.gen(function* () {
+    yield* assertPending(self);
+    yield* assertNotExpired(self);
+
+    const expiresAt = yield* WorkspaceInvitation.defaultExpiration;
+
+    return yield* WorkspaceInvitation.validate({
+      ...self,
+      expiresAt: expiresAt,
+    });
+  });
+
+export {
+  makeWorkspaceInvitation,
+  changeWorkspaceInvitationStatus,
+  renewWorkspaceInvitation,
+};

@@ -83,8 +83,7 @@ export class MemberRepository extends Context.Tag(
           drizzle
             .insert(schema.membersTable)
             .values(request.members.map(memberToDb))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -103,8 +102,7 @@ export class MemberRepository extends Context.Tag(
                 eq(schema.membersTable.workspaceId, request.workspaceId)
               )
             )
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -133,8 +131,7 @@ export class MemberRepository extends Context.Tag(
             .select()
             .from(schema.membersTable)
             .where(and(...whereConditions))
-            .limit(1)
-            .execute();
+            .limit(1);
         },
       });
 

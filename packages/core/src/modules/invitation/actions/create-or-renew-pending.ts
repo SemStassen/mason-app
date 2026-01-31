@@ -1,6 +1,10 @@
 import { Effect, Option } from "effect";
 import type { MemberId, WorkspaceId } from "~/shared/schemas";
-import { WorkspaceInvitation } from "../domain";
+import {
+  makeWorkspaceInvitation,
+  renewWorkspaceInvitation,
+  type WorkspaceInvitation,
+} from "../domain";
 import { WorkspaceInvitationRepository } from "../repositories";
 
 export interface CreateOrRenewPendingWorkspaceInvitationInput {
@@ -28,8 +32,8 @@ export const CreateOrRenewPendingWorkspaceInvitationAction = Effect.fn(
     .pipe(
       Effect.flatMap(
         Option.match({
-          onNone: () => WorkspaceInvitation.fromInput(input),
-          onSome: (invitation) => invitation.renew(),
+          onNone: () => makeWorkspaceInvitation(input),
+          onSome: (invitation) => renewWorkspaceInvitation(invitation),
         })
       )
     );

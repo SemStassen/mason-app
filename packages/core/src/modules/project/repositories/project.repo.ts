@@ -102,8 +102,7 @@ export class ProjectRepository extends Context.Tag(
           drizzle
             .insert(schema.projectsTable)
             .values(request.projects.map(projectToDb))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -122,8 +121,7 @@ export class ProjectRepository extends Context.Tag(
                 eq(schema.projectsTable.workspaceId, request.workspaceId)
               )
             )
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -149,8 +147,7 @@ export class ProjectRepository extends Context.Tag(
             .select()
             .from(schema.projectsTable)
             .where(and(...whereConditions))
-            .limit(1)
-            .execute();
+            .limit(1);
         },
       });
 
@@ -173,8 +170,7 @@ export class ProjectRepository extends Context.Tag(
           return drizzle
             .select()
             .from(schema.projectsTable)
-            .where(and(...whereConditions))
-            .execute();
+            .where(and(...whereConditions));
         },
       });
 

@@ -84,8 +84,7 @@ export class WorkspaceRepository extends Context.Tag(
           drizzle
             .insert(schema.workspacesTable)
             .values(request.workspaces.map(workspaceToDb))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const updateQuery = SqlSchema.findAll({
@@ -96,8 +95,7 @@ export class WorkspaceRepository extends Context.Tag(
             .update(schema.workspacesTable)
             .set(workspaceToDb(request.workspace))
             .where(eq(schema.workspacesTable.id, request.workspace.id))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -123,8 +121,7 @@ export class WorkspaceRepository extends Context.Tag(
             .where(
               whereConditions.length > 0 ? and(...whereConditions) : undefined
             )
-            .limit(1)
-            .execute();
+            .limit(1);
         },
       });
 
@@ -135,8 +132,7 @@ export class WorkspaceRepository extends Context.Tag(
         execute: (request) =>
           drizzle
             .delete(schema.workspacesTable)
-            .where(inArray(schema.workspacesTable.id, request.workspaceIds))
-            .execute(),
+            .where(inArray(schema.workspacesTable.id, request.workspaceIds)),
       });
 
       return WorkspaceRepository.of({
@@ -160,13 +156,14 @@ export class WorkspaceRepository extends Context.Tag(
           return results.flat().map(rowToWorkspace);
         }, wrapSqlError),
 
-        retrieve: Effect.fn("@mason/workspace/WorkspaceRepo.retrieve")(function* ({
-          query,
-        }) {
-          const maybeRow = yield* retrieveQuery({ ...query });
+        retrieve: Effect.fn("@mason/workspace/WorkspaceRepo.retrieve")(
+          function* ({ query }) {
+            const maybeRow = yield* retrieveQuery({ ...query });
 
-          return Option.map(maybeRow, rowToWorkspace);
-        }, wrapSqlError),
+            return Option.map(maybeRow, rowToWorkspace);
+          },
+          wrapSqlError
+        ),
 
         hardDelete: Effect.fn("@mason/workspace/WorkspaceRepo.hardDelete")(
           function* ({ workspaceIds }) {

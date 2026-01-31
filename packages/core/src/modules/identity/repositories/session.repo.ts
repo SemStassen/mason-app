@@ -77,8 +77,7 @@ export class SessionRepository extends Context.Tag(
             .update(schema.sessionsTable)
             .set(sessionToDb(session))
             .where(eq(schema.sessionsTable.id, session.id))
-            .returning()
-            .execute(),
+            .returning(),
       });
 
       const retrieveQuery = SqlSchema.findOne({
@@ -106,8 +105,7 @@ export class SessionRepository extends Context.Tag(
             .where(
               whereConditions.length > 0 ? and(...whereConditions) : undefined
             )
-            .limit(1)
-            .execute();
+            .limit(1);
         },
       });
 
