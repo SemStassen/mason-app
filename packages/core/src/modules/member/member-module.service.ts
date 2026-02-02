@@ -20,10 +20,10 @@ import type {
 } from "./domain";
 import { MemberRepository } from "./repositories/member.repo";
 
-export class MemberActionsService extends Context.Tag(
-  "@mason/member/MemberActionsService"
+export class MemberModuleService extends Context.Tag(
+  "@mason/member/MemberModuleService"
 )<
-  MemberActionsService,
+  MemberModuleService,
   {
     createMember: (
       params: CreateMemberInput
@@ -49,13 +49,13 @@ export class MemberActionsService extends Context.Tag(
   }
 >() {
   static readonly live = Layer.effect(
-    MemberActionsService,
+    MemberModuleService,
     Effect.gen(function* () {
       const memberRepo = yield* MemberRepository;
 
       const services = Context.make(MemberRepository, memberRepo);
 
-      return MemberActionsService.of({
+      return MemberModuleService.of({
         createMember: (params) =>
           CreateMemberAction(params).pipe(
             Effect.provide(services),

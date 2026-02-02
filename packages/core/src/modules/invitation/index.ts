@@ -1,3 +1,3 @@
 export * from "./domain";
 export * from "./errors";
-export * from "./invitation-actions.service";
+export * from "./invitation-module.service";

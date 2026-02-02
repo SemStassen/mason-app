@@ -1,6 +1,6 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { ProjectActionsService } from "~/modules/project";
+import { ProjectModuleService } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 import { ProjectId } from "~/shared/schemas";
 
@@ -14,14 +14,14 @@ export const ArchiveProjectFlow = Effect.fn("flows/ArchiveProjectFlow")(
 
     const authz = yield* AuthorizationService;
 
-    const projectActions = yield* ProjectActionsService;
+    const projectModule = yield* ProjectModuleService;
 
     yield* authz.ensureAllowed({
       action: "project:archive",
       role: member.role,
     });
 
-    yield* projectActions.archiveProject({
+    yield* projectModule.archiveProject({
       id: request.id,
       workspaceId: workspace.id,
     });

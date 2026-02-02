@@ -1,6 +1,6 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { Project, ProjectActionsService } from "~/modules/project";
+import { Project, ProjectModuleService } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 import { ProjectId } from "~/shared/schemas";
 
@@ -15,7 +15,7 @@ export const PatchProjectFlow = Effect.fn("flows/PatchProjectFlow")(function* (
 
   const authz = yield* AuthorizationService;
 
-  const projectActions = yield* ProjectActionsService;
+  const projectModule = yield* ProjectModuleService;
 
   yield* authz.ensureAllowed({
     action: "project:patch",
@@ -24,7 +24,7 @@ export const PatchProjectFlow = Effect.fn("flows/PatchProjectFlow")(function* (
 
   const { id, ...patch } = request;
 
-  yield* projectActions.patchProject({
+  yield* projectModule.patchProject({
     id: request.id,
     workspaceId: workspace.id,
     patch: patch,

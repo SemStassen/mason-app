@@ -19,10 +19,10 @@ import {
 } from "./actions";
 import { TimeEntryRepository } from "./repositories";
 
-export class TimeActionsService extends Context.Tag(
-  "@mason/time/TimeActionsService"
+export class TimeModuleService extends Context.Tag(
+  "@mason/time/TimeModuleService"
 )<
-  TimeActionsService,
+  TimeModuleService,
   {
     createTimeEntry: (
       params: CreateTimeEntryInput
@@ -42,13 +42,13 @@ export class TimeActionsService extends Context.Tag(
   }
 >() {
   static readonly live = Layer.effect(
-    TimeActionsService,
+    TimeModuleService,
     Effect.gen(function* () {
       const timeEntryRepo = yield* TimeEntryRepository;
 
       const services = Context.make(TimeEntryRepository, timeEntryRepo);
 
-      return TimeActionsService.of({
+      return TimeModuleService.of({
         createTimeEntry: (params) =>
           CreateTimeEntryAction(params).pipe(
             Effect.provide(services),

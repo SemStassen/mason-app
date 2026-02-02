@@ -1,5 +1,5 @@
 import { Effect, Schema } from "effect";
-import { InvitationActionsService } from "~/modules/invitation";
+import { InvitationModuleService } from "~/modules/invitation";
 import { SessionContext } from "~/shared/auth";
 import { WorkspaceInvitationId } from "~/shared/schemas";
 
@@ -12,9 +12,9 @@ export const RejectWorkspaceInvitationFlow = Effect.fn(
 )(function* (input: typeof RejectWorkspaceInvitationRequest.Type) {
   const { user } = yield* SessionContext;
 
-  const invitationActions = yield* InvitationActionsService;
+  const invitationModule = yield* InvitationModuleService;
 
-  yield* invitationActions.rejectWorkspaceInvitation({
+  yield* invitationModule.rejectWorkspaceInvitation({
     id: input.id,
     email: user.email,
   });

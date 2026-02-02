@@ -1,6 +1,6 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect } from "effect";
-import { Workspace, WorkspaceActionsService } from "~/modules/workspace";
+import { Workspace, WorkspaceModuleService } from "~/modules/workspace";
 import { WorkspaceContext } from "~/shared/auth";
 
 export const PatchWorkspaceRequest = Workspace.patchInput;
@@ -11,14 +11,14 @@ export const PatchWorkspaceFlow = Effect.fn("flows/PatchWorkspaceFlow")(
 
     const authz = yield* AuthorizationService;
 
-    const workspaceActions = yield* WorkspaceActionsService;
+    const workspaceModule = yield* WorkspaceModuleService;
 
     yield* authz.ensureAllowed({
       action: "workspace:patch",
       role: member.role,
     });
 
-    yield* workspaceActions.patchWorkspace({
+    yield* workspaceModule.patchWorkspace({
       id: workspace.id,
       patch: request,
     });

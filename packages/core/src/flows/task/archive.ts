@@ -1,6 +1,6 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { ProjectActionsService } from "~/modules/project";
+import { ProjectModuleService } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 import { TaskId } from "~/shared/schemas";
 
@@ -15,14 +15,14 @@ export const ArchiveTaskFlow = Effect.fn("flows/ArchiveTaskFlow")(function* (
 
   const authz = yield* AuthorizationService;
 
-  const projectActions = yield* ProjectActionsService;
+  const projectModule = yield* ProjectModuleService;
 
   yield* authz.ensureAllowed({
     action: "project:archive_task",
     role: member.role,
   });
 
-  yield* projectActions.archiveTask({
+  yield* projectModule.archiveTask({
     id: request.id,
     workspaceId: workspace.id,
   });

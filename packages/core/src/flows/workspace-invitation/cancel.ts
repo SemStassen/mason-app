@@ -1,6 +1,6 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { InvitationActionsService } from "~/modules/invitation";
+import { InvitationModuleService } from "~/modules/invitation";
 import { WorkspaceContext } from "~/shared/auth";
 import { WorkspaceInvitationId } from "~/shared/schemas";
 
@@ -15,14 +15,14 @@ export const CancelWorkspaceInvitationFlow = Effect.fn(
 
   const authz = yield* AuthorizationService;
 
-  const invitationActions = yield* InvitationActionsService;
+  const invitationModule = yield* InvitationModuleService;
 
   yield* authz.ensureAllowed({
     action: "workspace:cancel_invite",
     role: member.role,
   });
 
-  yield* invitationActions.cancelWorkspaceInvitation({
+  yield* invitationModule.cancelWorkspaceInvitation({
     id: input.id,
     workspaceId: workspace.id,
   });

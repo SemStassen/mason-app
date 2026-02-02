@@ -18,10 +18,10 @@ import type { WorkspaceSlugAlreadyExistsError } from "./domain";
 import type { WorkspaceNotFoundError } from "./errors";
 import { WorkspaceRepository } from "./repositories/workspace.repo";
 
-export class WorkspaceActionsService extends Context.Tag(
-  "@mason/workspace/WorkspaceActionsService"
+export class WorkspaceModuleService extends Context.Tag(
+  "@mason/workspace/WorkspaceModuleService"
 )<
-  WorkspaceActionsService,
+  WorkspaceModuleService,
   {
     createWorkspace: (
       params: CreateWorkspaceInput
@@ -47,13 +47,13 @@ export class WorkspaceActionsService extends Context.Tag(
   }
 >() {
   static readonly live = Layer.effect(
-    WorkspaceActionsService,
+    WorkspaceModuleService,
     Effect.gen(function* () {
       const workspaceRepo = yield* WorkspaceRepository;
 
       const services = Context.make(WorkspaceRepository, workspaceRepo);
 
-      return WorkspaceActionsService.of({
+      return WorkspaceModuleService.of({
         createWorkspace: (params) =>
           CreateWorkspaceAction(params).pipe(
             Effect.provide(services),

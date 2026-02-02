@@ -1,5 +1,5 @@
 import { Effect, Schema } from "effect";
-import { Workspace, WorkspaceActionsService } from "~/modules/workspace";
+import { Workspace, WorkspaceModuleService } from "~/modules/workspace";
 
 export const CheckWorkspaceSlugIsUniqueRequest = Schema.Struct({
   slug: Workspace.fields.slug,
@@ -12,9 +12,9 @@ export const CheckWorkspaceSlugIsUniqueResponse = Schema.Struct({
 export const CheckWorkspaceSlugIsUniqueFlow = Effect.fn(
   "flows/CheckWorkspaceSlugIsUniqueFlow"
 )(function* (params: typeof CheckWorkspaceSlugIsUniqueRequest.Type) {
-  const workspaceActions = yield* WorkspaceActionsService;
+  const workspaceModule = yield* WorkspaceModuleService;
 
-  const isUnique = yield* workspaceActions
+  const isUnique = yield* workspaceModule
     .assertWorkspaceSlugUnique({ slug: params.slug })
     .pipe(
       Effect.as(true),

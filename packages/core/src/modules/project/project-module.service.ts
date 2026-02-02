@@ -29,10 +29,10 @@ import {
 import type { ProjectArchivedError } from "./domain";
 import { ProjectRepository, TaskRepository } from "./repositories";
 
-export class ProjectActionsService extends Context.Tag(
-  "@mason/project/ProjectActionsService"
+export class ProjectModuleService extends Context.Tag(
+  "@mason/project/ProjectModuleService"
 )<
-  ProjectActionsService,
+  ProjectModuleService,
   {
     createProject: (
       params: CreateProjectInput
@@ -61,7 +61,7 @@ export class ProjectActionsService extends Context.Tag(
   }
 >() {
   static readonly live = Layer.effect(
-    ProjectActionsService,
+    ProjectModuleService,
     Effect.gen(function* () {
       const projectRepo = yield* ProjectRepository;
       const taskRepo = yield* TaskRepository;
@@ -70,7 +70,7 @@ export class ProjectActionsService extends Context.Tag(
         Context.add(TaskRepository, taskRepo)
       );
 
-      return ProjectActionsService.of({
+      return ProjectModuleService.of({
         createProject: (params) =>
           CreateProjectAction(params).pipe(
             Effect.provide(services),

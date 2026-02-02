@@ -2,7 +2,7 @@ import { AuthorizationService } from "@mason/authorization";
 import { Effect, Redacted, Schema } from "effect";
 import { CryptoService } from "~/infra/crypto";
 import {
-  IntegrationActionsService,
+  IntegrationModuleService,
   WorkspaceIntegration,
 } from "~/modules/integration";
 import { WorkspaceContext } from "~/shared/auth";
@@ -19,7 +19,7 @@ export const CreateWorkspaceIntegrationFlow = Effect.fn(
   const authz = yield* AuthorizationService;
   const crypto = yield* CryptoService;
 
-  const integrationActions = yield* IntegrationActionsService;
+  const integrationModule = yield* IntegrationModuleService;
 
   yield* authz.ensureAllowed({
     action: "workspace:create_integration",
@@ -34,7 +34,7 @@ export const CreateWorkspaceIntegrationFlow = Effect.fn(
       )
     );
 
-  yield* integrationActions.createWorkspaceIntegration({
+  yield* integrationModule.createWorkspaceIntegration({
     ...request,
     apiKey: encryptedApiKey,
     createdByMemberId: member.id,

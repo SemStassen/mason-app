@@ -1,10 +1,10 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Option } from "effect";
 import { EmailService } from "~/infra/email";
-import { IdentityActionsService } from "~/modules/identity";
-import { InvitationActionsService } from "~/modules/invitation";
+import { IdentityModuleService } from "~/modules/identity";
+import { InvitationModuleService } from "~/modules/invitation";
 import { WorkspaceInvitation } from "~/modules/invitation/domain";
-import { MemberActionsService } from "~/modules/member";
+import { MemberModuleService } from "~/modules/member";
 import { SessionContext, WorkspaceContext } from "~/shared/auth";
 
 export const CreateWorkspaceInvitationRequest = WorkspaceInvitation.createInput;
@@ -18,9 +18,9 @@ export const CreateWorkspaceInvitationFlow = Effect.fn(
   const authz = yield* AuthorizationService;
   const email = yield* EmailService;
 
-  const identityActions = yield* IdentityActionsService;
-  const memberActions = yield* MemberActionsService;
-  const invitationActions = yield* InvitationActionsService;
+  const identityModule = yield* IdentityModuleService;
+  const memberModule = yield* MemberModuleService;
+  const invitationModule = yield* InvitationModuleService;
 
   yield* authz.ensureAllowed({
     action: "workspace:invite_user",
@@ -28,7 +28,7 @@ export const CreateWorkspaceInvitationFlow = Effect.fn(
   });
 
   /** Assert that the user is not already a member of the workspace */
-  yield* identityActions
+  yield* identityModule
     .retrieveUser({
       query: {
         email: request.email,
@@ -39,7 +39,7 @@ export const CreateWorkspaceInvitationFlow = Effect.fn(
         Option.match({
           onNone: () => Effect.void,
           onSome: (user) =>
-            memberActions.assertUserNotWorkspaceMember({
+            memberModule.assertUserNotWorkspaceMember({
               workspaceId: workspace.id,
               userId: user.id,
             }),
@@ -48,7 +48,7 @@ export const CreateWorkspaceInvitationFlow = Effect.fn(
     );
 
   const invitation =
-    yield* invitationActions.createOrRenewPendingWorkspaceInvitation({
+    yield* invitationModule.createOrRenewPendingWorkspaceInvitation({
       ...request,
       workspaceId: workspace.id,
       inviterId: member.id,

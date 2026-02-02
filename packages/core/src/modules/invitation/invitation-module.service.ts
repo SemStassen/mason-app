@@ -17,10 +17,10 @@ import {
 import type { WorkspaceInvitationExpiredError } from "./domain";
 import { WorkspaceInvitationRepository } from "./repositories";
 
-export class InvitationActionsService extends Context.Tag(
-  "@mason/invitation/InvitationActionsService"
+export class InvitationModuleService extends Context.Tag(
+  "@mason/invitation/InvitationModuleService"
 )<
-  InvitationActionsService,
+  InvitationModuleService,
   {
     createOrRenewPendingWorkspaceInvitation: (
       params: CreateOrRenewPendingWorkspaceInvitationInput
@@ -49,7 +49,7 @@ export class InvitationActionsService extends Context.Tag(
   }
 >() {
   static readonly live = Layer.effect(
-    InvitationActionsService,
+    InvitationModuleService,
     Effect.gen(function* () {
       const workspaceInvitationRepo = yield* WorkspaceInvitationRepository;
 
@@ -58,7 +58,7 @@ export class InvitationActionsService extends Context.Tag(
         workspaceInvitationRepo
       );
 
-      return InvitationActionsService.of({
+      return InvitationModuleService.of({
         createOrRenewPendingWorkspaceInvitation: (params) =>
           CreateOrRenewPendingWorkspaceInvitationAction(params).pipe(
             Effect.provide(services),

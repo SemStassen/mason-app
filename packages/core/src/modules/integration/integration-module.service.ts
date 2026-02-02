@@ -21,10 +21,10 @@ import type { WorkspaceIntegrationProviderAlreadyExistsError } from "./domain";
 import type { WorkspaceIntegrationNotFoundError } from "./errors";
 import { WorkspaceIntegrationRepository } from "./repositories";
 
-export class IntegrationActionsService extends Context.Tag(
-  "@mason/integration/IntegrationActionsService"
+export class IntegrationModuleService extends Context.Tag(
+  "@mason/integration/IntegrationModuleService"
 )<
-  IntegrationActionsService,
+  IntegrationModuleService,
   {
     createWorkspaceIntegration: (
       params: CreateWorkspaceIntegrationInput
@@ -53,7 +53,7 @@ export class IntegrationActionsService extends Context.Tag(
   }
 >() {
   static readonly live = Layer.effect(
-    IntegrationActionsService,
+    IntegrationModuleService,
     Effect.gen(function* () {
       const workspaceIntegrationRepo = yield* WorkspaceIntegrationRepository;
 
@@ -62,7 +62,7 @@ export class IntegrationActionsService extends Context.Tag(
         workspaceIntegrationRepo
       );
 
-      return IntegrationActionsService.of({
+      return IntegrationModuleService.of({
         createWorkspaceIntegration: (params) =>
           CreateWorkspaceIntegrationAction(params).pipe(
             Effect.provide(services),
