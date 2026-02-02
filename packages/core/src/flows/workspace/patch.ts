@@ -1,6 +1,7 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect } from "effect";
-import { Workspace, WorkspaceModuleService } from "~/modules/workspace";
+import { Workspace } from "~/modules/workspace/domain/workspace.model";
+import { WorkspaceModuleService } from "~/modules/workspace/workspace-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 
 export const PatchWorkspaceRequest = Workspace.patchInput;

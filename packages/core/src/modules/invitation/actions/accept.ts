@@ -3,9 +3,9 @@ import type { WorkspaceInvitationId } from "~/shared/schemas";
 import {
   changeWorkspaceInvitationStatus,
   type WorkspaceInvitation,
-} from "../domain";
+} from "../domain/workspace-invitation.model";
 import { WorkspaceInvitationNotFoundError } from "../errors";
-import { WorkspaceInvitationRepository } from "../repositories";
+import { WorkspaceInvitationRepository } from "../repositories/workspace-invitation.repo";
 
 export interface AcceptWorkspaceInvitationInput {
   id: WorkspaceInvitationId;

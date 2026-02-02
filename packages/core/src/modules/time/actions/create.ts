@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { TimeEntry } from "../domain";
+import { TimeEntry } from "../domain/time-entry.model";
 import { TimeEntryRepository } from "../repositories/time-entry.repo";
 
 export type CreateTimeEntryInput = typeof TimeEntry.create.Type;

@@ -1,8 +1,8 @@
 import { Effect, Option } from "effect";
 import type { SessionId } from "~/shared/schemas";
-import type { Session } from "../../domain";
+import type { Session } from "../../domain/session.model";
 import { SessionNotFoundError } from "../../errors";
-import { SessionRepository } from "../../repositories";
+import { SessionRepository } from "../../repositories/session.repo";
 
 export interface SetActiveWorkspaceInput {
   sessionId: SessionId;

@@ -4,8 +4,8 @@ import {
   makeWorkspaceInvitation,
   renewWorkspaceInvitation,
   type WorkspaceInvitation,
-} from "../domain";
-import { WorkspaceInvitationRepository } from "../repositories";
+} from "../domain/workspace-invitation.model";
+import { WorkspaceInvitationRepository } from "../repositories/workspace-invitation.repo";
 
 export interface CreateOrRenewPendingWorkspaceInvitationInput {
   workspaceId: WorkspaceId;

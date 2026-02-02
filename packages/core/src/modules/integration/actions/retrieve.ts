@@ -1,8 +1,8 @@
 import { Effect, type Option } from "effect";
 import type { WorkspaceId, WorkspaceIntegrationId } from "~/shared/schemas";
 import type { AtLeastOne } from "~/shared/utils";
-import type { WorkspaceIntegration } from "../domain";
-import { WorkspaceIntegrationRepository } from "../repositories";
+import type { WorkspaceIntegration } from "../domain/workspace-integration.model";
+import { WorkspaceIntegrationRepository } from "../repositories/workspace-integration.repo";
 
 export interface RetrieveWorkspaceIntegrationInput {
   workspaceId: WorkspaceId;

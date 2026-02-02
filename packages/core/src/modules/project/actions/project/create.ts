@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { Project } from "../../domain";
-import { ProjectRepository } from "../../repositories";
+import { Project } from "../../domain/project.model";
+import { ProjectRepository } from "../../repositories/project.repo";
 
 export type CreateProjectInput = typeof Project.create.Type;
 

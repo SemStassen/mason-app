@@ -1,20 +1,26 @@
 import { Context, Effect, Layer } from "effect";
 import { MasonError } from "~/shared/errors";
-import {
-  AssertWorkspaceSlugUniqueAction,
-  type AssertWorkspaceSlugUniqueInput,
-  type AssertWorkspaceSlugUniqueOutput,
-  CreateWorkspaceAction,
-  type CreateWorkspaceInput,
-  type CreateWorkspaceOutput,
-  PatchWorkspaceAction,
-  type PatchWorkspaceInput,
-  type PatchWorkspaceOutput,
-  RetrieveWorkspaceAction,
-  type RetrieveWorkspaceInput,
-  type RetrieveWorkspaceOutput,
-} from "./actions";
-import type { WorkspaceSlugAlreadyExistsError } from "./domain";
+import type {
+  AssertWorkspaceSlugUniqueInput,
+  AssertWorkspaceSlugUniqueOutput,
+} from "./actions/assert-slug-unique";
+import { AssertWorkspaceSlugUniqueAction } from "./actions/assert-slug-unique";
+import type {
+  CreateWorkspaceInput,
+  CreateWorkspaceOutput,
+} from "./actions/create";
+import { CreateWorkspaceAction } from "./actions/create";
+import type {
+  PatchWorkspaceInput,
+  PatchWorkspaceOutput,
+} from "./actions/patch";
+import { PatchWorkspaceAction } from "./actions/patch";
+import type {
+  RetrieveWorkspaceInput,
+  RetrieveWorkspaceOutput,
+} from "./actions/retrieve";
+import { RetrieveWorkspaceAction } from "./actions/retrieve";
+import type { WorkspaceSlugAlreadyExistsError } from "./domain/errors";
 import type { WorkspaceNotFoundError } from "./errors";
 import { WorkspaceRepository } from "./repositories/workspace.repo";
 

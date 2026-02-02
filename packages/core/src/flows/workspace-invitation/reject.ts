@@ -1,5 +1,5 @@
 import { Effect, Schema } from "effect";
-import { InvitationModuleService } from "~/modules/invitation";
+import { InvitationModuleService } from "~/modules/invitation/invitation-module.service";
 import { SessionContext } from "~/shared/auth";
 import { WorkspaceInvitationId } from "~/shared/schemas";
 

@@ -1,6 +1,7 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { Project, ProjectModuleService } from "~/modules/project";
+import { Project } from "~/modules/project/domain/project.model";
+import { ProjectModuleService } from "~/modules/project/project-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 import { ProjectId } from "~/shared/schemas";
 

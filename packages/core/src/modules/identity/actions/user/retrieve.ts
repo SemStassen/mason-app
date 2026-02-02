@@ -1,8 +1,8 @@
 import { Effect, type Option } from "effect";
 import type { UserId } from "~/shared/schemas";
 import type { AtLeastOne } from "~/shared/utils";
-import type { User } from "../../domain";
-import { UserRepository } from "../../repositories";
+import type { User } from "../../domain/user.model";
+import { UserRepository } from "../../repositories/user.repo";
 
 export interface RetrieveUserInput {
   query: AtLeastOne<{

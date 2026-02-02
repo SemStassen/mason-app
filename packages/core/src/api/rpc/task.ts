@@ -8,7 +8,7 @@ import {
   PatchTaskRequest,
   RestoreTaskRequest,
 } from "~/flows";
-import { ProjectArchivedError } from "~/modules/project";
+import { ProjectArchivedError } from "~/modules/project/domain/errors";
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const TaskRpcs = RpcGroup.make(

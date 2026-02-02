@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { Member } from "../domain";
-import { MemberRepository } from "../repositories";
+import { Member } from "../domain/member.model";
+import { MemberRepository } from "../repositories/member.repo";
 import { AssertUserNotWorkspaceMemberAction } from "./assert-user-not-workspace-member";
 
 export type CreateMemberInput = typeof Member.create.Type;

@@ -1,10 +1,8 @@
 import { Effect, Option } from "effect";
 import type { WorkspaceId } from "~/shared/schemas";
-import { WorkspaceIntegrationRepository } from "../repositories";
-import {
-  type WorkspaceIntegration,
-  WorkspaceIntegrationProviderAlreadyExistsError,
-} from ".";
+import { WorkspaceIntegrationRepository } from "../repositories/workspace-integration.repo";
+import { WorkspaceIntegrationProviderAlreadyExistsError } from "./errors";
+import type { WorkspaceIntegration } from "./workspace-integration.model";
 
 export const assertUniqueWorkspaceIntegrationProvider = Effect.fn(
   "integration/AssertUniqueWorkspaceIntegrationProvider"

@@ -1,8 +1,10 @@
 import { Effect, Option } from "effect";
 import type { TaskId, WorkspaceId } from "~/shared/schemas";
-import { AssertProjectNotArchived, type Task } from "../../domain";
+import { AssertProjectNotArchived } from "../../domain/project.rules";
+import type { Task } from "../../domain/task.model";
 import { ProjectNotFoundError, TaskNotFoundError } from "../../errors";
-import { ProjectRepository, TaskRepository } from "../../repositories";
+import { ProjectRepository } from "../../repositories/project.repo";
+import { TaskRepository } from "../../repositories/task.repo";
 
 export interface PatchTaskInput {
   id: TaskId;

@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
-import type { Workspace } from "../domain";
-import { WorkspaceSlugAlreadyExistsError } from "../domain";
-import { WorkspaceRepository } from "../repositories";
+import { WorkspaceSlugAlreadyExistsError } from "../domain/errors";
+import type { Workspace } from "../domain/workspace.model";
+import { WorkspaceRepository } from "../repositories/workspace.repo";
 
 export interface AssertWorkspaceSlugUniqueInput {
   slug: Workspace["slug"];

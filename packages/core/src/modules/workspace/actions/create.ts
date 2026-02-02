@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { Workspace } from "../domain";
-import { WorkspaceRepository } from "../repositories";
+import { Workspace } from "../domain/workspace.model";
+import { WorkspaceRepository } from "../repositories/workspace.repo";
 import { AssertWorkspaceSlugUniqueAction } from "./assert-slug-unique";
 
 export type CreateWorkspaceInput = typeof Workspace.create.Type;

@@ -1,23 +1,31 @@
 import { Context, Effect, Layer } from "effect";
 import { MasonError } from "~/shared/errors";
-import {
-  CreateTimeEntryAction,
-  type CreateTimeEntryInput,
-  type CreateTimeEntryOutput,
-  HardDeleteTimeEntryAction,
-  type HardDeleteTimeEntryInput,
-  type HardDeleteTimeEntryOutput,
-  ListTimeEntriesAction,
-  type ListTimeEntriesInput,
-  type ListTimeEntriesOutput,
-  PatchTimeEntryAction,
-  type PatchTimeEntryInput,
-  type PatchTimeEntryOutput,
-  RetrieveTimeEntryAction,
-  type RetrieveTimeEntryInput,
-  type RetrieveTimeEntryOutput,
-} from "./actions";
-import { TimeEntryRepository } from "./repositories";
+import type {
+  CreateTimeEntryInput,
+  CreateTimeEntryOutput,
+} from "./actions/create";
+import { CreateTimeEntryAction } from "./actions/create";
+import type {
+  HardDeleteTimeEntryInput,
+  HardDeleteTimeEntryOutput,
+} from "./actions/hard-delete";
+import { HardDeleteTimeEntryAction } from "./actions/hard-delete";
+import type {
+  ListTimeEntriesInput,
+  ListTimeEntriesOutput,
+} from "./actions/list";
+import { ListTimeEntriesAction } from "./actions/list";
+import type {
+  PatchTimeEntryInput,
+  PatchTimeEntryOutput,
+} from "./actions/patch";
+import { PatchTimeEntryAction } from "./actions/patch";
+import type {
+  RetrieveTimeEntryInput,
+  RetrieveTimeEntryOutput,
+} from "./actions/retrieve";
+import { RetrieveTimeEntryAction } from "./actions/retrieve";
+import { TimeEntryRepository } from "./repositories/time-entry.repo";
 
 export class TimeModuleService extends Context.Tag(
   "@mason/time/TimeModuleService"

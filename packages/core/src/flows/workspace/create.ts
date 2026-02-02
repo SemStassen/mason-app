@@ -1,8 +1,9 @@
 import { Effect, Option } from "effect";
 import { DatabaseService } from "~/infra/db";
-import { IdentityModuleService } from "~/modules/identity";
-import { MemberModuleService } from "~/modules/member";
-import { Workspace, WorkspaceModuleService } from "~/modules/workspace";
+import { IdentityModuleService } from "~/modules/identity/identity-module";
+import { MemberModuleService } from "~/modules/member/member-module.service";
+import { Workspace } from "~/modules/workspace/domain/workspace.model";
+import { WorkspaceModuleService } from "~/modules/workspace/workspace-module.service";
 import { SessionContext } from "~/shared/auth";
 
 export const CreateWorkspaceRequest = Workspace.createInput;

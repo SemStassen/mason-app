@@ -1,6 +1,6 @@
 import { Context, type Effect } from "effect";
-import type { User } from "~/modules/identity";
-import type { Workspace } from "~/modules/workspace";
+import type { User } from "~/modules/identity/domain/user.model";
+import type { Workspace } from "~/modules/workspace/domain/workspace.model";
 import type {
   Email,
   WorkspaceId,

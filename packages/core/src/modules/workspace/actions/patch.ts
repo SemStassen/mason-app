@@ -1,8 +1,8 @@
 import { Effect, Option } from "effect";
 import type { WorkspaceId } from "~/shared/schemas";
-import type { Workspace } from "../domain";
+import type { Workspace } from "../domain/workspace.model";
 import { WorkspaceNotFoundError } from "../errors";
-import { WorkspaceRepository } from "../repositories";
+import { WorkspaceRepository } from "../repositories/workspace.repo";
 import { AssertWorkspaceSlugUniqueAction } from "./assert-slug-unique";
 
 export interface PatchWorkspaceInput {

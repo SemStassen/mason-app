@@ -1,9 +1,7 @@
 import { Effect } from "effect";
-import {
-  assertUniqueWorkspaceIntegrationProvider,
-  WorkspaceIntegration,
-} from "../domain";
-import { WorkspaceIntegrationRepository } from "../repositories";
+import { WorkspaceIntegration } from "../domain/workspace-integration.model";
+import { assertUniqueWorkspaceIntegrationProvider } from "../domain/workspace-integration.rules";
+import { WorkspaceIntegrationRepository } from "../repositories/workspace-integration.repo";
 
 export type CreateWorkspaceIntegrationInput =
   typeof WorkspaceIntegration.create.Type;

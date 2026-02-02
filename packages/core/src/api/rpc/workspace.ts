@@ -9,11 +9,9 @@ import {
   PatchWorkspaceRequest,
   SetActiveWorkspaceRequest,
 } from "~/flows";
-import { UserNotWorkspaceMemberError } from "~/modules/member";
-import {
-  WorkspaceNotFoundError,
-  WorkspaceSlugAlreadyExistsError,
-} from "~/modules/workspace";
+import { UserNotWorkspaceMemberError } from "~/modules/member/domain/errors";
+import { WorkspaceSlugAlreadyExistsError } from "~/modules/workspace/domain/errors";
+import { WorkspaceNotFoundError } from "~/modules/workspace/errors";
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const WorkspaceRpcs = RpcGroup.make(

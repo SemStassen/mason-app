@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { User } from "../../domain";
-import { UserRepository } from "../../repositories";
+import { User } from "../../domain/user.model";
+import { UserRepository } from "../../repositories/user.repo";
 
 export type CreateUserInput = typeof User.create.Type;
 export type CreateUserOutput = void;

@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 import type { ProjectId, WorkspaceId } from "~/shared/schemas";
 import { ProjectNotFoundError } from "../../errors";
-import { ProjectRepository } from "../../repositories";
+import { ProjectRepository } from "../../repositories/project.repo";
 
 export interface RestoreProjectInput {
   id: ProjectId;

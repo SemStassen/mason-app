@@ -1,7 +1,9 @@
 import { Effect, Option } from "effect";
-import { AssertProjectNotArchived, Task } from "../../domain";
+import { AssertProjectNotArchived } from "../../domain/project.rules";
+import { Task } from "../../domain/task.model";
 import { ProjectNotFoundError } from "../../errors";
-import { ProjectRepository, TaskRepository } from "../../repositories";
+import { ProjectRepository } from "../../repositories/project.repo";
+import { TaskRepository } from "../../repositories/task.repo";
 
 export type CreateTaskInput = typeof Task.create.Type;
 

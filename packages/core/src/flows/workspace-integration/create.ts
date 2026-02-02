@@ -1,10 +1,8 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Redacted, Schema } from "effect";
 import { CryptoService } from "~/infra/crypto";
-import {
-  IntegrationModuleService,
-  WorkspaceIntegration,
-} from "~/modules/integration";
+import { WorkspaceIntegration } from "~/modules/integration/domain/workspace-integration.model";
+import { IntegrationModuleService } from "~/modules/integration/integration-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 import { EncryptedApiKey } from "~/shared/schemas";
 

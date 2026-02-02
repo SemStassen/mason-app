@@ -1,23 +1,26 @@
 import { Context, Effect, Layer } from "effect";
 import { MasonError } from "~/shared/errors";
-import {
-  AssertUserNotWorkspaceMemberAction,
-  type AssertUserNotWorkspaceMemberInput,
-  type AssertUserNotWorkspaceMemberOutput,
-  AssertUserWorkspaceMemberAction,
-  type AssertUserWorkspaceMemberInput,
-  type AssertUserWorkspaceMemberOutput,
-  CreateMemberAction,
-  type CreateMemberInput,
-  type CreateMemberOutput,
-  RetrieveMemberAction,
-  type RetrieveMemberInput,
-  type RetrieveMemberOutput,
-} from "./actions";
+import type {
+  AssertUserNotWorkspaceMemberInput,
+  AssertUserNotWorkspaceMemberOutput,
+} from "./actions/assert-user-not-workspace-member";
+import { AssertUserNotWorkspaceMemberAction } from "./actions/assert-user-not-workspace-member";
+import type {
+  AssertUserWorkspaceMemberInput,
+  AssertUserWorkspaceMemberOutput,
+} from "./actions/assert-user-workspace-member";
+import { AssertUserWorkspaceMemberAction } from "./actions/assert-user-workspace-member";
+import type { CreateMemberInput, CreateMemberOutput } from "./actions/create";
+import { CreateMemberAction } from "./actions/create";
+import type {
+  RetrieveMemberInput,
+  RetrieveMemberOutput,
+} from "./actions/retrieve";
+import { RetrieveMemberAction } from "./actions/retrieve";
 import type {
   UserAlreadyWorkspaceMemberError,
   UserNotWorkspaceMemberError,
-} from "./domain";
+} from "./domain/errors";
 import { MemberRepository } from "./repositories/member.repo";
 
 export class MemberModuleService extends Context.Tag(

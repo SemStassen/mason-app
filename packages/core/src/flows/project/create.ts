@@ -1,6 +1,7 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect } from "effect";
-import { Project, ProjectModuleService } from "~/modules/project";
+import { Project } from "~/modules/project/domain/project.model";
+import { ProjectModuleService } from "~/modules/project/project-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 
 export const CreateProjectRequest = Project.createInput;

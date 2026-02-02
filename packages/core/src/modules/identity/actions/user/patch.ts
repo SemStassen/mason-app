@@ -1,8 +1,8 @@
 import { Effect, Option } from "effect";
 import type { UserId } from "~/shared/schemas";
-import type { User } from "../../domain";
+import type { User } from "../../domain/user.model";
 import { UserNotFoundError } from "../../errors";
-import { UserRepository } from "../../repositories";
+import { UserRepository } from "../../repositories/user.repo";
 
 export interface PatchUserInput {
   id: UserId;

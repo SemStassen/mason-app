@@ -1,25 +1,33 @@
 import { Context, Effect, Layer } from "effect";
 import { MasonError } from "~/shared/errors";
-import {
-  CreateWorkspaceIntegrationAction,
-  type CreateWorkspaceIntegrationInput,
-  type CreateWorkspaceIntegrationOutput,
-  HardDeleteWorkspaceIntegrationAction,
-  type HardDeleteWorkspaceIntegrationInput,
-  type HardDeleteWorkspaceIntegrationOutput,
-  ListWorkspaceIntegrationsAction,
-  type ListWorkspaceIntegrationsInput,
-  type ListWorkspaceIntegrationsOutput,
-  PatchWorkspaceIntegrationAction,
-  type PatchWorkspaceIntegrationInput,
-  type PatchWorkspaceIntegrationOutput,
-  RetrieveWorkspaceIntegrationAction,
-  type RetrieveWorkspaceIntegrationInput,
-  type RetrieveWorkspaceIntegrationOutput,
-} from "./actions";
-import type { WorkspaceIntegrationProviderAlreadyExistsError } from "./domain";
+import type {
+  CreateWorkspaceIntegrationInput,
+  CreateWorkspaceIntegrationOutput,
+} from "./actions/create";
+import { CreateWorkspaceIntegrationAction } from "./actions/create";
+import type {
+  HardDeleteWorkspaceIntegrationInput,
+  HardDeleteWorkspaceIntegrationOutput,
+} from "./actions/hard-delete";
+import { HardDeleteWorkspaceIntegrationAction } from "./actions/hard-delete";
+import type {
+  ListWorkspaceIntegrationsInput,
+  ListWorkspaceIntegrationsOutput,
+} from "./actions/list";
+import { ListWorkspaceIntegrationsAction } from "./actions/list";
+import type {
+  PatchWorkspaceIntegrationInput,
+  PatchWorkspaceIntegrationOutput,
+} from "./actions/patch";
+import { PatchWorkspaceIntegrationAction } from "./actions/patch";
+import type {
+  RetrieveWorkspaceIntegrationInput,
+  RetrieveWorkspaceIntegrationOutput,
+} from "./actions/retrieve";
+import { RetrieveWorkspaceIntegrationAction } from "./actions/retrieve";
+import type { WorkspaceIntegrationProviderAlreadyExistsError } from "./domain/errors";
 import type { WorkspaceIntegrationNotFoundError } from "./errors";
-import { WorkspaceIntegrationRepository } from "./repositories";
+import { WorkspaceIntegrationRepository } from "./repositories/workspace-integration.repo";
 
 export class IntegrationModuleService extends Context.Tag(
   "@mason/integration/IntegrationModuleService"

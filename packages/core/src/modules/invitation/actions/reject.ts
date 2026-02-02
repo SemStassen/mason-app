@@ -1,8 +1,8 @@
 import { Effect, Option } from "effect";
 import type { WorkspaceInvitationId } from "~/shared/schemas";
-import type { WorkspaceInvitation } from "../domain";
+import type { WorkspaceInvitation } from "../domain/workspace-invitation.model";
 import { WorkspaceInvitationNotFoundError } from "../errors";
-import { WorkspaceInvitationRepository } from "../repositories";
+import { WorkspaceInvitationRepository } from "../repositories/workspace-invitation.repo";
 
 export interface RejectWorkspaceInvitationInput {
   id: WorkspaceInvitationId;

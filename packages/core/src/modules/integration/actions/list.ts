@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { WorkspaceId, WorkspaceIntegrationId } from "~/shared/schemas";
-import type { WorkspaceIntegration } from "../domain";
-import { WorkspaceIntegrationRepository } from "../repositories";
+import type { WorkspaceIntegration } from "../domain/workspace-integration.model";
+import { WorkspaceIntegrationRepository } from "../repositories/workspace-integration.repo";
 
 export interface ListWorkspaceIntegrationsInput {
   workspaceId: WorkspaceId;

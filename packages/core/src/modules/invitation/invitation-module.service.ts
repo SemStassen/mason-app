@@ -1,21 +1,27 @@
 import { Context, Effect, Layer } from "effect";
 import { MasonError } from "~/shared/errors";
-import {
-  AcceptWorkspaceInvitationAction,
-  type AcceptWorkspaceInvitationInput,
-  type AcceptWorkspaceInvitationOutput,
-  CancelWorkspaceInvitationAction,
-  type CancelWorkspaceInvitationInput,
-  type CancelWorkspaceInvitationOutput,
-  CreateOrRenewPendingWorkspaceInvitationAction,
-  type CreateOrRenewPendingWorkspaceInvitationInput,
-  type CreateOrRenewPendingWorkspaceInvitationOutput,
-  RejectWorkspaceInvitationAction,
-  type RejectWorkspaceInvitationInput,
-  type RejectWorkspaceInvitationOutput,
-} from "./actions";
-import type { WorkspaceInvitationExpiredError } from "./domain";
-import { WorkspaceInvitationRepository } from "./repositories";
+import type {
+  AcceptWorkspaceInvitationInput,
+  AcceptWorkspaceInvitationOutput,
+} from "./actions/accept";
+import { AcceptWorkspaceInvitationAction } from "./actions/accept";
+import type {
+  CancelWorkspaceInvitationInput,
+  CancelWorkspaceInvitationOutput,
+} from "./actions/cancel";
+import { CancelWorkspaceInvitationAction } from "./actions/cancel";
+import type {
+  CreateOrRenewPendingWorkspaceInvitationInput,
+  CreateOrRenewPendingWorkspaceInvitationOutput,
+} from "./actions/create-or-renew-pending";
+import { CreateOrRenewPendingWorkspaceInvitationAction } from "./actions/create-or-renew-pending";
+import type {
+  RejectWorkspaceInvitationInput,
+  RejectWorkspaceInvitationOutput,
+} from "./actions/reject";
+import { RejectWorkspaceInvitationAction } from "./actions/reject";
+import type { WorkspaceInvitationExpiredError } from "./domain/errors";
+import { WorkspaceInvitationRepository } from "./repositories/workspace-invitation.repo";
 
 export class InvitationModuleService extends Context.Tag(
   "@mason/invitation/InvitationModuleService"

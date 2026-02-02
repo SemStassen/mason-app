@@ -1,6 +1,6 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { InvitationModuleService } from "~/modules/invitation";
+import { InvitationModuleService } from "~/modules/invitation/invitation-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 import { WorkspaceInvitationId } from "~/shared/schemas";
 

@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 import type { TimeEntryId, WorkspaceId } from "~/shared/schemas";
-import type { TimeEntry } from "../domain";
+import type { TimeEntry } from "../domain/time-entry.model";
 import { TimeEntryNotFoundError } from "../errors";
 import { TimeEntryRepository } from "../repositories/time-entry.repo";
 

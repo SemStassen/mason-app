@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 import type { WorkspaceId, WorkspaceInvitationId } from "~/shared/schemas";
 import { WorkspaceInvitationNotFoundError } from "../errors";
-import { WorkspaceInvitationRepository } from "../repositories";
+import { WorkspaceInvitationRepository } from "../repositories/workspace-invitation.repo";
 
 export interface CancelWorkspaceInvitationInput {
   id: WorkspaceInvitationId;

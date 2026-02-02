@@ -7,7 +7,7 @@ import type { DatabaseError } from "~/infra/db";
 import { wrapSqlError } from "~/infra/db";
 import { WorkspaceId, type WorkspaceIntegrationId } from "~/shared/schemas";
 import type { AtLeastOne } from "~/shared/utils";
-import { WorkspaceIntegration } from "../domain";
+import { WorkspaceIntegration } from "../domain/workspace-integration.model";
 
 /**
  * Schema representing a database row from the workspace_integrations table.

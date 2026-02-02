@@ -1,6 +1,6 @@
 import { Effect, Option, Schema } from "effect";
-import { IdentityModuleService } from "~/modules/identity";
-import { MemberModuleService } from "~/modules/member";
+import { IdentityModuleService } from "~/modules/identity/identity-module";
+import { MemberModuleService } from "~/modules/member/member-module.service";
 import { SessionContext } from "~/shared/auth";
 import { WorkspaceId } from "~/shared/schemas";
 

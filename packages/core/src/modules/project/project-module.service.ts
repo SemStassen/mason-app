@@ -1,33 +1,42 @@
 import { Context, Effect, Layer } from "effect";
 import { MasonError } from "~/shared/errors";
-import {
-  ArchiveProjectAction,
-  type ArchiveProjectInput,
-  type ArchiveProjectOutput,
-  ArchiveTaskAction,
-  type ArchiveTaskInput,
-  type ArchiveTaskOutput,
-  CreateProjectAction,
-  type CreateProjectInput,
-  type CreateProjectOutput,
-  CreateTaskAction,
-  type CreateTaskInput,
-  type CreateTaskOutput,
-  PatchProjectAction,
-  type PatchProjectInput,
-  type PatchProjectOutput,
-  PatchTaskAction,
-  type PatchTaskInput,
-  type PatchTaskOutput,
-  RestoreProjectAction,
-  type RestoreProjectInput,
-  type RestoreProjectOutput,
-  RestoreTaskAction,
-  type RestoreTaskInput,
-  type RestoreTaskOutput,
-} from "./actions";
-import type { ProjectArchivedError } from "./domain";
-import { ProjectRepository, TaskRepository } from "./repositories";
+import type {
+  ArchiveProjectInput,
+  ArchiveProjectOutput,
+} from "./actions/project/archive";
+import { ArchiveProjectAction } from "./actions/project/archive";
+import type {
+  CreateProjectInput,
+  CreateProjectOutput,
+} from "./actions/project/create";
+import { CreateProjectAction } from "./actions/project/create";
+import type {
+  PatchProjectInput,
+  PatchProjectOutput,
+} from "./actions/project/patch";
+import { PatchProjectAction } from "./actions/project/patch";
+import type {
+  RestoreProjectInput,
+  RestoreProjectOutput,
+} from "./actions/project/restore";
+import { RestoreProjectAction } from "./actions/project/restore";
+import type {
+  ArchiveTaskInput,
+  ArchiveTaskOutput,
+} from "./actions/task/archive";
+import { ArchiveTaskAction } from "./actions/task/archive";
+import type { CreateTaskInput, CreateTaskOutput } from "./actions/task/create";
+import { CreateTaskAction } from "./actions/task/create";
+import type { PatchTaskInput, PatchTaskOutput } from "./actions/task/patch";
+import { PatchTaskAction } from "./actions/task/patch";
+import type {
+  RestoreTaskInput,
+  RestoreTaskOutput,
+} from "./actions/task/restore";
+import { RestoreTaskAction } from "./actions/task/restore";
+import type { ProjectArchivedError } from "./domain/errors";
+import { ProjectRepository } from "./repositories/project.repo";
+import { TaskRepository } from "./repositories/task.repo";
 
 export class ProjectModuleService extends Context.Tag(
   "@mason/project/ProjectModuleService"

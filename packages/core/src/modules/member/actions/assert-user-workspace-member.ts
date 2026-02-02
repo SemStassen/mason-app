@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 import type { UserId, WorkspaceId } from "~/shared/schemas";
-import { UserNotWorkspaceMemberError } from "../domain";
-import { MemberRepository } from "../repositories";
+import { UserNotWorkspaceMemberError } from "../domain/errors";
+import { MemberRepository } from "../repositories/member.repo";
 
 export interface AssertUserWorkspaceMemberInput {
   userId: UserId;

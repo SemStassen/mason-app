@@ -6,7 +6,7 @@ import type { NonEmptyReadonlyArray } from "effect/Array";
 import type { DatabaseError } from "~/infra/db";
 import { wrapSqlError } from "~/infra/db";
 import type { TimeEntryId, WorkspaceId } from "~/shared/schemas";
-import { TimeEntry } from "../domain";
+import { TimeEntry } from "../domain/time-entry.model";
 
 /**
  * Schema representing a database row from the time_entries table.

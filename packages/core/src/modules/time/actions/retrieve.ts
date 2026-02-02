@@ -1,7 +1,7 @@
 import { Effect, type Option } from "effect";
 import type { TimeEntryId, WorkspaceId } from "~/shared/schemas";
-import type { TimeEntry } from "../domain";
-import { TimeEntryRepository } from "../repositories";
+import type { TimeEntry } from "../domain/time-entry.model";
+import { TimeEntryRepository } from "../repositories/time-entry.repo";
 
 export interface RetrieveTimeEntryInput {
   id: TimeEntryId;

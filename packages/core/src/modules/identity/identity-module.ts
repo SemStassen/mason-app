@@ -1,21 +1,22 @@
 import { Context, Effect, Layer } from "effect";
 import { MasonError } from "~/shared/errors";
-import {
-  CreateUserAction,
-  type CreateUserInput,
-  type CreateUserOutput,
-  PatchUserAction,
-  type PatchUserInput,
-  type PatchUserOutput,
-  RetrieveUserAction,
-  type RetrieveUserInput,
-  type RetrieveUserOutput,
-  SetActiveWorkspaceAction,
-  type SetActiveWorkspaceInput,
-  type SetActiveWorkspaceOutput,
-} from "./actions";
+import type {
+  SetActiveWorkspaceInput,
+  SetActiveWorkspaceOutput,
+} from "./actions/session/set-active-workspace";
+import { SetActiveWorkspaceAction } from "./actions/session/set-active-workspace";
+import type { CreateUserInput, CreateUserOutput } from "./actions/user/create";
+import { CreateUserAction } from "./actions/user/create";
+import type { PatchUserInput, PatchUserOutput } from "./actions/user/patch";
+import { PatchUserAction } from "./actions/user/patch";
+import type {
+  RetrieveUserInput,
+  RetrieveUserOutput,
+} from "./actions/user/retrieve";
+import { RetrieveUserAction } from "./actions/user/retrieve";
 import type { SessionNotFoundError, UserNotFoundError } from "./errors";
-import { SessionRepository, UserRepository } from "./repositories";
+import { SessionRepository } from "./repositories/session.repo";
+import { UserRepository } from "./repositories/user.repo";
 
 export class IdentityModuleService extends Context.Tag(
   "@mason/identity/IdentityModuleService"

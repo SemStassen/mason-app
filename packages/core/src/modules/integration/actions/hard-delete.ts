@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 import type { WorkspaceId, WorkspaceIntegrationId } from "~/shared/schemas";
 import { WorkspaceIntegrationNotFoundError } from "../errors";
-import { WorkspaceIntegrationRepository } from "../repositories";
+import { WorkspaceIntegrationRepository } from "../repositories/workspace-integration.repo";
 
 export interface HardDeleteWorkspaceIntegrationInput {
   id: WorkspaceIntegrationId;

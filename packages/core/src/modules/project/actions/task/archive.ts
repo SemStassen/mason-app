@@ -1,8 +1,9 @@
 import { Effect, Option } from "effect";
 import type { TaskId, WorkspaceId } from "~/shared/schemas";
-import { AssertProjectNotArchived } from "../../domain";
+import { AssertProjectNotArchived } from "../../domain/project.rules";
 import { ProjectNotFoundError, TaskNotFoundError } from "../../errors";
-import { ProjectRepository, TaskRepository } from "../../repositories";
+import { ProjectRepository } from "../../repositories/project.repo";
+import { TaskRepository } from "../../repositories/task.repo";
 
 export interface ArchiveTaskInput {
   id: TaskId;

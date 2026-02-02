@@ -1,6 +1,7 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect } from "effect";
-import { ProjectModuleService, Task } from "~/modules/project";
+import { Task } from "~/modules/project/domain/task.model";
+import { ProjectModuleService } from "~/modules/project/project-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 
 export const CreateTaskRequest = Task.createInput;
