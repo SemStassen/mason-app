@@ -20,12 +20,18 @@ export const SetActiveWorkspaceAction = Effect.fn(
       query: { id: input.sessionId },
     })
     .pipe(
-      Effect.map(Option.getOrThrowWith(() => new SessionNotFoundError()))
+      Effect.map(
+        Option.getOrThrowWith(
+          () => new SessionNotFoundError({ id: input.sessionId })
+        )
+      )
     );
 
   const updatedSession = yield* session.setActiveWorkspace(input.workspaceId);
 
-  const [persistedSession] = yield* sessionRepo.update({ sessions: [updatedSession] });
+  const [persistedSession] = yield* sessionRepo.update({
+    sessions: [updatedSession],
+  });
 
   return persistedSession;
 });

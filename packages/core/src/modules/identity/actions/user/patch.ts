@@ -22,7 +22,11 @@ export const PatchUserAction = Effect.fn("identity/PatchUserAction")(function* (
         id: input.id,
       },
     })
-    .pipe(Effect.map(Option.getOrThrowWith(() => new UserNotFoundError())));
+    .pipe(
+      Effect.map(
+        Option.getOrThrowWith(() => new UserNotFoundError({ id: input.id }))
+      )
+    );
 
   const updatedUser = yield* user.patch(input.patch);
 
