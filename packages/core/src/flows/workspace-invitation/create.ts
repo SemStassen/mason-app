@@ -7,7 +7,7 @@ import { InvitationModuleService } from "~/modules/invitation/invitation-module.
 import { MemberModuleService } from "~/modules/member/member-module.service";
 import { SessionContext, WorkspaceContext } from "~/shared/auth";
 
-export const CreateWorkspaceInvitationRequest = WorkspaceInvitation.createInput;
+export const CreateWorkspaceInvitationRequest = WorkspaceInvitation.flowCreate;
 
 export const CreateWorkspaceInvitationFlow = Effect.fn(
   "flows/CreateWorkspaceInvitationFlow"

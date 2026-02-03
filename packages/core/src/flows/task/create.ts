@@ -4,7 +4,7 @@ import { Task } from "~/modules/project/domain/task.model";
 import { ProjectModuleService } from "~/modules/project/project-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 
-export const CreateTaskRequest = Task.createInput;
+export const CreateTaskRequest = Task.flowCreate;
 
 export const CreateTaskFlow = Effect.fn("flows/CreateTaskFlow")(function* (
   request: typeof CreateTaskRequest.Type

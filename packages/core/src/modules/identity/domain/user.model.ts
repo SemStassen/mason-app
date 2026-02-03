@@ -18,12 +18,12 @@ export class User extends Model.Class<User>("User")(
     description: "A user",
   }
 ) {
-  private static _validate = (input: typeof User.model.Type) =>
+  private static _validate = (input: typeof User.entity.Type) =>
     Schema.validate(User)(input);
 
-  static fromInput = (input: typeof User.create.Type) =>
+  static fromInput = (input: typeof User.actionCreate.Type) =>
     Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(User.create)(input);
+      const safeInput = yield* Schema.decodeUnknown(User.actionCreate)(input);
 
       return yield* User._validate({
         id: UserId.make(generateUUID()),
@@ -32,9 +32,9 @@ export class User extends Model.Class<User>("User")(
       });
     });
 
-  patch = (patch: typeof User.patch.Type) =>
+  patch = (patch: typeof User.actionPatch.Type) =>
     Effect.gen(this, function* () {
-      const safePatch = yield* Schema.decodeUnknown(User.patch)(patch);
+      const safePatch = yield* Schema.decodeUnknown(User.actionPatch)(patch);
 
       return yield* User._validate({ ...this, ...safePatch });
     });

@@ -5,7 +5,7 @@ import { ProjectModuleService } from "~/modules/project/project-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 import { ProjectId } from "~/shared/schemas";
 
-export const PatchProjectRequest = Project.patchInput.pipe(
+export const PatchProjectRequest = Project.flowPatch.pipe(
   Schema.extend(Schema.Struct({ id: ProjectId }))
 );
 
@@ -23,7 +23,7 @@ export const PatchProjectFlow = Effect.fn("flows/PatchProjectFlow")(function* (
     role: member.role,
   });
 
-  const { id, ...patch } = request;
+  const { id: _id, ...patch } = request;
 
   yield* projectModule.patchProject({
     id: request.id,

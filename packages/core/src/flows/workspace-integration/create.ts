@@ -7,7 +7,7 @@ import { WorkspaceContext } from "~/shared/auth";
 import { EncryptedApiKey } from "~/shared/schemas";
 
 export const CreateWorkspaceIntegrationRequest =
-  WorkspaceIntegration.createInput;
+  WorkspaceIntegration.flowCreate;
 
 export const CreateWorkspaceIntegrationFlow = Effect.fn(
   "CreateWorkspaceIntegrationFlow"

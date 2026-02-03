@@ -12,8 +12,8 @@ const {
   fieldEvolve,
   fieldFromKey,
 } = VariantSchema.make({
-  variants: ["model", "create", "patch", "output", "createInput", "patchInput"],
-  defaultVariant: "model",
+  variants: ["entity", "actionCreate", "actionPatch", "flowCreate", "flowPatch", "output"],
+  defaultVariant: "entity",
 });
 
 export {
@@ -40,7 +40,7 @@ export const DomainManaged = <
   schema: S
 ) =>
   Field({
-    model: schema,
+    entity: schema,
     output: schema,
   });
 
@@ -55,8 +55,8 @@ export const SystemImmutable = <
   schema: S
 ) =>
   Field({
-    model: schema,
-    create: schema,
+    entity: schema,
+    actionCreate: schema,
     output: schema,
   });
 
@@ -71,9 +71,9 @@ export const UserImmutable = <
   schema: S
 ) =>
   Field({
-    model: schema,
-    create: schema,
-    createInput: schema,
+    entity: schema,
+    actionCreate: schema,
+    flowCreate: schema,
     output: schema,
   });
 
@@ -84,11 +84,11 @@ export const UserImmutable = <
  */
 export const Mutable = <S extends Schema.Schema.All>(schema: S) =>
   Field({
-    model: schema,
-    create: schema,
-    patch: Schema.optionalWith(schema, { exact: true }),
-    createInput: schema,
-    patchInput: Schema.optionalWith(schema, { exact: true }),
+    entity: schema,
+    actionCreate: schema,
+    actionPatch: Schema.optionalWith(schema, { exact: true }),
+    flowCreate: schema,
+    flowPatch: Schema.optionalWith(schema, { exact: true }),
     output: schema,
   });
 
@@ -105,11 +105,11 @@ export const TransformedMutable = <
   inputSchema: I
 ) =>
   Field({
-    model: modelSchema,
-    create: modelSchema,
-    patch: Schema.optionalWith(modelSchema, { exact: true }),
-    createInput: inputSchema,
-    patchInput: Schema.optionalWith(inputSchema, { exact: true }),
+    entity: modelSchema,
+    actionCreate: modelSchema,
+    actionPatch: Schema.optionalWith(modelSchema, { exact: true }),
+    flowCreate: inputSchema,
+    flowPatch: Schema.optionalWith(inputSchema, { exact: true }),
     output: modelSchema,
   });
 
@@ -126,9 +126,9 @@ export const TransformedImmutable = <
   inputSchema: I
 ) =>
   Field({
-    model: modelSchema,
-    create: modelSchema,
-    createInput: inputSchema,
+    entity: modelSchema,
+    actionCreate: modelSchema,
+    flowCreate: inputSchema,
     output: modelSchema,
   });
 
@@ -140,10 +140,10 @@ export const TransformedImmutable = <
  */
 export const OptionalMutable = <S extends Schema.Schema.All>(schema: S) =>
   Field({
-    model: schema,
-    create: Schema.optionalWith(schema, { exact: true }),
-    patch: Schema.optionalWith(schema, { exact: true }),
-    createInput: Schema.optionalWith(schema, { exact: true }),
-    patchInput: Schema.optionalWith(schema, { exact: true }),
+    entity: schema,
+    actionCreate: Schema.optionalWith(schema, { exact: true }),
+    actionPatch: Schema.optionalWith(schema, { exact: true }),
+    flowCreate: Schema.optionalWith(schema, { exact: true }),
+    flowPatch: Schema.optionalWith(schema, { exact: true }),
     output: schema,
   });

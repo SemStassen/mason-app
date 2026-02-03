@@ -4,7 +4,7 @@ import { Workspace } from "~/modules/workspace/domain/workspace.model";
 import { WorkspaceModuleService } from "~/modules/workspace/workspace-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 
-export const PatchWorkspaceRequest = Workspace.patchInput;
+export const PatchWorkspaceRequest = Workspace.flowPatch;
 
 export const PatchWorkspaceFlow = Effect.fn("flows/PatchWorkspaceFlow")(
   function* (request: typeof PatchWorkspaceRequest.Type) {

@@ -86,7 +86,7 @@ export class UserRepository extends Context.Tag(
       });
 
       const updateQuery = SqlSchema.findAll({
-        Request: Schema.Struct({ user: User.model }),
+        Request: Schema.Struct({ user: User.entity }),
         Result: UserDbRow,
         execute: (request) =>
           drizzle

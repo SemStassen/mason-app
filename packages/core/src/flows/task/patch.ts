@@ -5,7 +5,7 @@ import { ProjectModuleService } from "~/modules/project/project-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 import { TaskId } from "~/shared/schemas";
 
-export const PatchTaskRequest = Task.patchInput.pipe(
+export const PatchTaskRequest = Task.flowPatch.pipe(
   Schema.extend(Schema.Struct({ id: TaskId }))
 );
 
@@ -23,7 +23,7 @@ export const PatchTaskFlow = Effect.fn("flows/PatchTaskFlow")(function* (
     role: member.role,
   });
 
-  const { id, ...patch } = request;
+  const { id: _id, ...patch } = request;
 
   yield* projectModule.patchTask({
     id: request.id,

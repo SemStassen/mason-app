@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import { User } from "../../domain/user.model";
 import { UserRepository } from "../../repositories/user.repo";
 
-export type CreateUserInput = typeof User.create.Type;
-export type CreateUserOutput = void;
+export type CreateUserInput = typeof User.actionCreate.Type;
+export type CreateUserOutput = typeof User.entity.Type;
 
 export const CreateUserAction = Effect.fn("identity/CreateUserAction")(
   function* (input: CreateUserInput) {
@@ -11,6 +11,8 @@ export const CreateUserAction = Effect.fn("identity/CreateUserAction")(
 
     const createdUser = yield* User.fromInput(input);
 
-    yield* userRepo.insert({ users: [createdUser] });
+    const [persistedUser] = yield* userRepo.insert({ users: [createdUser] });
+
+    return persistedUser;
   }
 );

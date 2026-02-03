@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { Project } from "../../domain/project.model";
 import { ProjectRepository } from "../../repositories/project.repo";
 
-export type CreateProjectInput = typeof Project.create.Type;
+export type CreateProjectInput = typeof Project.createAction.Type;
 
 export type CreateProjectOutput = void;
 

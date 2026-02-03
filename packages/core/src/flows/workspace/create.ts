@@ -6,7 +6,7 @@ import { Workspace } from "~/modules/workspace/domain/workspace.model";
 import { WorkspaceModuleService } from "~/modules/workspace/workspace-module.service";
 import { SessionContext } from "~/shared/auth";
 
-export const CreateWorkspaceRequest = Workspace.createInput;
+export const CreateWorkspaceRequest = Workspace.flowCreate;
 
 export const CreateWorkspaceFlow = Effect.fn("flows/CreateWorkspaceFlow")(
   function* (request: typeof CreateWorkspaceRequest.Type) {

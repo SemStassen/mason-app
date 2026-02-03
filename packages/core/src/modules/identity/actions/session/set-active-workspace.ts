@@ -8,7 +8,7 @@ export interface SetActiveWorkspaceInput {
   sessionId: SessionId;
   workspaceId: Session["activeWorkspaceId"];
 }
-export type SetActiveWorkspaceOutput = void;
+export type SetActiveWorkspaceOutput = typeof Session.entity.Type;
 
 export const SetActiveWorkspaceAction = Effect.fn(
   "identity/SetActiveWorkspaceAction"
@@ -19,9 +19,13 @@ export const SetActiveWorkspaceAction = Effect.fn(
     .retrieve({
       query: { id: input.sessionId },
     })
-    .pipe(Effect.map(Option.getOrThrowWith(() => new SessionNotFoundError())));
+    .pipe(
+      Effect.map(Option.getOrThrowWith(() => new SessionNotFoundError()))
+    );
 
   const updatedSession = yield* session.setActiveWorkspace(input.workspaceId);
 
-  yield* sessionRepo.update({ sessions: [updatedSession] });
+  const [persistedSession] = yield* sessionRepo.update({ sessions: [updatedSession] });
+
+  return persistedSession;
 });

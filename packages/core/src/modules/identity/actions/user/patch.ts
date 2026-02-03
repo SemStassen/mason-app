@@ -6,10 +6,10 @@ import { UserRepository } from "../../repositories/user.repo";
 
 export interface PatchUserInput {
   id: UserId;
-  patch: typeof User.patch.Type;
+  patch: typeof User.actionPatch.Type;
 }
 
-export type PatchUserOutput = void;
+export type PatchUserOutput = typeof User.entity.Type;
 
 export const PatchUserAction = Effect.fn("identity/PatchUserAction")(function* (
   input: PatchUserInput
@@ -26,5 +26,7 @@ export const PatchUserAction = Effect.fn("identity/PatchUserAction")(function* (
 
   const updatedUser = yield* user.patch(input.patch);
 
-  yield* userRepo.update({ users: [updatedUser] });
+  const [persistedUser] = yield* userRepo.update({ users: [updatedUser] });
+
+  return persistedUser;
 });

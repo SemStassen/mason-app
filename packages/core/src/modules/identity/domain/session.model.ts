@@ -14,12 +14,12 @@ export class Session extends Model.Class<Session>("Session")(
     description: "A session",
   }
 ) {
-  private static _validate = (input: typeof Session.model.Type) =>
+  private static _validate = (input: typeof Session.entity.Type) =>
     Schema.validate(Session)(input);
 
-  static fromInput = (input: typeof Session.create.Type) =>
+  static fromInput = (input: typeof Session.actionCreate.Type) =>
     Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(Session.create)(input);
+      const safeInput = yield* Schema.decodeUnknown(Session.actionCreate)(input);
 
       return yield* Session._validate({
         id: SessionId.make(generateUUID()),
@@ -27,9 +27,9 @@ export class Session extends Model.Class<Session>("Session")(
       });
     });
 
-  patch = (patch: typeof Session.patch.Type) =>
+  patch = (patch: typeof Session.actionPatch.Type) =>
     Effect.gen(this, function* () {
-      const safePatch = yield* Schema.decodeUnknown(Session.patch)(patch);
+      const safePatch = yield* Schema.decodeUnknown(Session.actionPatch)(patch);
 
       return yield* Session._validate({
         ...this,

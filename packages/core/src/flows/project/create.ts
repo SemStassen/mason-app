@@ -4,7 +4,7 @@ import { Project } from "~/modules/project/domain/project.model";
 import { ProjectModuleService } from "~/modules/project/project-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 
-export const CreateProjectRequest = Project.createInput;
+export const CreateProjectRequest = Project.flowCreate;
 
 export const CreateProjectFlow = Effect.fn("flows/CreateProjectFlow")(
   function* (request: typeof CreateProjectRequest.Type) {
