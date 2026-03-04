@@ -7,28 +7,13 @@ import type { DatabaseError } from "~/infra/db";
 import { wrapSqlError } from "~/infra/db";
 import type { WorkspaceId } from "~/shared/schemas";
 import type { AtLeastOne } from "~/shared/utils";
-import { Workspace } from "../domain/workspace.model";
+import { Workspace } from "../domain/workspace.entity";
+import { createSelectSchema } from "drizzle-orm/effect-schema";
 
-/**
- * Schema representing a database row from the workspaces table.
- * Includes all fields including metadata (createdAt, updatedAt).
- */
-const WorkspaceDbRow = Schema.Struct({
-  id: Schema.String,
-  name: Schema.String,
-  slug: Schema.String,
-  logoUrl: Schema.NullOr(Schema.String),
-  metadata: Schema.NullOr(Schema.String),
-  createdAt: Schema.Date,
-  updatedAt: Schema.Date,
-});
-type WorkspaceDbRow = typeof WorkspaceDbRow.Type;
+const WorkspaceSelect = createSelectSchema(schema.workspacesTable);
+type WorkspaceSelect = typeof WorkspaceSelect.Type;
 
-/**
- * Convert database row to Workspace domain entity.
- * Pure function - no Effect wrapping needed.
- */
-const rowToWorkspace = (row: WorkspaceDbRow): Workspace =>
+const rowToWorkspace = (row: WorkspaceSelect): Workspace =>
   Schema.decodeUnknownSync(Workspace)({
     id: row.id,
     name: row.name,
@@ -37,10 +22,7 @@ const rowToWorkspace = (row: WorkspaceDbRow): Workspace =>
     metadata: Option.fromNullable(row.metadata),
   });
 
-/**
- * Maps domain model to database format (Option<string> -> string | null).
- */
-const workspaceToDb = (workspace: typeof Workspace.Encoded) => ({
+const workspaceToDb = (workspace: typeof Workspace.entity.Encoded) => ({
   id: workspace.id,
   name: workspace.name,
   slug: workspace.slug,
@@ -59,11 +41,11 @@ export class WorkspaceRepository extends Context.Tag(
     update: (params: {
       workspaces: NonEmptyReadonlyArray<Workspace>;
     }) => Effect.Effect<ReadonlyArray<Workspace>, DatabaseError>;
-    retrieve: (params: {
-      query: AtLeastOne<{
-        id?: WorkspaceId;
-        slug?: string;
-      }>;
+    retrieveBySlug: (params: {
+        slug: Workspace["slug"]
+    }) => Effect.Effect<Option.Option<Workspace>, DatabaseError>;
+    retrieveById: (params: {
+      id: WorkspaceId;
     }) => Effect.Effect<Option.Option<Workspace>, DatabaseError>;
     hardDelete: (params: {
       workspaceIds: NonEmptyReadonlyArray<WorkspaceId>;
@@ -77,9 +59,9 @@ export class WorkspaceRepository extends Context.Tag(
 
       const insertQuery = SqlSchema.findAll({
         Request: Schema.Struct({
-          workspaces: Schema.Array(Workspace.model),
+          workspaces: Schema.Array(Workspace.entity),
         }),
-        Result: WorkspaceDbRow,
+        Result: WorkspaceSelect,
         execute: (request) =>
           drizzle
             .insert(schema.workspacesTable)
@@ -88,8 +70,8 @@ export class WorkspaceRepository extends Context.Tag(
       });
 
       const updateQuery = SqlSchema.findAll({
-        Request: Schema.Struct({ workspace: Workspace.model }),
-        Result: WorkspaceDbRow,
+        Request: Schema.Struct({ workspace: Workspace.entity }),
+        Result: WorkspaceSelect,
         execute: (request) =>
           drizzle
             .update(schema.workspacesTable)
@@ -98,31 +80,29 @@ export class WorkspaceRepository extends Context.Tag(
             .returning(),
       });
 
-      const retrieveQuery = SqlSchema.findOne({
+      const retrieveBySlugQuery = SqlSchema.findOne({
         Request: Schema.Struct({
-          id: Schema.optional(Schema.String),
-          slug: Schema.optional(Schema.String),
+          slug: Schema.String,
         }),
-        Result: WorkspaceDbRow,
-        execute: (request) => {
-          const whereConditions: Array<SQL> = [];
-
-          if (request.id) {
-            whereConditions.push(eq(schema.workspacesTable.id, request.id));
-          }
-
-          if (request.slug) {
-            whereConditions.push(eq(schema.workspacesTable.slug, request.slug));
-          }
-
-          return drizzle
+        Result: WorkspaceSelect,
+        execute: (request) =>
+          drizzle
             .select()
             .from(schema.workspacesTable)
-            .where(
-              whereConditions.length > 0 ? and(...whereConditions) : undefined
-            )
-            .limit(1);
-        },
+            .where(eq(schema.workspacesTable.slug, request.slug))
+            .limit(1),
+      });
+
+      const retrieveByIdQuery = SqlSchema.findOne({
+        Request: Schema.Struct({
+          id: Schema.String,
+        }),
+        Result: WorkspaceSelect,
+        execute: (request) =>  drizzle
+          .select()
+          .from(schema.workspacesTable)
+          .where(eq(schema.workspacesTable.id, request.id))
+          .limit(1),
       });
 
       const hardDeleteQuery = SqlSchema.void({
@@ -139,9 +119,9 @@ export class WorkspaceRepository extends Context.Tag(
         insert: Effect.fn("@mason/workspace/WorkspaceRepo.insert")(function* ({
           workspaces,
         }) {
-          const rows = yield* insertQuery({ workspaces });
-
-          return rows.map(rowToWorkspace);
+          return yield* insertQuery({ workspaces }).pipe(
+            Effect.map((rows) => rows.map(rowToWorkspace))
+          );
         }, wrapSqlError),
 
         update: Effect.fn("@mason/workspace/WorkspaceRepo.update")(function* ({
@@ -156,9 +136,15 @@ export class WorkspaceRepository extends Context.Tag(
           return results.flat().map(rowToWorkspace);
         }, wrapSqlError),
 
-        retrieve: Effect.fn("@mason/workspace/WorkspaceRepo.retrieve")(
-          function* ({ query }) {
-            const maybeRow = yield* retrieveQuery({ ...query });
+        retrieveBySlug: Effect.fn("@mason/workspace/WorkspaceRepo.retrieveBySlug")(function* ({ slug }) {
+          const maybeRow = yield* retrieveBySlugQuery({ slug });
+
+          return Option.map(maybeRow, rowToWorkspace);
+        }, wrapSqlError),
+
+        retrieveById: Effect.fn("@mason/workspace/WorkspaceRepo.retrieveById")(
+          function* ({ id }) {
+            const maybeRow = yield* retrieveByIdQuery({ id });
 
             return Option.map(maybeRow, rowToWorkspace);
           },

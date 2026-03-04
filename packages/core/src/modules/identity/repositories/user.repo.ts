@@ -7,7 +7,7 @@ import type { DatabaseError } from "~/infra/db";
 import { wrapSqlError } from "~/infra/db";
 import type { UserId } from "~/shared/schemas";
 import type { AtLeastOne } from "~/shared/utils";
-import { User } from "../domain/user.model";
+import { User } from "../domain/user.entity";
 
 /**
  * Schema representing a database row from the users table.

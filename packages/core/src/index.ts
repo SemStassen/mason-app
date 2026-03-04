@@ -18,7 +18,7 @@ export * from "./modules/project/errors";
 export * from "./modules/project/project-module.service";
 export * from "./modules/time/errors";
 export * from "./modules/time/time-module.service";
-export * from "./modules/workspace/errors";
+export * from "./modules/workspace/workspace.errors";
 export * from "./modules/workspace/workspace-module.service";
 
 /** Shared */

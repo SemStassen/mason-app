@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { User } from "../../domain/user.model";
+import { User } from "../../domain/user.entity";
 import { UserRepository } from "../../repositories/user.repo";
 
 export type CreateUserInput = typeof User.actionCreate.Type;

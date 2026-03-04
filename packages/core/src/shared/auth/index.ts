@@ -1,8 +1,8 @@
 import { Context } from "effect";
-import type { Session } from "~/modules/identity/domain/session.model";
-import type { User } from "~/modules/identity/domain/user.model";
+import type { Session } from "~/modules/identity/domain/session.entity";
+import type { User } from "~/modules/identity/domain/user.entity";
 import type { Member } from "~/modules/member/domain/member.model";
-import type { Workspace } from "~/modules/workspace/domain/workspace.model";
+import type { Workspace } from "~/modules/workspace/domain/workspace.entity";
 
 export class SessionContext extends Context.Tag("@mason/shared/SessionContext")<
   SessionContext,

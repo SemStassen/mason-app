@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 import type { SessionId } from "~/shared/schemas";
-import type { Session } from "../../domain/session.model";
+import type { Session } from "../../domain/session.entity";
 import { SessionNotFoundError } from "../../errors";
 import { SessionRepository } from "../../repositories/session.repo";
 

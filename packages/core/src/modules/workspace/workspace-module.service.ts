@@ -15,14 +15,9 @@ import type {
   PatchWorkspaceOutput,
 } from "./actions/patch";
 import { PatchWorkspaceAction } from "./actions/patch";
-import type {
-  RetrieveWorkspaceInput,
-  RetrieveWorkspaceOutput,
-} from "./actions/retrieve";
-import { RetrieveWorkspaceAction } from "./actions/retrieve";
 import type { WorkspaceSlugAlreadyExistsError } from "./domain/errors";
-import type { WorkspaceNotFoundError } from "./errors";
 import { WorkspaceRepository } from "./repositories/workspace.repo";
+import type { WorkspaceNotFoundError } from "./workspace.errors";
 
 export class WorkspaceModuleService extends Context.Tag(
   "@mason/workspace/WorkspaceModuleService"
@@ -47,9 +42,6 @@ export class WorkspaceModuleService extends Context.Tag(
       PatchWorkspaceOutput,
       WorkspaceNotFoundError | WorkspaceSlugAlreadyExistsError | MasonError
     >;
-    retrieveWorkspace: (
-      params: RetrieveWorkspaceInput
-    ) => Effect.Effect<RetrieveWorkspaceOutput, MasonError>;
   }
 >() {
   static readonly live = Layer.effect(
@@ -84,15 +76,6 @@ export class WorkspaceModuleService extends Context.Tag(
             Effect.provide(services),
             Effect.catchTags({
               ParseError: (e) => Effect.fail(new MasonError({ cause: e })),
-              "infra/DatabaseError": (e) =>
-                Effect.fail(new MasonError({ cause: e })),
-            })
-          ),
-
-        retrieveWorkspace: (params) =>
-          RetrieveWorkspaceAction(params).pipe(
-            Effect.provide(services),
-            Effect.catchTags({
               "infra/DatabaseError": (e) =>
                 Effect.fail(new MasonError({ cause: e })),
             })

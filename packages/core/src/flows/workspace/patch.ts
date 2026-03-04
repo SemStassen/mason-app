@@ -1,6 +1,6 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect } from "effect";
-import { Workspace } from "~/modules/workspace/domain/workspace.model";
+import { Workspace } from "~/modules/workspace/domain/workspace.entity";
 import { WorkspaceModuleService } from "~/modules/workspace/workspace-module.service";
 import { WorkspaceContext } from "~/shared/auth";
 

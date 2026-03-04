@@ -9,11 +9,15 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
+    "@effect/experimental": "^0.58.0",
+    "@effect/sql": "catalog:",
     "@effect/platform": "catalog:",
+    "@effect/rpc": "catalog:",
+    "@mason/db": "workspace:*",
+    "drizzle-orm": "catalog:",
     "effect": "catalog:"
   },
   "devDependencies": {
-    "@mason/db": "workspace:*",
     "@mason/config": "workspace:*",
     "typescript": "catalog:dev"
   },

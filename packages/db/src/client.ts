@@ -1,48 +1,47 @@
-import { layerConfig, PgClient } from "@effect/sql-pg/PgClient";
-import { drizzle } from "drizzle-orm/effect-postgres";
-import { Config, Context, Effect, Layer } from "effect";
+import { PgClient } from '@effect/sql-pg';
+import * as PgDrizzle from "drizzle-orm/effect-postgres";
+import { Config, Context, Effect, Layer, Redacted, Schema } from "effect";
 import { relations } from "./relations";
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "./schema";
+import { types } from 'pg';
 
 export type { SqlError } from "@effect/sql/SqlError";
 
-/**
- * PostgreSQL client layer configured from DATABASE_URL environment variable.
- */
-const PgLive = layerConfig({
-  password: Config.redacted("POSTGRES_PW"),
-  username: Config.succeed("postgres"),
-  database: Config.succeed("postgres"),
-  host: Config.succeed("localhost"),
-  port: Config.succeed(5435),
+const PgClientLive = PgClient.layer({
+  password: Redacted.make(process.env.POSTGRES_PW!),
+  username: process.env.POSTGRES_USER!,
+  database: process.env.POSTGRES_DATABASE!,
+  host: process.env.POSTGRES_HOST!,
+  port: parseInt(process.env.POSTGRES_PORT!),
+  types: {
+    getTypeParser: (typeId, format) => {
+      // Return raw values for date/time types to let Drizzle handle parsing
+      if ([1184, 1114, 1082, 1186, 1231, 1115, 1185, 1187, 1182].includes(typeId)) {
+        return (val: any) => val;
+      }
+      return types.getTypeParser(typeId, format);
+    },
+  },
 });
 
-/**
- * Drizzle database type - inferred from what drizzle() returns.
- */
-type DrizzleDb = ReturnType<typeof drizzle<typeof schema, typeof relations>>;
-
-/**
- * Drizzle service that provides a fluent API for running queries.
- *
- * Usage:
- * ```ts
- * const drizzle = yield* DrizzleService;
- * const users = yield* drizzle.use(d => d.select().from(schema.usersTable));
- * ```
- */
 export class DrizzleService extends Context.Tag("@mason/db/DrizzleService")<
   DrizzleService,
-  DrizzleDb
+  PgDrizzle.EffectPgDatabase<typeof schema, typeof relations>
 >() {
   static readonly live = Layer.effect(
     DrizzleService,
     Effect.gen(function* () {
-      const pgClient = yield* PgClient;
-      const drizzleDb = drizzle(pgClient, { schema, relations });
+      const db = yield* PgDrizzle.make({ 
+          relations: relations, 
+          schema: schema
+       }).pipe(
+        Effect.provide(PgDrizzle.DefaultServices),
+      );;
 
-      return drizzleDb;
+      return db;
     })
-  ).pipe(Layer.provide(PgLive));
+  ).pipe(Layer.provide(PgClientLive));
 }
+
+

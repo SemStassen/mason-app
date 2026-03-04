@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 import type { UserId } from "~/shared/schemas";
-import type { User } from "../../domain/user.model";
+import type { User } from "../../domain/user.entity";
 import { UserNotFoundError } from "../../errors";
 import { UserRepository } from "../../repositories/user.repo";
 

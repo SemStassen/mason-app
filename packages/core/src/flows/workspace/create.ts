@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 import { DatabaseService } from "~/infra/db";
 import { IdentityModuleService } from "~/modules/identity/identity-module";
 import { MemberModuleService } from "~/modules/member/member-module.service";
-import { Workspace } from "~/modules/workspace/domain/workspace.model";
+import { Workspace } from "~/modules/workspace/domain/workspace.entity";
 import { WorkspaceModuleService } from "~/modules/workspace/workspace-module.service";
 import { SessionContext } from "~/shared/auth";
 

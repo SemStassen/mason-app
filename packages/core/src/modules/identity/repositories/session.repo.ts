@@ -7,7 +7,7 @@ import type { DatabaseError } from "~/infra/db";
 import { wrapSqlError } from "~/infra/db";
 import type { SessionId, UserId } from "~/shared/schemas";
 import type { AtLeastOne } from "~/shared/utils";
-import { Session } from "../domain/session.model";
+import { Session } from "../domain/session.entity";
 
 /**
  * Schema representing a database row from the sessions table.

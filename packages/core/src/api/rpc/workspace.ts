@@ -11,7 +11,7 @@ import {
 } from "~/flows";
 import { UserNotWorkspaceMemberError } from "~/modules/member/domain/errors";
 import { WorkspaceSlugAlreadyExistsError } from "~/modules/workspace/domain/errors";
-import { WorkspaceNotFoundError } from "~/modules/workspace/errors";
+import { WorkspaceNotFoundError } from "~/modules/workspace/workspace.errors";
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const WorkspaceRpcs = RpcGroup.make(

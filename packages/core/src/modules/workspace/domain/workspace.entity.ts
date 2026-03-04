@@ -20,12 +20,12 @@ export class Workspace extends Model.Class<Workspace>("Workspace")(
     description: "A workspace",
   }
 ) {
-  private static _validate = (input: typeof Workspace.model.Type) =>
+  private static _validate = (input: typeof Workspace.entity.Type) =>
     Schema.validate(Workspace)(input);
 
-  static fromInput = (input: typeof Workspace.create.Type) =>
+  static fromInput = (input: typeof Workspace.actionCreate.Type) =>
     Effect.gen(function* () {
-      const safeInput = yield* Schema.decodeUnknown(Workspace.create)(input);
+      const safeInput = yield* Schema.decodeUnknown(Workspace.actionCreate)(input);
 
       return yield* Workspace._validate({
         ...safeInput,
@@ -35,9 +35,9 @@ export class Workspace extends Model.Class<Workspace>("Workspace")(
       });
     });
 
-  patch = (patch: typeof Workspace.patch.Type) =>
+  patch = (patch: typeof Workspace.actionPatch.Type) =>
     Effect.gen(this, function* () {
-      const safePatch = yield* Schema.decodeUnknown(Workspace.patch)(patch);
+      const safePatch = yield* Schema.decodeUnknown(Workspace.actionPatch)(patch);
 
       return yield* Workspace._validate({
         ...this,
