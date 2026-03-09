@@ -1,17 +1,15 @@
-import { Context, Effect, Layer, Schema } from "effect";
+import {  Effect, Layer, Schema, ServiceMap  } from "effect";
 import type { Action } from "./rbac";
 
 export type WorkspaceRole = typeof WorkspaceRole.Type;
-export const WorkspaceRole = Schema.Literal("owner", "member");
+export const WorkspaceRole = Schema.Literals(["owner", "member"]);
 
-export class AuthorizationError extends Schema.TaggedError<AuthorizationError>()(
+export class AuthorizationError extends Schema.TaggedErrorClass<AuthorizationError>()(
   "authorization/AuthorizationError",
-  {}
+  {},
 ) {}
 
-export class AuthorizationService extends Context.Tag(
-  "@mason/authorization/AuthorizationService"
-)<
+export class AuthorizationService extends ServiceMap.Service<
   AuthorizationService,
   {
     ensureAllowed: (params: {
@@ -19,7 +17,7 @@ export class AuthorizationService extends Context.Tag(
       role: WorkspaceRole;
     }) => Effect.Effect<void, AuthorizationError>;
   }
->() {
+>()("@mason/authorization/AuthorizationService") {
   static readonly live = Layer.effect(
     AuthorizationService,
     Effect.gen(function* () {
@@ -37,20 +35,19 @@ export class AuthorizationService extends Context.Tag(
         "project:create_task": ["owner"],
         "project:patch_task": ["owner"],
         "project:archive_task": ["owner"],
-        "project:restore_task": ["owner"],
+        "project:restore_task": ["owner",],
       };
 
       return AuthorizationService.of({
-        ensureAllowed: Effect.fn("authorization/ensureAllowed")(function* ({
+        ensureAllowed: Effect.fn("authorization.ensureAllowed")(function* ({
           role,
           action,
         }) {
-          yield* Effect.if(permissionRules[action].includes(role), {
-            onFalse: () => Effect.fail(new AuthorizationError()),
-            onTrue: () => Effect.succeedNone,
-          });
+          if (!permissionRules[action].includes(role)) {
+            yield* new AuthorizationError();
+          }
         }),
       });
-    })
+    }),
   );
 }

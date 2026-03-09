@@ -9,16 +9,15 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@effect/sql": "catalog:",
     "@effect/sql-drizzle": "^0.48.1",
     "@effect/sql-pg": "^0.50.3",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
-    "pg": "^8.18.0"
+    "pg": "^8.19.0"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "drizzle-kit": "1.0.0-beta.15-859cf75",
     "typescript": "catalog:dev"
   },

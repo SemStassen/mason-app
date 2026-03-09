@@ -1,15 +1,15 @@
 import { Schema } from "effect";
 
-const WorkspaceAction = Schema.Literal(
+const WorkspaceAction = Schema.Literals([
   "workspace:invite_user",
   "workspace:cancel_invite",
   "workspace:patch",
   "workspace:delete",
   "workspace:create_integration",
   "workspace:delete_integration"
-);
+]);
 
-const ProjectAction = Schema.Literal(
+const ProjectAction = Schema.Literals([
   "project:create",
   "project:patch",
   "project:archive",
@@ -18,7 +18,7 @@ const ProjectAction = Schema.Literal(
   "project:patch_task",
   "project:archive_task",
   "project:restore_task"
-);
+]);
 
 export type Action = typeof Action.Type;
-export const Action = Schema.Union(WorkspaceAction, ProjectAction);
+export const Action = Schema.Union([WorkspaceAction, ProjectAction]);

@@ -1,6 +1,6 @@
 import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata } from "../utils";
-import { membersTable } from "./member.schema";
+import { membersTable } from "./workspace-member.schema";
 import { workspacesTable } from "./workspace.schema";
 
 export const workspaceInvitationsTable = pgTable("workspace_invitations", {

@@ -7,7 +7,7 @@ import type { DatabaseError } from "~/infra/db";
 import { wrapSqlError } from "~/infra/db";
 import type { MemberId, UserId, WorkspaceId } from "~/shared/schemas";
 import type { AtLeastOne } from "~/shared/utils";
-import { Member } from "../domain/member.model";
+import { Member } from "../domain/workspace-member.entity";
 
 /**
  * Schema representing a database row from the members table.

@@ -11,8 +11,6 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@effect/platform": "catalog:",
-    "@effect/rpc": "catalog:",
     "@mason/core": "workspace:*",
     "effect": "catalog:"
   },

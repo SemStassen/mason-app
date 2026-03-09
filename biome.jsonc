@@ -1,6 +1,7 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
   "extends": ["ultracite/core"],
+  "root": true,
   "linter": {
     "rules": {
       "correctness": {
@@ -18,6 +19,12 @@
           "level": "warn",
           "options": {
             "maxAllowedComplexity": 50
+          }
+        },
+        "useMaxParams": {
+          "level": "warn",
+          "options": {
+            "max": 4
           }
         }
       },
@@ -55,14 +62,7 @@
           "options": {}
         }
       },
-      "nursery": {
-        "useMaxParams": {
-          "level": "warn",
-          "options": {
-            "max": 4
-          }
-        }
-      }
+      "nursery": {}
     }
   }
 }

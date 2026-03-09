@@ -1,12 +1,12 @@
 import { Effect, Option } from "effect";
 import { DatabaseService } from "~/infra/db";
 import { IdentityModuleService } from "~/modules/identity/identity-module";
-import { MemberModuleService } from "~/modules/member/member-module.service";
 import { Workspace } from "~/modules/workspace/domain/workspace.entity";
-import { WorkspaceModuleService } from "~/modules/workspace/workspace-module.service";
+import { WorkspaceModuleService } from "~/modules/workspace/workspace.layer";
+import { WorkspaceMemberModuleService } from "~/modules/workspace-member/workspace-member.service";
 import { SessionContext } from "~/shared/auth";
 
-export const CreateWorkspaceRequest = Workspace.flowCreate;
+export const CreateWorkspaceRequest = Workspace.jsonCreate;
 
 export const CreateWorkspaceFlow = Effect.fn("flows/CreateWorkspaceFlow")(
   function* (request: typeof CreateWorkspaceRequest.Type) {
@@ -15,7 +15,7 @@ export const CreateWorkspaceFlow = Effect.fn("flows/CreateWorkspaceFlow")(
     const db = yield* DatabaseService;
 
     const workspaceModule = yield* WorkspaceModuleService;
-    const memberModule = yield* MemberModuleService;
+    const workspaceMemberModule = yield* WorkspaceMemberModuleService;
     const identityModule = yield* IdentityModuleService;
 
     yield* db.withTransaction(
@@ -23,10 +23,11 @@ export const CreateWorkspaceFlow = Effect.fn("flows/CreateWorkspaceFlow")(
         const createdWorkspace =
           yield* workspaceModule.createWorkspace(request);
 
-        yield* memberModule.createMember({
+        yield* workspaceMemberModule.createWorkspaceMember({
           workspaceId: createdWorkspace.id,
           userId: user.id,
           role: "owner",
+          deletedAt: Option.none(),
         });
 
         yield* identityModule.setActiveWorkspace({

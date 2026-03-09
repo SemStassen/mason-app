@@ -3,7 +3,7 @@ import { tableId, tableMetadata, tableSoftDelete } from "../utils";
 import { usersTable } from "./identity.schema";
 import { workspacesTable } from "./workspace.schema";
 
-export const membersTable = pgTable("members", {
+export const workspaceMembersTable = pgTable("workspace_members", {
   id: tableId,
   // References
   userId: uuid("user_id")

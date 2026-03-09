@@ -4,7 +4,7 @@ import { EmailService } from "~/infra/email";
 import { IdentityModuleService } from "~/modules/identity/identity-module";
 import { WorkspaceInvitation } from "~/modules/invitation/domain/workspace-invitation.model";
 import { InvitationModuleService } from "~/modules/invitation/invitation-module.service";
-import { MemberModuleService } from "~/modules/member/member-module.service";
+import { MemberModuleService } from "~/modules/workspace-member/workspace-member.service";
 import { SessionContext, WorkspaceContext } from "~/shared/auth";
 
 export const CreateWorkspaceInvitationRequest = WorkspaceInvitation.flowCreate;

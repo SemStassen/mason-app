@@ -1,6 +1,6 @@
 import { jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata } from "../utils";
-import { membersTable } from "./member.schema";
+import { membersTable } from "./workspace-member.schema";
 import { projectsTable, tasksTable } from "./project.schema";
 import { workspacesTable } from "./workspace.schema";
 

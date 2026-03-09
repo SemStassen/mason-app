@@ -9,7 +9,7 @@ import {
   RejectWorkspaceInvitationRequest,
 } from "~/flows";
 import { WorkspaceInvitationExpiredError } from "~/modules/invitation/domain/errors";
-import { UserAlreadyWorkspaceMemberError } from "~/modules/member/domain/errors";
+import { UserAlreadyWorkspaceMemberError } from "~/modules/workspace-member/domain/errors";
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const WorkspaceInvitationRpcs = RpcGroup.make(

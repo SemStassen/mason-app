@@ -1,12 +1,15 @@
-import { PgClient } from '@effect/sql-pg';
+import { PgClient } from "@effect/sql-pg";
 import * as PgDrizzle from "drizzle-orm/effect-postgres";
-import { Config, Context, Effect, Layer, Redacted, Schema } from "effect";
+import {
+  Effect,
+  Layer,
+  Redacted,
+  ServiceMap,
+} from "effect";
 import { relations } from "./relations";
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "./schema";
-import { types } from 'pg';
-
-export type { SqlError } from "@effect/sql/SqlError";
+import { types } from "pg";
 
 const PgClientLive = PgClient.layer({
   password: Redacted.make(process.env.POSTGRES_PW!),
@@ -17,7 +20,9 @@ const PgClientLive = PgClient.layer({
   types: {
     getTypeParser: (typeId, format) => {
       // Return raw values for date/time types to let Drizzle handle parsing
-      if ([1184, 1114, 1082, 1186, 1231, 1115, 1185, 1187, 1182].includes(typeId)) {
+      if (
+        [1184, 1114, 1082, 1186, 1231, 1115, 1185, 1187, 1182].includes(typeId)
+      ) {
         return (val: any) => val;
       }
       return types.getTypeParser(typeId, format);
@@ -25,23 +30,19 @@ const PgClientLive = PgClient.layer({
   },
 });
 
-export class DrizzleService extends Context.Tag("@mason/db/DrizzleService")<
+export class DrizzleService extends ServiceMap.Service<
   DrizzleService,
   PgDrizzle.EffectPgDatabase<typeof schema, typeof relations>
->() {
+>()("@mason/db/DrizzleService") {
   static readonly live = Layer.effect(
     DrizzleService,
     Effect.gen(function* () {
-      const db = yield* PgDrizzle.make({ 
-          relations: relations, 
-          schema: schema
-       }).pipe(
-        Effect.provide(PgDrizzle.DefaultServices),
-      );;
+      const db = yield* PgDrizzle.make({
+        relations: relations,
+        schema: schema,
+      }).pipe(Effect.provide(PgDrizzle.DefaultServices));
 
       return db;
-    })
+    }),
   ).pipe(Layer.provide(PgClientLive));
 }
-
-
