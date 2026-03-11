@@ -1,13 +1,13 @@
 import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata } from "../utils";
-import { membersTable } from "./workspace-member.schema";
 import { workspacesTable } from "./workspace.schema";
+import { workspaceMembersTable } from "./workspace-member.schema";
 
 export const workspaceInvitationsTable = pgTable("workspace_invitations", {
   id: tableId,
   // References
   inviterId: uuid("inviter_id")
-    .references(() => membersTable.id, { onDelete: "cascade" })
+    .references(() => workspaceMembersTable.id, { onDelete: "cascade" })
     .notNull(),
   workspaceId: uuid("workspace_id")
     .references(() => workspacesTable.id, { onDelete: "cascade" })

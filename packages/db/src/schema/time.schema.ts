@@ -1,8 +1,8 @@
 import { jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata } from "../utils";
-import { membersTable } from "./workspace-member.schema";
 import { projectsTable, tasksTable } from "./project.schema";
 import { workspacesTable } from "./workspace.schema";
+import { workspaceMembersTable } from "./workspace-member.schema";
 
 export const timeEntriesTable = pgTable("time_entries", {
   id: tableId,
@@ -10,8 +10,8 @@ export const timeEntriesTable = pgTable("time_entries", {
   workspaceId: uuid("workspace_id")
     .references(() => workspacesTable.id, { onDelete: "cascade" })
     .notNull(),
-  memberId: uuid("member_id")
-    .references(() => membersTable.id, { onDelete: "cascade" })
+  workspaceMemberId: uuid("workspace_member_id")
+    .references(() => workspaceMembersTable.id, { onDelete: "cascade" })
     .notNull(),
   projectId: uuid("project_id")
     .references(() => projectsTable.id, { onDelete: "cascade" })

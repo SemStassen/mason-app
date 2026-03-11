@@ -2,14 +2,14 @@ import { Effect, Layer, Option } from "effect";
 import { UserId } from "~/shared/schemas";
 import { generateUUID } from "~/shared/utils";
 import { Session } from "./domain/session.entity";
-import { SessionRepository } from "./domain/session.repository";
 import { User } from "./domain/user.entity";
-import { UserRepository } from "./domain/user.repository";
 import {
 	IdentityModule,
 	SessionNotFoundError,
 	UserNotFoundError,
 } from "./identity.service";
+import { SessionRepository } from "./session.repository";
+import { UserRepository } from "./user.repository";
 
 export const IdentityModuleLayer = Layer.effect(
 	IdentityModule,
@@ -74,6 +74,11 @@ export const IdentityModuleLayer = Layer.effect(
 
 				return persistedUser;
 			}),
+			retrieveUserByEmail: Effect.fn("identity/retrieveUserByEmail")(
+				function* (email) {
+					return yield* UserRepo.findByEmail(email);
+				},
+			),
 		};
 	}),
 );

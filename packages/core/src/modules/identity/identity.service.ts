@@ -1,4 +1,4 @@
-import { type Effect, Schema, ServiceMap } from "effect";
+import { type Effect, type Option, Schema, ServiceMap } from "effect";
 import type { RepositoryError } from "~/shared/errors";
 import { SessionId, UserId } from "~/shared/schemas";
 import type { Session } from "./domain/session.entity";
@@ -30,6 +30,9 @@ interface IdentityModuleShape {
 		userId: User["id"];
 		data: typeof User.jsonUpdate.Type;
 	}) => Effect.Effect<User, UserNotFoundError | RepositoryError>;
+	readonly retrieveUserByEmail: (
+		email: User["email"],
+	) => Effect.Effect<Option.Option<User>, RepositoryError>;
 }
 
 export class IdentityModule extends ServiceMap.Service<

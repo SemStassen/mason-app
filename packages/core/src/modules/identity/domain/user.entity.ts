@@ -7,11 +7,9 @@ export class User extends Model.Class<User>("User")(
 		displayName: Model.Mutable(
 			Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(100)),
 		),
-		email: Model.ServerImmutable(Email),
+		email: Model.ClientProvided(Email),
 		emailVerified: Model.ServerManaged(Schema.Boolean),
-		imageUrl: Model.MutableOptional(
-			Schema.Option(Schema.NonEmptyTrimmedString),
-		),
+		imageUrl: Model.MutableOptional(Schema.NonEmptyTrimmedString),
 	},
 	{
 		identifier: "User",

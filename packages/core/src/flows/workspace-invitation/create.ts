@@ -1,63 +1,61 @@
 import { AuthorizationService } from "@mason/authorization";
 import { Effect, Option } from "effect";
-import { EmailService } from "~/infra/email";
-import { IdentityModuleService } from "~/modules/identity/identity-module";
-import { WorkspaceInvitation } from "~/modules/invitation/domain/workspace-invitation.model";
-import { InvitationModuleService } from "~/modules/invitation/invitation-module.service";
-import { MemberModuleService } from "~/modules/workspace-member/workspace-member.service";
+import { IdentityModule } from "~/modules/identity/identity.service";
+import { WorkspaceInvitation } from "~/modules/workspace-invitation/domain/workspace-invitation.entity";
+import { WorkspaceInvitationModule } from "~/modules/workspace-invitation/workspace-invitation.service";
+import { WorkspaceMemberModule } from "~/modules/workspace-member/workspace-member.service";
 import { SessionContext, WorkspaceContext } from "~/shared/auth";
+import { Email } from "~/shared/email";
 
-export const CreateWorkspaceInvitationRequest = WorkspaceInvitation.flowCreate;
+export const CreateWorkspaceInvitationRequest = WorkspaceInvitation.jsonCreate;
+
+export const CreateWorkspaceInvitationResponse = WorkspaceInvitation.json;
 
 export const CreateWorkspaceInvitationFlow = Effect.fn(
-  "flows/CreateWorkspaceInvitationFlow"
+	"flows/CreateWorkspaceInvitationFlow",
 )(function* (request: typeof CreateWorkspaceInvitationRequest.Type) {
-  const { user } = yield* SessionContext;
-  const { member, workspace } = yield* WorkspaceContext;
+	const { user } = yield* SessionContext;
+	const { member, workspace } = yield* WorkspaceContext;
 
-  const authz = yield* AuthorizationService;
-  const email = yield* EmailService;
+	const authz = yield* AuthorizationService;
+	const email = yield* Email;
 
-  const identityModule = yield* IdentityModuleService;
-  const memberModule = yield* MemberModuleService;
-  const invitationModule = yield* InvitationModuleService;
+	const identityModule = yield* IdentityModule;
+	const workspaceMemberModule = yield* WorkspaceMemberModule;
+	const workspaceInvitationModule = yield* WorkspaceInvitationModule;
 
-  yield* authz.ensureAllowed({
-    action: "workspace:invite_user",
-    role: member.role,
-  });
+	yield* authz.ensureAllowed({
+		action: "workspace:invite_user",
+		role: member.role,
+	});
 
-  /** Assert that the user is not already a member of the workspace */
-  yield* identityModule
-    .retrieveUser({
-      query: {
-        email: request.email,
-      },
-    })
-    .pipe(
-      Effect.flatMap(
-        Option.match({
-          onNone: () => Effect.void,
-          onSome: (user) =>
-            memberModule.assertUserNotWorkspaceMember({
-              workspaceId: workspace.id,
-              userId: user.id,
-            }),
-        })
-      )
-    );
+	/** Assert that the user is not already a member of the workspace */
+	yield* identityModule.retrieveUserByEmail(request.email).pipe(
+		Effect.flatMap(
+			Option.match({
+				onNone: () => Effect.void,
+				onSome: (user) =>
+					workspaceMemberModule.assertUserNotWorkspaceMember({
+						workspaceId: workspace.id,
+						userId: user.id,
+					}),
+			}),
+		),
+	);
 
-  const invitation =
-    yield* invitationModule.createOrRenewPendingWorkspaceInvitation({
-      ...request,
-      workspaceId: workspace.id,
-      inviterId: member.id,
-    });
+	const createdWorkspaceInvitation =
+		yield* workspaceInvitationModule.createOrRenewPendingWorkspaceInvitation({
+			workspaceId: workspace.id,
+			inviterId: member.id,
+			data: request,
+		});
 
-  yield* email.sendWorkspaceInvitation({
-    email: request.email,
-    workspace: workspace,
-    inviterName: user.displayName,
-    invitationId: invitation.id,
-  });
+	yield* email.sendWorkspaceInvitation({
+		email: request.email,
+		workspace: workspace,
+		inviterName: user.displayName,
+		invitationId: createdWorkspaceInvitation.id,
+	});
+
+	return createdWorkspaceInvitation satisfies typeof CreateWorkspaceInvitationResponse.Type;
 });

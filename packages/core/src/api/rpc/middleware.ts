@@ -1,21 +1,21 @@
-import { Forbidden, Unauthorized } from "@effect/platform/HttpApiError";
-import { RpcMiddleware } from "@effect/rpc";
-import { SessionContext, WorkspaceContext } from "~/shared/auth";
+import type { HttpApiError } from "effect/unstable/httpapi";
+import { RpcMiddleware } from "effect/unstable/rpc";
+import type { SessionContext, WorkspaceContext } from "~/shared/auth";
 
-export class SessionMiddleware extends RpcMiddleware.Tag<SessionMiddleware>()(
-  "@mason/shared/SessionMiddleware",
-  {
-    provides: SessionContext,
-    requiredForClient: true,
-    failure: Unauthorized,
-  }
-) {}
+export class SessionMiddleware extends RpcMiddleware.Service<
+	SessionMiddleware,
+	{
+		provides: SessionContext;
+		requiredForClient: true;
+		failure: HttpApiError.Unauthorized;
+	}
+>()("@mason/shared/SessionMiddleware") {}
 
-export class WorkspaceMiddleware extends RpcMiddleware.Tag<WorkspaceMiddleware>()(
-  "@mason/shared/WorkspaceMiddleware",
-  {
-    provides: WorkspaceContext,
-    requiredForClient: true,
-    failure: Forbidden,
-  }
-) {}
+export class WorkspaceMiddleware extends RpcMiddleware.Service<
+	WorkspaceMiddleware,
+	{
+		provides: WorkspaceContext;
+		requiredForClient: true;
+		failure: HttpApiError.Forbidden;
+	}
+>()("@mason/shared/WorkspaceMiddleware") {}

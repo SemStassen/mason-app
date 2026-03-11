@@ -1,23 +1,15 @@
-import { Context, type Effect } from "effect";
-import type { User } from "~/modules/identity/domain/user.entity";
-import type { Workspace } from "~/modules/workspace/domain/workspace.entity";
-import type {
-  Email,
-  WorkspaceId,
-  WorkspaceInvitationId,
-} from "~/shared/schemas";
+import { Effect, Layer } from "effect";
+import { Email } from "~/shared/email";
 
-export class EmailService extends Context.Tag("@mason/infra/EmailService")<
-  EmailService,
-  {
-    sendWorkspaceInvitation: (params: {
-      email: Email;
-      workspace: {
-        name: Workspace["name"];
-        id: WorkspaceId;
-      };
-      inviterName: User["displayName"];
-      invitationId: WorkspaceInvitationId;
-    }) => Effect.Effect<void>;
-  }
->() {}
+export const EmailLayer = Layer.effect(
+	Email,
+	Effect.gen(function* () {
+		return {
+			sendWorkspaceInvitation: Effect.fn("email/sendWorkspaceInvitation")(
+				function* (params) {
+					return yield* Effect.succeed(undefined);
+				},
+			),
+		};
+	}),
+);

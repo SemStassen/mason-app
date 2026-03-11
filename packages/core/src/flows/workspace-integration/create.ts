@@ -1,41 +1,34 @@
 import { AuthorizationService } from "@mason/authorization";
-import { Effect, Redacted, Schema } from "effect";
-import { CryptoService } from "~/infra/crypto";
-import { WorkspaceIntegration } from "~/modules/integration/domain/workspace-integration.model";
-import { IntegrationModuleService } from "~/modules/integration/integration-module.service";
+import { Effect } from "effect";
+import { WorkspaceIntegration } from "~/modules/integration/domain/workspace-integration.entity";
+import { IntegrationModule } from "~/modules/integration/integration.service";
 import { WorkspaceContext } from "~/shared/auth";
-import { EncryptedApiKey } from "~/shared/schemas";
 
 export const CreateWorkspaceIntegrationRequest =
-  WorkspaceIntegration.flowCreate;
+	WorkspaceIntegration.jsonCreate;
+
+export const CreateWorkspaceIntegrationResponse = WorkspaceIntegration.json;
 
 export const CreateWorkspaceIntegrationFlow = Effect.fn(
-  "CreateWorkspaceIntegrationFlow"
+	"CreateWorkspaceIntegrationFlow",
 )(function* (request: typeof CreateWorkspaceIntegrationRequest.Type) {
-  const { member, workspace } = yield* WorkspaceContext;
+	const { member, workspace } = yield* WorkspaceContext;
 
-  const authz = yield* AuthorizationService;
-  const crypto = yield* CryptoService;
+	const authz = yield* AuthorizationService;
 
-  const integrationModule = yield* IntegrationModuleService;
+	const integrationModule = yield* IntegrationModule;
 
-  yield* authz.ensureAllowed({
-    action: "workspace:create_integration",
-    role: member.role,
-  });
+	yield* authz.ensureAllowed({
+		action: "workspace:create_integration",
+		role: member.role,
+	});
 
-  const encryptedApiKey = yield* crypto
-    .encrypt(Redacted.value(request.apiKey))
-    .pipe(
-      Effect.flatMap((encrypted) =>
-        Schema.decodeUnknown(EncryptedApiKey)(encrypted)
-      )
-    );
+	const createdWorkspaceIntegration =
+		yield* integrationModule.createWorkspaceIntegration({
+			workspaceId: workspace.id,
+			createdByMemberId: member.id,
+			data: request,
+		});
 
-  yield* integrationModule.createWorkspaceIntegration({
-    ...request,
-    apiKey: encryptedApiKey,
-    createdByMemberId: member.id,
-    workspaceId: workspace.id,
-  });
+	return createdWorkspaceIntegration satisfies typeof CreateWorkspaceIntegrationResponse.Type;
 });

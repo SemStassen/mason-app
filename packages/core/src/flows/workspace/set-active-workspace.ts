@@ -1,28 +1,32 @@
 import { Effect, Option, Schema } from "effect";
-import { IdentityModuleService } from "~/modules/identity/identity-module";
-import { MemberModuleService } from "~/modules/workspace-member/workspace-member.service";
+import { IdentityModule } from "~/modules/identity/identity.service";
+import { Workspace } from "~/modules/workspace/domain/workspace.entity";
+import { WorkspaceMemberModule } from "~/modules/workspace-member/workspace-member.service";
 import { SessionContext } from "~/shared/auth";
-import { WorkspaceId } from "~/shared/schemas";
 
 export const SetActiveWorkspaceRequest = Schema.Struct({
-  id: WorkspaceId,
+	id: Workspace.fields.id,
 });
 
+export const SetActiveWorkspaceResponse = Schema.Void;
+
 export const SetActiveWorkspaceFlow = Effect.fn("flows/SetActiveWorkspaceFlow")(
-  function* (request: typeof SetActiveWorkspaceRequest.Type) {
-    const { user, session } = yield* SessionContext;
+	function* (request: typeof SetActiveWorkspaceRequest.Type) {
+		const { user, session } = yield* SessionContext;
 
-    const memberModule = yield* MemberModuleService;
-    const identityModule = yield* IdentityModuleService;
+		const memberModule = yield* WorkspaceMemberModule;
+		const identityModule = yield* IdentityModule;
 
-    yield* memberModule.assertUserWorkspaceMember({
-      workspaceId: request.id,
-      userId: user.id,
-    });
+		yield* memberModule.assertUserWorkspaceMember({
+			workspaceId: request.id,
+			userId: user.id,
+		});
 
-    yield* identityModule.setActiveWorkspace({
-      sessionId: session.id,
-      workspaceId: Option.some(request.id),
-    });
-  }
+		yield* identityModule.setActiveWorkspace({
+			sessionId: session.id,
+			workspaceId: Option.some(request.id),
+		});
+
+		return undefined satisfies typeof SetActiveWorkspaceResponse.Type;
+	},
 );

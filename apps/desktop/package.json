@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo && cargo clean --manifest-path src-tauri/Cargo.toml",
     "dev": "tauri dev",
     "dev:vite": "vite dev",
     "build": "vite build",

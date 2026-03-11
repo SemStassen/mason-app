@@ -1,21 +1,25 @@
 import { Effect, Schema } from "effect";
-import { InvitationModuleService } from "~/modules/invitation/invitation-module.service";
+import { WorkspaceInvitationModule } from "~/modules/workspace-invitation/workspace-invitation.service";
 import { SessionContext } from "~/shared/auth";
 import { WorkspaceInvitationId } from "~/shared/schemas";
 
 export const RejectWorkspaceInvitationRequest = Schema.Struct({
-  id: WorkspaceInvitationId,
+	id: WorkspaceInvitationId,
 });
 
+export const RejectWorkspaceInvitationResponse = Schema.Void;
+
 export const RejectWorkspaceInvitationFlow = Effect.fn(
-  "flows/RejectWorkspaceInvitationFlow"
-)(function* (input: typeof RejectWorkspaceInvitationRequest.Type) {
-  const { user } = yield* SessionContext;
+	"flows/RejectWorkspaceInvitationFlow",
+)(function* (request: typeof RejectWorkspaceInvitationRequest.Type) {
+	const { user } = yield* SessionContext;
 
-  const invitationModule = yield* InvitationModuleService;
+	const workspaceInvitationModule = yield* WorkspaceInvitationModule;
 
-  yield* invitationModule.rejectWorkspaceInvitation({
-    id: input.id,
-    email: user.email,
-  });
+	yield* workspaceInvitationModule.rejectWorkspaceInvitation({
+		id: request.id,
+		email: user.email,
+	});
+
+	return undefined satisfies typeof RejectWorkspaceInvitationResponse.Type;
 });

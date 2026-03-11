@@ -1,8 +1,8 @@
 import { jsonb, pgTable, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { tableId, tableMetadata } from "../utils";
-import { membersTable } from "./workspace-member.schema";
 import { projectsTable, tasksTable } from "./project.schema";
 import { workspacesTable } from "./workspace.schema";
+import { workspaceMembersTable } from "./workspace-member.schema";
 
 export const workspaceIntegrationsTable = pgTable(
   "workspace_integrations",
@@ -12,10 +12,9 @@ export const workspaceIntegrationsTable = pgTable(
     workspaceId: uuid("workspace_id")
       .references(() => workspacesTable.id, { onDelete: "cascade" })
       .notNull(),
-    createdByMemberId: uuid("created_by_member_id").references(
-      () => membersTable.id,
-      { onDelete: "set null" }
-    ),
+    createdByWorkspaceMemberId: uuid(
+      "created_by_workspace_member_id"
+    ).references(() => workspaceMembersTable.id, { onDelete: "set null" }),
     // General
     provider: varchar().notNull(),
     encryptedApiKey: varchar("encrypted_api_key").notNull(),

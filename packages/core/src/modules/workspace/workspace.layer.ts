@@ -1,8 +1,6 @@
 import { Effect, Layer, Option } from "effect";
-import { WorkspaceId } from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
 import { Workspace } from "./domain/workspace.entity";
-import { WorkspaceRepository } from "./domain/workspace.repository";
+import { WorkspaceRepository } from "./workspace.repository";
 import {
 	WorkspaceModule,
 	WorkspaceNotFoundError,
@@ -28,12 +26,7 @@ export const WorkspaceModuleLayer = Layer.effect(
 			createWorkspace: Effect.fn("workspace.createWorkspace")(function* (data) {
 				yield* assertWorkspaceSlugIsUnique(data.slug);
 
-				const workspace = Workspace.make({
-					...data,
-					id: WorkspaceId.makeUnsafe(generateUUID()),
-					logoUrl: data.logoUrl ?? Option.none(),
-					metadata: data.metadata ?? Option.none(),
-				});
+				const workspace = Workspace.create(data);
 
 				const [persistedWorkspace] = yield* workspaceRepo.insert([workspace]);
 
@@ -44,7 +37,12 @@ export const WorkspaceModuleLayer = Layer.effect(
 					const workspace = yield* workspaceRepo.findById(params.id).pipe(
 						Effect.flatMap(
 							Option.match({
-								onNone: () => Effect.fail(new WorkspaceNotFoundError()),
+								onNone: () =>
+									Effect.fail(
+										new WorkspaceNotFoundError({
+											workspaceId: params.id,
+										}),
+									),
 								onSome: Effect.succeed,
 							}),
 						),

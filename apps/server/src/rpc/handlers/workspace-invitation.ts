@@ -1,4 +1,3 @@
-import { InternalServerError } from "@effect/platform/HttpApiError";
 import {
   AcceptWorkspaceInvitationFlow,
   CancelWorkspaceInvitationFlow,
@@ -6,41 +5,36 @@ import {
   RejectWorkspaceInvitationFlow,
   WorkspaceInvitationRpcs,
 } from "@mason/core";
-import { Effect, pipe } from "effect";
+import { Effect } from "effect";
+import { HttpApiError } from "effect/unstable/httpapi";
 
 export const WorkspaceInvitationRpcsLive = WorkspaceInvitationRpcs.toLayer({
   "WorkspaceInvitation.Create": (request) =>
-    pipe(
-      CreateWorkspaceInvitationFlow(request),
+    CreateWorkspaceInvitationFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
-        "invitation/WorkspaceInvitationExpiredError": () =>
-          new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
   "WorkspaceInvitation.Cancel": (request) =>
-    pipe(
-      CancelWorkspaceInvitationFlow(request),
+    CancelWorkspaceInvitationFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
-        "invitation/WorkspaceInvitationExpiredError": () =>
-          new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
   "WorkspaceInvitation.Accept": (request) =>
-    pipe(
-      AcceptWorkspaceInvitationFlow(request),
+    AcceptWorkspaceInvitationFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
-        "identity/SessionNotFoundError": () => new InternalServerError(),
-        "infra/DatabaseError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
   "WorkspaceInvitation.Reject": (request) =>
-    pipe(
-      RejectWorkspaceInvitationFlow(request),
+    RejectWorkspaceInvitationFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
 });

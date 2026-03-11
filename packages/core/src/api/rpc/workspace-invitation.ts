@@ -1,48 +1,75 @@
-import { InternalServerError } from "@effect/platform/HttpApiError";
-import { Rpc, RpcGroup } from "@effect/rpc";
 import { AuthorizationError } from "@mason/authorization";
 import { Schema } from "effect";
+import { HttpApiError } from "effect/unstable/httpapi";
+import { Rpc, RpcGroup } from "effect/unstable/rpc";
 import {
-  AcceptWorkspaceInvitationRequest,
-  CancelWorkspaceInvitationRequest,
-  CreateWorkspaceInvitationRequest,
-  RejectWorkspaceInvitationRequest,
+	AcceptWorkspaceInvitationRequest,
+	AcceptWorkspaceInvitationResponse,
+	CancelWorkspaceInvitationRequest,
+	CancelWorkspaceInvitationResponse,
+	CreateWorkspaceInvitationRequest,
+	CreateWorkspaceInvitationResponse,
+	RejectWorkspaceInvitationRequest,
+	RejectWorkspaceInvitationResponse,
 } from "~/flows";
-import { WorkspaceInvitationExpiredError } from "~/modules/invitation/domain/errors";
-import { UserAlreadyWorkspaceMemberError } from "~/modules/workspace-member/domain/errors";
+import {
+	WorkspaceInvitationEmailMismatchError,
+	WorkspaceInvitationExpiredError,
+	WorkspaceInvitationNotFoundError,
+	WorkspaceInvitationNotPendingError,
+} from "~/modules/workspace-invitation";
+import { WorkspaceMemberAlreadyExistsError } from "~/modules/workspace-member";
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const WorkspaceInvitationRpcs = RpcGroup.make(
-  Rpc.make("WorkspaceInvitation.Create", {
-    payload: CreateWorkspaceInvitationRequest,
-    success: Schema.Void,
-    error: Schema.Union(
-      AuthorizationError,
-      UserAlreadyWorkspaceMemberError,
-      InternalServerError
-    ),
-  })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
-  Rpc.make("WorkspaceInvitation.Cancel", {
-    payload: CancelWorkspaceInvitationRequest,
-    success: Schema.Void,
-    error: Schema.Union(AuthorizationError, InternalServerError),
-  })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
-  Rpc.make("WorkspaceInvitation.Accept", {
-    payload: AcceptWorkspaceInvitationRequest,
-    success: Schema.Void,
-    error: Schema.Union(
-      WorkspaceInvitationExpiredError,
-      UserAlreadyWorkspaceMemberError,
-      InternalServerError
-    ),
-  }).middleware(SessionMiddleware),
-  Rpc.make("WorkspaceInvitation.Reject", {
-    payload: RejectWorkspaceInvitationRequest,
-    success: Schema.Void,
-    error: Schema.Union(WorkspaceInvitationExpiredError, InternalServerError),
-  }).middleware(SessionMiddleware)
+	Rpc.make("WorkspaceInvitation.Create", {
+		payload: CreateWorkspaceInvitationRequest,
+		success: CreateWorkspaceInvitationResponse,
+		error: Schema.Union([
+			AuthorizationError,
+			WorkspaceMemberAlreadyExistsError,
+			HttpApiError.InternalServerError,
+		]),
+	})
+		.middleware(SessionMiddleware)
+		.middleware(WorkspaceMiddleware),
+
+	Rpc.make("WorkspaceInvitation.Cancel", {
+		payload: CancelWorkspaceInvitationRequest,
+		success: CancelWorkspaceInvitationResponse,
+		error: Schema.Union([
+			AuthorizationError,
+			WorkspaceInvitationNotFoundError,
+			WorkspaceInvitationNotPendingError,
+			WorkspaceInvitationExpiredError,
+			HttpApiError.InternalServerError,
+		]),
+	})
+		.middleware(SessionMiddleware)
+		.middleware(WorkspaceMiddleware),
+
+	Rpc.make("WorkspaceInvitation.Accept", {
+		payload: AcceptWorkspaceInvitationRequest,
+		success: AcceptWorkspaceInvitationResponse,
+		error: Schema.Union([
+			WorkspaceMemberAlreadyExistsError,
+			WorkspaceInvitationNotFoundError,
+			WorkspaceInvitationEmailMismatchError,
+			WorkspaceInvitationNotPendingError,
+			WorkspaceInvitationExpiredError,
+			HttpApiError.InternalServerError,
+		]),
+	}).middleware(SessionMiddleware),
+
+	Rpc.make("WorkspaceInvitation.Reject", {
+		payload: RejectWorkspaceInvitationRequest,
+		success: RejectWorkspaceInvitationResponse,
+		error: Schema.Union([
+			WorkspaceInvitationNotFoundError,
+			WorkspaceInvitationEmailMismatchError,
+			WorkspaceInvitationNotPendingError,
+			WorkspaceInvitationExpiredError,
+			HttpApiError.InternalServerError,
+		]),
+	}).middleware(SessionMiddleware),
 );

@@ -1,16 +1,11 @@
 import { Effect, Layer, Option } from "effect";
-import {
-	type UserId,
-	type WorkspaceId,
-	WorkspaceMemberId,
-} from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
+import type { UserId, WorkspaceId } from "~/shared/schemas";
 import { WorkspaceMember } from "./domain/workspace-member.entity";
-import { WorkspaceMemberRepository } from "./domain/workspace-member.repository";
+import { WorkspaceMemberRepository } from "./workspace-member.repository";
 import {
-	UserAlreadyWorkspaceMemberError,
-	UserNotWorkspaceMemberError,
+	WorkspaceMemberAlreadyExistsError,
 	WorkspaceMemberModule,
+	WorkspaceMemberNotFoundError,
 } from "./workspace-member.service";
 
 export const WorkspaceMemberModuleLayer = Layer.effect(
@@ -20,11 +15,14 @@ export const WorkspaceMemberModuleLayer = Layer.effect(
 
 		const assertUserNotWorkspaceMember = Effect.fn(
 			"workspace-member.assertUserNotWorkspaceMember",
-		)(function* (params: { workspaceId: WorkspaceId; userId: UserId }) {
+		)(function* (params: {
+			workspaceId: WorkspaceMember["workspaceId"];
+			userId: WorkspaceMember["userId"];
+		}) {
 			const maybeMember = yield* workspaceMemberRepo.findMembership(params);
 
 			if (Option.isSome(maybeMember)) {
-				return yield* new UserAlreadyWorkspaceMemberError();
+				return yield* new WorkspaceMemberAlreadyExistsError();
 			}
 		});
 
@@ -37,11 +35,7 @@ export const WorkspaceMemberModuleLayer = Layer.effect(
 					userId: params.userId,
 				});
 
-				const workspaceMember = WorkspaceMember.make({
-					...params,
-					id: WorkspaceMemberId.makeUnsafe(generateUUID()),
-					deletedAt: Option.none(),
-				});
+				const workspaceMember = WorkspaceMember.create(params);
 
 				const [persistedWorkspaceMember] = yield* workspaceMemberRepo.insert([
 					workspaceMember,
@@ -55,9 +49,10 @@ export const WorkspaceMemberModuleLayer = Layer.effect(
 				const maybeMember = yield* workspaceMemberRepo.findMembership(params);
 
 				if (Option.isNone(maybeMember)) {
-					return yield* new UserNotWorkspaceMemberError();
+					return yield* new WorkspaceMemberNotFoundError();
 				}
 			}),
+			assertUserNotWorkspaceMember: assertUserNotWorkspaceMember,
 		};
 	}),
 );
