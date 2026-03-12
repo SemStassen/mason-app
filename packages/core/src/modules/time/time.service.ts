@@ -21,7 +21,9 @@ interface TimeModuleShape {
 		data: typeof TimeEntry.jsonCreate.Type;
 	}) => Effect.Effect<
 		TimeEntry,
-		TimeEntryAlreadyRunningError | RepositoryError
+		| TimeEntryAlreadyRunningError
+		| TimeEntryStoppedAtBeforeStartedAtError
+		| RepositoryError
 	>;
 	readonly updateTimeEntry: (params: {
 		id: TimeEntry["id"];
@@ -29,8 +31,8 @@ interface TimeModuleShape {
 		data: typeof TimeEntry.jsonUpdate.Type;
 	}) => Effect.Effect<
 		TimeEntry,
-		| TimeEntryAlreadyRunningError
 		| TimeEntryNotFoundError
+		| TimeEntryAlreadyRunningError
 		| TimeEntryStoppedAtBeforeStartedAtError
 		| RepositoryError
 	>;

@@ -1,7 +1,9 @@
 import { DateTime, Effect, Layer, Option } from "effect";
-import { TimeEntry } from "./domain/time-entry.entity";
+import type { TimeEntry } from "./domain/time-entry.entity";
 import { TimeEntryAlreadyRunningError } from "./domain/time-entry.errors";
-import { updateTimeEntry as applyUpdateTimeEntry } from "./domain/time-entry.transitions";
+
+import * as timeEntryTransitions from "./domain/time-entry.transitions";
+
 import { TimeEntryNotFoundError, TimeModule } from "./time.service";
 import { TimeEntryRepository } from "./time-entry.repository";
 
@@ -28,18 +30,14 @@ export const TimeModuleLayer = Layer.effect(
 			createTimeEntry: Effect.fn("time.createTimeEntry")(function* (params) {
 				const now = yield* DateTime.now;
 
-				const timeEntry = TimeEntry.create({
-					workspaceId: params.workspaceId,
-					workspaceMemberId: params.workspaceMemberId,
-					projectId: params.data.projectId,
-					taskId: params.data.taskId ?? Option.none(),
-					stoppedAt: params.data.stoppedAt ?? Option.none(),
-					notes: params.data.notes ?? Option.none(),
-					...(Option.isSome(params.data.startedAt)
-						? { startedAt: params.data.startedAt.value }
-						: {}),
-					now,
-				});
+				const timeEntry = yield* Effect.fromResult(
+					timeEntryTransitions.createTimeEntry({
+						workspaceId: params.workspaceId,
+						workspaceMemberId: params.workspaceMemberId,
+						data: params.data,
+						now,
+					}),
+				);
 
 				if (Option.isNone(timeEntry.stoppedAt)) {
 					yield* ensureNoOtherRunningTimeEntry({
@@ -70,7 +68,10 @@ export const TimeModuleLayer = Layer.effect(
 					);
 
 				const updatedTimeEntry = yield* Effect.fromResult(
-					applyUpdateTimeEntry({ timeEntry, data: params.data }),
+					timeEntryTransitions.updateTimeEntry({
+						timeEntry,
+						data: params.data,
+					}),
 				);
 
 				if (Option.isNone(updatedTimeEntry.stoppedAt)) {

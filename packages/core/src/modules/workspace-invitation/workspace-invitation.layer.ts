@@ -1,5 +1,4 @@
 import { DateTime, Effect, Layer, Option } from "effect";
-import { Clock } from "~/shared/effect";
 import { WorkspaceInvitation } from "./domain/workspace-invitation.entity";
 import {
 	acceptWorkspaceInvitation,

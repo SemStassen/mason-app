@@ -1,4 +1,4 @@
-import { type DateTime, Option, Schema } from "effect";
+import { Option, Schema } from "effect";
 import { Model } from "~/shared/effect";
 import {
 	ProjectId,
@@ -7,7 +7,6 @@ import {
 	WorkspaceId,
 	WorkspaceMemberId,
 } from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
 
 export class TimeEntry extends Model.Class<TimeEntry>("TimeEntry")(
 	{
@@ -26,26 +25,6 @@ export class TimeEntry extends Model.Class<TimeEntry>("TimeEntry")(
 		description: "A time entry tracking work on a project",
 	},
 ) {
-	static create(params: {
-		workspaceId: TimeEntry["workspaceId"];
-		workspaceMemberId: TimeEntry["workspaceMemberId"];
-		projectId: TimeEntry["projectId"];
-		taskId?: TimeEntry["taskId"];
-		startedAt?: TimeEntry["startedAt"];
-		stoppedAt?: TimeEntry["stoppedAt"];
-		notes?: TimeEntry["notes"];
-		now: DateTime.Utc;
-	}): TimeEntry {
-		return TimeEntry.make({
-			...params,
-			id: TimeEntryId.makeUnsafe(generateUUID()),
-			startedAt: params.startedAt ?? params.now,
-			taskId: params.taskId ?? Option.none(),
-			stoppedAt: params.stoppedAt ?? Option.none(),
-			notes: params.notes ?? Option.none(),
-		});
-	}
-
 	isRunning(): boolean {
 		return Option.isNone(this.stoppedAt);
 	}

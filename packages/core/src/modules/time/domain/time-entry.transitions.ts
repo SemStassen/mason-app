@@ -1,9 +1,8 @@
 import { DateTime, Option, Result } from "effect";
+import { TimeEntryId } from "~/shared/schemas";
+import { generateUUID } from "~/shared/utils";
 import { TimeEntry } from "./time-entry.entity";
-import {
-	TimeEntryNotRunningError,
-	TimeEntryStoppedAtBeforeStartedAtError,
-} from "./time-entry.errors";
+import { TimeEntryStoppedAtBeforeStartedAtError } from "./time-entry.errors";
 
 const ensureValidDateRange = (
 	startedAt: DateTime.Utc,
@@ -16,30 +15,31 @@ const ensureValidDateRange = (
 				? Result.succeed(undefined)
 				: Result.fail(new TimeEntryStoppedAtBeforeStartedAtError()),
 	});
-const ensureRunning = (
-	timeEntry: TimeEntry,
-): Result.Result<void, TimeEntryNotRunningError> =>
-	timeEntry.isRunning()
-		? Result.succeed(undefined)
-		: Result.fail(new TimeEntryNotRunningError());
 
-export const stopTimeEntry = (params: {
-	timeEntry: TimeEntry;
-	stoppedAt: DateTime.Utc;
-}): Result.Result<
-	TimeEntry,
-	TimeEntryNotRunningError | TimeEntryStoppedAtBeforeStartedAtError
-> =>
+export const createTimeEntry = (params: {
+	workspaceId: TimeEntry["workspaceId"];
+	workspaceMemberId: TimeEntry["workspaceMemberId"];
+	data: typeof TimeEntry.jsonCreate.Type;
+	now: DateTime.Utc;
+}): Result.Result<TimeEntry, TimeEntryStoppedAtBeforeStartedAtError> =>
 	Result.gen(function* () {
-		yield* ensureRunning(params.timeEntry);
-		yield* ensureValidDateRange(
-			params.timeEntry.startedAt,
-			Option.some(params.stoppedAt),
-		);
-		return TimeEntry.make({
-			...params.timeEntry,
-			stoppedAt: Option.some(params.stoppedAt),
+		const createdTimeEntry = TimeEntry.make({
+			...params.data,
+			id: TimeEntryId.makeUnsafe(generateUUID()),
+			workspaceId: params.workspaceId,
+			workspaceMemberId: params.workspaceMemberId,
+			taskId: params.data.taskId ?? Option.none(),
+			startedAt: Option.getOrElse(params.data.startedAt, () => params.now),
+			stoppedAt: params.data.stoppedAt ?? Option.none(),
+			notes: params.data.notes ?? Option.none(),
 		});
+
+		yield* ensureValidDateRange(
+			createdTimeEntry.startedAt,
+			createdTimeEntry.stoppedAt,
+		);
+
+		return createdTimeEntry;
 	});
 
 export const updateTimeEntry = (params: {
@@ -47,12 +47,15 @@ export const updateTimeEntry = (params: {
 	data: typeof TimeEntry.jsonUpdate.Type;
 }): Result.Result<TimeEntry, TimeEntryStoppedAtBeforeStartedAtError> =>
 	Result.gen(function* () {
-		const patched = TimeEntry.make({
+		const updatedTimeEntry = TimeEntry.make({
 			...params.timeEntry,
 			...params.data,
 		});
 
-		yield* ensureValidDateRange(patched.startedAt, patched.stoppedAt);
+		yield* ensureValidDateRange(
+			updatedTimeEntry.startedAt,
+			updatedTimeEntry.stoppedAt,
+		);
 
-		return patched;
+		return updatedTimeEntry;
 	});
