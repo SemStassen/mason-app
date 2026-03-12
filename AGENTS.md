@@ -1,127 +1,154 @@
-# Mason Agent Guidelines
+# Mason Agent Playbook
 
-This repository is a monorepo built with Bun, Turbo, and Effect-TS. It uses Biome for linting and formatting.
+This guide is for agentic coding tools operating in this monorepo.
+Stack: Bun workspaces + Turbo + TypeScript + Effect + Biome (Ultracite preset).
 
-## 🛠 Commands
+## Scope and precedence
 
-| Task | Command |
-| :--- | :--- |
-| **Build** | `turbo build` |
-| **Lint** | `turbo lint && manypkg check` |
-| **Format** | `bun run format` (alias for `biome format --write .`) |
-| **Typecheck** | `turbo typecheck` |
-| **Test (All)** | `bun test` or `npx vitest` |
-| **Test (Single)** | `npx vitest run <path-to-file>` |
-| **Dev** | `turbo dev --parallel` |
-| **Docker** | `npm run docker:up` |
+1. Follow this file for repository-wide defaults.
+2. If editing inside `interface/` or `packages/ui/`, also follow that directory's `AGENTS.md`.
+3. Apply repository Cursor/Copilot instruction files when present.
+4. Prefer minimal, focused edits that match existing architecture and naming.
 
-## 🏗 Architectural Patterns (Effect-TS)
+## Environment and setup
 
-- **Generators**: Always prefer `Effect.gen` over long `.pipe` chains or `.andThen`.
-- **Services**: Model dependencies as Services and provide them via `Layer`. Define an interface (Service Tag) and multiple implementations (Live, Test, Dev).
-- **Validation**: Use `Schema` for all data parsing and validation (API, DB, Config). Define schemas once and derive types from them using `Schema.Type`.
-- **Errors**: Use `Data.TaggedError` for type-safe, domain-specific errors. Always provide a tag and handle it using `Effect.catchTag`.
-- **Clock**: Use the `Clock` service for time-based logic to ensure testability. Avoid `new Date()` or `Date.now()`.
-- **Concurrency**: Use `Effect.all` for parallel execution and `Stream` for processing large datasets with constant memory.
-- **Context**: Access configuration and dependencies only through the Effect context. Do not use global variables or singleton patterns.
-- **Resource Management**: Use `Scope` and `acquireRelease` for safe resource management. Ensure resources are closed correctly even on failure.
+Run commands from repository root unless a section says otherwise.
 
-## 🎨 Code Style & Consistency
+| Task                    | Command             | Notes                              |
+| ----------------------- | ------------------- | ---------------------------------- |
+| Install dependencies    | `bun install`       | Uses Bun workspaces + lockfile     |
+| Start dev graph         | `bun run dev`       | Runs `turbo dev --parallel`        |
+| Build all workspaces    | `bun run build`     | Runs `turbo build`                 |
+| Lint                    | `bun run lint`      | Runs `turbo lint && manypkg check` |
+| Format                  | `bun run format`    | Runs `biome format --write .`      |
+| Typecheck               | `bun run typecheck` | Runs `turbo typecheck`             |
+| Clean outputs           | `bun run clean`     | Also removes `.turbo/cache`        |
+| Start local Docker deps | `bun run docker:up` | Uses root `docker-compose.yml`     |
 
-- **Imports**: 
-  - Use `import type` for type-only imports to improve build performance and avoid circular dependencies.
-  - Avoid barrel files if possible (prefer direct imports).
-  - Domain imports: Import from the domain's public `index.ts` (e.g., `~/domains/workspace`) instead of internal paths.
-- **Types**: 
-  - **NO `any` or `unknown`** as type constraints.
-  - Use `as const` instead of literal type annotations for better inference.
-  - Prefer `Array<T>` over `T[]` (generic syntax) for consistency.
-  - No non-null assertions (`!`). Use `Option` or check for existence explicitly.
-- **Formatting**: Adhere to Biome standards. Use `===` and `!==`. No trailing spaces.
-- **Naming**: 
-  - Use descriptive, camelCase names for variables and functions.
-  - Use PascalCase for Classes, Interfaces, and Types.
-  - Suffix Services with `Service` (e.g., `UserService`) and Repositories with `Repo` (e.g., `UserRepo`).
-- **Error Handling**: 
-  - NEVER swallow errors.
-  - Use `Effect.catchTag` or `Effect.catchTags` to handle specific errors.
-  - Accompany `tryPromise` or `try` with proper error mapping to your domain errors.
+## Build/lint/test commands
 
-## 🖥 Frontend Guidelines (React & Base UI)
+There is no root `test` script in `package.json`; use Vitest directly.
+Also note: root `turbo.json` has no global `test` task by default.
 
-- **Components**: Use `@base-ui-components/react` for unstyled, accessible primitives.
-- **Accessibility (MUST)**:
-  - Full keyboard support per WAI-ARIA APG (trap focus, move focus, return focus).
-  - Visible focus rings using `:focus-visible`.
-  - Hit targets ≥24px (mobile ≥44px). Expand hit area if visual is smaller.
-  - Semantic HTML elements (`button`, `a`, `label`, `table`) over ARIA roles where possible.
-  - `alt` text for images (avoid "image", "picture", "photo" in the text).
-- **Performance**:
-  - Minimize re-renders; use `React Scan` or DevTools to verify.
-  - Virtualize large lists using `virtua` or `@tanstack/react-virtual`.
-  - Animate only `transform` and `opacity` for compositor efficiency.
-- **Forms**:
-  - Use `@tanstack/react-form` for form management.
-  - Ensure inputs are hydration-safe (no lost focus or values).
-  - Submit on Enter in text inputs; ⌘/Ctrl+Enter in textareas.
-  - Loading buttons must show a spinner and keep the original label.
-- **Navigation**: Use `@tanstack/react-router`. URL must reflect state (filters, tabs, panels, etc.).
-- **Feedback**:
-  - Use optimistic UI with reconciliation on response.
-  - Confirm destructive actions or provide an Undo window.
-  - Use `aria-live` for toasts and inline validation messages.
-- **Layout**:
-  - Respect safe areas using `env(safe-area-inset-*)`.
-  - Skeletons should mirror final content to avoid Layout Shift (CLS).
+### Vitest commands (preferred)
 
-## 🛠 Interaction Details (UI)
+| Task                      | Command                                               |
+| ------------------------- | ----------------------------------------------------- |
+| Run all tests once        | `bunx vitest run`                                     |
+| Watch mode                | `bunx vitest`                                         |
+| Run a single test file    | `bunx vitest run path/to/file.test.ts`                |
+| Run a single test by name | `bunx vitest run -t "test name"`                      |
+| Run one file + one test   | `bunx vitest run path/to/file.test.ts -t "test name"` |
+| Run tests in one folder   | `bunx vitest run packages/core/foo`                   |
 
-### Key MUSTs
-- **Keyboard**: Full support per WAI-ARIA APG; visible focus rings; manage focus trap/return.
-- **Targets**: Hit target ≥24px (mobile ≥44px).
-- **Forms**: Hydration-safe; never block paste; Enter submits; loading spinners on buttons.
-- **State**: URL must reflect state (filters, tabs, pagination).
-- **Feedback**: Optimistic UI; confirm destructive actions or provide Undo window; use `aria-live` for toasts.
+### Workspace-scoped turbo examples
 
-### Animation
-- Honor `prefers-reduced-motion`.
-- Animate compositor-friendly props (`transform`, `opacity`) only.
-- Animations must be interruptible and input-driven.
+Use these when a workspace defines the corresponding task:
 
-### Content
-- Redundant status cues (not color-only).
-- Skeletons must mirror final content.
-- Accurate names (`aria-label`) for icon-only buttons.
-- Use native semantics (`button`, `a`, `label`, `table`) before ARIA.
-- Use the ellipsis character `…` (not `...`).
+- `bunx turbo run build --filter=<workspace>`
+- `bunx turbo run lint --filter=<workspace>`
+- `bunx turbo run typecheck --filter=<workspace>`
+- `bunx turbo run test --filter=<workspace>`
 
-## 🧪 Testing Best Practices
+## Recommended local verification flow
 
+For broad changes, run: `bun run format`, `bun run lint`, `bun run typecheck`, then `bunx vitest run`.
+For small focused edits, run the narrowest relevant checks first (single file/test), then expand if needed.
 
-- **Vitest**: Use `vitest` with `@effect/vitest` for Effect-specific assertions.
-- **Mocks**: Provide mock service implementations via test-specific `Layer`s.
-- **Structure**: Avoid deep nesting of `describe` blocks. Assertions should be inside `it()` or `test()`.
-- **Deterministic**: Use `TestClock` for time-based tests.
+## Code style baseline
 
-## 🛡 Security
+The root `biome.jsonc` extends `ultracite/core` and adds project overrides.
+Treat lints and formatting as source-of-truth over personal preference.
 
-- **Secrets**: NEVER hardcode API keys, tokens, or sensitive data. Use `@mason/config`.
-- **Validation**: Sanitize and validate all user input via `Schema`.
-- **Protocol**: Use `node:` protocol for Node.js built-ins (though disabled in some Biome configs, it is generally preferred).
+### Imports and exports
 
-## 📁 Project Structure
+- Use `import type` for type-only imports.
+- Prefer `export type` for type re-exports.
+- Avoid namespace imports.
+- Respect domain boundaries: import from public domain entrypoints only.
+  - Enforced restriction: do not import `~/domains/*/**`; use `~/domains/<domain>`.
+- Avoid redundant aliasing (`{ foo as foo }`).
 
-- `apps/`: Main applications (web, desktop, server).
-- `packages/`: Shared libraries and modules.
-  - `core/`: Core business logic and domain modules.
-  - `db/`: Database schemas and migrations (Drizzle).
-  - `ui/`: Shared UI components.
-  - `config/`: Configuration management.
-- `interface/`: Frontend application code and routes.
+### Formatting and syntax
 
-## 📝 General Rules
+- Let Biome format code; do not hand-tune formatting.
+- Use strict equality (`===` / `!==`).
+- Prefer template literals when interpolation is involved.
+- Prefer object spread over `Object.assign` for object creation.
+- Prefer `const`; use `let` only when reassignment is required.
+- Keep control flow simple; reduce nested conditionals where possible.
 
-- **DRY vs AHA**: Avoid Hasty Abstractions. Prefer duplication over the wrong abstraction, but keep domain logic consolidated in `packages/core`.
-- **Commit Messages**: Follow conventional commits.
-- **Git Hooks**: Lefthook is used for pre-commit linting and formatting.
-- **Documentation**: Keep `AGENTS.md` up to date with any major architectural changes.
+### TypeScript rules
+
+- Do not use `any`.
+- Do not use `unknown` as a type constraint.
+- Prefer inference for obvious local literals.
+- Use `as const` to preserve literal precision when appropriate.
+- Keep array type style consistent: `Array<T>`.
+- Avoid non-null assertions (`!`); narrow with guards.
+- Avoid enums/namespaces unless unavoidable for interop.
+
+### Naming and structure
+
+- `camelCase`: variables, functions, helpers.
+- `PascalCase`: components, classes, types/interfaces.
+- Prefer descriptive names over abbreviations.
+- Barrel files are allowed, but explicit imports are preferred unless defining a public API.
+
+### Error handling and reliability
+
+- Never swallow errors silently.
+- Throw `Error` (or typed domain errors), never strings/primitives.
+- Add actionable context to error messages.
+- Translate low-level/infrastructure errors at boundaries.
+- Preserve failure information needed for debugging and observability.
+
+## Effect-specific conventions
+
+Apply especially in `packages/core/*` and service/infrastructure layers:
+
+- Prefer `Effect.gen` for multi-step workflows over long chaining.
+- Model dependencies as services and wire with `Layer`.
+- Access time via `Clock` (not direct `Date`) for testability.
+- Use `Schema` for parsing/validation of external input.
+- Prefer `Option` over nullable primitives for optional values.
+- Use `Effect.all`/concurrency operators for independent work.
+- Use tagged errors and targeted recovery (`catchTag`, `catchTags`).
+- Manage resource lifecycles with `Scope` and scoped layers.
+
+## UI and accessibility conventions
+
+When editing `interface/` or `packages/ui/`, local AGENTS rules are mandatory:
+
+- Prioritize accessibility: semantic HTML, keyboard nav, valid ARIA, visible focus.
+- Preserve strong form UX: stable focus/value, paste support, inline validation clarity.
+- Maintain interaction quality: generous hit areas, consistent feedback, no dead zones.
+- Protect performance: avoid unnecessary rerenders, prevent CLS, virtualize large lists.
+- Respect reduced motion preferences; animate `transform`/`opacity` where possible.
+- Use `@base-ui-components/react` primitives and composition guidance.
+
+## Cursor and Copilot instructions detected
+
+Detected Cursor rules in this repository:
+
+- `.cursor/rules/ultracite.mdc` (`alwaysApply: true`)
+  - Default JS/TS quality, type-safety, React, and accessibility guidance.
+- `.cursor/rules/effect.mdc` (`alwaysApply: false`)
+  - Effect architecture and implementation patterns.
+- `.cursor/rules/base-ui.mdc`
+  - Base UI docs/reference guidance.
+- `packages/ui/.cursor/rules/base-ui.mdc` (`alwaysApply: true` in that package)
+  - Mandatory Base UI guidance for `packages/ui` edits.
+
+Also detected: no root `.cursorrules` and no `.github/copilot-instructions.md`.
+
+## Practical agent workflow
+
+1. Identify target package and check for nested `AGENTS.md` before editing.
+2. Follow existing patterns first; avoid broad refactors unless requested.
+3. Make the smallest change that fully solves the task.
+4. Run focused verification early (single file/test), then broaden.
+5. Before handing off large changes, run format + lint + typecheck + relevant tests.
+6. Document trade-offs, assumptions, and skipped checks in PR notes or handoff summary.
+
+Keep this playbook up to date when scripts, tooling, or architectural conventions change.

@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import crypto from "node:crypto";
 import { Config, Effect, Layer } from "effect";
 import { Crypto } from "~/shared/crypto";
