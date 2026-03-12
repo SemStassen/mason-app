@@ -1,11 +1,15 @@
 import { SqlSchema } from "@effect/sql";
 import { DrizzleService, schema } from "@mason/db";
-import { and, eq, gte, inArray, lte, type SQL } from "drizzle-orm";
+import { and, eq, gte, inArray, isNull, lte, not, type SQL } from "drizzle-orm";
 import { Context, DateTime, Effect, Layer, Option, Schema } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
 import type { DatabaseError } from "~/infra/db";
 import { wrapSqlError } from "~/infra/db";
-import type { TimeEntryId, WorkspaceId } from "~/shared/schemas";
+import type {
+	TimeEntryId,
+	WorkspaceId,
+	WorkspaceMemberId,
+} from "~/shared/schemas";
 import { TimeEntry } from "../domain/time-entry.entity";
 
 /**
@@ -75,6 +79,11 @@ export class TimeEntryRepository extends Context.Tag(
 			query: {
 				id: TimeEntryId;
 			};
+		}) => Effect.Effect<Option.Option<TimeEntry>, DatabaseError>;
+		findRunningByWorkspaceMember: (params: {
+			workspaceId: WorkspaceId;
+			workspaceMemberId: WorkspaceMemberId;
+			excludeId?: TimeEntryId;
 		}) => Effect.Effect<Option.Option<TimeEntry>, DatabaseError>;
 		list: (params: {
 			workspaceId: WorkspaceId;
@@ -189,6 +198,37 @@ export class TimeEntryRepository extends Context.Tag(
 				},
 			});
 
+			const findRunningByWorkspaceMemberQuery = SqlSchema.findOne({
+				Request: Schema.Struct({
+					workspaceId: Schema.String,
+					workspaceMemberId: Schema.String,
+					excludeId: Schema.optional(Schema.String),
+				}),
+				Result: TimeEntryDbRow,
+				execute: (request) => {
+					const whereConditions: Array<SQL> = [
+						eq(schema.timeEntriesTable.workspaceId, request.workspaceId),
+						eq(
+							schema.timeEntriesTable.workspaceMemberId,
+							request.workspaceMemberId,
+						),
+						isNull(schema.timeEntriesTable.stoppedAt),
+					];
+
+					if (request.excludeId) {
+						whereConditions.push(
+							not(eq(schema.timeEntriesTable.id, request.excludeId)),
+						);
+					}
+
+					return drizzle
+						.select()
+						.from(schema.timeEntriesTable)
+						.where(and(...whereConditions))
+						.limit(1);
+				},
+			});
+
 			const hardDeleteQuery = SqlSchema.void({
 				Request: Schema.Struct({
 					workspaceId: Schema.String,
@@ -234,6 +274,18 @@ export class TimeEntryRepository extends Context.Tag(
 					const maybeRow = yield* retrieveQuery({
 						workspaceId,
 						id: query.id,
+					});
+
+					return Option.map(maybeRow, rowToTimeEntry);
+				}, wrapSqlError),
+
+				findRunningByWorkspaceMember: Effect.fn(
+					"@mason/time/TimeEntryRepo.findRunningByWorkspaceMember",
+				)(function* ({ workspaceId, workspaceMemberId, excludeId }) {
+					const maybeRow = yield* findRunningByWorkspaceMemberQuery({
+						workspaceId,
+						workspaceMemberId,
+						excludeId,
 					});
 
 					return Option.map(maybeRow, rowToTimeEntry);

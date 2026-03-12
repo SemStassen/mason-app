@@ -1,4 +1,4 @@
-import { DateTime, Effect, Option, Schema } from "effect";
+import { type DateTime, Option, Schema } from "effect";
 import { Model } from "~/shared/effect";
 import {
 	ProjectId,
@@ -31,13 +31,15 @@ export class TimeEntry extends Model.Class<TimeEntry>("TimeEntry")(
 		workspaceMemberId: TimeEntry["workspaceMemberId"];
 		projectId: TimeEntry["projectId"];
 		taskId?: TimeEntry["taskId"];
-		startedAt: TimeEntry["startedAt"];
+		startedAt?: TimeEntry["startedAt"];
 		stoppedAt?: TimeEntry["stoppedAt"];
 		notes?: TimeEntry["notes"];
+		now: DateTime.Utc;
 	}): TimeEntry {
 		return TimeEntry.make({
 			...params,
 			id: TimeEntryId.makeUnsafe(generateUUID()),
+			startedAt: params.startedAt ?? params.now,
 			taskId: params.taskId ?? Option.none(),
 			stoppedAt: params.stoppedAt ?? Option.none(),
 			notes: params.notes ?? Option.none(),

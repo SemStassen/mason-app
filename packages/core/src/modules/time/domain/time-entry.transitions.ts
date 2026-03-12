@@ -1,7 +1,6 @@
 import { DateTime, Option, Result } from "effect";
 import { TimeEntry } from "./time-entry.entity";
 import {
-	TimeEntryAlreadyRunningError,
 	TimeEntryNotRunningError,
 	TimeEntryStoppedAtBeforeStartedAtError,
 } from "./time-entry.errors";
@@ -23,13 +22,6 @@ const ensureRunning = (
 	timeEntry.isRunning()
 		? Result.succeed(undefined)
 		: Result.fail(new TimeEntryNotRunningError());
-
-const ensureNotRunning = (
-	timeEntry: TimeEntry,
-): Result.Result<void, TimeEntryAlreadyRunningError> =>
-	timeEntry.isRunning()
-		? Result.fail(new TimeEntryAlreadyRunningError())
-		: Result.succeed(undefined);
 
 export const stopTimeEntry = (params: {
 	timeEntry: TimeEntry;

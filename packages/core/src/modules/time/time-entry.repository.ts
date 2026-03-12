@@ -14,9 +14,15 @@ export interface TimeEntryRepositoryShape {
 		workspaceId: TimeEntry["workspaceId"];
 		timeEntryIds: NonEmptyReadonlyArray<TimeEntry["id"]>;
 	}) => Effect.Effect<void, RepositoryError>;
-	readonly findById: (
-		id: TimeEntry["id"],
-	) => Effect.Effect<Option.Option<TimeEntry>, RepositoryError>;
+	readonly findById: (params: {
+		workspaceId: TimeEntry["workspaceId"];
+		id: TimeEntry["id"];
+	}) => Effect.Effect<Option.Option<TimeEntry>, RepositoryError>;
+	readonly findRunningByWorkspaceMember: (params: {
+		workspaceId: TimeEntry["workspaceId"];
+		workspaceMemberId: TimeEntry["workspaceMemberId"];
+		excludeId?: TimeEntry["id"];
+	}) => Effect.Effect<Option.Option<TimeEntry>, RepositoryError>;
 }
 
 export class TimeEntryRepository extends ServiceMap.Service<
