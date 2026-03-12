@@ -1,29 +1,33 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { ProjectModuleService } from "~/modules/project/project-module.service";
+import { ProjectModule } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 import { ProjectId } from "~/shared/schemas";
 
 export const ArchiveProjectRequest = Schema.Struct({
-  id: ProjectId,
+	id: ProjectId,
 });
 
+export const ArchiveProjectResponse = Schema.Void;
+
 export const ArchiveProjectFlow = Effect.fn("flows/ArchiveProjectFlow")(
-  function* (request: typeof ArchiveProjectRequest.Type) {
-    const { member, workspace } = yield* WorkspaceContext;
+	function* (request: typeof ArchiveProjectRequest.Type) {
+		const { member, workspace } = yield* WorkspaceContext;
 
-    const authz = yield* AuthorizationService;
+		const authz = yield* Authorization;
 
-    const projectModule = yield* ProjectModuleService;
+		const projectModule = yield* ProjectModule;
 
-    yield* authz.ensureAllowed({
-      action: "project:archive",
-      role: member.role,
-    });
+		yield* authz.ensureAllowed({
+			action: "project:archive",
+			role: member.role,
+		});
 
-    yield* projectModule.archiveProject({
-      id: request.id,
-      workspaceId: workspace.id,
-    });
-  }
+		yield* projectModule.archiveProject({
+			id: request.id,
+			workspaceId: workspace.id,
+		});
+
+		return undefined satisfies typeof ArchiveProjectResponse.Type;
+	},
 );

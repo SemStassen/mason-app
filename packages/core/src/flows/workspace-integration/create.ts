@@ -1,4 +1,4 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect } from "effect";
 import { WorkspaceIntegration } from "~/modules/integration/domain/workspace-integration.entity";
 import { IntegrationModule } from "~/modules/integration/integration.service";
@@ -14,7 +14,7 @@ export const CreateWorkspaceIntegrationFlow = Effect.fn(
 )(function* (request: typeof CreateWorkspaceIntegrationRequest.Type) {
 	const { member, workspace } = yield* WorkspaceContext;
 
-	const authz = yield* AuthorizationService;
+	const authz = yield* Authorization;
 
 	const integrationModule = yield* IntegrationModule;
 

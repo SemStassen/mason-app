@@ -1,40 +1,40 @@
-import { InternalServerError } from "@effect/platform/HttpApiError";
 import {
   ArchiveProjectFlow,
   CreateProjectFlow,
-  PatchProjectFlow,
   ProjectRpcs,
   RestoreProjectFlow,
+  UpdateProjectFlow,
 } from "@mason/core";
-import { Effect, pipe } from "effect";
+import { Effect } from "effect";
+import { HttpApiError } from "effect/unstable/httpapi";
 
 export const ProjectRpcsLive = ProjectRpcs.toLayer({
   "Project.Create": (request) =>
-    pipe(
-      CreateProjectFlow(request),
+    CreateProjectFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
-  "Project.Patch": (request) =>
-    pipe(
-      PatchProjectFlow(request),
+  "Project.Update": (request) =>
+    UpdateProjectFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
   "Project.Archive": (request) =>
-    pipe(
-      ArchiveProjectFlow(request),
+    ArchiveProjectFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
   "Project.Restore": (request) =>
-    pipe(
-      RestoreProjectFlow(request),
+    RestoreProjectFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
 });

@@ -1,27 +1,30 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect } from "effect";
-import { Project } from "~/modules/project/domain/project.model";
-import { ProjectModuleService } from "~/modules/project/project-module.service";
+import { Project, ProjectModule } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 
-export const CreateProjectRequest = Project.flowCreate;
+export const CreateProjectRequest = Project.jsonCreate;
+
+export const CreateProjectResponse = Project.json;
 
 export const CreateProjectFlow = Effect.fn("flows/CreateProjectFlow")(
-  function* (request: typeof CreateProjectRequest.Type) {
-    const { member, workspace } = yield* WorkspaceContext;
+	function* (request: typeof CreateProjectRequest.Type) {
+		const { member, workspace } = yield* WorkspaceContext;
 
-    const authz = yield* AuthorizationService;
+		const authz = yield* Authorization;
 
-    const projectModule = yield* ProjectModuleService;
+		const projectModule = yield* ProjectModule;
 
-    yield* authz.ensureAllowed({
-      action: "project:create",
-      role: member.role,
-    });
+		yield* authz.ensureAllowed({
+			action: "project:create",
+			role: member.role,
+		});
 
-    yield* projectModule.createProject({
-      ...request,
-      workspaceId: workspace.id,
-    });
-  }
+		const createdProject = yield* projectModule.createProject({
+			workspaceId: workspace.id,
+			data: request,
+		});
+
+		return createdProject satisfies typeof CreateProjectResponse.Type;
+	},
 );

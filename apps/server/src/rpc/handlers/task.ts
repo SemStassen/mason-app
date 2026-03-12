@@ -1,40 +1,40 @@
-import { InternalServerError } from "@effect/platform/HttpApiError";
 import {
   ArchiveTaskFlow,
   CreateTaskFlow,
-  PatchTaskFlow,
   RestoreTaskFlow,
   TaskRpcs,
+  UpdateTaskFlow,
 } from "@mason/core";
-import { Effect, pipe } from "effect";
+import { Effect } from "effect";
+import { HttpApiError } from "effect/unstable/httpapi";
 
 export const TaskRpcsLive = TaskRpcs.toLayer({
   "Task.Create": (request) =>
-    pipe(
-      CreateTaskFlow(request),
+    CreateTaskFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
-  "Task.Patch": (request) =>
-    pipe(
-      PatchTaskFlow(request),
+  "Task.Update": (request) =>
+    UpdateTaskFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
   "Task.Archive": (request) =>
-    pipe(
-      ArchiveTaskFlow(request),
+    ArchiveTaskFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
   "Task.Restore": (request) =>
-    pipe(
-      RestoreTaskFlow(request),
+    RestoreTaskFlow(request).pipe(
       Effect.catchTags({
-        "shared/MasonError": () => new InternalServerError(),
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
       })
     ),
 });

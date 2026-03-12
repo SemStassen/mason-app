@@ -1,27 +1,30 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect } from "effect";
-import { Task } from "~/modules/project/domain/task.model";
-import { ProjectModuleService } from "~/modules/project/project-module.service";
+import { ProjectModule, Task } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 
-export const CreateTaskRequest = Task.flowCreate;
+export const CreateTaskRequest = Task.jsonCreate;
+
+export const CreateTaskResponse = Task.json;
 
 export const CreateTaskFlow = Effect.fn("flows/CreateTaskFlow")(function* (
-  request: typeof CreateTaskRequest.Type
+	request: typeof CreateTaskRequest.Type,
 ) {
-  const { member, workspace } = yield* WorkspaceContext;
+	const { member, workspace } = yield* WorkspaceContext;
 
-  const authz = yield* AuthorizationService;
+	const authz = yield* Authorization;
 
-  const projectModule = yield* ProjectModuleService;
+	const projectModule = yield* ProjectModule;
 
-  yield* authz.ensureAllowed({
-    action: "project:create_task",
-    role: member.role,
-  });
+	yield* authz.ensureAllowed({
+		action: "project:create_task",
+		role: member.role,
+	});
 
-  yield* projectModule.createTask({
-    ...request,
-    workspaceId: workspace.id,
-  });
+	const createdTask = yield* projectModule.createTask({
+		workspaceId: workspace.id,
+		data: request,
+	});
+
+	return createdTask satisfies typeof CreateTaskResponse.Type;
 });

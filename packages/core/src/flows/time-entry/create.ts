@@ -1,4 +1,4 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect } from "effect";
 import { TimeEntry, TimeModule } from "~/modules/time";
 import { WorkspaceContext } from "~/shared/auth";
@@ -11,7 +11,7 @@ export const CreateTimeEntryFlow = Effect.fn("flows/CreateTimeEntryFlow")(
 	function* (request: typeof CreateTimeEntryRequest.Type) {
 		const { member, workspace } = yield* WorkspaceContext;
 
-		const authz = yield* AuthorizationService;
+		const authz = yield* Authorization;
 
 		const timeModule = yield* TimeModule;
 

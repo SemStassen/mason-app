@@ -1,4 +1,5 @@
 export { TimeEntry } from "./domain/time-entry.entity";
+
 export {
 	TimeEntryAlreadyRunningError,
 	TimeEntryStoppedAtBeforeStartedAtError,

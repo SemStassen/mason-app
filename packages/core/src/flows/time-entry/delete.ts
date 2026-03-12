@@ -1,4 +1,4 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect, Schema } from "effect";
 import { TimeModule } from "~/modules/time";
 import { WorkspaceContext } from "~/shared/auth";
@@ -14,7 +14,7 @@ export const DeleteTimeEntryFlow = Effect.fn("flows/DeleteTimeEntryFlow")(
 	function* (request: typeof DeleteTimeEntryRequest.Type) {
 		const { member, workspace } = yield* WorkspaceContext;
 
-		const authz = yield* AuthorizationService;
+		const authz = yield* Authorization;
 
 		const timeModule = yield* TimeModule;
 

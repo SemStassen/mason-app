@@ -1,29 +1,33 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { ProjectModuleService } from "~/modules/project/project-module.service";
+import { ProjectModule } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 import { ProjectId } from "~/shared/schemas";
 
 export const RestoreProjectRequest = Schema.Struct({
-  id: ProjectId,
+	id: ProjectId,
 });
 
+export const RestoreProjectResponse = Schema.Void;
+
 export const RestoreProjectFlow = Effect.fn("flows/RestoreProjectFlow")(
-  function* (request: typeof RestoreProjectRequest.Type) {
-    const { member, workspace } = yield* WorkspaceContext;
+	function* (request: typeof RestoreProjectRequest.Type) {
+		const { member, workspace } = yield* WorkspaceContext;
 
-    const authz = yield* AuthorizationService;
+		const authz = yield* Authorization;
 
-    const projectModule = yield* ProjectModuleService;
+		const projectModule = yield* ProjectModule;
 
-    yield* authz.ensureAllowed({
-      action: "project:restore",
-      role: member.role,
-    });
+		yield* authz.ensureAllowed({
+			action: "project:restore",
+			role: member.role,
+		});
 
-    yield* projectModule.restoreProject({
-      id: request.id,
-      workspaceId: workspace.id,
-    });
-  }
+		yield* projectModule.restoreProject({
+			id: request.id,
+			workspaceId: workspace.id,
+		});
+
+		return undefined satisfies typeof RestoreProjectResponse.Type;
+	},
 );

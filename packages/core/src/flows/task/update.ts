@@ -1,17 +1,18 @@
 import { Authorization } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { ProjectModule } from "~/modules/project";
+import { ProjectModule, Task } from "~/modules/project";
 import { WorkspaceContext } from "~/shared/auth";
 import { TaskId } from "~/shared/schemas";
 
-export const ArchiveTaskRequest = Schema.Struct({
+export const UpdateTaskRequest = Schema.Struct({
 	id: TaskId,
+	data: Task.jsonUpdate,
 });
 
-export const ArchiveTaskResponse = Schema.Void;
+export const UpdateTaskResponse = Task.json;
 
-export const ArchiveTaskFlow = Effect.fn("flows/ArchiveTaskFlow")(function* (
-	request: typeof ArchiveTaskRequest.Type,
+export const UpdateTaskFlow = Effect.fn("flows/UpdateTaskFlow")(function* (
+	request: typeof UpdateTaskRequest.Type,
 ) {
 	const { member, workspace } = yield* WorkspaceContext;
 
@@ -20,14 +21,15 @@ export const ArchiveTaskFlow = Effect.fn("flows/ArchiveTaskFlow")(function* (
 	const projectModule = yield* ProjectModule;
 
 	yield* authz.ensureAllowed({
-		action: "project:archive_task",
+		action: "project:patch_task",
 		role: member.role,
 	});
 
-	yield* projectModule.archiveTask({
+	const updatedTask = yield* projectModule.updateTask({
 		id: request.id,
 		workspaceId: workspace.id,
+		data: request.data,
 	});
 
-	return undefined satisfies typeof ArchiveTaskResponse.Type;
+	return updatedTask satisfies typeof UpdateTaskResponse.Type;
 });

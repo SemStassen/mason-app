@@ -5,17 +5,9 @@ export * from "./flows";
 export * from "./infra/crypto";
 export * from "./infra/db";
 export * from "./infra/email";
-export * from "./modules/identity/errors";
 /** Modules */
-export * from "./modules/identity/identity-module";
 export * from "./modules/integration/integration.layer";
 export * from "./modules/integration/integration.service";
-export * from "./modules/project/errors";
-export * from "./modules/project/project-module.service";
-export * from "./modules/time/errors";
-export * from "./modules/time/time-module.service";
-export * from "./modules/workspace-invitation/errors";
-export * from "./modules/workspace-invitation/invitation-module.service";
 export * from "./modules/workspace-member/workspace-member.service";
 /** Shared */
 export * from "./shared/auth";

@@ -1,4 +1,4 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect, Option } from "effect";
 import { IdentityModule } from "~/modules/identity/identity.service";
 import { WorkspaceInvitation } from "~/modules/workspace-invitation/domain/workspace-invitation.entity";
@@ -17,7 +17,7 @@ export const CreateWorkspaceInvitationFlow = Effect.fn(
 	const { user } = yield* SessionContext;
 	const { member, workspace } = yield* WorkspaceContext;
 
-	const authz = yield* AuthorizationService;
+	const authz = yield* Authorization;
 	const email = yield* Email;
 
 	const identityModule = yield* IdentityModule;

@@ -1,4 +1,4 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect, Schema } from "effect";
 import { WorkspaceInvitation } from "~/modules/workspace-invitation/domain/workspace-invitation.entity";
 import { WorkspaceInvitationModule } from "~/modules/workspace-invitation/workspace-invitation.service";
@@ -15,7 +15,7 @@ export const CancelWorkspaceInvitationFlow = Effect.fn(
 )(function* (request: typeof CancelWorkspaceInvitationRequest.Type) {
 	const { member, workspace } = yield* WorkspaceContext;
 
-	const authz = yield* AuthorizationService;
+	const authz = yield* Authorization;
 
 	const workspaceInvitationModule = yield* WorkspaceInvitationModule;
 

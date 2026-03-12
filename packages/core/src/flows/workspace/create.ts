@@ -1,10 +1,10 @@
 import { Effect, Option } from "effect";
-import { DatabaseService } from "~/infra/db";
 import { IdentityModule } from "~/modules/identity/identity.service";
 import { Workspace } from "~/modules/workspace/domain/workspace.entity";
 import { WorkspaceModule } from "~/modules/workspace/workspace.service";
 import { WorkspaceMemberModule } from "~/modules/workspace-member/workspace-member.service";
 import { SessionContext } from "~/shared/auth";
+import { Database } from "~/shared/database";
 
 export const CreateWorkspaceRequest = Workspace.jsonCreate;
 
@@ -14,7 +14,7 @@ export const CreateWorkspaceFlow = Effect.fn("flows/CreateWorkspaceFlow")(
 	function* (request: typeof CreateWorkspaceRequest.Type) {
 		const { user, session } = yield* SessionContext;
 
-		const db = yield* DatabaseService;
+		const db = yield* Database;
 
 		const workspaceModule = yield* WorkspaceModule;
 		const workspaceMemberModule = yield* WorkspaceMemberModule;

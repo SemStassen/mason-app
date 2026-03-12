@@ -9,17 +9,17 @@ export class AuthorizationError extends Schema.TaggedErrorClass<AuthorizationErr
   {}
 ) {}
 
-export class AuthorizationService extends ServiceMap.Service<
-  AuthorizationService,
+export class Authorization extends ServiceMap.Service<
+  Authorization,
   {
     ensureAllowed: (params: {
       action: Action;
       role: WorkspaceRole;
     }) => Effect.Effect<void, AuthorizationError>;
   }
->()("@mason/authorization/AuthorizationService") {
+>()("@mason/authorization/Authorization") {
   static readonly live = Layer.effect(
-    AuthorizationService,
+    Authorization,
     Effect.sync(() => {
       const permissionRules: Record<Action, ReadonlyArray<WorkspaceRole>> = {
         "workspace:invite_user": ["owner"],
@@ -28,6 +28,7 @@ export class AuthorizationService extends ServiceMap.Service<
         "workspace:delete": ["owner"],
         "workspace:create_integration": ["owner"],
         "workspace:delete_integration": ["owner"],
+
         "project:create": ["owner"],
         "project:patch": ["owner"],
         "project:archive": ["owner"],
@@ -36,12 +37,13 @@ export class AuthorizationService extends ServiceMap.Service<
         "project:patch_task": ["owner"],
         "project:archive_task": ["owner"],
         "project:restore_task": ["owner"],
+
         "time:create_time_entry": ["owner"],
         "time:update_time_entry": ["owner"],
         "time:delete_time_entry": ["owner"],
       };
 
-      return AuthorizationService.of({
+      return Authorization.of({
         ensureAllowed: Effect.fn("authorization.ensureAllowed")(function* ({
           role,
           action,

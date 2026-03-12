@@ -1,4 +1,4 @@
-import { AuthorizationService } from "@mason/authorization";
+import { Authorization } from "@mason/authorization";
 import { Effect } from "effect";
 import { Workspace } from "~/modules/workspace/domain/workspace.entity";
 import { WorkspaceModule } from "~/modules/workspace/workspace.service";
@@ -12,7 +12,7 @@ export const UpdateWorkspaceFlow = Effect.fn("flows/UpdateWorkspaceFlow")(
 	function* (request: typeof UpdateWorkspaceRequest.Type) {
 		const { member, workspace } = yield* WorkspaceContext;
 
-		const authz = yield* AuthorizationService;
+		const authz = yield* Authorization;
 
 		const workspaceModule = yield* WorkspaceModule;
 

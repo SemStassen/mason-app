@@ -1,10 +1,10 @@
 import { Effect, Option, Schema } from "effect";
-import { DatabaseService } from "~/infra/db";
 import { IdentityModule } from "~/modules/identity/identity.service";
 import { WorkspaceInvitation } from "~/modules/workspace-invitation/domain/workspace-invitation.entity";
 import { WorkspaceInvitationModule } from "~/modules/workspace-invitation/workspace-invitation.service";
 import { WorkspaceMemberModule } from "~/modules/workspace-member/workspace-member.service";
 import { SessionContext } from "~/shared/auth";
+import { Database } from "~/shared/database";
 
 export const AcceptWorkspaceInvitationRequest = Schema.Struct({
 	id: WorkspaceInvitation.fields.id,
@@ -17,7 +17,7 @@ export const AcceptWorkspaceInvitationFlow = Effect.fn(
 )(function* (request: typeof AcceptWorkspaceInvitationRequest.Type) {
 	const { user, session } = yield* SessionContext;
 
-	const db = yield* DatabaseService;
+	const db = yield* Database;
 
 	const workspaceInvitationModule = yield* WorkspaceInvitationModule;
 	const workspaceMemberModule = yield* WorkspaceMemberModule;
