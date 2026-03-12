@@ -1,4 +1,4 @@
-import {  Effect, Layer, Schema, ServiceMap  } from "effect";
+import { Effect, Layer, Schema, ServiceMap } from "effect";
 import type { Action } from "./rbac";
 
 export type WorkspaceRole = typeof WorkspaceRole.Type;
@@ -6,7 +6,7 @@ export const WorkspaceRole = Schema.Literals(["owner", "member"]);
 
 export class AuthorizationError extends Schema.TaggedErrorClass<AuthorizationError>()(
   "authorization/AuthorizationError",
-  {},
+  {}
 ) {}
 
 export class AuthorizationService extends ServiceMap.Service<
@@ -20,7 +20,7 @@ export class AuthorizationService extends ServiceMap.Service<
 >()("@mason/authorization/AuthorizationService") {
   static readonly live = Layer.effect(
     AuthorizationService,
-    Effect.gen(function* () {
+    Effect.sync(() => {
       const permissionRules: Record<Action, ReadonlyArray<WorkspaceRole>> = {
         "workspace:invite_user": ["owner"],
         "workspace:cancel_invite": ["owner"],
@@ -35,7 +35,10 @@ export class AuthorizationService extends ServiceMap.Service<
         "project:create_task": ["owner"],
         "project:patch_task": ["owner"],
         "project:archive_task": ["owner"],
-        "project:restore_task": ["owner",],
+        "project:restore_task": ["owner"],
+        "time:create_time_entry": ["owner"],
+        "time:update_time_entry": ["owner"],
+        "time:delete_time_entry": ["owner"],
       };
 
       return AuthorizationService.of({
@@ -44,10 +47,10 @@ export class AuthorizationService extends ServiceMap.Service<
           action,
         }) {
           if (!permissionRules[action].includes(role)) {
-            yield* new AuthorizationError();
+            return yield* new AuthorizationError();
           }
         }),
       });
-    }),
+    })
   );
 }

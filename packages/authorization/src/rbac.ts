@@ -6,7 +6,7 @@ const WorkspaceAction = Schema.Literals([
   "workspace:patch",
   "workspace:delete",
   "workspace:create_integration",
-  "workspace:delete_integration"
+  "workspace:delete_integration",
 ]);
 
 const ProjectAction = Schema.Literals([
@@ -17,8 +17,18 @@ const ProjectAction = Schema.Literals([
   "project:create_task",
   "project:patch_task",
   "project:archive_task",
-  "project:restore_task"
+  "project:restore_task",
+]);
+
+const TimeAction = Schema.Literals([
+  "time:create_time_entry",
+  "time:update_time_entry",
+  "time:delete_time_entry",
 ]);
 
 export type Action = typeof Action.Type;
-export const Action = Schema.Union([WorkspaceAction, ProjectAction]);
+export const Action = Schema.Union([
+  WorkspaceAction,
+  ProjectAction,
+  TimeAction,
+]);

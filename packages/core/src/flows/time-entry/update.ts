@@ -1,0 +1,35 @@
+import { AuthorizationService } from "@mason/authorization";
+import { Effect, Schema } from "effect";
+import { TimeEntry, TimeModule } from "~/modules/time";
+import { WorkspaceContext } from "~/shared/auth";
+import { TimeEntryId } from "~/shared/schemas";
+
+export const UpdateTimeEntryRequest = Schema.Struct({
+	timeEntryId: TimeEntryId,
+	data: TimeEntry.jsonUpdate,
+});
+
+export const UpdateTimeEntryResponse = TimeEntry.json;
+
+export const UpdateTimeEntryFlow = Effect.fn("flows/UpdateTimeEntryFlow")(
+	function* (request: typeof UpdateTimeEntryRequest.Type) {
+		const { member, workspace } = yield* WorkspaceContext;
+
+		const authz = yield* AuthorizationService;
+
+		const timeModule = yield* TimeModule;
+
+		yield* authz.ensureAllowed({
+			action: "time:update_time_entry",
+			role: member.role,
+		});
+
+		const updatedTimeEntry = yield* timeModule.updateTimeEntry({
+			id: request.timeEntryId,
+			workspaceId: workspace.id,
+			data: request.data,
+		});
+
+		return updatedTimeEntry satisfies typeof UpdateTimeEntryResponse.Type;
+	},
+);

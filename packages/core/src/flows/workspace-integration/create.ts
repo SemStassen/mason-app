@@ -26,7 +26,7 @@ export const CreateWorkspaceIntegrationFlow = Effect.fn(
 	const createdWorkspaceIntegration =
 		yield* integrationModule.createWorkspaceIntegration({
 			workspaceId: workspace.id,
-			createdByMemberId: member.id,
+			createdByWorkspaceMemberId: member.id,
 			data: request,
 		});
 
