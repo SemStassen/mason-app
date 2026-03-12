@@ -1,11 +1,5 @@
 import { DateTime, Effect, Layer, Option } from "effect";
-import { WorkspaceInvitation } from "./domain/workspace-invitation.entity";
-import {
-	acceptWorkspaceInvitation,
-	cancelWorkspaceInvitation,
-	rejectWorkspaceInvitation,
-	renewWorkspaceInvitation,
-} from "./domain/workspace-invitation.transitions";
+import * as workspaceInvitationTransitions from "./domain/workspace-invitation.transitions";
 import { WorkspaceInvitationRepository } from "./workspace-invitation.repository";
 import {
 	WorkspaceInvitationModule,
@@ -31,7 +25,7 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 
 				if (Option.isSome(maybeActivePendingWorkspaceInvitation)) {
 					const renewedWorkspaceInvitation = yield* Effect.fromResult(
-						renewWorkspaceInvitation({
+						workspaceInvitationTransitions.renewWorkspaceInvitation({
 							workspaceInvitation: maybeActivePendingWorkspaceInvitation.value,
 							now: now,
 						}),
@@ -49,12 +43,14 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 					return persistedWorkspaceInvitation;
 				}
 
-				const workspaceInvitation = WorkspaceInvitation.create({
-					...params.data,
-					inviterId: params.inviterId,
-					workspaceId: params.workspaceId,
-					now: now,
-				});
+				const workspaceInvitation = yield* Effect.fromResult(
+					workspaceInvitationTransitions.createWorkspaceInvitation({
+						data: params.data,
+						inviterId: params.inviterId,
+						workspaceId: params.workspaceId,
+						now,
+					}),
+				);
 
 				const [persistedWorkspaceInvitation] =
 					yield* workspaceInvitationRepo.insert([workspaceInvitation]);
@@ -86,7 +82,7 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 					);
 
 				const canceledWorkspaceInvitation = yield* Effect.fromResult(
-					cancelWorkspaceInvitation({
+					workspaceInvitationTransitions.cancelWorkspaceInvitation({
 						workspaceInvitation: workspaceInvitation,
 						now: now,
 					}),
@@ -121,7 +117,7 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 					);
 
 				const acceptedWorkspaceInvitation = yield* Effect.fromResult(
-					acceptWorkspaceInvitation({
+					workspaceInvitationTransitions.acceptWorkspaceInvitation({
 						workspaceInvitation: workspaceInvitation,
 						email: params.email,
 						now: now,
@@ -157,7 +153,7 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 					);
 
 				const rejectedWorkspaceInvitation = yield* Effect.fromResult(
-					rejectWorkspaceInvitation({
+					workspaceInvitationTransitions.rejectWorkspaceInvitation({
 						workspaceInvitation: workspaceInvitation,
 						email: params.email,
 						now: now,

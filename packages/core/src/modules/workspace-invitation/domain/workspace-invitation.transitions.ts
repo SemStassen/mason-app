@@ -1,10 +1,33 @@
 import { DateTime, Result } from "effect";
+import { WorkspaceInvitationId } from "~/shared/schemas";
+import { generateUUID } from "~/shared/utils";
 import { WorkspaceInvitation } from "./workspace-invitation.entity";
 import {
 	WorkspaceInvitationEmailMismatchError,
 	WorkspaceInvitationExpiredError,
 	WorkspaceInvitationNotPendingError,
 } from "./workspace-invitation.errors";
+
+const defaultExpiration = (now: DateTime.Utc): DateTime.Utc =>
+	DateTime.add(now, { days: 2 });
+
+export const createWorkspaceInvitation = (params: {
+	workspaceId: WorkspaceInvitation["workspaceId"];
+	inviterId: WorkspaceInvitation["inviterId"];
+	data: typeof WorkspaceInvitation.jsonCreate.Type;
+	now: DateTime.Utc;
+}): Result.Result<WorkspaceInvitation, never> =>
+	Result.succeed(
+		WorkspaceInvitation.make({
+			id: WorkspaceInvitationId.makeUnsafe(generateUUID()),
+			workspaceId: params.workspaceId,
+			inviterId: params.inviterId,
+			email: params.data.email,
+			role: params.data.role,
+			status: "pending",
+			expiresAt: defaultExpiration(params.now),
+		}),
+	);
 
 const ensurePending = (
 	workspaceInvitation: WorkspaceInvitation,
@@ -41,7 +64,7 @@ export const renewWorkspaceInvitation = (params: {
 		yield* ensureNotExpired(params.workspaceInvitation, params.now);
 		return WorkspaceInvitation.make({
 			...params.workspaceInvitation,
-			expiresAt: WorkspaceInvitation.defaultExpiration(params.now),
+			expiresAt: defaultExpiration(params.now),
 		});
 	});
 

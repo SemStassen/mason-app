@@ -1,6 +1,7 @@
 import { Effect, Layer, Option } from "effect";
 import type { UserId, WorkspaceId } from "~/shared/schemas";
-import { WorkspaceMember } from "./domain/workspace-member.entity";
+import type { WorkspaceMember } from "./domain/workspace-member.entity";
+import * as workspaceMemberTransitions from "./domain/workspace-member.transitions";
 import { WorkspaceMemberRepository } from "./workspace-member.repository";
 import {
 	WorkspaceMemberAlreadyExistsError,
@@ -35,7 +36,9 @@ export const WorkspaceMemberModuleLayer = Layer.effect(
 					userId: params.userId,
 				});
 
-				const workspaceMember = WorkspaceMember.create(params);
+				const workspaceMember = yield* Effect.fromResult(
+					workspaceMemberTransitions.createWorkspaceMember(params),
+				);
 
 				const [persistedWorkspaceMember] = yield* workspaceMemberRepo.insert([
 					workspaceMember,

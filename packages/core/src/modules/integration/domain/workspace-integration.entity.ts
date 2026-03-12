@@ -1,4 +1,4 @@
-import { type DateTime, Option, Schema } from "effect";
+import { Schema } from "effect";
 import { Model } from "~/shared/effect";
 import {
 	EncryptedApiKey,
@@ -7,7 +7,6 @@ import {
 	WorkspaceIntegrationId,
 	WorkspaceMemberId,
 } from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
 
 export class WorkspaceIntegration extends Model.Class<WorkspaceIntegration>(
 	"WorkspaceIntegration",
@@ -42,19 +41,4 @@ export class WorkspaceIntegration extends Model.Class<WorkspaceIntegration>(
 		title: "Workspace Integration",
 		description: "An integration connecting a workspace to an external service",
 	},
-) {
-	static create(params: {
-		workspaceId: WorkspaceIntegration["workspaceId"];
-		createdByWorkspaceMemberId: WorkspaceIntegration["createdByWorkspaceMemberId"];
-		provider: WorkspaceIntegration["provider"];
-		apiKey: WorkspaceIntegration["apiKey"];
-		now: DateTime.Utc;
-	}): WorkspaceIntegration {
-		return WorkspaceIntegration.make({
-			...params,
-			id: WorkspaceIntegrationId.makeUnsafe(generateUUID()),
-			_metadata: Option.none(),
-			createdAt: params.now,
-		});
-	}
-}
+) {}

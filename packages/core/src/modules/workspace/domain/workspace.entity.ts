@@ -1,7 +1,5 @@
-import { Option } from "effect";
 import { Model, Schema } from "~/shared/effect";
 import { WorkspaceId } from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
 
 export class Workspace extends Model.Class<Workspace>("Workspace")(
 	{
@@ -20,18 +18,4 @@ export class Workspace extends Model.Class<Workspace>("Workspace")(
 		title: "Workspace",
 		description: "A workspace",
 	},
-) {
-	static create(params: {
-		name: Workspace["name"];
-		slug: Workspace["slug"];
-		logoUrl?: Workspace["logoUrl"];
-		metadata?: Workspace["metadata"];
-	}): Workspace {
-		return Workspace.make({
-			...params,
-			id: WorkspaceId.makeUnsafe(generateUUID()),
-			logoUrl: params.logoUrl ?? Option.none(),
-			metadata: params.metadata ?? Option.none(),
-		});
-	}
-}
+) {}

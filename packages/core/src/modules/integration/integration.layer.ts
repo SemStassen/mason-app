@@ -1,7 +1,7 @@
 import { DateTime, Effect, Layer, Option, Redacted } from "effect";
 import { Crypto } from "~/shared/crypto";
 import { EncryptedApiKey, PlainApiKey } from "~/shared/schemas";
-import { WorkspaceIntegration } from "./domain/workspace-integration.entity";
+import * as workspaceIntegrationTransitions from "./domain/workspace-integration.transitions";
 import {
 	IntegrationModule,
 	WorkspaceIntegrationNotFoundError,
@@ -56,13 +56,15 @@ export const IntegrationModuleLayer = Layer.effect(
 
 				const encryptedApiKey = yield* encryptApiKey(params.data.apiKey);
 
-				const workspaceIntegration = WorkspaceIntegration.create({
-					...params.data,
-					createdByWorkspaceMemberId: params.createdByWorkspaceMemberId,
-					workspaceId: params.workspaceId,
-					apiKey: encryptedApiKey,
-					now: now,
-				});
+				const workspaceIntegration = yield* Effect.fromResult(
+					workspaceIntegrationTransitions.createWorkspaceIntegration({
+						provider: params.data.provider,
+						createdByWorkspaceMemberId: params.createdByWorkspaceMemberId,
+						workspaceId: params.workspaceId,
+						apiKey: encryptedApiKey,
+						now,
+					}),
+				);
 
 				const [persistedWorkspaceIntegration] =
 					yield* workspaceIntegrationRepo.insert({
@@ -97,11 +99,13 @@ export const IntegrationModuleLayer = Layer.effect(
 					? yield* encryptApiKey(params.data.apiKey)
 					: workspaceIntegration.apiKey;
 
-				const updatedWorkspaceIntegration = WorkspaceIntegration.make({
-					...workspaceIntegration,
-					...params.data,
-					apiKey: encryptedApiKey,
-				});
+				const updatedWorkspaceIntegration = yield* Effect.fromResult(
+					workspaceIntegrationTransitions.updateWorkspaceIntegration({
+						workspaceIntegration,
+						data: params.data,
+						apiKey: encryptedApiKey,
+					}),
+				);
 
 				const [persistedWorkspaceIntegration] =
 					yield* workspaceIntegrationRepo.update({

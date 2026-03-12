@@ -1,5 +1,5 @@
 import { Effect, Layer, Option } from "effect";
-import { Workspace } from "./domain/workspace.entity";
+import * as workspaceTransitions from "./domain/workspace.transitions";
 import { WorkspaceRepository } from "./workspace.repository";
 import {
 	WorkspaceModule,
@@ -26,7 +26,9 @@ export const WorkspaceModuleLayer = Layer.effect(
 			createWorkspace: Effect.fn("workspace.createWorkspace")(function* (data) {
 				yield* assertWorkspaceSlugIsUnique(data.slug);
 
-				const workspace = Workspace.create(data);
+				const workspace = yield* Effect.fromResult(
+					workspaceTransitions.createWorkspace(data),
+				);
 
 				const [persistedWorkspace] = yield* workspaceRepo.insert([workspace]);
 
@@ -52,10 +54,12 @@ export const WorkspaceModuleLayer = Layer.effect(
 						yield* assertWorkspaceSlugIsUnique(params.data.slug);
 					}
 
-					const updatedWorkspace = Workspace.make({
-						...workspace,
-						...params.data,
-					});
+					const updatedWorkspace = yield* Effect.fromResult(
+						workspaceTransitions.updateWorkspace({
+							workspace,
+							data: params.data,
+						}),
+					);
 
 					const persistedWorkspace =
 						yield* workspaceRepo.update(updatedWorkspace);
