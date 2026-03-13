@@ -1,22 +1,17 @@
 import { PgClient } from "@effect/sql-pg";
 import * as PgDrizzle from "drizzle-orm/effect-postgres";
-import {
-  Effect,
-  Layer,
-  Redacted,
-  ServiceMap,
-} from "effect";
+import { Effect, Layer, Redacted, ServiceMap } from "effect";
+import { types } from "pg";
 import { relations } from "./relations";
 // biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "./schema";
-import { types } from "pg";
 
 const PgClientLive = PgClient.layer({
   password: Redacted.make(process.env.POSTGRES_PW!),
   username: process.env.POSTGRES_USER!,
   database: process.env.POSTGRES_DATABASE!,
   host: process.env.POSTGRES_HOST!,
-  port: parseInt(process.env.POSTGRES_PORT!),
+  port: Number.parseInt(process.env.POSTGRES_PORT!),
   types: {
     getTypeParser: (typeId, format) => {
       // Return raw values for date/time types to let Drizzle handle parsing
@@ -30,12 +25,12 @@ const PgClientLive = PgClient.layer({
   },
 });
 
-export class DrizzleService extends ServiceMap.Service<
-  DrizzleService,
+export class Drizzle extends ServiceMap.Service<
+  Drizzle,
   PgDrizzle.EffectPgDatabase<typeof schema, typeof relations>
->()("@mason/db/DrizzleService") {
+>()("@mason/db/Drizzle") {
   static readonly live = Layer.effect(
-    DrizzleService,
+    Drizzle,
     Effect.gen(function* () {
       const db = yield* PgDrizzle.make({
         relations: relations,
@@ -43,6 +38,6 @@ export class DrizzleService extends ServiceMap.Service<
       }).pipe(Effect.provide(PgDrizzle.DefaultServices));
 
       return db;
-    }),
+    })
   ).pipe(Layer.provide(PgClientLive));
 }

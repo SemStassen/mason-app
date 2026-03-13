@@ -4,7 +4,7 @@ import type { Workspace } from "~/modules/workspace/domain/workspace.entity";
 import type { WorkspaceInvitation } from "~/modules/workspace-invitation/domain/workspace-invitation.entity";
 import type { Email as EmailValueObject } from "~/shared/schemas";
 
-interface EmailShape {
+interface MailerShape {
 	sendWorkspaceInvitation: (params: {
 		email: EmailValueObject;
 		workspace: {
@@ -16,6 +16,6 @@ interface EmailShape {
 	}) => Effect.Effect<void>;
 }
 
-export class Email extends ServiceMap.Service<Email, EmailShape>()(
-	"@mason/infra/EmailService",
+export class Mailer extends ServiceMap.Service<Mailer, MailerShape>()(
+	"@mason/shared/Mailer",
 ) {}

@@ -155,7 +155,19 @@
     "packages/core": {
       "name": "@mason/core",
       "dependencies": {
+        "effect": "catalog:",
+        "uuid": "^13.0.0",
+      },
+      "devDependencies": {
+        "@mason/config": "workspace:*",
+        "typescript": "catalog:dev",
+      },
+    },
+    "packages/core-server": {
+      "name": "@mason/core-server",
+      "dependencies": {
         "@mason/authorization": "workspace:*",
+        "@mason/core": "workspace:*",
         "@mason/db": "workspace:*",
         "drizzle-orm": "catalog:",
         "effect": "catalog:",
@@ -544,6 +556,8 @@
     "@mason/config": ["@mason/config@workspace:packages/config"],
 
     "@mason/core": ["@mason/core@workspace:packages/core"],
+
+    "@mason/core-server": ["@mason/core-server@workspace:packages/core-server"],
 
     "@mason/db": ["@mason/db@workspace:packages/db"],
 

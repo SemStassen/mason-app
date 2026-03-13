@@ -19,3 +19,7 @@ export class Workspace extends Model.Class<Workspace>("Workspace")(
 		description: "A workspace",
 	},
 ) {}
+
+export const WorkspaceSelect = Workspace.select;
+export const WorkspaceInsert = Workspace.insert;
+export const WorkspaceUpdate = Workspace.update;

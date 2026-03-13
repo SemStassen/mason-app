@@ -9,9 +9,6 @@
 		"typecheck": "tsc -noEmit"
 	},
 	"dependencies": {
-		"@mason/authorization": "workspace:*",
-		"@mason/db": "workspace:*",
-		"drizzle-orm": "catalog:",
 		"effect": "catalog:",
 		"uuid": "^13.0.0"
 	},
