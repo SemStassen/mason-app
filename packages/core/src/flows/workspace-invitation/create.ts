@@ -1,11 +1,13 @@
 import { Authorization } from "@mason/authorization";
 import { Effect, Option } from "effect";
-import { IdentityModule } from "~/modules/identity/identity.service";
-import { WorkspaceInvitation } from "~/modules/workspace-invitation/domain/workspace-invitation.entity";
-import { WorkspaceInvitationModule } from "~/modules/workspace-invitation/workspace-invitation.service";
-import { WorkspaceMemberModule } from "~/modules/workspace-member/workspace-member.service";
-import { SessionContext, WorkspaceContext } from "~/shared/auth";
-import { Email } from "~/shared/email";
+import { IdentityModule } from "#modules/identity/index";
+import {
+	WorkspaceInvitation,
+	WorkspaceInvitationModule,
+} from "#modules/workspace-invitation/index";
+import { WorkspaceMemberModule } from "#modules/workspace-member/index";
+import { SessionContext, WorkspaceContext } from "#shared/auth/index";
+import { Mailer } from "#shared/email/index";
 
 export const CreateWorkspaceInvitationRequest = WorkspaceInvitation.jsonCreate;
 
@@ -18,7 +20,7 @@ export const CreateWorkspaceInvitationFlow = Effect.fn(
 	const { member, workspace } = yield* WorkspaceContext;
 
 	const authz = yield* Authorization;
-	const email = yield* Email;
+	const mailer = yield* Mailer;
 
 	const identityModule = yield* IdentityModule;
 	const workspaceMemberModule = yield* WorkspaceMemberModule;
@@ -50,7 +52,7 @@ export const CreateWorkspaceInvitationFlow = Effect.fn(
 			data: request,
 		});
 
-	yield* email.sendWorkspaceInvitation({
+	yield* mailer.sendWorkspaceInvitation({
 		email: request.email,
 		workspace: workspace,
 		inviterName: user.displayName,

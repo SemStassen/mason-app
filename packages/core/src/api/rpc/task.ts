@@ -3,6 +3,11 @@ import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
 import {
+	ProjectArchivedError,
+	ProjectNotFoundError,
+	TaskNotFoundError,
+} from "#modules/project/index";
+import {
 	ArchiveTaskRequest,
 	ArchiveTaskResponse,
 	CreateTaskRequest,
@@ -12,11 +17,6 @@ import {
 	UpdateTaskRequest,
 	UpdateTaskResponse,
 } from "~/flows";
-import {
-	ProjectArchivedError,
-	ProjectNotFoundError,
-	TaskNotFoundError,
-} from "~/modules/project";
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const TaskRpcs = RpcGroup.make(

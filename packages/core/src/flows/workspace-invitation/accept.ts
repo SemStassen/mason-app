@@ -1,10 +1,12 @@
 import { Effect, Option, Schema } from "effect";
-import { IdentityModule } from "~/modules/identity/identity.service";
-import { WorkspaceInvitation } from "~/modules/workspace-invitation/domain/workspace-invitation.entity";
-import { WorkspaceInvitationModule } from "~/modules/workspace-invitation/workspace-invitation.service";
-import { WorkspaceMemberModule } from "~/modules/workspace-member/workspace-member.service";
-import { SessionContext } from "~/shared/auth";
-import { Database } from "~/shared/database";
+import { IdentityModule } from "#modules/identity/index";
+import {
+	WorkspaceInvitation,
+	WorkspaceInvitationModule,
+} from "#modules/workspace-invitation/index";
+import { WorkspaceMemberModule } from "#modules/workspace-member/index";
+import { SessionContext } from "#shared/auth/index";
+import { Database } from "#shared/database/index";
 
 export const AcceptWorkspaceInvitationRequest = Schema.Struct({
 	id: WorkspaceInvitation.fields.id,

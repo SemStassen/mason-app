@@ -1,6 +1,6 @@
 import { Effect, Layer, Option } from "effect";
-import { UserId } from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
+import { UserId } from "#shared/schemas/index";
+import { generateUUID } from "#shared/utils/index";
 import { Session } from "./domain/session.entity";
 import { User } from "./domain/user.entity";
 import {

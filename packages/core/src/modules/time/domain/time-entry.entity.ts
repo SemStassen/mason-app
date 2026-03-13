@@ -1,12 +1,12 @@
 import { Option, Schema } from "effect";
-import { Model } from "~/shared/effect";
+import { Model } from "#shared/effect/index";
 import {
 	ProjectId,
 	TaskId,
 	TimeEntryId,
 	WorkspaceId,
 	WorkspaceMemberId,
-} from "~/shared/schemas";
+} from "#shared/schemas/index";
 
 export class TimeEntry extends Model.Class<TimeEntry>("TimeEntry")(
 	{

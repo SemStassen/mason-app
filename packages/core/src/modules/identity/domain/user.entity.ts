@@ -1,5 +1,5 @@
-import { Model, Schema } from "~/shared/effect";
-import { Email, UserId } from "~/shared/schemas";
+import { Model, Schema } from "#shared/effect/index";
+import { Email, UserId } from "#shared/schemas/index";
 
 export class User extends Model.Class<User>("User")(
 	{

@@ -30,7 +30,7 @@ export const WorkspaceModuleLayer = Layer.effect(
 					workspaceTransitions.createWorkspace(data),
 				);
 
-				const [persistedWorkspace] = yield* workspaceRepo.insert([workspace]);
+				const persistedWorkspace = yield* workspaceRepo.insert(workspace);
 
 				return persistedWorkspace;
 			}),

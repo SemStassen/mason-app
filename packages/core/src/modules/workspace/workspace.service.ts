@@ -1,6 +1,6 @@
 import { type Effect, Schema, ServiceMap } from "effect";
-import type { RepositoryError } from "~/shared/errors";
-import { WorkspaceId } from "~/shared/schemas";
+import type { RepositoryError } from "#shared/database/index";
+import { WorkspaceId } from "#shared/schemas/index";
 import type { Workspace } from "./domain/workspace.entity";
 
 export class WorkspaceSlugAlreadyExistsError extends Schema.TaggedErrorClass<WorkspaceSlugAlreadyExistsError>()(

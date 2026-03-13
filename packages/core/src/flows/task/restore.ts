@@ -1,8 +1,8 @@
 import { Authorization } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { ProjectModule } from "~/modules/project";
-import { WorkspaceContext } from "~/shared/auth";
-import { TaskId } from "~/shared/schemas";
+import { ProjectModule } from "#modules/project/index";
+import { WorkspaceContext } from "#shared/auth/index";
+import { TaskId } from "#shared/schemas/index";
 
 export const RestoreTaskRequest = Schema.Struct({
 	id: TaskId,

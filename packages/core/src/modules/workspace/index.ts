@@ -1,9 +1,4 @@
-export {
-	Workspace,
-	WorkspaceInsert,
-	WorkspaceSelect,
-	WorkspaceUpdate,
-} from "./domain/workspace.entity";
+export { Workspace } from "./domain/workspace.entity";
 
 export { WorkspaceRepository } from "./workspace.repository";
 

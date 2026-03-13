@@ -1,5 +1,5 @@
-import { Model, Schema } from "~/shared/effect";
-import { SessionId, UserId, WorkspaceId } from "~/shared/schemas";
+import { Model, Schema } from "#shared/effect/index";
+import { SessionId, UserId, WorkspaceId } from "#shared/schemas/index";
 
 export class Session extends Model.Class<Session>("Session")(
 	{

@@ -1,7 +1,7 @@
 import { Authorization } from "@mason/authorization";
 import { Effect } from "effect";
-import { Project, ProjectModule } from "~/modules/project";
-import { WorkspaceContext } from "~/shared/auth";
+import { Project, ProjectModule } from "#modules/project/index";
+import { WorkspaceContext } from "#shared/auth/index";
 
 export const CreateProjectRequest = Project.jsonCreate;
 

@@ -1,6 +1,6 @@
 import { Option, Result } from "effect";
-import { WorkspaceMemberId } from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
+import { WorkspaceMemberId } from "#shared/schemas/index";
+import { generateUUID } from "#shared/utils/index";
 import { WorkspaceMember } from "./workspace-member.entity";
 
 export const createWorkspaceMember = (params: {

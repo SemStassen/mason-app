@@ -9,6 +9,7 @@ This plan documents the migration from barrel export pattern (index.ts files) to
 There are **35+ barrel files** across the modules:
 
 ### Module-Level Barrels (7)
+
 - `modules/identity/index.ts`
 - `modules/workspace/index.ts`
 - `modules/project/index.ts`
@@ -18,7 +19,9 @@ There are **35+ barrel files** across the modules:
 - `modules/time/index.ts`
 
 ### Sub-Directory Barrels (30+)
+
 Each module has nested barrels in:
+
 - `domain/index.ts` - Domain models and errors
 - `repositories/index.ts` - Repository implementations
 - `actions/index.ts` - Action implementations
@@ -27,16 +30,18 @@ Each module has nested barrels in:
 ### Import Patterns to Replace
 
 **Current (barrel imports):**
+
 ```typescript
 import { IdentityModuleService } from "~/modules/identity";
 import { Workspace, WorkspaceModuleService } from "~/modules/workspace";
-import { ProjectModuleService, Task } from "~/modules/project";
+import { ProjectModuleService, Task } from "#modules/project/index";
 import { MemberModuleService } from "~/modules/member";
 import { InvitationModuleService } from "~/modules/invitation";
 import { IntegrationModuleService } from "~/modules/integration";
 ```
 
 **Target (direct imports):**
+
 ```typescript
 import { IdentityModuleService } from "~/modules/identity/identity-module";
 import { Workspace } from "~/modules/workspace/domain/workspace.model";
@@ -66,6 +71,7 @@ Start with identity module as the priority area.
 #### Files to Update
 
 **Barrels to Remove:**
+
 1. `modules/identity/index.ts` (main barrel)
 2. `modules/identity/domain/index.ts`
 3. `modules/identity/repositories/index.ts`
@@ -74,6 +80,7 @@ Start with identity module as the priority area.
 6. `modules/identity/actions/session/index.ts`
 
 **Files Importing from Identity:**
+
 - `flows/workspace/create.ts`
 - `flows/workspace/set-active-workspace.ts`
 - `flows/workspace-invitation/create.ts`
@@ -123,6 +130,7 @@ After identity module is complete, apply the same pattern to:
 ## Implementation Steps (Per Module)
 
 ### Step 1: Identify All Barrel Exports
+
 ```bash
 # Find all index.ts files in modules
 glob "**/modules/**/index.ts"
@@ -135,16 +143,17 @@ grep -r "from \"~/modules/\w+\"" --include="*.ts"
 
 For each barrel, document what it exports and the direct import path:
 
-| Barrel File | Current Export | Direct Import Path |
-|------------|----------------|-------------------|
-| `identity/index.ts` | `IdentityModuleService` | `~/modules/identity/identity-module` |
-| `identity/index.ts` | `User`, `Session` | `~/modules/identity/domain/user.model`, `~/modules/identity/domain/session.model` |
+| Barrel File         | Current Export                        | Direct Import Path                                                                          |
+| ------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `identity/index.ts` | `IdentityModuleService`               | `~/modules/identity/identity-module`                                                        |
+| `identity/index.ts` | `User`, `Session`                     | `~/modules/identity/domain/user.model`, `~/modules/identity/domain/session.model`           |
 | `identity/index.ts` | `UserRepository`, `SessionRepository` | `~/modules/identity/repositories/user.repo`, `~/modules/identity/repositories/session.repo` |
-| `identity/index.ts` | Error classes | `~/modules/identity/errors` |
+| `identity/index.ts` | Error classes                         | `~/modules/identity/errors`                                                                 |
 
 ### Step 3: Update Import Statements
 
 Replace all barrel imports with direct imports in:
+
 - Flow files (`flows/**/*.ts`)
 - API files (`api/**/*.ts`)
 - Shared files (`shared/**/*.ts`)
@@ -277,6 +286,7 @@ import { UserNotFoundError } from "~/modules/identity/errors";
 1. **Error Files**: Most modules have a single `errors.ts` file that can still be imported directly (e.g., `~/modules/identity/errors`). This is NOT a barrel file - it's a single source file.
 
 2. **Actions with Multiple Exports**: Action files may export multiple items (main action + types). Keep these in the same file and import directly:
+
    ```typescript
    import {
      CreateUserAction,
@@ -289,22 +299,22 @@ import { UserNotFoundError } from "~/modules/identity/errors";
    - The model class
    - Create/patch input schemas
    - Related types
-   
+
    Import everything needed from the single file.
 
 ### IDE Support
 
 Configure your IDE to:
+
 - Auto-import from direct paths (not barrels)
 - Show import path suggestions
 - Organize imports on save
 
 VS Code settings:
+
 ```json
 {
-  "typescript.preferences.autoImportFileExcludePatterns": [
-    "**/index.ts"
-  ],
+  "typescript.preferences.autoImportFileExcludePatterns": ["**/index.ts"],
   "typescript.preferences.importModuleSpecifier": "non-relative"
 }
 ```

@@ -1,6 +1,6 @@
 import { DateTime, Result } from "effect";
-import { WorkspaceInvitationId } from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
+import { WorkspaceInvitationId } from "#shared/schemas/index";
+import { generateUUID } from "#shared/utils/index";
 import { WorkspaceInvitation } from "./workspace-invitation.entity";
 import {
 	WorkspaceInvitationEmailMismatchError,

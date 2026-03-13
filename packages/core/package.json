@@ -9,12 +9,17 @@
 		"typecheck": "tsc -noEmit"
 	},
 	"dependencies": {
+		"@mason/authorization": "workspace:*",
 		"effect": "catalog:",
 		"uuid": "^13.0.0"
 	},
 	"devDependencies": {
 		"@mason/config": "workspace:*",
 		"typescript": "catalog:dev"
+	},
+	"imports": {
+		"#modules/*": "./src/modules/*.ts",
+		"#shared/*": "./src/shared/*.ts"
 	},
 	"exports": {
 		".": "./src/index.ts"

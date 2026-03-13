@@ -1,8 +1,7 @@
 import { Authorization } from "@mason/authorization";
 import { Effect } from "effect";
-import { Workspace } from "~/modules/workspace/domain/workspace.entity";
-import { WorkspaceModule } from "~/modules/workspace/workspace.service";
-import { WorkspaceContext } from "~/shared/auth";
+import { Workspace, WorkspaceModule } from "#modules/workspace/index";
+import { WorkspaceContext } from "#shared/auth/index";
 
 export const UpdateWorkspaceRequest = Workspace.jsonUpdate;
 

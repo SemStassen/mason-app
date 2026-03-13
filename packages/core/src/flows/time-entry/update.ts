@@ -1,8 +1,8 @@
 import { Authorization } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { TimeEntry, TimeModule } from "~/modules/time";
-import { WorkspaceContext } from "~/shared/auth";
-import { TimeEntryId } from "~/shared/schemas";
+import { TimeEntry, TimeModule } from "#modules/time/index";
+import { WorkspaceContext } from "#shared/auth/index";
+import { TimeEntryId } from "#shared/schemas/index";
 
 export const UpdateTimeEntryRequest = Schema.Struct({
 	timeEntryId: TimeEntryId,

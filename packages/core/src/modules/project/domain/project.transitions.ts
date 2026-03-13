@@ -1,6 +1,6 @@
 import { DateTime, Option, Result } from "effect";
-import { ProjectId } from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
+import { ProjectId } from "#shared/schemas/index";
+import { generateUUID } from "#shared/utils/index";
 import { Project } from "./project.entity";
 import {
 	ProjectArchivedError,

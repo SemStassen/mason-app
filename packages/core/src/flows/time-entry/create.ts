@@ -1,7 +1,7 @@
 import { Authorization } from "@mason/authorization";
 import { Effect } from "effect";
-import { TimeEntry, TimeModule } from "~/modules/time";
-import { WorkspaceContext } from "~/shared/auth";
+import { TimeEntry, TimeModule } from "#modules/time/index";
+import { WorkspaceContext } from "#shared/auth/index";
 
 export const CreateTimeEntryRequest = TimeEntry.jsonCreate;
 

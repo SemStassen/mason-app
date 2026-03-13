@@ -1,10 +1,9 @@
 import { Effect, Option } from "effect";
-import { IdentityModule } from "~/modules/identity/identity.service";
-import { Workspace } from "~/modules/workspace/domain/workspace.entity";
-import { WorkspaceModule } from "~/modules/workspace/workspace.service";
-import { WorkspaceMemberModule } from "~/modules/workspace-member/workspace-member.service";
-import { SessionContext } from "~/shared/auth";
-import { Database } from "~/shared/database";
+import { IdentityModule } from "#modules/identity/index";
+import { Workspace, WorkspaceModule } from "#modules/workspace/index";
+import { WorkspaceMemberModule } from "#modules/workspace-member/index";
+import { SessionContext } from "#shared/auth/index";
+import { Database } from "#shared/database/index";
 
 export const CreateWorkspaceRequest = Workspace.jsonCreate;
 

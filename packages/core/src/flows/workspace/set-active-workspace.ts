@@ -1,8 +1,8 @@
 import { Effect, Option, Schema } from "effect";
-import { IdentityModule } from "~/modules/identity/identity.service";
-import { Workspace } from "~/modules/workspace/domain/workspace.entity";
-import { WorkspaceMemberModule } from "~/modules/workspace-member/workspace-member.service";
-import { SessionContext } from "~/shared/auth";
+import { IdentityModule } from "#modules/identity/index";
+import { Workspace } from "#modules/workspace/index";
+import { WorkspaceMemberModule } from "#modules/workspace-member/index";
+import { SessionContext } from "#shared/auth/index";
 
 export const SetActiveWorkspaceRequest = Schema.Struct({
 	id: Workspace.fields.id,

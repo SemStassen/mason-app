@@ -1,5 +1,5 @@
 import { Schema } from "effect";
-import { regex } from "~/shared/utils";
+import { regex } from "#shared/utils/index";
 
 export type PlainApiKey = typeof PlainApiKey.Type;
 export const PlainApiKey = Schema.Redacted(Schema.NonEmptyString).pipe(

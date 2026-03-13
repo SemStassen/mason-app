@@ -1,6 +1,6 @@
 import type { HttpApiError } from "effect/unstable/httpapi";
 import { RpcMiddleware } from "effect/unstable/rpc";
-import type { SessionContext, WorkspaceContext } from "~/shared/auth";
+import type { SessionContext, WorkspaceContext } from "#shared/auth/index";
 
 export class SessionMiddleware extends RpcMiddleware.Service<
 	SessionMiddleware,

@@ -1,6 +1,6 @@
 import { type DateTime, Option, Result } from "effect";
-import { WorkspaceIntegrationId } from "~/shared/schemas";
-import { generateUUID } from "~/shared/utils";
+import { WorkspaceIntegrationId } from "#shared/schemas/index";
+import { generateUUID } from "#shared/utils/index";
 import { WorkspaceIntegration } from "./workspace-integration.entity";
 
 export const createWorkspaceIntegration = (params: {

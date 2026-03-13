@@ -1,10 +1,10 @@
 import { type Effect, Schema, ServiceMap } from "effect";
-import type { RepositoryError } from "~/shared/errors";
+import type { RepositoryError } from "#shared/database/index";
 import {
 	type PlainApiKey,
 	type WorkspaceId,
 	WorkspaceIntegrationId,
-} from "~/shared/schemas";
+} from "#shared/schemas/index";
 import type { WorkspaceIntegration } from "./domain/workspace-integration.entity";
 
 export class WorkspaceIntegrationNotFoundError extends Schema.TaggedErrorClass<WorkspaceIntegrationNotFoundError>()(

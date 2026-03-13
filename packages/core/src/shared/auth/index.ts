@@ -1,8 +1,7 @@
 import { ServiceMap } from "effect";
-import type { Session } from "~/modules/identity/domain/session.entity";
-import type { User } from "~/modules/identity/domain/user.entity";
-import type { Workspace } from "~/modules/workspace/domain/workspace.entity";
-import type { WorkspaceMember } from "~/modules/workspace-member/domain/workspace-member.entity";
+import type { Session, User } from "#modules/identity/index";
+import type { Workspace } from "#modules/workspace/index";
+import type { WorkspaceMember } from "#modules/workspace-member/index";
 
 export class SessionContext extends ServiceMap.Service<
 	SessionContext,

@@ -1,12 +1,11 @@
 import { type Effect, type Option, ServiceMap } from "effect";
-import type { NonEmptyReadonlyArray } from "effect/Array";
-import type { RepositoryError } from "~/shared/errors";
+import type { RepositoryError } from "#shared/database/index";
 import type { Workspace } from "./domain/workspace.entity";
 
 export interface WorkspaceRepositoryShape {
 	readonly insert: (
-		data: NonEmptyReadonlyArray<typeof Workspace.insert.Type>,
-	) => Effect.Effect<NonEmptyReadonlyArray<Workspace>, RepositoryError>;
+		data: typeof Workspace.insert.Type,
+	) => Effect.Effect<Workspace, RepositoryError>;
 	readonly update: (
 		data: typeof Workspace.update.Type,
 	) => Effect.Effect<Workspace, RepositoryError>;

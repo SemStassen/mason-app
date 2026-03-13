@@ -1,7 +1,10 @@
 import { type Effect, type Option, ServiceMap } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
-import type { RepositoryError } from "~/shared/errors";
-import type { WorkspaceId, WorkspaceIntegrationId } from "~/shared/schemas";
+import type { RepositoryError } from "#shared/database/index";
+import type {
+	WorkspaceId,
+	WorkspaceIntegrationId,
+} from "#shared/schemas/index";
 import type { WorkspaceIntegration } from "./domain/workspace-integration.entity";
 
 export interface WorkspaceIntegrationRepositoryShape {

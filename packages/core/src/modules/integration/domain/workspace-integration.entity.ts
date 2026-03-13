@@ -1,12 +1,12 @@
 import { Schema } from "effect";
-import { Model } from "~/shared/effect";
+import { Model } from "#shared/effect/index";
 import {
 	EncryptedApiKey,
 	PlainApiKey,
 	WorkspaceId,
 	WorkspaceIntegrationId,
 	WorkspaceMemberId,
-} from "~/shared/schemas";
+} from "#shared/schemas/index";
 
 export class WorkspaceIntegration extends Model.Class<WorkspaceIntegration>(
 	"WorkspaceIntegration",

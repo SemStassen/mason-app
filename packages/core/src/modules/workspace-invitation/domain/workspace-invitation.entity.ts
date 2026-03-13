@@ -1,11 +1,11 @@
 import { WorkspaceRole } from "@mason/authorization";
-import { Model, Schema } from "~/shared/effect";
+import { Model, Schema } from "#shared/effect/index";
 import {
 	Email,
 	WorkspaceId,
 	WorkspaceInvitationId,
 	WorkspaceMemberId,
-} from "~/shared/schemas";
+} from "#shared/schemas/index";
 
 export class WorkspaceInvitation extends Model.Class<WorkspaceInvitation>(
 	"WorkspaceInvitation",

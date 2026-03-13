@@ -1,6 +1,6 @@
 import { type Effect, type Option, ServiceMap } from "effect";
 import type { NonEmptyReadonlyArray } from "effect/Array";
-import type { RepositoryError } from "~/shared/errors";
+import type { RepositoryError } from "#shared/database/index";
 import type { User } from "./domain/user.entity";
 
 export interface UserRepositoryShape {

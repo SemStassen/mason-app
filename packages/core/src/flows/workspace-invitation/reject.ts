@@ -1,7 +1,7 @@
 import { Effect, Schema } from "effect";
-import { WorkspaceInvitationModule } from "~/modules/workspace-invitation/workspace-invitation.service";
-import { SessionContext } from "~/shared/auth";
-import { WorkspaceInvitationId } from "~/shared/schemas";
+import { WorkspaceInvitationModule } from "#modules/workspace-invitation/index";
+import { SessionContext } from "#shared/auth/index";
+import { WorkspaceInvitationId } from "#shared/schemas/index";
 
 export const RejectWorkspaceInvitationRequest = Schema.Struct({
 	id: WorkspaceInvitationId,

@@ -1,8 +1,8 @@
 import { Authorization } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { Project, ProjectModule } from "~/modules/project";
-import { WorkspaceContext } from "~/shared/auth";
-import { ProjectId } from "~/shared/schemas";
+import { Project, ProjectModule } from "#modules/project/index";
+import { WorkspaceContext } from "#shared/auth/index";
+import { ProjectId } from "#shared/schemas/index";
 
 export const UpdateProjectRequest = Schema.Struct({
 	id: ProjectId,

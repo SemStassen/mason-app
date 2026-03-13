@@ -1,8 +1,10 @@
 import { Authorization } from "@mason/authorization";
 import { Effect, Schema } from "effect";
-import { WorkspaceInvitation } from "~/modules/workspace-invitation/domain/workspace-invitation.entity";
-import { WorkspaceInvitationModule } from "~/modules/workspace-invitation/workspace-invitation.service";
-import { WorkspaceContext } from "~/shared/auth";
+import {
+	WorkspaceInvitation,
+	WorkspaceInvitationModule,
+} from "#modules/workspace-invitation/index";
+import { WorkspaceContext } from "#shared/auth/index";
 
 export const CancelWorkspaceInvitationRequest = Schema.Struct({
 	id: WorkspaceInvitation.fields.id,

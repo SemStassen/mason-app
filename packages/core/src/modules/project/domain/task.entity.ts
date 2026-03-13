@@ -1,5 +1,5 @@
-import { Model, Schema } from "~/shared/effect";
-import { ProjectId, TaskId, WorkspaceId } from "~/shared/schemas";
+import { Model, Schema } from "#shared/effect/index";
+import { ProjectId, TaskId, WorkspaceId } from "#shared/schemas/index";
 
 export class Task extends Model.Class<Task>("Task")(
 	{

@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 import crypto from "node:crypto";
 import { Config, Effect, Layer } from "effect";
-import { Crypto } from "~/shared/crypto";
+import { Crypto } from "#shared/crypto/index";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 16;

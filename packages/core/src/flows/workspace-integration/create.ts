@@ -1,8 +1,10 @@
 import { Authorization } from "@mason/authorization";
 import { Effect } from "effect";
-import { WorkspaceIntegration } from "~/modules/integration/domain/workspace-integration.entity";
-import { IntegrationModule } from "~/modules/integration/integration.service";
-import { WorkspaceContext } from "~/shared/auth";
+import {
+	IntegrationModule,
+	WorkspaceIntegration,
+} from "#modules/integration/index";
+import { WorkspaceContext } from "#shared/auth/index";
 
 export const CreateWorkspaceIntegrationRequest =
 	WorkspaceIntegration.jsonCreate;

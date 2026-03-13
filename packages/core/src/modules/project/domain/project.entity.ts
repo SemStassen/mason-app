@@ -1,5 +1,5 @@
-import { Model, Schema } from "~/shared/effect";
-import { HexColor, ProjectId, WorkspaceId } from "~/shared/schemas";
+import { Model, Schema } from "#shared/effect/index";
+import { HexColor, ProjectId, WorkspaceId } from "#shared/schemas/index";
 export class Project extends Model.Class<Project>("Project")(
 	{
 		id: Model.ServerManaged(ProjectId),

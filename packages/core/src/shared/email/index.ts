@@ -1,12 +1,11 @@
 import { type Effect, ServiceMap } from "effect";
-import type { User } from "~/modules/identity/domain/user.entity";
-import type { Workspace } from "~/modules/workspace/domain/workspace.entity";
-import type { WorkspaceInvitation } from "~/modules/workspace-invitation/domain/workspace-invitation.entity";
-import type { Email as EmailValueObject } from "~/shared/schemas";
+import type { User } from "#modules/identity/index";
+import type { Workspace } from "#modules/workspace/index";
+import type { WorkspaceInvitation } from "#modules/workspace-invitation/index";
 
 interface MailerShape {
 	sendWorkspaceInvitation: (params: {
-		email: EmailValueObject;
+		email: User["email"];
 		workspace: {
 			name: Workspace["name"];
 			id: Workspace["id"];

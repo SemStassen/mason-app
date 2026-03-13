@@ -1,6 +1,6 @@
 import { DateTime, Effect, Layer, Option, Redacted } from "effect";
+import { EncryptedApiKey, PlainApiKey } from "#shared/schemas/index";
 import { Crypto } from "~/shared/crypto";
-import { EncryptedApiKey, PlainApiKey } from "~/shared/schemas";
 import * as workspaceIntegrationTransitions from "./domain/workspace-integration.transitions";
 import {
 	IntegrationModule,

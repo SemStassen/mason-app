@@ -1,5 +1,5 @@
 import { Effect, Layer, Option } from "effect";
-import type { UserId, WorkspaceId } from "~/shared/schemas";
+import type { UserId, WorkspaceId } from "#shared/schemas/index";
 import type { WorkspaceMember } from "./domain/workspace-member.entity";
 import * as workspaceMemberTransitions from "./domain/workspace-member.transitions";
 import { WorkspaceMemberRepository } from "./workspace-member.repository";

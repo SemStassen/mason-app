@@ -3,6 +3,11 @@ import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
 import {
+	TimeEntryAlreadyRunningError,
+	TimeEntryNotFoundError,
+	TimeEntryStoppedAtBeforeStartedAtError,
+} from "#modules/time/index";
+import {
 	CreateTimeEntryRequest,
 	CreateTimeEntryResponse,
 	DeleteTimeEntryRequest,
@@ -10,11 +15,6 @@ import {
 	UpdateTimeEntryRequest,
 	UpdateTimeEntryResponse,
 } from "~/flows/time-entry";
-import {
-	TimeEntryAlreadyRunningError,
-	TimeEntryNotFoundError,
-	TimeEntryStoppedAtBeforeStartedAtError,
-} from "~/modules/time";
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const TimeEntryRpcs = RpcGroup.make(

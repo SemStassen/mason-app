@@ -1,6 +1,5 @@
 import { Effect, Schema } from "effect";
-import { Workspace } from "~/modules/workspace/domain/workspace.entity";
-import { WorkspaceModule } from "~/modules/workspace/workspace.service";
+import { Workspace, WorkspaceModule } from "#modules/workspace/index";
 
 export const CheckWorkspaceSlugIsUniqueRequest = Schema.Struct({
 	slug: Workspace.fields.slug,
