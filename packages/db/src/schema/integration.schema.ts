@@ -1,0 +1,61 @@
+import { jsonb, pgTable, unique, uuid, varchar } from "drizzle-orm/pg-core";
+import { tableId, tableMetadata } from "../utils";
+import { projectsTable, tasksTable } from "./project.schema";
+import { workspacesTable } from "./workspace.schema";
+import { workspaceMembersTable } from "./workspace-member.schema";
+
+export const workspaceIntegrationsTable = pgTable(
+  "workspace_integrations",
+  {
+    id: tableId,
+    // References
+    workspaceId: uuid("workspace_id")
+      .references(() => workspacesTable.id, { onDelete: "cascade" })
+      .notNull(),
+    createdByWorkspaceMemberId: uuid(
+      "created_by_workspace_member_id"
+    ).references(() => workspaceMembersTable.id, { onDelete: "set null" }),
+    // General
+    provider: varchar().notNull(),
+    encryptedApiKey: varchar("encrypted_api_key").notNull(),
+    // Metadata
+    _metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    ...tableMetadata,
+  },
+  (table) => [
+    unique("unique_workspace_id_provider").on(
+      table.workspaceId,
+      table.provider
+    ),
+  ]
+);
+
+export const projectIntegrationsTable = pgTable("project_integrations", {
+  id: tableId,
+  // References
+  workspaceId: uuid("workspace_id")
+    .references(() => workspacesTable.id, { onDelete: "cascade" })
+    .notNull(),
+  projectId: uuid("project_id")
+    .references(() => projectsTable.id)
+    .notNull(),
+  // General
+  source: varchar().notNull(),
+  externalId: varchar("external_id").notNull(),
+  ...tableMetadata,
+});
+
+export const taskIntegrationsTable = pgTable("task_integrations", {
+  id: tableId,
+  // References
+  workspaceId: uuid("workspace_id")
+    .references(() => workspacesTable.id, { onDelete: "cascade" })
+    .notNull(),
+  taskId: uuid("task_id")
+    .references(() => tasksTable.id)
+    .notNull(),
+  // General
+  source: varchar().notNull(),
+  externalId: varchar("external_id").notNull(),
+  ...tableMetadata,
+});

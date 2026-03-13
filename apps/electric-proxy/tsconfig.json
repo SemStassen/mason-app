@@ -1,0 +1,14 @@
+{
+  "extends": "@mason/config/base.tsconfig.json",
+  "include": ["src"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "paths": {
+      "~/api/*": ["./src/api/*"],
+      "~/application/*": ["./src/application/*"],
+      "~/domains/*": ["./src/domains/*"],
+      "~/infra/*": ["./src/infra/*"],
+      "~/shared/*": ["./src/shared/*"]
+    }
+  }
+}

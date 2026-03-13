@@ -1,0 +1,58 @@
+import { AuthorizationError } from "@mason/authorization";
+import { Schema } from "effect";
+import { HttpApiError } from "effect/unstable/httpapi";
+import { Rpc, RpcGroup } from "effect/unstable/rpc";
+import {
+	CheckWorkspaceSlugIsUniqueRequest,
+	CheckWorkspaceSlugIsUniqueResponse,
+	CreateWorkspaceRequest,
+	CreateWorkspaceResponse,
+	SetActiveWorkspaceRequest,
+	UpdateWorkspaceRequest,
+	UpdateWorkspaceResponse,
+} from "~/flows";
+import {
+	WorkspaceNotFoundError,
+	WorkspaceSlugAlreadyExistsError,
+} from "~/modules/workspace";
+import { WorkspaceMemberNotFoundError } from "~/modules/workspace-member";
+import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
+
+export const WorkspaceRpcs = RpcGroup.make(
+	Rpc.make("Workspace.Create", {
+		payload: CreateWorkspaceRequest,
+		success: CreateWorkspaceResponse,
+		error: Schema.Union([
+			WorkspaceSlugAlreadyExistsError,
+			HttpApiError.InternalServerError,
+		]),
+	}).middleware(SessionMiddleware),
+
+	Rpc.make("Workspace.CheckSlugIsUnique", {
+		payload: CheckWorkspaceSlugIsUniqueRequest,
+		success: CheckWorkspaceSlugIsUniqueResponse,
+		error: Schema.Union([HttpApiError.InternalServerError]),
+	}).middleware(SessionMiddleware),
+
+	Rpc.make("Workspace.Update", {
+		payload: UpdateWorkspaceRequest,
+		success: UpdateWorkspaceResponse,
+		error: Schema.Union([
+			AuthorizationError,
+			WorkspaceNotFoundError,
+			WorkspaceSlugAlreadyExistsError,
+			HttpApiError.InternalServerError,
+		]),
+	})
+		.middleware(SessionMiddleware)
+		.middleware(WorkspaceMiddleware),
+
+	Rpc.make("Workspace.SetActive", {
+		payload: SetActiveWorkspaceRequest,
+		success: Schema.Void,
+		error: Schema.Union([
+			WorkspaceMemberNotFoundError,
+			HttpApiError.InternalServerError,
+		]),
+	}).middleware(SessionMiddleware),
+);

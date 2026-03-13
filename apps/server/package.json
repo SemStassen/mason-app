@@ -4,18 +4,14 @@
   "type": "module",
   "scripts": {
     "build": "bun build --outdir=dist src/index.ts",
-    "clean": "git clean -xdf node_modules",
+    "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
     "dev": "bun run --hot src/index.ts",
     "format": "biome format --write .",
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@effect/platform": "catalog:",
-    "@effect/platform-bun": "^0.81.1",
-    "@mason/api-contract": "workspace:*",
-    "@mason/mason": "workspace:*",
-    "@mason/use-cases": "workspace:*",
+    "@mason/core": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
