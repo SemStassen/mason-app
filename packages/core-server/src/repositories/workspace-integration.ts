@@ -1,0 +1,130 @@
+import {
+  RepositoryError,
+  WorkspaceIntegration,
+  WorkspaceIntegrationRepository,
+} from "@mason/core";
+import { Drizzle, schema } from "@mason/db";
+import { and, eq } from "drizzle-orm";
+import { Effect, Layer, Option, Redacted, Schema } from "effect";
+import { SqlSchema } from "effect/unstable/sql";
+
+export const WorkspaceIntegrationRepositoryLayer = Layer.effect(
+  WorkspaceIntegrationRepository,
+  Effect.gen(function* () {
+    const drizzle = yield* Drizzle;
+
+    const insertWorkspaceIntegration = SqlSchema.findOne({
+      Request: WorkspaceIntegration.insert,
+      Result: WorkspaceIntegration,
+      execute: (data) =>
+        drizzle
+          .insert(schema.workspaceIntegrationsTable)
+          .values({
+            ...data,
+            encryptedApiKey: Redacted.value(data.apiKey),
+            _metadata: Option.getOrNull(data._metadata),
+          })
+          .returning(),
+    });
+
+    const updateWorkspaceIntegration = SqlSchema.findOne({
+      Request: Schema.Struct({
+        workspaceId: WorkspaceIntegration.fields.workspaceId,
+        id: WorkspaceIntegration.fields.id,
+        update: WorkspaceIntegration.update,
+      }),
+      Result: WorkspaceIntegration,
+      execute: ({ workspaceId, id, update }) =>
+        drizzle
+          .update(schema.workspaceIntegrationsTable)
+          .set({
+            ...update,
+            encryptedApiKey: Redacted.value(update.apiKey),
+            _metadata: Option.getOrNull(update._metadata ?? Option.none()),
+          })
+          .where(
+            and(
+              eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+              eq(schema.workspaceIntegrationsTable.id, id)
+            )
+          )
+          .returning(),
+    });
+
+    const hardDeleteWorkspaceIntegration = SqlSchema.findOneOption({
+      Request: Schema.Struct({
+        workspaceId: WorkspaceIntegration.fields.workspaceId,
+        id: WorkspaceIntegration.fields.id,
+      }),
+      Result: Schema.Void,
+      execute: ({ workspaceId, id }) =>
+        drizzle
+          .delete(schema.workspaceIntegrationsTable)
+          .where(
+            and(
+              eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+              eq(schema.workspaceIntegrationsTable.id, id)
+            )
+          ),
+    });
+
+    const findWorkspaceIntegrationById = SqlSchema.findOneOption({
+      Request: Schema.Struct({
+        workspaceId: WorkspaceIntegration.fields.workspaceId,
+        id: WorkspaceIntegration.fields.id,
+      }),
+      Result: WorkspaceIntegration,
+      execute: ({ workspaceId, id }) =>
+        drizzle
+          .select()
+          .from(schema.workspaceIntegrationsTable)
+          .where(
+            and(
+              eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+              eq(schema.workspaceIntegrationsTable.id, id)
+            )
+          ),
+    });
+
+    const findWorkspaceIntegrationByProvider = SqlSchema.findOneOption({
+      Request: Schema.Struct({
+        workspaceId: WorkspaceIntegration.fields.workspaceId,
+        provider: WorkspaceIntegration.fields.provider,
+      }),
+      Result: WorkspaceIntegration,
+      execute: ({ workspaceId, provider }) =>
+        drizzle
+          .select()
+          .from(schema.workspaceIntegrationsTable)
+          .where(
+            and(
+              eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+              eq(schema.workspaceIntegrationsTable.provider, provider)
+            )
+          ),
+    });
+
+    return {
+      insert: (data) =>
+        insertWorkspaceIntegration(data).pipe(
+          Effect.mapError((e) => new RepositoryError({ cause: e }))
+        ),
+      update: (params) =>
+        updateWorkspaceIntegration(params).pipe(
+          Effect.mapError((e) => new RepositoryError({ cause: e }))
+        ),
+      hardDelete: (params) =>
+        hardDeleteWorkspaceIntegration(params).pipe(
+          Effect.mapError((e) => new RepositoryError({ cause: e }))
+        ),
+      findById: (params) =>
+        findWorkspaceIntegrationById(params).pipe(
+          Effect.mapError((e) => new RepositoryError({ cause: e }))
+        ),
+      findByProvider: (params) =>
+        findWorkspaceIntegrationByProvider(params).pipe(
+          Effect.mapError((e) => new RepositoryError({ cause: e }))
+        ),
+    };
+  })
+);

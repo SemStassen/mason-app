@@ -79,9 +79,9 @@ export const ProjectModuleLayer = Layer.effect(
             )
           );
 
-        yield* projectRepo.archive({
+        yield* projectRepo.archiveMany({
           workspaceId: params.workspaceId,
-          projectIds: [project.id],
+          ids: [project.id],
         });
       }),
       restoreProject: Effect.fn("project.restoreProject")(function* (params) {
@@ -99,9 +99,9 @@ export const ProjectModuleLayer = Layer.effect(
             )
           );
 
-        yield* projectRepo.restore({
+        yield* projectRepo.restoreMany({
           workspaceId: params.workspaceId,
-          projectIds: [project.id],
+          ids: [project.id],
         });
       }),
       createTasks: Effect.fn("project.createTasks")(function* (params) {
@@ -218,9 +218,9 @@ export const ProjectModuleLayer = Layer.effect(
           projectTransitions.ensureProjectNotArchived(project)
         );
 
-        yield* taskRepo.archive({
+        yield* taskRepo.archiveMany({
           workspaceId: params.workspaceId,
-          timeEntryIds: [task.id],
+          ids: [task.id],
         });
       }),
       restoreTask: Effect.fn("project.restoreTask")(function* (params) {
@@ -254,9 +254,9 @@ export const ProjectModuleLayer = Layer.effect(
           projectTransitions.ensureProjectNotArchived(project)
         );
 
-        yield* taskRepo.restore({
+        yield* taskRepo.restoreMany({
           workspaceId: params.workspaceId,
-          projectIds: [task.id],
+          ids: [task.id],
         });
       }),
     };

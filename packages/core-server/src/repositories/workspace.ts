@@ -1,7 +1,7 @@
 import { RepositoryError, Workspace, WorkspaceRepository } from "@mason/core";
 import { Drizzle, schema } from "@mason/db";
 import { eq } from "drizzle-orm";
-import { Effect, Layer, Option, Schema } from "effect";
+import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
 export const WorkspaceRepositoryLayer = Layer.effect(
@@ -9,39 +9,30 @@ export const WorkspaceRepositoryLayer = Layer.effect(
   Effect.gen(function* () {
     const drizzle = yield* Drizzle;
 
-    const insertWorkspaceRow = SqlSchema.findOne({
+    const insertWorkspace = SqlSchema.findOne({
       Request: Workspace.insert,
-      Result: Workspace.select,
-      execute: (request) =>
-        drizzle
-          .insert(schema.workspacesTable)
-          .values({
-            ...request,
-            metadata: request.metadata as string,
-          })
-          .returning(),
+      Result: Workspace,
+      execute: (data) =>
+        drizzle.insert(schema.workspacesTable).values(data).returning(),
     });
 
-    const updateWorkspaceRow = SqlSchema.findOne({
+    const updateWorkspace = SqlSchema.findOne({
       Request: Schema.Struct({
         id: Workspace.fields.id,
         update: Workspace.update,
       }),
-      Result: Workspace.select,
+      Result: Workspace,
       execute: ({ id, update }) =>
         drizzle
           .update(schema.workspacesTable)
-          .set({
-            ...update,
-            metadata: update.metadata as string,
-          })
+          .set(update)
           .where(eq(schema.workspacesTable.id, id))
           .returning(),
     });
 
-    const findWorkspaceById = SqlSchema.findOne({
+    const findWorkspaceById = SqlSchema.findOneOption({
       Request: Workspace.fields.id,
-      Result: Workspace.select,
+      Result: Workspace,
       execute: (id) =>
         drizzle
           .select()
@@ -49,9 +40,9 @@ export const WorkspaceRepositoryLayer = Layer.effect(
           .where(eq(schema.workspacesTable.id, id)),
     });
 
-    const findWorkspaceBySlug = SqlSchema.findOne({
+    const findWorkspaceBySlug = SqlSchema.findOneOption({
       Request: Workspace.fields.slug,
-      Result: Workspace.select,
+      Result: Workspace,
       execute: (slug) =>
         drizzle
           .select()
@@ -61,27 +52,19 @@ export const WorkspaceRepositoryLayer = Layer.effect(
 
     return {
       insert: (data) =>
-        insertWorkspaceRow(data).pipe(
+        insertWorkspace(data).pipe(
           Effect.mapError((e) => new RepositoryError({ cause: e }))
         ),
-      update: (data) =>
-        updateWorkspaceRow(data).pipe(
+      update: (params) =>
+        updateWorkspace(params).pipe(
           Effect.mapError((e) => new RepositoryError({ cause: e }))
         ),
       findById: (id) =>
         findWorkspaceById(id).pipe(
-          Effect.map(Option.some),
-          Effect.catchTags({
-            NoSuchElementError: () => Effect.succeed(Option.none()),
-          }),
           Effect.mapError((e) => new RepositoryError({ cause: e }))
         ),
       findBySlug: (slug) =>
         findWorkspaceBySlug(slug).pipe(
-          Effect.map(Option.some),
-          Effect.catchTags({
-            NoSuchElementError: () => Effect.succeed(Option.none()),
-          }),
           Effect.mapError((e) => new RepositoryError({ cause: e }))
         ),
     };

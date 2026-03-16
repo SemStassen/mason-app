@@ -27,10 +27,7 @@ export const projectsTable = pgTable("projects", {
     withTimezone: true,
     precision: 0,
   }),
-  notes: jsonb("notes").$type<{
-    // Generic object type
-    [key: string]: unknown;
-  }>(),
+  notes: jsonb("notes"),
   // Metadata
   ...tableArchive,
   ...tableMetadata,

@@ -1,5 +1,4 @@
 import { DateTime, Effect, Layer, Option } from "effect";
-import type { TimeEntry } from "./domain/time-entry.entity";
 import { TimeEntryAlreadyRunningError } from "./domain/time-entry.errors";
 
 import * as timeEntryTransitions from "./domain/time-entry.transitions";
@@ -11,20 +10,6 @@ export const TimeModuleLayer = Layer.effect(
   TimeModule,
   Effect.gen(function* () {
     const timeEntryRepo = yield* TimeEntryRepository;
-
-    const ensureNoOtherRunningTimeEntry = (params: {
-      workspaceId: TimeEntry["workspaceId"];
-      workspaceMemberId: TimeEntry["workspaceMemberId"];
-      excludeId?: TimeEntry["id"];
-    }) =>
-      timeEntryRepo.findRunningByWorkspaceMember(params).pipe(
-        Effect.flatMap(
-          Option.match({
-            onNone: () => Effect.void,
-            onSome: () => Effect.fail(new TimeEntryAlreadyRunningError()),
-          })
-        )
-      );
 
     return {
       createTimeEntries: Effect.fn("time.createTimeEntries")(
@@ -46,14 +31,21 @@ export const TimeModuleLayer = Layer.effect(
           );
 
           const runningEntries = timeEntries.filter((e) => e.isRunning());
+
           if (runningEntries.length > 1) {
             return yield* new TimeEntryAlreadyRunningError();
           }
+
           if (runningEntries.length === 1) {
-            yield* ensureNoOtherRunningTimeEntry({
-              workspaceId: params.workspaceId,
-              workspaceMemberId: params.workspaceMemberId,
-            });
+            const otherRunning =
+              yield* timeEntryRepo.findRunningByWorkspaceMember({
+                workspaceId: params.workspaceId,
+                workspaceMemberId: params.workspaceMemberId,
+              });
+
+            if (Option.isSome(otherRunning)) {
+              return yield* new TimeEntryAlreadyRunningError();
+            }
           }
 
           const persistedTimeEntries =
@@ -87,11 +79,16 @@ export const TimeModuleLayer = Layer.effect(
         );
 
         if (entity.isRunning()) {
-          yield* ensureNoOtherRunningTimeEntry({
-            workspaceId: params.workspaceId,
-            workspaceMemberId: entity.workspaceMemberId,
-            excludeId: params.id,
-          });
+          const otherRunning = yield* timeEntryRepo
+            .findRunningByWorkspaceMember({
+              workspaceId: params.workspaceId,
+              workspaceMemberId: entity.workspaceMemberId,
+            })
+            .pipe(Effect.map(Option.filter((e) => e.id !== params.id)));
+
+          if (Option.isSome(otherRunning)) {
+            return yield* new TimeEntryAlreadyRunningError();
+          }
         }
 
         const persistedTimeEntry = yield* timeEntryRepo.update({
