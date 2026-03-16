@@ -4,15 +4,17 @@ import type { RepositoryError } from "#shared/database/index";
 import type { Project } from "./domain/project.entity";
 
 export interface ProjectRepositoryShape {
-	readonly insert: (
-		data: NonEmptyReadonlyArray<typeof Project.insert.Type>,
-	) => Effect.Effect<NonEmptyReadonlyArray<Project>, RepositoryError>;
-	readonly update: (
-		data: typeof Project.update.Type,
-	) => Effect.Effect<Project, RepositoryError>;
+	readonly insertMany: (
+		data: ReadonlyArray<typeof Project.insert.Type>,
+	) => Effect.Effect<ReadonlyArray<Project>, RepositoryError>;
+	readonly update: (params: {
+		id: Project["id"];
+		workspaceId: Project["workspaceId"];
+		update: typeof Project.update.Type;
+	}) => Effect.Effect<Project, RepositoryError>;
 	readonly archive: (params: {
 		workspaceId: Project["workspaceId"];
-		timeEntryIds: NonEmptyReadonlyArray<Project["id"]>;
+		projectIds: NonEmptyReadonlyArray<Project["id"]>;
 	}) => Effect.Effect<void, RepositoryError>;
 	readonly restore: (params: {
 		workspaceId: Project["workspaceId"];
@@ -22,6 +24,10 @@ export interface ProjectRepositoryShape {
 		workspaceId: Project["workspaceId"];
 		id: Project["id"];
 	}) => Effect.Effect<Option.Option<Project>, RepositoryError>;
+	readonly findManyByIds: (params: {
+		workspaceId: Project["workspaceId"];
+		ids: ReadonlyArray<Project["id"]>;
+	}) => Effect.Effect<ReadonlyArray<Project>, RepositoryError>;
 }
 
 export class ProjectRepository extends ServiceMap.Service<

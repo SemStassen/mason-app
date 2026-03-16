@@ -23,9 +23,9 @@ export const DeleteTimeEntryFlow = Effect.fn("flows/DeleteTimeEntryFlow")(
 			role: member.role,
 		});
 
-		yield* timeModule.hardDeleteTimeEntry({
-			id: request.timeEntryId,
+		yield* timeModule.hardDeleteTimeEntries({
 			workspaceId: workspace.id,
+			ids: [request.timeEntryId],
 		});
 
 		return undefined satisfies typeof DeleteTimeEntryResponse.Type;

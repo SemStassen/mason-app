@@ -20,10 +20,10 @@ export const CreateTimeEntryFlow = Effect.fn("flows/CreateTimeEntryFlow")(
 			role: member.role,
 		});
 
-		const createdTimeEntry = yield* timeModule.createTimeEntry({
+		const [createdTimeEntry] = yield* timeModule.createTimeEntries({
 			workspaceId: workspace.id,
 			workspaceMemberId: member.id,
-			data: request,
+			data: [request],
 		});
 
 		return createdTimeEntry satisfies typeof CreateTimeEntryResponse.Type;

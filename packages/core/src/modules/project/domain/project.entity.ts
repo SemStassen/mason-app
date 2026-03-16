@@ -2,8 +2,8 @@ import { Model, Schema } from "#shared/effect/index";
 import { HexColor, ProjectId, WorkspaceId } from "#shared/schemas/index";
 export class Project extends Model.Class<Project>("Project")(
 	{
-		id: Model.ServerManaged(ProjectId),
-		workspaceId: Model.ServerManaged(WorkspaceId),
+		id: Model.ServerImmutable(ProjectId),
+		workspaceId: Model.ServerImmutable(WorkspaceId),
 		name: Model.Mutable(
 			Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(255)),
 		),

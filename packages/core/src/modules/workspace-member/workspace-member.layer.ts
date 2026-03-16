@@ -40,9 +40,8 @@ export const WorkspaceMemberModuleLayer = Layer.effect(
 					workspaceMemberTransitions.createWorkspaceMember(params),
 				);
 
-				const [persistedWorkspaceMember] = yield* workspaceMemberRepo.insert([
-					workspaceMember,
-				]);
+				const persistedWorkspaceMember =
+					yield* workspaceMemberRepo.insert(workspaceMember);
 
 				return persistedWorkspaceMember;
 			}),

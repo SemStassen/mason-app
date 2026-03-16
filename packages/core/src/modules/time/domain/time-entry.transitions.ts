@@ -29,7 +29,7 @@ export const createTimeEntry = (params: {
 			workspaceId: params.workspaceId,
 			workspaceMemberId: params.workspaceMemberId,
 			taskId: params.data.taskId ?? Option.none(),
-			startedAt: Option.getOrElse(params.data.startedAt, () => params.now),
+			startedAt: params.data.startedAt ?? params.now,
 			stoppedAt: params.data.stoppedAt ?? Option.none(),
 			notes: params.data.notes ?? Option.none(),
 		});
@@ -45,7 +45,10 @@ export const createTimeEntry = (params: {
 export const updateTimeEntry = (params: {
 	timeEntry: TimeEntry;
 	data: typeof TimeEntry.jsonUpdate.Type;
-}): Result.Result<TimeEntry, TimeEntryStoppedAtBeforeStartedAtError> =>
+}): Result.Result<
+	{ entity: TimeEntry; changes: typeof TimeEntry.update.Type },
+	TimeEntryStoppedAtBeforeStartedAtError
+> =>
 	Result.gen(function* () {
 		const updatedTimeEntry = TimeEntry.make({
 			...params.timeEntry,
@@ -57,5 +60,8 @@ export const updateTimeEntry = (params: {
 			updatedTimeEntry.stoppedAt,
 		);
 
-		return updatedTimeEntry;
+		return {
+			entity: updatedTimeEntry,
+			changes: params.data,
+		};
 	});

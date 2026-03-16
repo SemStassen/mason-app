@@ -20,9 +20,9 @@ export const CreateProjectFlow = Effect.fn("flows/CreateProjectFlow")(
 			role: member.role,
 		});
 
-		const createdProject = yield* projectModule.createProject({
+		const [createdProject] = yield* projectModule.createProjects({
 			workspaceId: workspace.id,
-			data: request,
+			data: [request],
 		});
 
 		return createdProject satisfies typeof CreateProjectResponse.Type;

@@ -6,9 +6,10 @@ export interface WorkspaceRepositoryShape {
 	readonly insert: (
 		data: typeof Workspace.insert.Type,
 	) => Effect.Effect<Workspace, RepositoryError>;
-	readonly update: (
-		data: typeof Workspace.update.Type,
-	) => Effect.Effect<Workspace, RepositoryError>;
+	readonly update: (params: {
+		id: Workspace["id"];
+		update: typeof Workspace.update.Type;
+	}) => Effect.Effect<Workspace, RepositoryError>;
 	readonly findById: (
 		id: Workspace["id"],
 	) => Effect.Effect<Option.Option<Workspace>, RepositoryError>;

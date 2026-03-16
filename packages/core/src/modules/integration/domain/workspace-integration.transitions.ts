@@ -6,14 +6,17 @@ import { WorkspaceIntegration } from "./workspace-integration.entity";
 export const createWorkspaceIntegration = (params: {
 	workspaceId: WorkspaceIntegration["workspaceId"];
 	createdByWorkspaceMemberId: WorkspaceIntegration["createdByWorkspaceMemberId"];
-	provider: WorkspaceIntegration["provider"];
+	data: typeof WorkspaceIntegration.jsonCreate.Type;
 	apiKey: WorkspaceIntegration["apiKey"];
 	now: DateTime.Utc;
 }): Result.Result<WorkspaceIntegration, never> =>
 	Result.succeed(
 		WorkspaceIntegration.make({
-			...params,
+			...params.data,
 			id: WorkspaceIntegrationId.makeUnsafe(generateUUID()),
+			workspaceId: params.workspaceId,
+			createdByWorkspaceMemberId: params.createdByWorkspaceMemberId,
+			apiKey: params.apiKey,
 			_metadata: Option.none(),
 			createdAt: params.now,
 		}),
@@ -23,11 +26,23 @@ export const updateWorkspaceIntegration = (params: {
 	workspaceIntegration: WorkspaceIntegration;
 	data: typeof WorkspaceIntegration.jsonUpdate.Type;
 	apiKey: WorkspaceIntegration["apiKey"];
-}): Result.Result<WorkspaceIntegration, never> =>
-	Result.succeed(
-		WorkspaceIntegration.make({
+}): Result.Result<
+	{
+		entity: WorkspaceIntegration;
+		changes: typeof WorkspaceIntegration.update.Type;
+	},
+	never
+> => {
+	const { apiKey, ...rest } = params.data;
+	return Result.succeed({
+		entity: WorkspaceIntegration.make({
 			...params.workspaceIntegration,
-			...params.data,
+			...rest,
 			apiKey: params.apiKey,
 		}),
-	);
+		changes: {
+			...rest,
+			apiKey: params.apiKey,
+		},
+	});
+};

@@ -27,29 +27,39 @@ export const TimeModuleLayer = Layer.effect(
 			);
 
 		return {
-			createTimeEntry: Effect.fn("time.createTimeEntry")(function* (params) {
-				const now = yield* DateTime.now;
+			createTimeEntries: Effect.fn("time.createTimeEntries")(
+				function* (params) {
+					if (params.data.length === 0) return [];
 
-				const timeEntry = yield* Effect.fromResult(
-					timeEntryTransitions.createTimeEntry({
-						workspaceId: params.workspaceId,
-						workspaceMemberId: params.workspaceMemberId,
-						data: params.data,
-						now,
-					}),
-				);
+					const now = yield* DateTime.now;
+					const timeEntries = yield* Effect.forEach(params.data, (data) =>
+						Effect.fromResult(
+							timeEntryTransitions.createTimeEntry({
+								workspaceId: params.workspaceId,
+								workspaceMemberId: params.workspaceMemberId,
+								data,
+								now,
+							}),
+						),
+					);
 
-				if (Option.isNone(timeEntry.stoppedAt)) {
-					yield* ensureNoOtherRunningTimeEntry({
-						workspaceId: params.workspaceId,
-						workspaceMemberId: params.workspaceMemberId,
-					});
-				}
+					const runningEntries = timeEntries.filter((e) => e.isRunning());
+					if (runningEntries.length > 1) {
+						return yield* new TimeEntryAlreadyRunningError();
+					}
+					if (runningEntries.length === 1) {
+						yield* ensureNoOtherRunningTimeEntry({
+							workspaceId: params.workspaceId,
+							workspaceMemberId: params.workspaceMemberId,
+						});
+					}
 
-				const [persistedTimeEntry] = yield* timeEntryRepo.insert([timeEntry]);
+					const persistedTimeEntries =
+						yield* timeEntryRepo.insertMany(timeEntries);
 
-				return persistedTimeEntry;
-			}),
+					return persistedTimeEntries;
+				},
+			),
 			updateTimeEntry: Effect.fn("time.updateTimeEntry")(function* (params) {
 				const timeEntry = yield* timeEntryRepo
 					.findById({ workspaceId: params.workspaceId, id: params.id })
@@ -67,47 +77,36 @@ export const TimeModuleLayer = Layer.effect(
 						),
 					);
 
-				const updatedTimeEntry = yield* Effect.fromResult(
+				const { entity, changes } = yield* Effect.fromResult(
 					timeEntryTransitions.updateTimeEntry({
 						timeEntry,
 						data: params.data,
 					}),
 				);
 
-				if (Option.isNone(updatedTimeEntry.stoppedAt)) {
+				if (entity.isRunning()) {
 					yield* ensureNoOtherRunningTimeEntry({
 						workspaceId: params.workspaceId,
-						workspaceMemberId: updatedTimeEntry.workspaceMemberId,
+						workspaceMemberId: entity.workspaceMemberId,
 						excludeId: params.id,
 					});
 				}
 
-				const persistedTimeEntry =
-					yield* timeEntryRepo.update(updatedTimeEntry);
+				const persistedTimeEntry = yield* timeEntryRepo.update({
+					id: entity.id,
+					workspaceId: entity.workspaceId,
+					update: changes,
+				});
 
 				return persistedTimeEntry;
 			}),
-			hardDeleteTimeEntry: Effect.fn("time.hardDeleteTimeEntry")(
+			hardDeleteTimeEntries: Effect.fn("time.hardDeleteTimeEntries")(
 				function* (params) {
-					const timeEntry = yield* timeEntryRepo
-						.findById({ workspaceId: params.workspaceId, id: params.id })
-						.pipe(
-							Effect.flatMap(
-								Option.match({
-									onNone: () =>
-										Effect.fail(
-											new TimeEntryNotFoundError({
-												timeEntryId: params.id,
-											}),
-										),
-									onSome: Effect.succeed,
-								}),
-							),
-						);
+					if (params.ids.length === 0) return;
 
-					yield* timeEntryRepo.hardDelete({
+					yield* timeEntryRepo.hardDeleteMany({
 						workspaceId: params.workspaceId,
-						timeEntryIds: [timeEntry.id],
+						ids: params.ids,
 					});
 				},
 			),

@@ -1,18 +1,19 @@
 import { type Effect, type Option, ServiceMap } from "effect";
-import type { NonEmptyReadonlyArray } from "effect/Array";
 import type { RepositoryError } from "#shared/database/index";
 import type { TimeEntry } from "./domain/time-entry.entity";
 
 export interface TimeEntryRepositoryShape {
-	readonly insert: (
-		data: NonEmptyReadonlyArray<typeof TimeEntry.insert.Type>,
-	) => Effect.Effect<NonEmptyReadonlyArray<TimeEntry>, RepositoryError>;
-	readonly update: (
-		data: typeof TimeEntry.update.Type,
-	) => Effect.Effect<TimeEntry, RepositoryError>;
-	readonly hardDelete: (params: {
+	readonly insertMany: (
+		data: ReadonlyArray<typeof TimeEntry.insert.Type>,
+	) => Effect.Effect<ReadonlyArray<TimeEntry>, RepositoryError>;
+	readonly update: (params: {
 		workspaceId: TimeEntry["workspaceId"];
-		timeEntryIds: NonEmptyReadonlyArray<TimeEntry["id"]>;
+		id: TimeEntry["id"];
+		update: typeof TimeEntry.update.Type;
+	}) => Effect.Effect<TimeEntry, RepositoryError>;
+	readonly hardDeleteMany: (params: {
+		workspaceId: TimeEntry["workspaceId"];
+		ids: ReadonlyArray<TimeEntry["id"]>;
 	}) => Effect.Effect<void, RepositoryError>;
 	readonly findById: (params: {
 		workspaceId: TimeEntry["workspaceId"];

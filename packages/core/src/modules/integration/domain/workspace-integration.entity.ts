@@ -12,9 +12,9 @@ export class WorkspaceIntegration extends Model.Class<WorkspaceIntegration>(
 	"WorkspaceIntegration",
 )(
 	{
-		id: Model.ServerManaged(WorkspaceIntegrationId),
-		workspaceId: Model.ServerManaged(WorkspaceId),
-		createdByWorkspaceMemberId: Model.ServerManaged(WorkspaceMemberId),
+		id: Model.ServerImmutable(WorkspaceIntegrationId),
+		workspaceId: Model.ServerImmutable(WorkspaceId),
+		createdByWorkspaceMemberId: Model.ServerImmutable(WorkspaceMemberId),
 		provider: Model.ClientProvided(
 			Schema.Literal("float").pipe(
 				Schema.brand("WorkspaceIntegrationProvider"),

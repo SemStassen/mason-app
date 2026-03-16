@@ -19,10 +19,11 @@ export const createWorkspace = (
 export const updateWorkspace = (params: {
 	workspace: Workspace;
 	data: typeof Workspace.jsonUpdate.Type;
-}): Result.Result<Workspace, never> =>
-	Result.succeed(
-		Workspace.make({
-			...params.workspace,
-			...params.data,
-		}),
-	);
+}): Result.Result<
+	{ entity: Workspace; changes: typeof Workspace.update.Type },
+	never
+> =>
+	Result.succeed({
+		entity: Workspace.make({ ...params.workspace, ...params.data }),
+		changes: params.data,
+	});

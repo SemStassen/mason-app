@@ -21,9 +21,9 @@ export const CreateTaskFlow = Effect.fn("flows/CreateTaskFlow")(function* (
 		role: member.role,
 	});
 
-	const createdTask = yield* projectModule.createTask({
+	const [createdTask] = yield* projectModule.createTasks({
 		workspaceId: workspace.id,
-		data: request,
+		data: [request],
 	});
 
 	return createdTask satisfies typeof CreateTaskResponse.Type;

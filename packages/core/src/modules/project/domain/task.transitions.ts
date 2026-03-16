@@ -20,10 +20,11 @@ export const createTask = (params: {
 export const updateTask = (params: {
 	task: Task;
 	data: typeof Task.jsonUpdate.Type;
-}): Result.Result<Task, never> =>
-	Result.succeed(
-		Task.make({
+}): Result.Result<{ entity: Task; changes: typeof Task.update.Type }, never> =>
+	Result.succeed({
+		entity: Task.make({
 			...params.task,
 			...params.data,
 		}),
-	);
+		changes: params.data,
+	});

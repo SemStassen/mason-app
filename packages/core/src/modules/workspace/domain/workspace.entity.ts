@@ -3,7 +3,7 @@ import { WorkspaceId } from "#shared/schemas/index";
 
 export class Workspace extends Model.Class<Workspace>("Workspace")(
 	{
-		id: Model.ServerManaged(WorkspaceId),
+		id: Model.ServerImmutable(WorkspaceId),
 		name: Model.Mutable(
 			Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(100)),
 		),

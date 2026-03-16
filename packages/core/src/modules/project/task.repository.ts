@@ -4,12 +4,14 @@ import type { RepositoryError } from "#shared/database/index";
 import type { Task } from "./domain/task.entity";
 
 export interface TaskRepositoryShape {
-	readonly insert: (
-		data: NonEmptyReadonlyArray<typeof Task.insert.Type>,
-	) => Effect.Effect<NonEmptyReadonlyArray<Task>, RepositoryError>;
-	readonly update: (
-		data: typeof Task.update.Type,
-	) => Effect.Effect<Task, RepositoryError>;
+	readonly insertMany: (
+		data: ReadonlyArray<typeof Task.insert.Type>,
+	) => Effect.Effect<ReadonlyArray<Task>, RepositoryError>;
+	readonly update: (params: {
+		id: Task["id"];
+		workspaceId: Task["workspaceId"];
+		update: typeof Task.update.Type;
+	}) => Effect.Effect<Task, RepositoryError>;
 	readonly archive: (params: {
 		workspaceId: Task["workspaceId"];
 		timeEntryIds: NonEmptyReadonlyArray<Task["id"]>;

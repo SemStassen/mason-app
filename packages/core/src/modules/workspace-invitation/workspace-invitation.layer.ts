@@ -24,7 +24,7 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 					});
 
 				if (Option.isSome(maybeActivePendingWorkspaceInvitation)) {
-					const renewedWorkspaceInvitation = yield* Effect.fromResult(
+					const { changes, entity } = yield* Effect.fromResult(
 						workspaceInvitationTransitions.renewWorkspaceInvitation({
 							workspaceInvitation: maybeActivePendingWorkspaceInvitation.value,
 							now: now,
@@ -38,7 +38,11 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 					);
 
 					const persistedWorkspaceInvitation =
-						yield* workspaceInvitationRepo.update(renewedWorkspaceInvitation);
+						yield* workspaceInvitationRepo.update({
+							id: entity.id,
+							workspaceId: entity.workspaceId,
+							update: changes,
+						});
 
 					return persistedWorkspaceInvitation;
 				}
@@ -52,8 +56,8 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 					}),
 				);
 
-				const [persistedWorkspaceInvitation] =
-					yield* workspaceInvitationRepo.insert([workspaceInvitation]);
+				const persistedWorkspaceInvitation =
+					yield* workspaceInvitationRepo.insert(workspaceInvitation);
 
 				return persistedWorkspaceInvitation;
 			}),
@@ -81,7 +85,7 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 						),
 					);
 
-				const canceledWorkspaceInvitation = yield* Effect.fromResult(
+				const { changes, entity } = yield* Effect.fromResult(
 					workspaceInvitationTransitions.cancelWorkspaceInvitation({
 						workspaceInvitation: workspaceInvitation,
 						now: now,
@@ -89,7 +93,11 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 				);
 
 				const persistedWorkspaceInvitation =
-					yield* workspaceInvitationRepo.update(canceledWorkspaceInvitation);
+					yield* workspaceInvitationRepo.update({
+						id: entity.id,
+						workspaceId: entity.workspaceId,
+						update: changes,
+					});
 
 				return persistedWorkspaceInvitation;
 			}),
@@ -116,7 +124,7 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 						),
 					);
 
-				const acceptedWorkspaceInvitation = yield* Effect.fromResult(
+				const { changes, entity } = yield* Effect.fromResult(
 					workspaceInvitationTransitions.acceptWorkspaceInvitation({
 						workspaceInvitation: workspaceInvitation,
 						email: params.email,
@@ -125,7 +133,11 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 				);
 
 				const persistedWorkspaceInvitation =
-					yield* workspaceInvitationRepo.update(acceptedWorkspaceInvitation);
+					yield* workspaceInvitationRepo.update({
+						id: entity.id,
+						workspaceId: entity.workspaceId,
+						update: changes,
+					});
 
 				return persistedWorkspaceInvitation;
 			}),
@@ -152,7 +164,7 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 						),
 					);
 
-				const rejectedWorkspaceInvitation = yield* Effect.fromResult(
+				const { changes, entity } = yield* Effect.fromResult(
 					workspaceInvitationTransitions.rejectWorkspaceInvitation({
 						workspaceInvitation: workspaceInvitation,
 						email: params.email,
@@ -161,7 +173,11 @@ export const WorkspaceInvitationModuleLayer = Layer.effect(
 				);
 
 				const persistedWorkspaceInvitation =
-					yield* workspaceInvitationRepo.update(rejectedWorkspaceInvitation);
+					yield* workspaceInvitationRepo.update({
+						id: entity.id,
+						workspaceId: entity.workspaceId,
+						update: changes,
+					});
 
 				return persistedWorkspaceInvitation;
 			}),

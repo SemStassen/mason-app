@@ -56,33 +56,50 @@ export const renewWorkspaceInvitation = (params: {
 	workspaceInvitation: WorkspaceInvitation;
 	now: DateTime.Utc;
 }): Result.Result<
-	WorkspaceInvitation,
+	{
+		entity: WorkspaceInvitation;
+		changes: typeof WorkspaceInvitation.update.Type;
+	},
 	WorkspaceInvitationNotPendingError | WorkspaceInvitationExpiredError
 > =>
 	Result.gen(function* () {
 		yield* ensurePending(params.workspaceInvitation);
 		yield* ensureNotExpired(params.workspaceInvitation, params.now);
-		return WorkspaceInvitation.make({
-			...params.workspaceInvitation,
-			expiresAt: defaultExpiration(params.now),
-		});
+
+		const changes = { expiresAt: defaultExpiration(params.now) };
+
+		return {
+			entity: WorkspaceInvitation.make({
+				...params.workspaceInvitation,
+				...changes,
+			}),
+			changes: changes,
+		};
 	});
 
 export const cancelWorkspaceInvitation = (params: {
 	workspaceInvitation: WorkspaceInvitation;
 	now: DateTime.Utc;
 }): Result.Result<
-	WorkspaceInvitation,
+	{
+		entity: WorkspaceInvitation;
+		changes: typeof WorkspaceInvitation.update.Type;
+	},
 	WorkspaceInvitationNotPendingError | WorkspaceInvitationExpiredError
 > =>
 	Result.gen(function* () {
 		yield* ensurePending(params.workspaceInvitation);
 		yield* ensureNotExpired(params.workspaceInvitation, params.now);
 
-		return WorkspaceInvitation.make({
-			...params.workspaceInvitation,
-			status: "canceled",
-		});
+		const changes = { status: "canceled" as const };
+
+		return {
+			entity: WorkspaceInvitation.make({
+				...params.workspaceInvitation,
+				...changes,
+			}),
+			changes: changes,
+		};
 	});
 
 export const acceptWorkspaceInvitation = (params: {
@@ -90,7 +107,10 @@ export const acceptWorkspaceInvitation = (params: {
 	email: WorkspaceInvitation["email"];
 	now: DateTime.Utc;
 }): Result.Result<
-	WorkspaceInvitation,
+	{
+		entity: WorkspaceInvitation;
+		changes: typeof WorkspaceInvitation.update.Type;
+	},
 	| WorkspaceInvitationNotPendingError
 	| WorkspaceInvitationExpiredError
 	| WorkspaceInvitationEmailMismatchError
@@ -100,10 +120,15 @@ export const acceptWorkspaceInvitation = (params: {
 		yield* ensureNotExpired(params.workspaceInvitation, params.now);
 		yield* ensureEmailMatches(params.workspaceInvitation, params.email);
 
-		return WorkspaceInvitation.make({
-			...params.workspaceInvitation,
-			status: "accepted",
-		});
+		const changes = { status: "accepted" as const };
+
+		return {
+			entity: WorkspaceInvitation.make({
+				...params.workspaceInvitation,
+				...changes,
+			}),
+			changes: changes,
+		};
 	});
 
 export const rejectWorkspaceInvitation = (params: {
@@ -111,7 +136,10 @@ export const rejectWorkspaceInvitation = (params: {
 	email: WorkspaceInvitation["email"];
 	now: DateTime.Utc;
 }): Result.Result<
-	WorkspaceInvitation,
+	{
+		entity: WorkspaceInvitation;
+		changes: typeof WorkspaceInvitation.update.Type;
+	},
 	| WorkspaceInvitationNotPendingError
 	| WorkspaceInvitationExpiredError
 	| WorkspaceInvitationEmailMismatchError
@@ -121,8 +149,13 @@ export const rejectWorkspaceInvitation = (params: {
 		yield* ensureNotExpired(params.workspaceInvitation, params.now);
 		yield* ensureEmailMatches(params.workspaceInvitation, params.email);
 
-		return WorkspaceInvitation.make({
-			...params.workspaceInvitation,
-			status: "rejected",
-		});
+		const changes = { status: "rejected" as const };
+
+		return {
+			entity: WorkspaceInvitation.make({
+				...params.workspaceInvitation,
+				...changes,
+			}),
+			changes: changes,
+		};
 	});

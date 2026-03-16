@@ -11,9 +11,9 @@ export class WorkspaceInvitation extends Model.Class<WorkspaceInvitation>(
 	"WorkspaceInvitation",
 )(
 	{
-		id: Model.ServerManaged(WorkspaceInvitationId),
-		inviterId: Model.ServerManaged(WorkspaceMemberId),
-		workspaceId: Model.ServerManaged(WorkspaceId),
+		id: Model.ServerImmutable(WorkspaceInvitationId),
+		inviterId: Model.ServerImmutable(WorkspaceMemberId),
+		workspaceId: Model.ServerImmutable(WorkspaceId),
 		email: Model.ClientProvided(Email),
 		role: Model.ClientProvided(WorkspaceRole),
 		status: Model.ServerManaged(

@@ -10,12 +10,19 @@ import {
 
 export class TimeEntry extends Model.Class<TimeEntry>("TimeEntry")(
 	{
-		id: Model.ServerManaged(TimeEntryId),
-		workspaceId: Model.ServerManaged(WorkspaceId),
+		id: Model.ServerImmutable(TimeEntryId),
+		workspaceId: Model.ServerImmutable(WorkspaceId),
 		workspaceMemberId: Model.ServerManaged(WorkspaceMemberId),
 		projectId: Model.Mutable(ProjectId),
 		taskId: Model.MutableOptional(TaskId),
-		startedAt: Model.ClientOptional(Schema.DateTimeUtc),
+		startedAt: Model.Field({
+			select: Schema.DateTimeUtc,
+			insert: Schema.DateTimeUtc,
+			update: Schema.optionalKey(Schema.DateTimeUtc),
+			json: Schema.DateTimeUtc,
+			jsonCreate: Schema.optionalKey(Schema.DateTimeUtc),
+			jsonUpdate: Schema.optionalKey(Schema.DateTimeUtc),
+		}),
 		stoppedAt: Model.MutableOptional(Schema.DateTimeUtc),
 		notes: Model.MutableOptional(Schema.Json),
 	},
