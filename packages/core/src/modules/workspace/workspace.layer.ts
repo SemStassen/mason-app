@@ -54,15 +54,17 @@ export const WorkspaceModuleLayer = Layer.effect(
 						yield* assertWorkspaceSlugIsUnique(params.data.slug);
 					}
 
-					const updatedWorkspace = yield* Effect.fromResult(
+					const { changes, entity } = yield* Effect.fromResult(
 						workspaceTransitions.updateWorkspace({
 							workspace,
 							data: params.data,
 						}),
 					);
 
-					const persistedWorkspace =
-						yield* workspaceRepo.update(updatedWorkspace);
+					const persistedWorkspace = yield* workspaceRepo.update({
+						id: entity.id,
+						update: changes,
+					});
 
 					return persistedWorkspace;
 				},

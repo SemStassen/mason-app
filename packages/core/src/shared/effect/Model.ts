@@ -38,7 +38,9 @@ export interface SystemGenerated<S extends Schema.Top>
 
 /**
  * Field owned entirely by the database. Set via DEFAULT, serial, or triggers.
- * Never written by the server or client. Only readable.
+ * Never written by the server or client — only readable.
+ *
+ * Absent from all insert, update, and JSON input variants.
  *
  * Local-first: client treats this as read-only; never included in any
  * mutation payload.
@@ -56,6 +58,39 @@ export const SystemGenerated = <S extends Schema.Top>(
 	});
 
 // ---------------------------------------------------------------------------
+// ServerImmutable
+// ---------------------------------------------------------------------------
+
+export interface ServerImmutable<S extends Schema.Top>
+	extends VariantSchema.Field<{
+		readonly select: S;
+		readonly insert: S;
+		readonly json: S;
+	}> {}
+
+/**
+ * Field set once by the server and never updated. The value is permanent
+ * after the initial insert — no SQL UPDATE will ever touch this column.
+ *
+ * Absent from the update variant and all JSON input variants — never included
+ * in create or update payloads from any source.
+ *
+ * Local-first: client treats this as read-only after the initial sync.
+ *
+ * @example
+ * id: ServerImmutable(WorkspaceId)
+ * createdAt: ServerImmutable(Timestamp)
+ */
+export const ServerImmutable = <S extends Schema.Top>(
+	schema: S,
+): ServerImmutable<S> =>
+	Field({
+		select: schema,
+		insert: schema,
+		json: schema,
+	});
+
+// ---------------------------------------------------------------------------
 // ServerManaged
 // ---------------------------------------------------------------------------
 
@@ -63,7 +98,7 @@ export interface ServerManaged<S extends Schema.Top>
 	extends VariantSchema.Field<{
 		readonly select: S;
 		readonly insert: S;
-		readonly update: S;
+		readonly update: Schema.optionalKey<S>;
 		readonly json: S;
 	}> {}
 
@@ -71,11 +106,13 @@ export interface ServerManaged<S extends Schema.Top>
  * Field managed entirely by the server. Never included in client-facing
  * create or update payloads. The server can read and write freely.
  *
+ * Uses patch semantics on update — the server only writes this column when
+ * explicitly provided.
+ *
  * Local-first: server is always authoritative on these fields. The client's
  * local copy is stale until a confirmed server response is received.
  *
  * @example
- * id: ServerManaged(WorkspaceId)
  * userId: ServerManaged(UserId)
  * emailVerified: ServerManaged(Schema.Boolean)
  * role: ServerManaged(WorkspaceRole)
@@ -86,7 +123,7 @@ export const ServerManaged = <S extends Schema.Top>(
 	Field({
 		select: schema,
 		insert: schema,
-		update: schema,
+		update: Schema.optionalKey(schema),
 		json: schema,
 	});
 
@@ -98,15 +135,18 @@ export interface ClientProvided<S extends Schema.Top>
 	extends VariantSchema.Field<{
 		readonly select: S;
 		readonly insert: S;
-		readonly update: S;
+		readonly update: Schema.optionalKey<S>;
 		readonly json: S;
 		readonly jsonCreate: S;
 	}> {}
 
 /**
- * Field the client must provide on create. Fixed forever after — never
- * included in client-facing update payloads. The server can still read and
- * write internally.
+ * Field the client must provide on create. Fixed from the client's perspective
+ * forever after — absent from jsonUpdate. The server can still write this
+ * column internally via the update variant.
+ *
+ * Uses patch semantics on update — the server only writes this column when
+ * explicitly provided.
  *
  * Local-first: client owns the initial value and can write it optimistically
  * on create. Treat as immutable after that.
@@ -121,7 +161,7 @@ export const ClientProvided = <S extends Schema.Top>(
 	Field({
 		select: schema,
 		insert: schema,
-		update: schema,
+		update: Schema.optionalKey(schema),
 		json: schema,
 		jsonCreate: schema,
 	});
@@ -134,15 +174,19 @@ export interface ClientOptional<S extends Schema.Top>
 	extends VariantSchema.Field<{
 		readonly select: S;
 		readonly insert: S;
-		readonly update: S;
+		readonly update: Schema.optionalKey<S>;
 		readonly json: S;
 		readonly jsonCreate: Schema.OptionFromOptionalKey<S>;
 	}> {}
 
 /**
  * Field the client may optionally provide on create. If absent, the server
- * assigns a value. Fixed forever after — never included in client-facing
- * update payloads.
+ * assigns a value. Fixed from the client's perspective forever after —
+ * absent from jsonUpdate. The server can still write this column internally
+ * via the update variant.
+ *
+ * Uses patch semantics on update — the server only writes this column when
+ * explicitly provided.
  *
  * Useful for local-first flows where the client can generate its own IDs
  * offline, but the server will generate one if the client doesn't.
@@ -156,7 +200,7 @@ export const ClientOptional = <S extends Schema.Top>(
 	Field({
 		select: schema,
 		insert: schema,
-		update: schema,
+		update: Schema.optionalKey(schema),
 		json: schema,
 		jsonCreate: Schema.OptionFromOptionalKey(schema),
 	});
@@ -169,7 +213,7 @@ export interface Mutable<S extends Schema.Top>
 	extends VariantSchema.Field<{
 		readonly select: S;
 		readonly insert: S;
-		readonly update: S;
+		readonly update: Schema.optionalKey<S>;
 		readonly json: S;
 		readonly jsonCreate: S;
 		readonly jsonUpdate: Schema.optionalKey<S>;
@@ -177,7 +221,9 @@ export interface Mutable<S extends Schema.Top>
 
 /**
  * Required field the client must provide on create and can update freely.
- * Uses patch semantics on update — absent in jsonUpdate means "leave unchanged".
+ *
+ * Uses patch semantics on both the server update variant and jsonUpdate —
+ * absent means "leave unchanged".
  *
  * Local-first: fully optimistic. The client owns this value and can apply
  * mutations locally before syncing.
@@ -190,7 +236,7 @@ export const Mutable = <S extends Schema.Top>(schema: S): Mutable<S> =>
 	Field({
 		select: schema,
 		insert: schema,
-		update: schema,
+		update: Schema.optionalKey(schema),
 		json: schema,
 		jsonCreate: schema,
 		jsonUpdate: Schema.optionalKey(schema),
@@ -204,7 +250,7 @@ export interface MutableOptional<S extends Schema.Top>
 	extends VariantSchema.Field<{
 		readonly select: Schema.OptionFromNullOr<S>;
 		readonly insert: Schema.OptionFromNullOr<S>;
-		readonly update: Schema.OptionFromNullOr<S>;
+		readonly update: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
 		readonly json: Schema.Option<S>;
 		readonly jsonCreate: Schema.optionalKey<Schema.Option<S>>;
 		readonly jsonUpdate: Schema.optionalKey<Schema.Option<S>>;
@@ -216,7 +262,7 @@ export interface MutableOptional<S extends Schema.Top>
  * use Option<T> so the client works with idiomatic Option values.
  *
  * Pass the inner schema — the Option wrapping is applied automatically.
- * Absent in jsonCreate means not provided; absent in jsonUpdate means
+ * Uses patch semantics everywhere — absent in any mutation variant means
  * "leave unchanged".
  *
  * Local-first: fully optimistic. The client can set, clear, or leave
@@ -232,7 +278,7 @@ export const MutableOptional = <S extends Schema.Top>(
 	Field({
 		select: Schema.OptionFromNullOr(schema),
 		insert: Schema.OptionFromNullOr(schema),
-		update: Schema.OptionFromNullOr(schema),
+		update: Schema.optionalKey(Schema.OptionFromNullOr(schema)),
 		json: Schema.Option(schema),
 		jsonCreate: Schema.optionalKey(Schema.Option(schema)),
 		jsonUpdate: Schema.optionalKey(Schema.Option(schema)),
@@ -246,12 +292,15 @@ export interface Sensitive<S extends Schema.Top>
 	extends VariantSchema.Field<{
 		readonly select: S;
 		readonly insert: S;
-		readonly update: S;
+		readonly update: Schema.optionalKey<S>;
 	}> {}
 
 /**
  * Field the server manages internally that is never serialized to the client.
- * Absent from all json variants — will never appear in API responses or inputs.
+ * Absent from all JSON variants — will never appear in API responses or inputs.
+ *
+ * Uses patch semantics on update — the server only writes this column when
+ * explicitly provided.
  *
  * @example
  * passwordHash: Sensitive(Schema.NonEmptyTrimmedString)
@@ -261,7 +310,7 @@ export const Sensitive = <S extends Schema.Top>(schema: S): Sensitive<S> =>
 	Field({
 		select: schema,
 		insert: schema,
-		update: schema,
+		update: Schema.optionalKey(schema),
 	});
 
 // ---------------------------------------------------------------------------
@@ -274,7 +323,7 @@ export interface TransformedMutable<
 > extends VariantSchema.Field<{
 		readonly select: Db;
 		readonly insert: Db;
-		readonly update: Db;
+		readonly update: Schema.optionalKey<Db>;
 		readonly json: Json;
 		readonly jsonCreate: Json;
 		readonly jsonUpdate: Schema.optionalKey<Json>;
@@ -286,7 +335,8 @@ export interface TransformedMutable<
  * transformed before persistence (e.g. hashed, encrypted, or serialized).
  *
  * Pass `{ db: dbSchema, json: jsonSchema }` — DB variants use `db`,
- * JSON read, create, and update use `json`. Optional in jsonUpdate.
+ * JSON read, create, and update use `json`. Uses patch semantics on both
+ * the server update variant and jsonUpdate — absent means "leave unchanged".
  *
  * @example
  * apiKey: TransformedMutable({ db: HashedString, json: Schema.NonEmptyTrimmedString })
@@ -302,7 +352,7 @@ export const TransformedMutable = <
 	Field({
 		select: schemas.db,
 		insert: schemas.db,
-		update: schemas.db,
+		update: Schema.optionalKey(schemas.db),
 		json: schemas.json,
 		jsonCreate: schemas.json,
 		jsonUpdate: Schema.optionalKey(schemas.json),
@@ -318,19 +368,19 @@ export interface TransformedImmutable<
 > extends VariantSchema.Field<{
 		readonly select: Db;
 		readonly insert: Db;
-		readonly update: Db;
 		readonly json: Json;
 		readonly jsonCreate: Json;
 	}> {}
 
 /**
- * Field the client must provide on create, fixed forever after, but stored
- * in a different encoding in the DB vs JSON. Useful for fields that are
- * transformed between representations (e.g. encrypted at rest, encoded,
- * or serialized differently).
+ * Field the client must provide on create, fixed from the client's perspective
+ * forever after, but stored in a different encoding in the DB vs JSON. The
+ * server can still write this column internally via the update variant.
  *
  * Pass `{ db: dbSchema, json: jsonSchema }` — DB variants use `db`,
- * JSON read and create use `json`. Absent from jsonUpdate (immutable).
+ * JSON read and create use `json`. Absent from jsonUpdate (client-immutable).
+ * Uses patch semantics on update — the server only writes this column when
+ * explicitly provided.
  *
  * @example
  * accessToken: TransformedImmutable({ db: EncryptedString, json: Schema.NonEmptyTrimmedString })
@@ -346,7 +396,6 @@ export const TransformedImmutable = <
 	Field({
 		select: schemas.db,
 		insert: schemas.db,
-		update: schemas.db,
 		json: schemas.json,
 		jsonCreate: schemas.json,
 	});

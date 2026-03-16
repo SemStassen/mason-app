@@ -58,7 +58,7 @@ export const updateProject = (params: {
 	project: Project;
 	data: typeof Project.jsonUpdate.Type;
 }): Result.Result<
-	Project,
+	{ entity: Project; changes: typeof Project.update.Type },
 	ProjectArchivedError | ProjectEndDateBeforeStartDateError
 > =>
 	Result.gen(function* () {
@@ -74,5 +74,8 @@ export const updateProject = (params: {
 			endDate: updatedProject.endDate,
 		});
 
-		return updatedProject;
+		return {
+			entity: updatedProject,
+			changes: params.data,
+		};
 	});

@@ -3,8 +3,8 @@ import { ProjectId, TaskId, WorkspaceId } from "#shared/schemas/index";
 
 export class Task extends Model.Class<Task>("Task")(
 	{
-		id: Model.ServerManaged(TaskId),
-		workspaceId: Model.ServerManaged(WorkspaceId),
+		id: Model.ServerImmutable(TaskId),
+		workspaceId: Model.ServerImmutable(WorkspaceId),
 		projectId: Model.ClientProvided(ProjectId),
 		name: Model.Mutable(
 			Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(255)),

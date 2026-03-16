@@ -16,17 +16,21 @@ export const ProjectModuleLayer = Layer.effect(
 		const taskRepo = yield* TaskRepository;
 
 		return {
-			createProject: Effect.fn("project.createProject")(function* (params) {
-				const project = yield* Effect.fromResult(
-					projectTransitions.createProject({
-						workspaceId: params.workspaceId,
-						data: params.data,
-					}),
+			createProjects: Effect.fn("project.createProjects")(function* (params) {
+				if (params.data.length === 0) return [];
+
+				const projects = yield* Effect.forEach(params.data, (data) =>
+					Effect.fromResult(
+						projectTransitions.createProject({
+							workspaceId: params.workspaceId,
+							data,
+						}),
+					),
 				);
 
-				const [persistedProject] = yield* projectRepo.insert([project]);
+				const persistedProjects = yield* projectRepo.insertMany(projects);
 
-				return persistedProject;
+				return persistedProjects;
 			}),
 			updateProject: Effect.fn("project.updateProject")(function* (params) {
 				const project = yield* projectRepo
@@ -43,14 +47,18 @@ export const ProjectModuleLayer = Layer.effect(
 						),
 					);
 
-				const updatedProject = yield* Effect.fromResult(
+				const { entity, changes } = yield* Effect.fromResult(
 					projectTransitions.updateProject({
 						project,
 						data: params.data,
 					}),
 				);
 
-				const persistedProject = yield* projectRepo.update(updatedProject);
+				const persistedProject = yield* projectRepo.update({
+					id: entity.id,
+					workspaceId: entity.workspaceId,
+					update: changes,
+				});
 
 				return persistedProject;
 			}),
@@ -71,7 +79,7 @@ export const ProjectModuleLayer = Layer.effect(
 
 				yield* projectRepo.archive({
 					workspaceId: params.workspaceId,
-					timeEntryIds: [project.id],
+					projectIds: [project.id],
 				});
 			}),
 			restoreProject: Effect.fn("project.restoreProject")(function* (params) {
@@ -94,40 +102,43 @@ export const ProjectModuleLayer = Layer.effect(
 					projectIds: [project.id],
 				});
 			}),
-			createTask: Effect.fn("project.createTask")(function* (params) {
-				const project = yield* projectRepo
-					.findById({
-						workspaceId: params.workspaceId,
-						id: params.data.projectId,
-					})
-					.pipe(
-						Effect.flatMap(
-							Option.match({
-								onNone: () =>
-									Effect.fail(
-										new ProjectNotFoundError({
-											projectId: params.data.projectId,
-										}),
-									),
-								onSome: Effect.succeed,
-							}),
-						),
-					);
+			createTasks: Effect.fn("project.createTasks")(function* (params) {
+				if (params.data.length === 0) return [];
 
-				yield* Effect.fromResult(
-					projectTransitions.ensureProjectNotArchived(project),
+				const projectIds = [...new Set(params.data.map((d) => d.projectId))];
+				const projects = yield* projectRepo.findManyByIds({
+					workspaceId: params.workspaceId,
+					ids: projectIds,
+				});
+
+				const missingProjectId = projectIds.find(
+					(id) => !projects.some((p) => p.id === id),
 				);
 
-				const task = yield* Effect.fromResult(
-					taskTransitions.createTask({
-						workspaceId: params.workspaceId,
-						data: params.data,
-					}),
+				if (missingProjectId) {
+					return yield* new ProjectNotFoundError({
+						projectId: missingProjectId,
+					});
+				}
+
+				yield* Effect.forEach(projects, (project) =>
+					Effect.fromResult(
+						projectTransitions.ensureProjectNotArchived(project),
+					),
 				);
 
-				const [persistedTask] = yield* taskRepo.insert([task]);
+				const tasks = yield* Effect.forEach(params.data, (data) =>
+					Effect.fromResult(
+						taskTransitions.createTask({
+							workspaceId: params.workspaceId,
+							data,
+						}),
+					),
+				);
 
-				return persistedTask;
+				const persistedTasks = yield* taskRepo.insertMany(tasks);
+
+				return persistedTasks;
 			}),
 			updateTask: Effect.fn("project.updateTask")(function* (params) {
 				const task = yield* taskRepo
@@ -160,11 +171,15 @@ export const ProjectModuleLayer = Layer.effect(
 					projectTransitions.ensureProjectNotArchived(project),
 				);
 
-				const updatedTask = yield* Effect.fromResult(
+				const { entity, changes } = yield* Effect.fromResult(
 					taskTransitions.updateTask({ task, data: params.data }),
 				);
 
-				const persistedTask = yield* taskRepo.update(updatedTask);
+				const persistedTask = yield* taskRepo.update({
+					id: entity.id,
+					workspaceId: entity.workspaceId,
+					update: changes,
+				});
 
 				return persistedTask;
 			}),

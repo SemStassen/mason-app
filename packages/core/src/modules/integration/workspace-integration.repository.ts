@@ -1,23 +1,19 @@
 import { type Effect, type Option, ServiceMap } from "effect";
-import type { NonEmptyReadonlyArray } from "effect/Array";
 import type { RepositoryError } from "#shared/database/index";
-import type {
-	WorkspaceId,
-	WorkspaceIntegrationId,
-} from "#shared/schemas/index";
+import type { WorkspaceId } from "#shared/schemas/index";
 import type { WorkspaceIntegration } from "./domain/workspace-integration.entity";
 
 export interface WorkspaceIntegrationRepositoryShape {
-	readonly insert: (params: {
-		workspaceIntegrations: NonEmptyReadonlyArray<WorkspaceIntegration>;
-	}) => Effect.Effect<ReadonlyArray<WorkspaceIntegration>, RepositoryError>;
+	readonly insert: (
+		workspaceIntegration: typeof WorkspaceIntegration.insert.Type,
+	) => Effect.Effect<WorkspaceIntegration, RepositoryError>;
 	readonly update: (params: {
 		workspaceId: WorkspaceId;
-		workspaceIntegrations: NonEmptyReadonlyArray<WorkspaceIntegration>;
-	}) => Effect.Effect<ReadonlyArray<WorkspaceIntegration>, RepositoryError>;
+		workspaceIntegration: typeof WorkspaceIntegration.update.Type;
+	}) => Effect.Effect<WorkspaceIntegration, RepositoryError>;
 	readonly hardDelete: (params: {
 		workspaceId: WorkspaceId;
-		ids: NonEmptyReadonlyArray<WorkspaceIntegrationId>;
+		id: WorkspaceIntegration["id"];
 	}) => Effect.Effect<void, RepositoryError>;
 	readonly findById: (params: {
 		workspaceId: WorkspaceIntegration["workspaceId"];

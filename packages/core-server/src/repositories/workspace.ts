@@ -1,7 +1,7 @@
 import { RepositoryError, Workspace, WorkspaceRepository } from "@mason/core";
 import { Drizzle, schema } from "@mason/db";
 import { eq } from "drizzle-orm";
-import { Effect, Layer, Option } from "effect";
+import { Effect, Layer, Option, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
 export const WorkspaceRepositoryLayer = Layer.effect(
@@ -23,16 +23,19 @@ export const WorkspaceRepositoryLayer = Layer.effect(
     });
 
     const updateWorkspaceRow = SqlSchema.findOne({
-      Request: Workspace.update,
+      Request: Schema.Struct({
+        id: Workspace.fields.id,
+        update: Workspace.update,
+      }),
       Result: Workspace.select,
-      execute: (request) =>
+      execute: ({ id, update }) =>
         drizzle
           .update(schema.workspacesTable)
           .set({
-            ...request,
-            metadata: request.metadata as string,
+            ...update,
+            metadata: update.metadata as string,
           })
-          .where(eq(schema.workspacesTable.id, request.id))
+          .where(eq(schema.workspacesTable.id, id))
           .returning(),
     });
 

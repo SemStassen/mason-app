@@ -23,11 +23,11 @@ export class TaskNotFoundError extends Schema.TaggedErrorClass<TaskNotFoundError
 ) {}
 
 interface ProjectModuleShape {
-	readonly createProject: (params: {
+	readonly createProjects: (params: {
 		workspaceId: Project["workspaceId"];
-		data: typeof Project.jsonCreate.Type;
+		data: ReadonlyArray<typeof Project.jsonCreate.Type>;
 	}) => Effect.Effect<
-		Project,
+		ReadonlyArray<Project>,
 		ProjectEndDateBeforeStartDateError | RepositoryError
 	>;
 	readonly updateProject: (params: {
@@ -50,11 +50,11 @@ interface ProjectModuleShape {
 		workspaceId: Project["workspaceId"];
 	}) => Effect.Effect<void, ProjectNotFoundError | RepositoryError>;
 
-	readonly createTask: (params: {
+	readonly createTasks: (params: {
 		workspaceId: Task["workspaceId"];
-		data: typeof Task.jsonCreate.Type;
+		data: ReadonlyArray<typeof Task.jsonCreate.Type>;
 	}) => Effect.Effect<
-		Task,
+		ReadonlyArray<Task>,
 		ProjectNotFoundError | ProjectArchivedError | RepositoryError
 	>;
 	readonly updateTask: (params: {

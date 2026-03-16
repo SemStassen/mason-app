@@ -1,6 +1,6 @@
 import { DateTime, Effect, Layer, Option, Redacted } from "effect";
+import { Crypto } from "#shared/crypto/index";
 import { EncryptedApiKey, PlainApiKey } from "#shared/schemas/index";
-import { Crypto } from "~/shared/crypto";
 import * as workspaceIntegrationTransitions from "./domain/workspace-integration.transitions";
 import {
 	IntegrationModule,
@@ -58,9 +58,9 @@ export const IntegrationModuleLayer = Layer.effect(
 
 				const workspaceIntegration = yield* Effect.fromResult(
 					workspaceIntegrationTransitions.createWorkspaceIntegration({
-						provider: params.data.provider,
 						createdByWorkspaceMemberId: params.createdByWorkspaceMemberId,
 						workspaceId: params.workspaceId,
+						data: params.data,
 						apiKey: encryptedApiKey,
 						now,
 					}),
@@ -99,7 +99,7 @@ export const IntegrationModuleLayer = Layer.effect(
 					? yield* encryptApiKey(params.data.apiKey)
 					: workspaceIntegration.apiKey;
 
-				const updatedWorkspaceIntegration = yield* Effect.fromResult(
+				const { entity, changes } = yield* Effect.fromResult(
 					workspaceIntegrationTransitions.updateWorkspaceIntegration({
 						workspaceIntegration,
 						data: params.data,
@@ -110,7 +110,7 @@ export const IntegrationModuleLayer = Layer.effect(
 				const [persistedWorkspaceIntegration] =
 					yield* workspaceIntegrationRepo.update({
 						workspaceId: params.workspaceId,
-						workspaceIntegrations: [updatedWorkspaceIntegration],
+						workspaceIntegrations: [changes],
 					});
 
 				return persistedWorkspaceIntegration;

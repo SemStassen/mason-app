@@ -15,19 +15,19 @@ export class TimeEntryNotFoundError extends Schema.TaggedErrorClass<TimeEntryNot
 ) {}
 
 interface TimeModuleShape {
-	readonly createTimeEntry: (params: {
+	readonly createTimeEntries: (params: {
 		workspaceId: TimeEntry["workspaceId"];
 		workspaceMemberId: TimeEntry["workspaceMemberId"];
-		data: typeof TimeEntry.jsonCreate.Type;
+		data: ReadonlyArray<typeof TimeEntry.jsonCreate.Type>;
 	}) => Effect.Effect<
-		TimeEntry,
+		ReadonlyArray<TimeEntry>,
 		| TimeEntryStoppedAtBeforeStartedAtError
 		| TimeEntryAlreadyRunningError
 		| RepositoryError
 	>;
 	readonly updateTimeEntry: (params: {
-		id: TimeEntry["id"];
 		workspaceId: TimeEntry["workspaceId"];
+		id: TimeEntry["id"];
 		data: typeof TimeEntry.jsonUpdate.Type;
 	}) => Effect.Effect<
 		TimeEntry,
@@ -36,10 +36,10 @@ interface TimeModuleShape {
 		| TimeEntryAlreadyRunningError
 		| RepositoryError
 	>;
-	readonly hardDeleteTimeEntry: (params: {
-		id: TimeEntry["id"];
+	readonly hardDeleteTimeEntries: (params: {
 		workspaceId: TimeEntry["workspaceId"];
-	}) => Effect.Effect<void, TimeEntryNotFoundError | RepositoryError>;
+		ids: ReadonlyArray<TimeEntry["id"]>;
+	}) => Effect.Effect<void, RepositoryError>;
 }
 
 export class TimeModule extends ServiceMap.Service<
