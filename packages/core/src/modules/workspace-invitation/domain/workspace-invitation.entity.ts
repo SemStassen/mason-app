@@ -14,8 +14,8 @@ export class WorkspaceInvitation extends Model.Class<WorkspaceInvitation>(
     id: Model.ServerImmutable(WorkspaceInvitationId),
     inviterId: Model.ServerImmutable(WorkspaceMemberId),
     workspaceId: Model.ServerImmutable(WorkspaceId),
-    email: Model.ClientProvided(Email),
-    role: Model.ClientProvided(WorkspaceRole),
+    email: Model.ClientRequiredImmutable(Email),
+    role: Model.ClientRequiredImmutable(WorkspaceRole),
     status: Model.ServerManaged(
       Schema.Literals(["pending", "accepted", "rejected", "canceled"])
     ),

@@ -4,13 +4,13 @@ import { WorkspaceId } from "#shared/schemas/index";
 export class Workspace extends Model.Class<Workspace>("Workspace")(
   {
     id: Model.ServerImmutable(WorkspaceId),
-    name: Model.Mutable(
+    name: Model.ClientMutable(
       Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(100))
     ),
-    slug: Model.Mutable(
+    slug: Model.ClientMutable(
       Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(100))
     ),
-    logoUrl: Model.MutableOptional(Schema.NonEmptyTrimmedString),
+    logoUrl: Model.ClientMutableOptional(Schema.NonEmptyTrimmedString),
   },
   {
     identifier: "Workspace",

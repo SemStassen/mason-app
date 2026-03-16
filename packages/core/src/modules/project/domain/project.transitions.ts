@@ -1,5 +1,5 @@
 import { DateTime, Option, Result } from "effect";
-import { ProjectId } from "#shared/schemas/index";
+import { HexColor, ProjectId } from "#shared/schemas/index";
 import { generateUUID } from "#shared/utils/index";
 import { Project } from "./project.entity";
 import {
@@ -38,8 +38,8 @@ export const createProject = (params: {
 			id: ProjectId.makeUnsafe(generateUUID()),
 			workspaceId: params.workspaceId,
 			name: params.data.name,
-			hexColor: params.data.hexColor ?? Option.none(),
-			isBillable: params.data.isBillable ?? Option.none(),
+			hexColor: params.data.hexColor ?? HexColor.makeUnsafe("#000000"),
+			isBillable: params.data.isBillable ?? false,
 			startDate: params.data.startDate ?? Option.none(),
 			endDate: params.data.endDate ?? Option.none(),
 			notes: params.data.notes ?? Option.none(),

@@ -19,25 +19,18 @@ export class WorkspaceIntegration extends Model.Class<WorkspaceIntegration>(
     id: Model.ServerImmutable(WorkspaceIntegrationId),
     workspaceId: Model.ServerImmutable(WorkspaceId),
     createdByWorkspaceMemberId: Model.ServerImmutable(WorkspaceMemberId),
-    provider: Model.Field({
-      select: WorkspaceIntegrationProvider,
-      insert: WorkspaceIntegrationProvider,
-      json: WorkspaceIntegrationProvider,
-      jsonCreate: WorkspaceIntegrationProvider,
-    }),
+    provider: Model.ClientImmutable(WorkspaceIntegrationProvider),
     apiKey: Model.Field({
       select: EncryptedApiKey,
       insert: EncryptedApiKey,
-      update: EncryptedApiKey,
+      update: Schema.optionalKey(EncryptedApiKey),
       jsonCreate: PlainApiKey,
       jsonUpdate: Schema.optionalKey(PlainApiKey),
     }),
-    _metadata: Model.ServerManaged(
-      Schema.Option(
-        Schema.Struct({
-          lastSyncedAt: Schema.optionalKey(Schema.DateTimeUtcFromDate),
-        })
-      )
+    _metadata: Model.ServerManagedNullable(
+      Schema.Struct({
+        lastSyncedAt: Schema.optionalKey(Schema.DateTimeUtcFromDate),
+      })
     ),
     createdAt: Model.SystemGenerated(Schema.DateTimeUtcFromDate),
   },

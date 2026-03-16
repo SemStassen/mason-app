@@ -1,5 +1,5 @@
-import { Option, Schema } from "effect";
-import { Model } from "#shared/effect/index";
+import { Option } from "effect";
+import { Model, Schema } from "#shared/effect/index";
 import {
   ProjectId,
   TaskId,
@@ -10,21 +10,14 @@ import {
 
 export class TimeEntry extends Model.Class<TimeEntry>("TimeEntry")(
   {
-    id: Model.ServerImmutable(TimeEntryId),
+    id: Model.ClientGenerated(TimeEntryId),
     workspaceId: Model.ServerImmutable(WorkspaceId),
     workspaceMemberId: Model.ServerManaged(WorkspaceMemberId),
-    projectId: Model.Mutable(ProjectId),
-    taskId: Model.MutableOptional(TaskId),
-    startedAt: Model.Field({
-      select: Schema.DateTimeUtcFromDate,
-      insert: Schema.DateTimeUtcFromDate,
-      update: Schema.optionalKey(Schema.DateTimeUtcFromDate),
-      json: Schema.DateTimeUtcFromDate,
-      jsonCreate: Schema.optionalKey(Schema.DateTimeUtcFromDate),
-      jsonUpdate: Schema.optionalKey(Schema.DateTimeUtcFromDate),
-    }),
-    stoppedAt: Model.MutableOptional(Schema.DateTimeUtcFromDate),
-    notes: Model.MutableOptional(Schema.Json),
+    projectId: Model.ClientMutable(ProjectId),
+    taskId: Model.ClientMutableOptional(TaskId),
+    startedAt: Model.ClientMutableWithDefault(Schema.DateTimeUtcFromDate),
+    stoppedAt: Model.ClientMutableOptional(Schema.DateTimeUtcFromDate),
+    notes: Model.ClientMutableOptional(Schema.Json),
   },
   {
     identifier: "TimeEntry",
