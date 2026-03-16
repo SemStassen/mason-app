@@ -54,17 +54,6 @@
         "typescript": "catalog:dev",
       },
     },
-    "apps/server": {
-      "name": "@mason/server",
-      "dependencies": {
-        "@mason/core": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@mason/config": "workspace:*",
-        "typescript": "catalog:dev",
-      },
-    },
     "apps/web": {
       "name": "@mason/web",
       "dependencies": {
@@ -131,6 +120,7 @@
     "packages/auth": {
       "name": "@mason/auth",
       "dependencies": {
+        "@mason/db": "workspace:*",
         "better-auth": "^1.4.10",
         "effect": "catalog:",
       },
@@ -565,8 +555,6 @@
     "@mason/electric-proxy": ["@mason/electric-proxy@workspace:apps/electric-proxy"],
 
     "@mason/interface": ["@mason/interface@workspace:interface"],
-
-    "@mason/server": ["@mason/server@workspace:apps/server"],
 
     "@mason/telemetry": ["@mason/telemetry@workspace:packages/telemetry"],
 

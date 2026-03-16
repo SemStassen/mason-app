@@ -6,7 +6,8 @@
     "rules": {
       "correctness": {
         "noChildrenProp": "off",
-        "noNestedComponentDefinitions": "off"
+        "noNestedComponentDefinitions": "off",
+        "useImportExtensions": "off"
       },
       "complexity": {
         "noExcessiveLinesPerFunction": {

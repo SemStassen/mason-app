@@ -1,4 +1,5 @@
 import { PgClient } from "@effect/sql-pg";
+// biome-ignore lint/performance/noNamespaceImport: Needed for PgDrizzle
 import * as PgDrizzle from "drizzle-orm/effect-postgres";
 import { Effect, Layer, Redacted, ServiceMap } from "effect";
 import { types } from "pg";
@@ -29,7 +30,7 @@ export class Drizzle extends ServiceMap.Service<
   Drizzle,
   PgDrizzle.EffectPgDatabase<typeof schema, typeof relations>
 >()("@mason/db/Drizzle") {
-  static readonly live = Layer.effect(
+  static readonly layer = Layer.effect(
     Drizzle,
     Effect.gen(function* () {
       const db = yield* PgDrizzle.make({

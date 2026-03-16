@@ -1,11 +1,12 @@
 import { defineRelations } from "drizzle-orm";
-import { schema } from ".";
+// biome-ignore lint/performance/noNamespaceImport: Needed for schema
+import * as schema from "./schema";
 
 const identityRelations = defineRelations(schema, (r) => ({
   usersTable: {
     sessions: r.many.sessionsTable(),
     accounts: r.many.accountsTable(),
-    memberships: r.many.membersTable(),
+    workspaceMemberships: r.many.workspaceMembersTable(),
   },
   sessionsTable: {
     user: r.one.usersTable({
@@ -27,9 +28,9 @@ const integrationRelations = defineRelations(schema, (r) => ({
       from: r.workspaceIntegrationsTable.workspaceId,
       to: r.workspacesTable.id,
     }),
-    createdByMember: r.one.membersTable({
-      from: r.workspaceIntegrationsTable.createdByMemberId,
-      to: r.membersTable.id,
+    createdByWorkspaceMember: r.one.workspaceMembersTable({
+      from: r.workspaceIntegrationsTable.createdByWorkspaceMemberId,
+      to: r.workspaceMembersTable.id,
     }),
   },
   projectIntegrationsTable: {
@@ -54,14 +55,14 @@ const integrationRelations = defineRelations(schema, (r) => ({
   },
 }));
 
-const memberRelations = defineRelations(schema, (r) => ({
-  membersTable: {
+const workspaceMemberRelations = defineRelations(schema, (r) => ({
+  workspaceMembersTable: {
     user: r.one.usersTable({
-      from: r.membersTable.userId,
+      from: r.workspaceMembersTable.userId,
       to: r.usersTable.id,
     }),
     workspace: r.one.workspacesTable({
-      from: r.membersTable.workspaceId,
+      from: r.workspaceMembersTable.workspaceId,
       to: r.workspacesTable.id,
     }),
     sentWorkspaceInvitations: r.many.workspaceInvitationsTable(),
@@ -91,9 +92,9 @@ const projectRelations = defineRelations(schema, (r) => ({
 
 const timeRelations = defineRelations(schema, (r) => ({
   timeEntriesTable: {
-    member: r.one.membersTable({
-      from: r.timeEntriesTable.memberId,
-      to: r.membersTable.id,
+    workspaceMember: r.one.workspaceMembersTable({
+      from: r.timeEntriesTable.workspaceMemberId,
+      to: r.workspaceMembersTable.id,
     }),
     project: r.one.projectsTable({
       from: r.timeEntriesTable.projectId,
@@ -108,7 +109,7 @@ const timeRelations = defineRelations(schema, (r) => ({
 
 const workspaceRelations = defineRelations(schema, (r) => ({
   workspacesTable: {
-    members: r.many.membersTable(),
+    members: r.many.workspaceMembersTable(),
     integrations: r.many.workspaceIntegrationsTable(),
     projects: r.many.projectsTable(),
     timeEntries: r.many.timeEntriesTable(),
@@ -121,9 +122,9 @@ const workspaceInvitationRelations = defineRelations(schema, (r) => ({
       from: r.workspaceInvitationsTable.workspaceId,
       to: r.workspacesTable.id,
     }),
-    inviter: r.one.membersTable({
+    inviter: r.one.workspaceMembersTable({
       from: r.workspaceInvitationsTable.inviterId,
-      to: r.membersTable.id,
+      to: r.workspaceMembersTable.id,
     }),
   },
 }));
@@ -131,7 +132,7 @@ const workspaceInvitationRelations = defineRelations(schema, (r) => ({
 export const relations = {
   ...identityRelations,
   ...integrationRelations,
-  ...memberRelations,
+  ...workspaceMemberRelations,
   ...projectRelations,
   ...timeRelations,
   ...workspaceRelations,

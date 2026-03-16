@@ -1,7 +1,14 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
-  "extends": ["../../biome.jsonc"],
+  "extends": "//",
   "root": false,
+  "linter": {
+    "rules": {
+      "performance": {
+        "noNamespaceImport": "off"
+      }
+    }
+  },
   "assist": {
     "actions": {
       "source": {

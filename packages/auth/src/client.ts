@@ -1,30 +1,31 @@
-import { DrizzleService, schema } from "@mason/db";
+import { Drizzle, schema } from "@mason/db";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, emailOTP, organization } from "better-auth/plugins";
-import { Config, Effect, Schema } from "effect";
-export class BetterAuthError extends Schema.TaggedError<BetterAuthError>()(
+import { Config, Effect, Layer, Schema, ServiceMap } from "effect";
+
+export class BetterAuthError extends Schema.TaggedErrorClass<BetterAuthError>()(
   "shared/BetterAuthError",
   {
     cause: Schema.Unknown,
   }
 ) {}
 
-export class AuthService extends Effect.Service<AuthService>()(
-  "@mason/shared/AuthService",
+export class Authentication extends ServiceMap.Service<Authentication>()(
+  "@mason/auth/Authentication",
   {
-    effect: Effect.gen(function* () {
+    make: Effect.gen(function* () {
       const authConfig = yield* Config.all({
         googleClientId: Config.string("GOOGLE_CLIENT_ID"),
         googleClientSecret: Config.string("GOOGLE_CLIENT_SECRET"),
       });
 
-      const db = yield* DrizzleService;
+      const drizzle = yield* Drizzle;
 
       // This is required to be separate for the type inference to work in the customSession plugin
       const betterAuthOptions = {
         appName: "Mason",
-        database: drizzleAdapter(db.drizzle, {
+        database: drizzleAdapter(drizzle, {
           provider: "pg",
           schema: schema,
         }),
@@ -134,4 +135,8 @@ export class AuthService extends Effect.Service<AuthService>()(
       return { use } as const;
     }).pipe(Effect.catchTags({ ConfigError: (error) => Effect.die(error) })),
   }
-) {}
+) {
+  static readonly layer = Layer.effect(this, this.make).pipe(
+    Layer.provide(Drizzle.layer),
+  );
+}

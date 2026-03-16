@@ -9,6 +9,7 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
+    "@mason/db": "workspace:*",
     "better-auth": "^1.4.10",
     "effect": "catalog:"
   },
