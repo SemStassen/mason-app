@@ -1,5 +1,0 @@
-{
-  "extends": "@mason/config/package.tsconfig.json",
-  "include": ["src", "../project.dto.ts"],
-  "exclude": ["dist"]
-}

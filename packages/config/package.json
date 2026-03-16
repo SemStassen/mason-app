@@ -6,7 +6,7 @@
   },
   "private": true,
   "scripts": {
-    "clean": "git clean -xdf node_modules",
+    "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
     "format": "biome format --write .",
     "lint": "biome check .",
     "typecheck": "tsc -noEmit"

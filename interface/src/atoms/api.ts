@@ -28,7 +28,7 @@ export const createWorkspaceIntegrationAtom = Atom.optimisticFn(
       const optimisticResponse = WorkspaceIntegrationResponse.make({
         id: crypto.randomUUID(),
         workspaceId: "temp",
-        kind: update.kind,
+        provider: update.provider,
         _metadata: null,
         createdAt: new Date(),
       });

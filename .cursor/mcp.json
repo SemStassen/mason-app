@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "effect-docs": {
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "timsmart/effect-mcp"],
-      "env": {}
-    }
-  }
-}

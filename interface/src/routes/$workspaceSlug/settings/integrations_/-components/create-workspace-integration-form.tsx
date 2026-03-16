@@ -9,7 +9,7 @@ const createWorkspaceIntegrationSchema = z.object({
   apiKeyUnencrypted: z.string(),
 });
 
-function CreateWorkspaceIntegrationForm({ kind }: { kind: "float" }) {
+function CreateWorkspaceIntegrationForm({ provider }: { provider: "float" }) {
   const createWorkspaceIntegration = useAtomSet(
     createWorkspaceIntegrationAtom,
     {
@@ -24,7 +24,7 @@ function CreateWorkspaceIntegrationForm({ kind }: { kind: "float" }) {
     onSubmit: async ({ value }) => {
       const result = createWorkspaceIntegrationSchema.parse(value);
       await createWorkspaceIntegration({
-        kind: kind,
+        provider: provider,
         ...result,
       }).then((exit) =>
         Effect.runPromise(

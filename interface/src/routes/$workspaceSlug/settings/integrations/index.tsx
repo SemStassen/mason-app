@@ -22,49 +22,51 @@ function RouteComponent() {
       <IntegrationCard
         description={defaultDescription}
         icon={<Icons.Company.Float />}
-        kind="float"
+        provider="float"
       />
       <IntegrationCard
         description={defaultDescription}
         disabled={true}
         icon={<Icons.Company.Early />}
-        kind="early"
+        provider="early"
       />
       <IntegrationCard
         description={defaultDescription}
         disabled={true}
         icon={<Icons.Company.Simplicate />}
-        kind="simplicate"
+        provider="simplicate"
       />
       <IntegrationCard
         description={defaultDescription}
         disabled={true}
         icon={<Icons.Company.Toggl />}
-        kind="toggl"
+        provider="toggl"
       />
     </div>
   );
 }
 
 function IntegrationCard({
-  kind,
+  provider,
   description,
   icon,
   disabled = false,
 }: {
-  kind: "float" | "early" | "simplicate" | "toggl";
+  provider: "float" | "early" | "simplicate" | "toggl";
   description: string;
   icon: React.ReactNode;
   disabled?: boolean;
 }) {
   const workspaceIntegrations = useAtomValue(workspaceIntegrationsAtom);
-  const integration = workspaceIntegrations.find((i) => i.kind === kind);
+  const integration = workspaceIntegrations.find(
+    (i) => i.provider === provider
+  );
 
   return (
     <Link
       disabled={disabled}
       from="/$workspaceSlug/settings/integrations"
-      to={`/$workspaceSlug/settings/integrations/${kind as "float"}`}
+      to={`/$workspaceSlug/settings/integrations/${provider as "float"}`}
     >
       <Card>
         <CardHeader className="flex items-center justify-between">
@@ -72,7 +74,7 @@ function IntegrationCard({
             <Avatar rounded="lg">
               <AvatarFallback>{icon}</AvatarFallback>
             </Avatar>
-            <CardTitle>{kind}</CardTitle>
+            <CardTitle>{provider}</CardTitle>
           </div>
           {disabled && <Badge variant="info">Coming soon</Badge>}
           {integration && <Badge variant="success">Connected</Badge>}

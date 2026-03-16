@@ -71,7 +71,7 @@ const floatFetch = ({ apiKey, path }: { apiKey: PlainApiKey; path: string }) =>
       if (res.status === 401) {
         return yield* Effect.fail(
           new InvalidApiKeyError({
-            kind: "float",
+            provider: "float",
             path: path,
             error: body,
           })

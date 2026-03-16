@@ -10,7 +10,7 @@ export class InternalAdapterError extends Schema.TaggedError<InternalAdapterErro
 export class InvalidApiKeyError extends Schema.TaggedError<InvalidApiKeyError>()(
   "adapters/InvalidApiKeyError",
   {
-    kind: Schema.Literal("float"),
+    provider: Schema.Literal("float"),
     path: Schema.String,
     error: Schema.Unknown,
   }
