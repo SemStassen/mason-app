@@ -5,27 +5,27 @@ import { WorkspaceContext } from "#shared/auth/index";
 import { TaskId } from "#shared/schemas/index";
 
 export const RestoreTaskRequest = Schema.Struct({
-	id: TaskId,
+  id: TaskId,
 });
 
 export const RestoreTaskResponse = Schema.Void;
 
-export const RestoreTaskFlow = Effect.fn("flows/RestoreTaskFlow")(function* (
-	request: typeof RestoreTaskRequest.Type,
+export const restoreTaskFlow = Effect.fn("flows.restoreTaskFlow")(function* (
+  request: typeof RestoreTaskRequest.Type
 ) {
-	const { member, workspace } = yield* WorkspaceContext;
+  const { member, workspace } = yield* WorkspaceContext;
 
-	const authz = yield* Authorization;
+  const authz = yield* Authorization;
 
-	const projectModule = yield* ProjectModule;
+  const projectModule = yield* ProjectModule;
 
-	yield* authz.ensureAllowed({
-		action: "project:restore_task",
-		role: member.role,
-	});
+  yield* authz.ensureAllowed({
+    action: "project:restore_task",
+    role: member.role,
+  });
 
-	yield* projectModule.restoreTask({
-		id: request.id,
-		workspaceId: workspace.id,
-	});
+  yield* projectModule.restoreTask({
+    id: request.id,
+    workspaceId: workspace.id,
+  });
 });

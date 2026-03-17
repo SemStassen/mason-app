@@ -7,25 +7,25 @@ export const CreateTimeEntryRequest = TimeEntry.jsonCreate;
 
 export const CreateTimeEntryResponse = TimeEntry.json;
 
-export const CreateTimeEntryFlow = Effect.fn("flows/CreateTimeEntryFlow")(
-	function* (request: typeof CreateTimeEntryRequest.Type) {
-		const { member, workspace } = yield* WorkspaceContext;
+export const createTimeEntryFlow = Effect.fn("flows.createTimeEntryFlow")(
+  function* (request: typeof CreateTimeEntryRequest.Type) {
+    const { member, workspace } = yield* WorkspaceContext;
 
-		const authz = yield* Authorization;
+    const authz = yield* Authorization;
 
-		const timeModule = yield* TimeModule;
+    const timeModule = yield* TimeModule;
 
-		yield* authz.ensureAllowed({
-			action: "time:create_time_entry",
-			role: member.role,
-		});
+    yield* authz.ensureAllowed({
+      action: "time:create_time_entry",
+      role: member.role,
+    });
 
-		const [createdTimeEntry] = yield* timeModule.createTimeEntries({
-			workspaceId: workspace.id,
-			workspaceMemberId: member.id,
-			data: [request],
-		});
+    const [createdTimeEntry] = yield* timeModule.createTimeEntries({
+      workspaceId: workspace.id,
+      workspaceMemberId: member.id,
+      data: [request],
+    });
 
-		return createdTimeEntry satisfies typeof CreateTimeEntryResponse.Type;
-	},
+    return createdTimeEntry satisfies typeof CreateTimeEntryResponse.Type;
+  }
 );

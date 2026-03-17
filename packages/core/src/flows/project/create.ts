@@ -7,24 +7,24 @@ export const CreateProjectRequest = Project.jsonCreate;
 
 export const CreateProjectResponse = Project.json;
 
-export const CreateProjectFlow = Effect.fn("flows/CreateProjectFlow")(
-	function* (request: typeof CreateProjectRequest.Type) {
-		const { member, workspace } = yield* WorkspaceContext;
+export const createProjectFlow = Effect.fn("flows.createProjectFlow")(
+  function* (request: typeof CreateProjectRequest.Type) {
+    const { member, workspace } = yield* WorkspaceContext;
 
-		const authz = yield* Authorization;
+    const authz = yield* Authorization;
 
-		const projectModule = yield* ProjectModule;
+    const projectModule = yield* ProjectModule;
 
-		yield* authz.ensureAllowed({
-			action: "project:create",
-			role: member.role,
-		});
+    yield* authz.ensureAllowed({
+      action: "project:create",
+      role: member.role,
+    });
 
-		const [createdProject] = yield* projectModule.createProjects({
-			workspaceId: workspace.id,
-			data: [request],
-		});
+    const [createdProject] = yield* projectModule.createProjects({
+      workspaceId: workspace.id,
+      data: [request],
+    });
 
-		return createdProject satisfies typeof CreateProjectResponse.Type;
-	},
+    return createdProject satisfies typeof CreateProjectResponse.Type;
+  }
 );

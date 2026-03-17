@@ -1,4 +1,4 @@
-export * from "./api/index";
+export * from "./api/rpc";
 
 /** Modules */
 export * from "./modules/identity";

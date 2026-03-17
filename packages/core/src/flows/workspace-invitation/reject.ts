@@ -4,22 +4,22 @@ import { SessionContext } from "#shared/auth/index";
 import { WorkspaceInvitationId } from "#shared/schemas/index";
 
 export const RejectWorkspaceInvitationRequest = Schema.Struct({
-	id: WorkspaceInvitationId,
+  id: WorkspaceInvitationId,
 });
 
 export const RejectWorkspaceInvitationResponse = Schema.Void;
 
-export const RejectWorkspaceInvitationFlow = Effect.fn(
-	"flows/RejectWorkspaceInvitationFlow",
+export const rejectWorkspaceInvitationFlow = Effect.fn(
+  "flows.rejectWorkspaceInvitationFlow"
 )(function* (request: typeof RejectWorkspaceInvitationRequest.Type) {
-	const { user } = yield* SessionContext;
+  const { user } = yield* SessionContext;
 
-	const workspaceInvitationModule = yield* WorkspaceInvitationModule;
+  const workspaceInvitationModule = yield* WorkspaceInvitationModule;
 
-	yield* workspaceInvitationModule.rejectWorkspaceInvitation({
-		id: request.id,
-		email: user.email,
-	});
+  yield* workspaceInvitationModule.rejectWorkspaceInvitation({
+    id: request.id,
+    email: user.email,
+  });
 
-	return undefined satisfies typeof RejectWorkspaceInvitationResponse.Type;
+  return undefined satisfies typeof RejectWorkspaceInvitationResponse.Type;
 });

@@ -5,31 +5,31 @@ import { WorkspaceContext } from "#shared/auth/index";
 import { TimeEntryId } from "#shared/schemas/index";
 
 export const UpdateTimeEntryRequest = Schema.Struct({
-	timeEntryId: TimeEntryId,
-	data: TimeEntry.jsonUpdate,
+  timeEntryId: TimeEntryId,
+  data: TimeEntry.jsonUpdate,
 });
 
 export const UpdateTimeEntryResponse = TimeEntry.json;
 
-export const UpdateTimeEntryFlow = Effect.fn("flows/UpdateTimeEntryFlow")(
-	function* (request: typeof UpdateTimeEntryRequest.Type) {
-		const { member, workspace } = yield* WorkspaceContext;
+export const updateTimeEntryFlow = Effect.fn("flows.updateTimeEntryFlow")(
+  function* (request: typeof UpdateTimeEntryRequest.Type) {
+    const { member, workspace } = yield* WorkspaceContext;
 
-		const authz = yield* Authorization;
+    const authz = yield* Authorization;
 
-		const timeModule = yield* TimeModule;
+    const timeModule = yield* TimeModule;
 
-		yield* authz.ensureAllowed({
-			action: "time:update_time_entry",
-			role: member.role,
-		});
+    yield* authz.ensureAllowed({
+      action: "time:update_time_entry",
+      role: member.role,
+    });
 
-		const updatedTimeEntry = yield* timeModule.updateTimeEntry({
-			id: request.timeEntryId,
-			workspaceId: workspace.id,
-			data: request.data,
-		});
+    const updatedTimeEntry = yield* timeModule.updateTimeEntry({
+      id: request.timeEntryId,
+      workspaceId: workspace.id,
+      data: request.data,
+    });
 
-		return updatedTimeEntry satisfies typeof UpdateTimeEntryResponse.Type;
-	},
+    return updatedTimeEntry satisfies typeof UpdateTimeEntryResponse.Type;
+  }
 );

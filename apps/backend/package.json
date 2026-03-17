@@ -1,0 +1,20 @@
+{
+  "name": "@mason/backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
+  },
+  "dependencies": {
+    "@mason/core": "workspace:*",
+    "@mason/core-server": "workspace:*",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "typescript": "catalog:dev"
+  }
+}

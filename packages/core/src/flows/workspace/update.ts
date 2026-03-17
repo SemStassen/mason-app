@@ -7,24 +7,24 @@ export const UpdateWorkspaceRequest = Workspace.jsonUpdate;
 
 export const UpdateWorkspaceResponse = Workspace.json;
 
-export const UpdateWorkspaceFlow = Effect.fn("flows/UpdateWorkspaceFlow")(
-	function* (request: typeof UpdateWorkspaceRequest.Type) {
-		const { member, workspace } = yield* WorkspaceContext;
+export const updateWorkspaceFlow = Effect.fn("flows.updateWorkspaceFlow")(
+  function* (request: typeof UpdateWorkspaceRequest.Type) {
+    const { member, workspace } = yield* WorkspaceContext;
 
-		const authz = yield* Authorization;
+    const authz = yield* Authorization;
 
-		const workspaceModule = yield* WorkspaceModule;
+    const workspaceModule = yield* WorkspaceModule;
 
-		yield* authz.ensureAllowed({
-			action: "workspace:patch",
-			role: member.role,
-		});
+    yield* authz.ensureAllowed({
+      action: "workspace:patch",
+      role: member.role,
+    });
 
-		const updatedWorkspace = yield* workspaceModule.updateWorkspace({
-			id: workspace.id,
-			data: request,
-		});
+    const updatedWorkspace = yield* workspaceModule.updateWorkspace({
+      id: workspace.id,
+      data: request,
+    });
 
-		return updatedWorkspace satisfies typeof UpdateWorkspaceResponse.Type;
-	},
+    return updatedWorkspace satisfies typeof UpdateWorkspaceResponse.Type;
+  }
 );

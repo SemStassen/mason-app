@@ -5,63 +5,65 @@ import { TimeEntry } from "./time-entry.entity";
 import { TimeEntryStoppedAtBeforeStartedAtError } from "./time-entry.errors";
 
 const ensureValidDateRange = (
-	startedAt: DateTime.Utc,
-	stoppedAt: Option.Option<DateTime.Utc>,
+  startedAt: DateTime.Utc,
+  stoppedAt: Option.Option<DateTime.Utc>
 ): Result.Result<void, TimeEntryStoppedAtBeforeStartedAtError> =>
-	Option.match(stoppedAt, {
-		onNone: () => Result.succeed(undefined), // running timer, no end to validate
-		onSome: (stopped) =>
-			DateTime.isGreaterThanOrEqualTo(stopped, startedAt)
-				? Result.succeed(undefined)
-				: Result.fail(new TimeEntryStoppedAtBeforeStartedAtError()),
-	});
+  Option.match(stoppedAt, {
+    onNone: () => Result.succeed(undefined), // running timer, no end to validate
+    onSome: (stopped) =>
+      DateTime.isGreaterThanOrEqualTo(stopped, startedAt)
+        ? Result.succeed(undefined)
+        : Result.fail(new TimeEntryStoppedAtBeforeStartedAtError()),
+  });
 
 export const createTimeEntry = (params: {
-	workspaceId: TimeEntry["workspaceId"];
-	workspaceMemberId: TimeEntry["workspaceMemberId"];
-	data: typeof TimeEntry.jsonCreate.Type;
-	now: DateTime.Utc;
+  workspaceId: TimeEntry["workspaceId"];
+  workspaceMemberId: TimeEntry["workspaceMemberId"];
+  data: typeof TimeEntry.jsonCreate.Type;
+  now: DateTime.Utc;
 }): Result.Result<TimeEntry, TimeEntryStoppedAtBeforeStartedAtError> =>
-	Result.gen(function* () {
-		const createdTimeEntry = TimeEntry.make({
-			...params.data,
-			id: TimeEntryId.makeUnsafe(generateUUID()),
-			workspaceId: params.workspaceId,
-			workspaceMemberId: params.workspaceMemberId,
-			taskId: params.data.taskId ?? Option.none(),
-			startedAt: params.data.startedAt ?? params.now,
-			stoppedAt: params.data.stoppedAt ?? Option.none(),
-			notes: params.data.notes ?? Option.none(),
-		});
+  Result.gen(function* () {
+    const { id, ...rest } = params.data;
 
-		yield* ensureValidDateRange(
-			createdTimeEntry.startedAt,
-			createdTimeEntry.stoppedAt,
-		);
+    const createdTimeEntry = TimeEntry.make({
+      id: Option.getOrElse(id, () => TimeEntryId.makeUnsafe(generateUUID())),
+      workspaceId: params.workspaceId,
+      workspaceMemberId: params.workspaceMemberId,
+      taskId: params.data.taskId ?? Option.none(),
+      startedAt: params.data.startedAt ?? params.now,
+      stoppedAt: params.data.stoppedAt ?? Option.none(),
+      notes: params.data.notes ?? Option.none(),
+      ...rest,
+    });
 
-		return createdTimeEntry;
-	});
+    yield* ensureValidDateRange(
+      createdTimeEntry.startedAt,
+      createdTimeEntry.stoppedAt
+    );
+
+    return createdTimeEntry;
+  });
 
 export const updateTimeEntry = (params: {
-	timeEntry: TimeEntry;
-	data: typeof TimeEntry.jsonUpdate.Type;
+  timeEntry: TimeEntry;
+  data: typeof TimeEntry.jsonUpdate.Type;
 }): Result.Result<
-	{ entity: TimeEntry; changes: typeof TimeEntry.update.Type },
-	TimeEntryStoppedAtBeforeStartedAtError
+  { entity: TimeEntry; changes: typeof TimeEntry.update.Type },
+  TimeEntryStoppedAtBeforeStartedAtError
 > =>
-	Result.gen(function* () {
-		const updatedTimeEntry = TimeEntry.make({
-			...params.timeEntry,
-			...params.data,
-		});
+  Result.gen(function* () {
+    const updatedTimeEntry = TimeEntry.make({
+      ...params.timeEntry,
+      ...params.data,
+    });
 
-		yield* ensureValidDateRange(
-			updatedTimeEntry.startedAt,
-			updatedTimeEntry.stoppedAt,
-		);
+    yield* ensureValidDateRange(
+      updatedTimeEntry.startedAt,
+      updatedTimeEntry.stoppedAt
+    );
 
-		return {
-			entity: updatedTimeEntry,
-			changes: params.data,
-		};
-	});
+    return {
+      entity: updatedTimeEntry,
+      changes: params.data,
+    };
+  });

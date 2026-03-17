@@ -5,28 +5,28 @@ import { WorkspaceMemberModule } from "#modules/workspace-member/index";
 import { SessionContext } from "#shared/auth/index";
 
 export const SetActiveWorkspaceRequest = Schema.Struct({
-	id: Workspace.fields.id,
+  id: Workspace.fields.id,
 });
 
 export const SetActiveWorkspaceResponse = Schema.Void;
 
-export const SetActiveWorkspaceFlow = Effect.fn("flows/SetActiveWorkspaceFlow")(
-	function* (request: typeof SetActiveWorkspaceRequest.Type) {
-		const { user, session } = yield* SessionContext;
+export const setActiveWorkspaceFlow = Effect.fn("flows.setActiveWorkspaceFlow")(
+  function* (request: typeof SetActiveWorkspaceRequest.Type) {
+    const { user, session } = yield* SessionContext;
 
-		const memberModule = yield* WorkspaceMemberModule;
-		const identityModule = yield* IdentityModule;
+    const memberModule = yield* WorkspaceMemberModule;
+    const identityModule = yield* IdentityModule;
 
-		yield* memberModule.assertUserWorkspaceMember({
-			workspaceId: request.id,
-			userId: user.id,
-		});
+    yield* memberModule.assertUserWorkspaceMember({
+      workspaceId: request.id,
+      userId: user.id,
+    });
 
-		yield* identityModule.setActiveWorkspace({
-			sessionId: session.id,
-			workspaceId: Option.some(request.id),
-		});
+    yield* identityModule.setActiveWorkspace({
+      sessionId: session.id,
+      workspaceId: Option.some(request.id),
+    });
 
-		return undefined satisfies typeof SetActiveWorkspaceResponse.Type;
-	},
+    return undefined satisfies typeof SetActiveWorkspaceResponse.Type;
+  }
 );

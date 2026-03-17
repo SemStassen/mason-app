@@ -1,28 +1,30 @@
 {
-	"name": "@mason/core",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
-		"format": "biome format --write .",
-		"lint": "biome check .",
-		"typecheck": "tsc -noEmit"
-	},
-	"dependencies": {
-		"@mason/authorization": "workspace:*",
-		"effect": "catalog:",
-		"uuid": "^13.0.0"
-	},
-	"devDependencies": {
-		"@mason/config": "workspace:*",
-		"typescript": "catalog:dev"
-	},
-	"imports": {
-		"#flows/*": "./src/flows/*.ts",
-		"#modules/*": "./src/modules/*.ts",
-		"#shared/*": "./src/shared/*.ts"
-	},
-	"exports": {
-		".": "./src/index.ts"
-	}
+  "name": "@mason/core",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "typecheck": "tsc -noEmit"
+  },
+  "dependencies": {
+    "@mason/authorization": "workspace:*",
+    "effect": "catalog:",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@mason/config": "workspace:*",
+    "typescript": "catalog:dev"
+  },
+  "imports": {
+    "#flows/*": "./src/flows/*.ts",
+    "#modules/*": "./src/modules/*.ts",
+    "#shared/*": "./src/shared/*.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./rpc": "./src/api/rpc/index.ts",
+    "./flows/*": "./src/flows/*/index.ts"
+  }
 }

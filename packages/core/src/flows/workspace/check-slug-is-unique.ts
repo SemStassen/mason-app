@@ -2,23 +2,23 @@ import { Effect, Schema } from "effect";
 import { Workspace, WorkspaceModule } from "#modules/workspace/index";
 
 export const CheckWorkspaceSlugIsUniqueRequest = Schema.Struct({
-	slug: Workspace.fields.slug,
+  slug: Workspace.fields.slug,
 });
 
 export const CheckWorkspaceSlugIsUniqueResponse = Schema.Struct({
-	isUnique: Schema.Boolean,
+  isUnique: Schema.Boolean,
 });
 
-export const CheckWorkspaceSlugIsUniqueFlow = Effect.fn(
-	"flows/CheckWorkspaceSlugIsUniqueFlow",
+export const checkWorkspaceSlugIsUniqueFlow = Effect.fn(
+  "flows.checkWorkspaceSlugIsUniqueFlow"
 )(function* (params: typeof CheckWorkspaceSlugIsUniqueRequest.Type) {
-	const workspaceModule = yield* WorkspaceModule;
+  const workspaceModule = yield* WorkspaceModule;
 
-	const isUnique = yield* workspaceModule.checkWorkspaceSlugAvailability(
-		params.slug,
-	);
+  const isUnique = yield* workspaceModule.checkWorkspaceSlugAvailability(
+    params.slug
+  );
 
-	return {
-		isUnique,
-	} satisfies typeof CheckWorkspaceSlugIsUniqueResponse.Type;
+  return {
+    isUnique,
+  } satisfies typeof CheckWorkspaceSlugIsUniqueResponse.Type;
 });

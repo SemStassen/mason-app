@@ -7,24 +7,24 @@ export const CreateTaskRequest = Task.jsonCreate;
 
 export const CreateTaskResponse = Task.json;
 
-export const CreateTaskFlow = Effect.fn("flows/CreateTaskFlow")(function* (
-	request: typeof CreateTaskRequest.Type,
+export const createTaskFlow = Effect.fn("flows.createTaskFlow")(function* (
+  request: typeof CreateTaskRequest.Type
 ) {
-	const { member, workspace } = yield* WorkspaceContext;
+  const { member, workspace } = yield* WorkspaceContext;
 
-	const authz = yield* Authorization;
+  const authz = yield* Authorization;
 
-	const projectModule = yield* ProjectModule;
+  const projectModule = yield* ProjectModule;
 
-	yield* authz.ensureAllowed({
-		action: "project:create_task",
-		role: member.role,
-	});
+  yield* authz.ensureAllowed({
+    action: "project:create_task",
+    role: member.role,
+  });
 
-	const [createdTask] = yield* projectModule.createTasks({
-		workspaceId: workspace.id,
-		data: [request],
-	});
+  const [createdTask] = yield* projectModule.createTasks({
+    workspaceId: workspace.id,
+    data: [request],
+  });
 
-	return createdTask satisfies typeof CreateTaskResponse.Type;
+  return createdTask satisfies typeof CreateTaskResponse.Type;
 });
