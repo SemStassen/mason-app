@@ -7,6 +7,8 @@ export {
 
 export { Task } from "./domain/task.entity";
 
+export { ProjectModuleLayer } from "./project.layer";
+
 export { ProjectRepository } from "./project.repository";
 
 export {

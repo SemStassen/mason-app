@@ -1,3 +1,2 @@
-export * from "./client";
+export { Drizzle } from "./client";
 export * as schema from "./schema";
-export * from "./utils";

@@ -21,6 +21,9 @@
     "drizzle-kit": "1.0.0-beta.15-859cf75",
     "typescript": "catalog:dev"
   },
+  "imports": {
+    "#utils/*": "./src/utils/*.ts"
+  },
   "exports": {
     ".": "./src/index.ts"
   }

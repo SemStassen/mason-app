@@ -1,13 +1,12 @@
+import { WorkspaceRpcGroup } from "@mason/core/rpc";
 import {
   checkWorkspaceSlugIsUniqueFlow,
   createWorkspaceFlow,
   setActiveWorkspaceFlow,
   updateWorkspaceFlow,
-} from "@mason/core/flows/workspace";
-import { WorkspaceRpcGroup } from "@mason/core/rpc";
+} from "@mason/core-server/modules/workspace";
 import { Effect } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
-import { mapInfraErrors } from "../../utils";
 
 export const WorkspaceRpcGroupLayer = WorkspaceRpcGroup.toLayer(
   Effect.gen(function* () {
@@ -17,7 +16,14 @@ export const WorkspaceRpcGroupLayer = WorkspaceRpcGroup.toLayer(
           const workspace = yield* createWorkspaceFlow(payload);
 
           return workspace;
-        }).pipe(mapInfraErrors()),
+        }).pipe(
+          Effect.catchTags({
+            RepositoryError: () =>
+              Effect.fail(new HttpApiError.InternalServerError()),
+            "infra/DatabaseError": () =>
+              Effect.fail(new HttpApiError.InternalServerError()),
+          })
+        ),
       "Workspace.Update": (payload) =>
         Effect.gen(function* () {
           const workspace = yield* updateWorkspaceFlow(payload);

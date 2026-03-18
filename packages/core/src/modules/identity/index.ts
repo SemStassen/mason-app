@@ -2,7 +2,13 @@ export { Session } from "./domain/session.entity";
 
 export { User } from "./domain/user.entity";
 
-export { IdentityModule } from "./identity.service";
+export { IdentityModuleLayer } from "./identity.layer";
+
+export {
+  IdentityModule,
+  SessionNotFoundError,
+  UserNotFoundError,
+} from "./identity.service";
 
 export { SessionRepository } from "./session.repository";
 

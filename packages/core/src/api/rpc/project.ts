@@ -1,72 +1,73 @@
 import { AuthorizationError } from "@mason/authorization";
+
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
 import {
-	ArchiveProjectRequest,
-	ArchiveProjectResponse,
-	CreateProjectRequest,
-	CreateProjectResponse,
-	RestoreProjectRequest,
-	RestoreProjectResponse,
-	UpdateProjectRequest,
-	UpdateProjectResponse,
-} from "#flows/project/index";
-import {
-	ProjectArchivedError,
-	ProjectEndDateBeforeStartDateError,
-	ProjectNotFoundError,
+  ProjectArchivedError,
+  ProjectEndDateBeforeStartDateError,
+  ProjectNotFoundError,
 } from "#modules/project/index";
+import {
+  ArchiveProjectCommand,
+  ArchiveProjectResult,
+  CreateProjectCommand,
+  CreateProjectResult,
+  RestoreProjectCommand,
+  RestoreProjectResult,
+  UpdateProjectCommand,
+  UpdateProjectResult,
+} from "../contracts";
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
-export const ProjectRpcs = RpcGroup.make(
-	Rpc.make("Project.Create", {
-		payload: CreateProjectRequest,
-		success: CreateProjectResponse,
-		error: Schema.Union([
-			AuthorizationError,
-			ProjectEndDateBeforeStartDateError,
-			HttpApiError.InternalServerError,
-		]),
-	})
-		.middleware(SessionMiddleware)
-		.middleware(WorkspaceMiddleware),
+export const ProjectRpcGroup = RpcGroup.make(
+  Rpc.make("Project.Create", {
+    payload: CreateProjectCommand,
+    success: CreateProjectResult,
+    error: Schema.Union([
+      AuthorizationError,
+      ProjectEndDateBeforeStartDateError,
+      HttpApiError.InternalServerError,
+    ]),
+  })
+    .middleware(SessionMiddleware)
+    .middleware(WorkspaceMiddleware),
 
-	Rpc.make("Project.Update", {
-		payload: UpdateProjectRequest,
-		success: UpdateProjectResponse,
-		error: Schema.Union([
-			AuthorizationError,
-			ProjectNotFoundError,
-			ProjectArchivedError,
-			ProjectEndDateBeforeStartDateError,
-			HttpApiError.InternalServerError,
-		]),
-	})
-		.middleware(SessionMiddleware)
-		.middleware(WorkspaceMiddleware),
+  Rpc.make("Project.Update", {
+    payload: UpdateProjectCommand,
+    success: UpdateProjectResult,
+    error: Schema.Union([
+      AuthorizationError,
+      ProjectNotFoundError,
+      ProjectArchivedError,
+      ProjectEndDateBeforeStartDateError,
+      HttpApiError.InternalServerError,
+    ]),
+  })
+    .middleware(SessionMiddleware)
+    .middleware(WorkspaceMiddleware),
 
-	Rpc.make("Project.Archive", {
-		payload: ArchiveProjectRequest,
-		success: ArchiveProjectResponse,
-		error: Schema.Union([
-			AuthorizationError,
-			ProjectNotFoundError,
-			HttpApiError.InternalServerError,
-		]),
-	})
-		.middleware(SessionMiddleware)
-		.middleware(WorkspaceMiddleware),
+  Rpc.make("Project.Archive", {
+    payload: ArchiveProjectCommand,
+    success: ArchiveProjectResult,
+    error: Schema.Union([
+      AuthorizationError,
+      ProjectNotFoundError,
+      HttpApiError.InternalServerError,
+    ]),
+  })
+    .middleware(SessionMiddleware)
+    .middleware(WorkspaceMiddleware),
 
-	Rpc.make("Project.Restore", {
-		payload: RestoreProjectRequest,
-		success: RestoreProjectResponse,
-		error: Schema.Union([
-			AuthorizationError,
-			ProjectNotFoundError,
-			HttpApiError.InternalServerError,
-		]),
-	})
-		.middleware(SessionMiddleware)
-		.middleware(WorkspaceMiddleware),
+  Rpc.make("Project.Restore", {
+    payload: RestoreProjectCommand,
+    success: RestoreProjectResult,
+    error: Schema.Union([
+      AuthorizationError,
+      ProjectNotFoundError,
+      HttpApiError.InternalServerError,
+    ]),
+  })
+    .middleware(SessionMiddleware)
+    .middleware(WorkspaceMiddleware)
 );

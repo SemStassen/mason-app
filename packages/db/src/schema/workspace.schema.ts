@@ -1,6 +1,5 @@
 import { pgTable, text } from "drizzle-orm/pg-core";
-import { tableId, tableMetadata } from "../utils";
-
+import { tableId, tableMetadata } from "#utils/snippets";
 
 export const workspacesTable = pgTable("workspaces", {
   id: tableId,
@@ -12,4 +11,3 @@ export const workspacesTable = pgTable("workspaces", {
   // Metadata
   ...tableMetadata,
 });
-

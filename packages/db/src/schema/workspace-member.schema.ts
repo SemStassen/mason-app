@@ -1,5 +1,5 @@
 import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
-import { tableId, tableMetadata, tableSoftDelete } from "../utils";
+import { tableId, tableMetadata, tableSoftDelete } from "#utils/snippets";
 import { usersTable } from "./identity.schema";
 import { workspacesTable } from "./workspace.schema";
 

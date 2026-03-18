@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mason/db": "workspace:*",
-    "better-auth": "^1.4.10",
+    "better-auth": "^1.5.5",
     "effect": "catalog:"
   },
   "devDependencies": {

@@ -5,7 +5,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { tableId, tableMetadata } from "../utils";
+import { tableId, tableMetadata } from "#utils/snippets";
 
 export const usersTable = pgTable("users", {
   id: tableId,

@@ -2,36 +2,39 @@ import { AuthorizationError } from "@mason/authorization";
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
-import {
-  CheckWorkspaceSlugIsUniqueRequest,
-  CheckWorkspaceSlugIsUniqueResponse,
-  CreateWorkspaceRequest,
-  CreateWorkspaceResponse,
-  SetActiveWorkspaceRequest,
-  SetActiveWorkspaceResponse,
-  UpdateWorkspaceRequest,
-  UpdateWorkspaceResponse,
-} from "#flows/workspace/index";
+
+import { SessionNotFoundError } from "#modules/identity/identity.service";
 import {
   WorkspaceNotFoundError,
   WorkspaceSlugAlreadyExistsError,
 } from "#modules/workspace/index";
 import { WorkspaceMemberNotFoundError } from "#modules/workspace-member/index";
+import {
+  CheckWorkspaceSlugIsUniqueCommand,
+  CheckWorkspaceSlugIsUniqueResult,
+  CreateWorkspaceCommand,
+  CreateWorkspaceResult,
+  SetActiveWorkspaceCommand,
+  SetActiveWorkspaceResult,
+  UpdateWorkspaceCommand,
+  UpdateWorkspaceResult,
+} from "../contracts";
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const WorkspaceRpcGroup = RpcGroup.make(
   Rpc.make("Workspace.Create", {
-    payload: CreateWorkspaceRequest,
-    success: CreateWorkspaceResponse,
+    payload: CreateWorkspaceCommand,
+    success: CreateWorkspaceResult,
     error: Schema.Union([
       WorkspaceSlugAlreadyExistsError,
+      SessionNotFoundError,
       HttpApiError.InternalServerError,
     ]),
   }).middleware(SessionMiddleware),
 
   Rpc.make("Workspace.Update", {
-    payload: UpdateWorkspaceRequest,
-    success: UpdateWorkspaceResponse,
+    payload: UpdateWorkspaceCommand,
+    success: UpdateWorkspaceResult,
     error: Schema.Union([
       AuthorizationError,
       WorkspaceNotFoundError,
@@ -43,14 +46,14 @@ export const WorkspaceRpcGroup = RpcGroup.make(
     .middleware(WorkspaceMiddleware),
 
   Rpc.make("Workspace.CheckSlugIsUnique", {
-    payload: CheckWorkspaceSlugIsUniqueRequest,
-    success: CheckWorkspaceSlugIsUniqueResponse,
+    payload: CheckWorkspaceSlugIsUniqueCommand,
+    success: CheckWorkspaceSlugIsUniqueResult,
     error: Schema.Union([HttpApiError.InternalServerError]),
   }).middleware(SessionMiddleware),
 
   Rpc.make("Workspace.SetActive", {
-    payload: SetActiveWorkspaceRequest,
-    success: SetActiveWorkspaceResponse,
+    payload: SetActiveWorkspaceCommand,
+    success: SetActiveWorkspaceResult,
     error: Schema.Union([
       WorkspaceMemberNotFoundError,
       HttpApiError.InternalServerError,

@@ -5,6 +5,8 @@ export {
   TimeEntryStoppedAtBeforeStartedAtError,
 } from "./domain/time-entry.errors";
 
+export { TimeModuleLayer } from "./time.layer";
+
 export { TimeEntryNotFoundError, TimeModule } from "./time.service";
 
 export { TimeEntryRepository } from "./time-entry.repository";

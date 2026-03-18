@@ -6,6 +6,8 @@ export {
   WorkspaceInvitationNotPendingError,
 } from "./domain/workspace-invitation.errors";
 
+export { WorkspaceInvitationModuleLayer } from "./workspace-invitation.layer";
+
 export { WorkspaceInvitationRepository } from "./workspace-invitation.repository";
 
 export {
