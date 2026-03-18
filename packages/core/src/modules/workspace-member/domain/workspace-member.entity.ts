@@ -9,8 +9,8 @@ export class WorkspaceMember extends Model.Class<WorkspaceMember>(
     id: Model.ServerImmutable(WorkspaceMemberId),
     workspaceId: Model.ServerImmutable(WorkspaceId),
     userId: Model.ServerImmutable(UserId),
-    role: Model.ClientMutable(WorkspaceRole),
-    deletedAt: Model.ServerManagedNullable(Schema.DateTimeUtcFromDate),
+    role: Model.ServerMutableClientMutable(WorkspaceRole),
+    deletedAt: Model.ServerMutableOptional(Schema.DateTimeUtcFromDate),
   },
   {
     identifier: "WorkspaceMember",

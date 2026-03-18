@@ -3,13 +3,13 @@ import { ProjectId, TaskId, WorkspaceId } from "#shared/schemas/index";
 
 export class Task extends Model.Class<Task>("Task")(
   {
-    id: Model.ClientGenerated(TaskId),
+    id: Model.ServerImmutableClientImmutableCreateOptional(TaskId),
     workspaceId: Model.ServerImmutable(WorkspaceId),
-    projectId: Model.ClientRequiredImmutable(ProjectId),
-    name: Model.ClientMutable(
+    projectId: Model.ServerMutableClientImmutable(ProjectId),
+    name: Model.ServerMutableClientMutable(
       Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(255))
     ),
-    archivedAt: Model.ServerManagedNullable(Schema.DateTimeUtcFromDate),
+    archivedAt: Model.ServerMutableOptional(Schema.DateTimeUtcFromDate),
   },
   {
     identifier: "Task",

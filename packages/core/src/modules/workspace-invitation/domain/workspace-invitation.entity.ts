@@ -14,12 +14,12 @@ export class WorkspaceInvitation extends Model.Class<WorkspaceInvitation>(
     id: Model.ServerImmutable(WorkspaceInvitationId),
     inviterId: Model.ServerImmutable(WorkspaceMemberId),
     workspaceId: Model.ServerImmutable(WorkspaceId),
-    email: Model.ClientRequiredImmutable(Email),
-    role: Model.ClientRequiredImmutable(WorkspaceRole),
-    status: Model.ServerManaged(
+    email: Model.ServerMutableClientImmutable(Email),
+    role: Model.ServerMutableClientImmutable(WorkspaceRole),
+    status: Model.ServerMutable(
       Schema.Literals(["pending", "accepted", "rejected", "canceled"])
     ),
-    expiresAt: Model.ServerManaged(Schema.DateTimeUtcFromDate),
+    expiresAt: Model.ServerMutable(Schema.DateTimeUtcFromDate),
   },
   {
     identifier: "WorkspaceInvitation",

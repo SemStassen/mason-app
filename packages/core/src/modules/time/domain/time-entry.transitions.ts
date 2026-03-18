@@ -29,10 +29,7 @@ export const createTimeEntry = (params: {
       id: Option.getOrElse(id, () => TimeEntryId.makeUnsafe(generateUUID())),
       workspaceId: params.workspaceId,
       workspaceMemberId: params.workspaceMemberId,
-      taskId: params.data.taskId ?? Option.none(),
       startedAt: params.data.startedAt ?? params.now,
-      stoppedAt: params.data.stoppedAt ?? Option.none(),
-      notes: params.data.notes ?? Option.none(),
       ...rest,
     });
 

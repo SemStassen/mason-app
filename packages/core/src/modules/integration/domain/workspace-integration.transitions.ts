@@ -27,7 +27,7 @@ export const createWorkspaceIntegration = (params: {
 
 export const updateWorkspaceIntegration = (params: {
   workspaceIntegration: WorkspaceIntegration;
-  apiKey: WorkspaceIntegration["apiKey"];
+  apiKey: WorkspaceIntegration["apiKey"] | undefined;
   data: typeof WorkspaceIntegration.jsonUpdate.Type;
 }): Result.Result<
   {
@@ -36,17 +36,21 @@ export const updateWorkspaceIntegration = (params: {
   },
   never
 > => {
-  const { apiKey: _apikey, ...rest } = params.data;
+  const { apiKey: _apiKey, ...rest } = params.data;
+  let changes: typeof WorkspaceIntegration.update.Type = { ...rest };
+
+  if (params.apiKey !== undefined) {
+    changes = {
+      ...rest,
+      apiKey: params.apiKey,
+    };
+  }
 
   return Result.succeed({
     entity: WorkspaceIntegration.make({
       ...params.workspaceIntegration,
-      apiKey: params.apiKey,
-      ...rest,
+      ...changes,
     }),
-    changes: {
-      apiKey: params.apiKey,
-      ...rest,
-    },
+    changes,
   });
 };

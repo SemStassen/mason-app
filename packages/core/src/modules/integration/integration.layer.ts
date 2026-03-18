@@ -95,7 +95,7 @@ export const IntegrationModuleLayer = Layer.effect(
 
         const encryptedApiKey = params.data.apiKey
           ? yield* encryptApiKey(params.data.apiKey)
-          : workspaceIntegration.apiKey;
+          : undefined;
 
         const { entity, changes } = yield* Effect.fromResult(
           workspaceIntegrationTransitions.updateWorkspaceIntegration({
