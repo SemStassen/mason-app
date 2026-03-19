@@ -3,7 +3,7 @@ import type {
   WorkspaceIntegrationNotFoundError,
   WorkspaceIntegrationProviderAlreadyExistsError,
 } from "@mason/core/modules/integration";
-import type { RepositoryError } from "@mason/core/shared/database";
+import type { RepositoryError } from "@mason/core/shared/repository";
 import type {
   PlainApiKey,
   WorkspaceIntegrationId,

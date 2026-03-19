@@ -1,5 +1,5 @@
 import { Task, TaskRepository } from "@mason/core/modules/project";
-import { RepositoryError } from "@mason/core/shared/database";
+import { RepositoryError } from "@mason/core/shared/repository";
 import { Drizzle, schema } from "@mason/db";
 import { and, eq, inArray } from "drizzle-orm";
 import { DateTime, Effect, Layer, Schema } from "effect";

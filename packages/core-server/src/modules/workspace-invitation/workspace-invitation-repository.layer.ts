@@ -2,7 +2,7 @@ import {
   WorkspaceInvitation,
   WorkspaceInvitationRepository,
 } from "@mason/core/modules/workspace-invitation";
-import { RepositoryError } from "@mason/core/shared/database";
+import { RepositoryError } from "@mason/core/shared/repository";
 import { Drizzle, schema } from "@mason/db";
 import { and, eq, gt } from "drizzle-orm";
 import { DateTime, Effect, Layer, Schema } from "effect";

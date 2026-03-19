@@ -1,7 +1,7 @@
 import { ServiceMap } from "effect";
 import type { Effect, Option } from "effect";
 
-import type { RepositoryError } from "#shared/database/index";
+import type { RepositoryError } from "#shared/repository/index";
 
 import type { User } from "./domain/user.entity";
 

@@ -1,7 +1,7 @@
 import { Schema, ServiceMap } from "effect";
 import type { Effect } from "effect";
 
-import type { RepositoryError } from "#shared/database/index";
+import type { RepositoryError } from "#shared/repository/index";
 
 import type { WorkspaceMember } from "./domain/workspace-member.entity";
 

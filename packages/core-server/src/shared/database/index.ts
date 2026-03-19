@@ -1,13 +1,6 @@
 import { Schema, ServiceMap } from "effect";
 import type { Effect } from "effect";
 
-export class RepositoryError extends Schema.TaggedErrorClass<RepositoryError>()(
-  "RepositoryError",
-  {
-    cause: Schema.Defect,
-  }
-) {}
-
 export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   "infra/DatabaseError",
   {

@@ -1,7 +1,4 @@
-import type {
-  DatabaseError,
-  RepositoryError,
-} from "@mason/core/shared/database";
+import type { RepositoryError } from "@mason/core/shared/repository";
 import { Effect } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 

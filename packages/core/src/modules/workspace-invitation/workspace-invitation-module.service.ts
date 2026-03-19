@@ -1,7 +1,7 @@
 import { Schema, ServiceMap } from "effect";
 import type { Effect } from "effect";
 
-import type { RepositoryError } from "#shared/database/index";
+import type { RepositoryError } from "#shared/repository/index";
 import { WorkspaceInvitationId } from "#shared/schemas/index";
 
 import type { WorkspaceInvitation } from "./domain/workspace-invitation.entity";

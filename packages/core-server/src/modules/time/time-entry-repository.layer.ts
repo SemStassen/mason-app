@@ -1,5 +1,5 @@
 import { TimeEntry, TimeEntryRepository } from "@mason/core/modules/time";
-import { RepositoryError } from "@mason/core/shared/database";
+import { RepositoryError } from "@mason/core/shared/repository";
 import { Drizzle, schema } from "@mason/db";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";

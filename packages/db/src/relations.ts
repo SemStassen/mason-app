@@ -1,6 +1,5 @@
 import { defineRelations } from "drizzle-orm";
 
-// oxlint-disable-next-line import/no-namespace -- Needed for schema
 import * as schema from "./schema";
 
 const identityRelations = defineRelations(schema, (r) => ({

@@ -2,7 +2,7 @@ import {
   WorkspaceMember,
   WorkspaceMemberRepository,
 } from "@mason/core/modules/workspace-member";
-import { RepositoryError } from "@mason/core/shared/database";
+import { RepositoryError } from "@mason/core/shared/repository";
 import { Drizzle, schema } from "@mason/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";

@@ -9,7 +9,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@effect/sql-drizzle": "catalog:",
     "@effect/sql-pg": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",

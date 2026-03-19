@@ -1,5 +1,5 @@
 import { User, UserRepository } from "@mason/core/modules/identity";
-import { RepositoryError } from "@mason/core/shared/database";
+import { RepositoryError } from "@mason/core/shared/repository";
 import { Drizzle, schema } from "@mason/db";
 import { eq } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";

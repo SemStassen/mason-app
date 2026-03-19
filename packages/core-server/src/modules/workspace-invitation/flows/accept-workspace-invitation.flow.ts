@@ -6,8 +6,9 @@ import { IdentityModule } from "@mason/core/modules/identity";
 import { WorkspaceInvitationModule } from "@mason/core/modules/workspace-invitation";
 import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
 import { SessionContext } from "@mason/core/shared/auth";
-import { Database } from "@mason/core/shared/database";
 import { Effect, Option } from "effect";
+
+import { Database } from "#shared/database/index";
 
 export const acceptWorkspaceInvitationFlow = Effect.fn(
   "flows.acceptWorkspaceInvitationFlow"

@@ -1,7 +1,7 @@
 import { Schema, ServiceMap } from "effect";
 import type { Effect } from "effect";
 
-import type { RepositoryError } from "#shared/database/index";
+import type { RepositoryError } from "#shared/repository/index";
 import { TimeEntryId } from "#shared/schemas/index";
 
 import type { TimeEntry } from "./domain/time-entry.entity";

@@ -1,5 +1,5 @@
 import { WorkspaceIntegration } from "@mason/core/modules/integration";
-import { RepositoryError } from "@mason/core/shared/database";
+import { RepositoryError } from "@mason/core/shared/repository";
 import { Drizzle, schema } from "@mason/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Redacted, Schema, ServiceMap } from "effect";

@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "effect": "catalog:",
-    "uuid": "^13.0.0"
+    "uuid": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",

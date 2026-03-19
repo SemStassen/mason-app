@@ -1,7 +1,7 @@
 import { Schema, ServiceMap } from "effect";
 import type { Effect, Option } from "effect";
 
-import type { RepositoryError } from "#shared/database/index";
+import type { RepositoryError } from "#shared/repository/index";
 import { SessionId, UserId } from "#shared/schemas/index";
 
 import type { Session } from "./domain/session.entity";

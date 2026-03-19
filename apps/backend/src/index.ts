@@ -1,10 +1,4 @@
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
-import { IdentityModuleLayer } from "@mason/core/modules/identity";
-import { ProjectModuleLayer } from "@mason/core/modules/project";
-import { TimeModuleLayer } from "@mason/core/modules/time";
-import { WorkspaceModuleLayer } from "@mason/core/modules/workspace";
-import { WorkspaceInvitationModuleLayer } from "@mason/core/modules/workspace-invitation";
-import { WorkspaceMemberModuleLayer } from "@mason/core/modules/workspace-member";
 import { CryptoLayer } from "@mason/core-server/infra/crypto";
 import {
   SessionRepositoryLayer,
@@ -23,10 +17,17 @@ import { WorkspaceRepositoryLayer } from "@mason/core-server/modules/workspace";
 import { WorkspaceInvitationRepositoryLayer } from "@mason/core-server/modules/workspace-invitation";
 import { WorkspaceMemberRepositoryLayer } from "@mason/core-server/modules/workspace-member";
 import { Authorization } from "@mason/core-server/shared/authorization";
+import { IdentityModuleLayer } from "@mason/core/modules/identity";
+import { ProjectModuleLayer } from "@mason/core/modules/project";
+import { TimeModuleLayer } from "@mason/core/modules/time";
+import { WorkspaceModuleLayer } from "@mason/core/modules/workspace";
+import { WorkspaceInvitationModuleLayer } from "@mason/core/modules/workspace-invitation";
+import { WorkspaceMemberModuleLayer } from "@mason/core/modules/workspace-member";
 import { Drizzle } from "@mason/db";
 import { Config, Layer } from "effect";
 import { HttpRouter } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
+
 import { AllRpcsGroup, AllRpcsGroupLayer } from "./rpc";
 
 const InfraLayer = Layer.mergeAll(CryptoLayer, Authorization.layer);
@@ -51,7 +52,7 @@ const ModulesLayer = Layer.mergeAll(
   WorkspaceModuleLayer,
   WorkspaceInvitationModuleLayer,
   WorkspaceMemberModuleLayer
-).pipe(Layer.provide(InfraLayer));
+);
 
 const RpcRouteLayer = RpcServer.layerHttp({
   group: AllRpcsGroup,
@@ -65,7 +66,10 @@ const RpcRouteLayer = RpcServer.layerHttp({
 const AllRoutesLayer = Layer.mergeAll(RpcRouteLayer);
 
 const MainLayer = Layer.mergeAll(
-  ModulesLayer.pipe(Layer.provideMerge(RepositoriesLayer))
+  ModulesLayer.pipe(
+    Layer.provideMerge(RepositoriesLayer),
+    Layer.provideMerge(InfraLayer)
+  )
 );
 
 const ServerLayer = HttpRouter.serve(AllRoutesLayer).pipe(
