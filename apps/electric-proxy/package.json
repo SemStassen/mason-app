@@ -6,11 +6,12 @@
     "build": "bun build --outdir=dist src/index.ts",
     "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
     "dev": "bun run --hot src/index.ts",
-    "format": "biome format --write .",
-    "lint": "biome check .",
-    "typecheck": "tsc -noEmit"
+    "format": "oxfmt --write .",
+    "lint": "oxlint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@effect/platform": "^0.87.0",
     "@effect/platform-bun": "^0.87.0",
     "@electric-sql/client": "^1.4.0",
     "effect": "catalog:"

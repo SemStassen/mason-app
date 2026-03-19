@@ -1,5 +1,8 @@
-import { type Effect, type Option, ServiceMap } from "effect";
+import { ServiceMap } from "effect";
+import type { Effect, Option } from "effect";
+
 import type { RepositoryError } from "#shared/database/index";
+
 import type { WorkspaceInvitation } from "./domain/workspace-invitation.entity";
 
 export interface WorkspaceInvitationRepositoryShape {

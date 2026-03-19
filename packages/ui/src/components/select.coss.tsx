@@ -1,4 +1,5 @@
 import { Select as SelectPrimitive } from "@base-ui-components/react/select";
+
 import { cn } from "../utils";
 import { Icons } from "./icons";
 
@@ -109,7 +110,6 @@ function SelectItem({
       {...props}
     >
       <SelectPrimitive.ItemIndicator className="col-start-1">
-        {/* biome-ignore lint/a11y/noSvgWithoutTitle: Should probably use Icons here */}
         <svg
           fill="none"
           height="24"

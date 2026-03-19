@@ -2,6 +2,7 @@
 
 import { OTPInput, OTPInputContext } from "input-otp";
 import { useContext } from "react";
+
 import { cn } from "../utils";
 import { Icons } from "./icons";
 
@@ -70,9 +71,6 @@ function InputOTPSeparator({
   ...props
 }: React.ComponentProps<"div">) {
   return (
-    // biome-ignore lint/a11y/useSemanticElements: <hr /> limits styling options
-    // biome-ignore lint/a11y/useAriaPropsForRole: Probably worth looking into this more
-    // biome-ignore lint/a11y/useFocusableInteractive: Not interactive
     <div data-slot="input-otp-separator" role="separator" {...props}>
       {children || <Icons.Minus />}
     </div>

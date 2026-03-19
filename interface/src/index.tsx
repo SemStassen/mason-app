@@ -1,6 +1,7 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode, Suspense, useEffect } from "react";
 import ReactDOM from "react-dom/client";
+
 import { ErrorPage } from "./routes/-error";
 import { NotFoundPage } from "./routes/-not-found";
 
@@ -10,15 +11,12 @@ import { PLATFORM } from "./utils/constants";
 
 // This is required for Tanstack router to work properly
 declare module "@tanstack/react-router" {
-  // biome-ignore lint/nursery/useConsistentTypeDefinitions: Needed here
   interface Register {
     router: typeof router;
   }
 }
 
 declare module "@tanstack/react-table" {
-  // biome-ignore lint/nursery/useConsistentTypeDefinitions: Needed for declaration merging
-  // biome-ignore lint/correctness/noUnusedVariables: Needed for declaration merging
   interface ColumnMeta<TData, TValue> {
     className?: string;
   }
@@ -31,7 +29,6 @@ export const router = createRouter({
 });
 
 export function renderMasonInterface() {
-  // biome-ignore lint/style/noNonNullAssertion: Fine for root
   const rootElement = document.getElementById("root")!;
 
   if (!rootElement.innerHTML) {

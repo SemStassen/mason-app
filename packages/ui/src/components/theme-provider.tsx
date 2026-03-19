@@ -62,7 +62,6 @@ export function ThemeProvider({
 
   const value = {
     theme,
-    // biome-ignore lint/nursery/noShadow: Fine
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);

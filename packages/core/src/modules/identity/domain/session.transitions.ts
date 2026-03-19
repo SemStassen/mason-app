@@ -1,4 +1,5 @@
 import { Result } from "effect";
+
 import { Session } from "./session.entity";
 
 export const updateSession = (params: {

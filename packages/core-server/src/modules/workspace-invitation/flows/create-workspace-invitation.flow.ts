@@ -8,6 +8,7 @@ import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
 import { SessionContext, WorkspaceContext } from "@mason/core/shared/auth";
 import { Mailer } from "@mason/core/shared/email";
 import { Effect, Option } from "effect";
+
 import { Authorization } from "#shared/authorization/index";
 
 export const createWorkspaceInvitationFlow = Effect.fn(
@@ -33,10 +34,10 @@ export const createWorkspaceInvitationFlow = Effect.fn(
     Effect.flatMap(
       Option.match({
         onNone: () => Effect.void,
-        onSome: (user) =>
+        onSome: (existingUser) =>
           workspaceMemberModule.assertUserNotWorkspaceMember({
             workspaceId: workspace.id,
-            userId: user.id,
+            userId: existingUser.id,
           }),
       })
     )

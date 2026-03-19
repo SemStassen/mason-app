@@ -1,6 +1,6 @@
 import { Combobox as ComboboxPrimitive } from "@base-ui-components/react/combobox";
-// biome-ignore lint/performance/noNamespaceImport: Fine for now
 import * as React from "react";
+
 import { cn } from "../utils";
 import { Icons } from "./icons";
 import { Input } from "./input.coss";
@@ -158,7 +158,6 @@ function ComboboxItem({
       {...props}
     >
       <ComboboxPrimitive.ItemIndicator className="col-start-1">
-        {/* biome-ignore lint/a11y/noSvgWithoutTitle: Should probably use Icons here anyways */}
         <svg
           fill="none"
           height="24"

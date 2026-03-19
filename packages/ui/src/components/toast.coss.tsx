@@ -1,4 +1,5 @@
 import { Toast } from "@base-ui-components/react/toast";
+
 import { cn } from "../utils";
 import { buttonVariants } from "./button.coss";
 import { Icons } from "./icons";
@@ -111,8 +112,7 @@ function ToastList({ position = "bottom-right" }: { position: ToastPosition }) {
               swipeDirection={
                 position.includes("center")
                   ? [isTop ? "up" : "down"]
-                  : // biome-ignore lint/style/noNestedTernary: Fine for styling logic
-                    position.includes("left")
+                  : position.includes("left")
                     ? ["left", isTop ? "up" : "down"]
                     : ["right", isTop ? "up" : "down"]
               }

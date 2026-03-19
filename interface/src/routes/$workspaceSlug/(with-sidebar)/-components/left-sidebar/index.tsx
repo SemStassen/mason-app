@@ -4,7 +4,9 @@ import { type IconProps, Icons } from "@mason/ui/icons";
 import { Link, linkOptions } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+
 import { leftSidebarAtom } from "~/atoms/ui-atoms";
+
 import { LedgerToggle } from "./ledger-toggle";
 import { UserDropdownMenu } from "./user-dropdown-menu";
 import { WorkspaceDropdownMenu } from "./workspace-dropdown-menu";
@@ -110,7 +112,6 @@ function LeftSidebar() {
               </div>
             </div>
           </nav>
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: Okay for resize */}
           <div
             className="absolute inset-y-0 right-0 w-[7px] cursor-col-resize"
             onMouseDown={handleResize}

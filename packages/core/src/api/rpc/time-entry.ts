@@ -1,12 +1,7 @@
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
-import {
-  TimeEntryAlreadyRunningError,
-  TimeEntryNotFoundError,
-  TimeEntryStoppedAtBeforeStartedAtError,
-} from "#modules/time/index";
-import { AuthorizationError } from "#shared/authorization/index";
+
 import {
   CreateTimeEntryCommand,
   CreateTimeEntryResult,
@@ -14,7 +9,14 @@ import {
   DeleteTimeEntryResult,
   UpdateTimeEntryCommand,
   UpdateTimeEntryResult,
-} from "../contracts";
+} from "#api/contracts/index";
+import {
+  TimeEntryAlreadyRunningError,
+  TimeEntryNotFoundError,
+  TimeEntryStoppedAtBeforeStartedAtError,
+} from "#modules/time/index";
+import { AuthorizationError } from "#shared/authorization/index";
+
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const TimeEntryRpcGroup = RpcGroup.make(

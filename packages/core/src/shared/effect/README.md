@@ -35,18 +35,18 @@ The main goal is to encode the stable contract of a field:
 Grammar:
 
 ```ts
-Server<Mutability>[Client<Mutability>][FieldModifier][CreateModifier]
+Server < Mutability > [Client<Mutability>][FieldModifier][CreateModifier];
 ```
 
 Examples:
 
 ```ts
-ServerImmutable
-ServerMutableOptional
-ServerImmutableClientImmutable
-ServerMutableClientMutable
-ServerMutableClientMutableOptional
-ServerMutableClientMutableOptionalCreateDefault
+ServerImmutable;
+ServerMutableOptional;
+ServerImmutableClientImmutable;
+ServerMutableClientMutable;
+ServerMutableClientMutableOptional;
+ServerMutableClientMutableOptionalCreateDefault;
 ```
 
 Meaning:

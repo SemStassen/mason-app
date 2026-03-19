@@ -1,6 +1,8 @@
 import { Option, Result } from "effect";
+
 import { UserId } from "#shared/schemas/index";
 import { generateUUID } from "#shared/utils/index";
+
 import { User } from "./user.entity";
 
 export const createUser = (

@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+
 import { Model } from "#shared/effect/index";
 import {
   EncryptedApiKey,

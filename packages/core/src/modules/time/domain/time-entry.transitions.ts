@@ -1,6 +1,8 @@
 import { DateTime, Option, Result } from "effect";
+
 import { TimeEntryId } from "#shared/schemas/index";
 import { generateUUID } from "#shared/utils/index";
+
 import { TimeEntry } from "./time-entry.entity";
 import { TimeEntryStoppedAtBeforeStartedAtError } from "./time-entry.errors";
 

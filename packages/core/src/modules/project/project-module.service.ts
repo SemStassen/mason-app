@@ -1,6 +1,9 @@
-import { type Effect, Schema, ServiceMap } from "effect";
+import { Schema, ServiceMap } from "effect";
+import type { Effect } from "effect";
+
 import type { RepositoryError } from "#shared/database/index";
 import { ProjectId, TaskId } from "#shared/schemas/index";
+
 import type { Project } from "./domain/project.entity";
 import type {
   ProjectArchivedError,

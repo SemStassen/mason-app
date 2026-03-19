@@ -1,6 +1,6 @@
 import { DateTime, Effect, Layer, Option } from "effect";
-import { TimeEntryAlreadyRunningError } from "./domain/time-entry.errors";
 
+import { TimeEntryAlreadyRunningError } from "./domain/time-entry.errors";
 import * as timeEntryTransitions from "./domain/time-entry.transitions";
 import { TimeEntryRepository } from "./time-entry-repository.service";
 import { TimeEntryNotFoundError, TimeModule } from "./time-module.service";

@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
-    "format": "biome format --write .",
-    "lint": "biome check .",
-    "typecheck": "tsc -noEmit"
+    "format": "oxfmt --write .",
+    "lint": "oxlint -c ../../.oxlintrc.json .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@effect/opentelemetry": "^0.59.0",

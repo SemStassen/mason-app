@@ -6,9 +6,9 @@
     "build": "vite build",
     "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
     "dev": "vite dev",
-    "format": "biome format --write .",
-    "lint": "biome check .",
-    "typecheck": "tsc -noEmit",
+    "format": "oxfmt --write .",
+    "lint": "oxlint .",
+    "typecheck": "tsc --noEmit",
     "machine-translate": "inlang machine translate --project project.inlang"
   },
   "dependencies": {

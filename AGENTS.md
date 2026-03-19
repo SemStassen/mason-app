@@ -1,7 +1,7 @@
 # Mason Agent Playbook
 
 This guide is for agentic coding tools operating in this monorepo.
-Stack: Bun workspaces + Turbo + TypeScript + Effect + Biome (Ultracite preset).
+Stack: Bun workspaces + Turbo + TypeScript + Effect + Oxlint/Oxfmt (Ultracite preset).
 
 ## Scope and precedence
 
@@ -20,7 +20,7 @@ Run commands from repository root unless a section says otherwise.
 | Start dev graph         | `bun run dev`       | Runs `turbo dev --parallel`        |
 | Build all workspaces    | `bun run build`     | Runs `turbo build`                 |
 | Lint                    | `bun run lint`      | Runs `turbo lint && manypkg check` |
-| Format                  | `bun run format`    | Runs `biome format --write .`      |
+| Format                  | `bun run format`    | Runs `oxfmt --write .`             |
 | Typecheck               | `bun run typecheck` | Runs `turbo typecheck`             |
 | Clean outputs           | `bun run clean`     | Also removes `.turbo/cache`        |
 | Start local Docker deps | `bun run docker:up` | Uses root `docker-compose.yml`     |
@@ -57,7 +57,7 @@ For small focused edits, run the narrowest relevant checks first (single file/te
 
 ## Code style baseline
 
-The root `biome.jsonc` extends `ultracite/core` and adds project overrides.
+The root `.oxlintrc.json` extends Ultracite's Oxlint presets and `.oxfmtrc.jsonc` stores formatter options plus project overrides.
 Treat lints and formatting as source-of-truth over personal preference.
 
 ### Imports and exports
@@ -71,7 +71,7 @@ Treat lints and formatting as source-of-truth over personal preference.
 
 ### Formatting and syntax
 
-- Let Biome format code; do not hand-tune formatting.
+- Let Oxfmt format code; do not hand-tune formatting.
 - Use strict equality (`===` / `!==`).
 - Prefer template literals when interpolation is involved.
 - Prefer object spread over `Object.assign` for object creation.

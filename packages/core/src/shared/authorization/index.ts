@@ -1,2 +1,2 @@
 export { Action, WorkspaceRole } from "./actions";
-export { isAllowed } from "./is-allowed";
+export { isAllowed, AuthorizationError } from "./is-allowed";

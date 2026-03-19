@@ -1,8 +1,8 @@
 import type { Toggle as TogglePrimitive } from "@base-ui-components/react/toggle";
 import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui-components/react/toggle-group";
 import type { VariantProps } from "class-variance-authority";
-// biome-ignore lint/performance/noNamespaceImport: Fine for now
 import * as React from "react";
+
 import { cn } from "../utils";
 import { Separator } from "./separator.coss";
 import { Toggle as ToggleComponent, type toggleVariants } from "./toggle.coss";

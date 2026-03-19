@@ -1,6 +1,7 @@
 import { mergeProps } from "@base-ui-components/react/merge-props";
 import { useRender } from "@base-ui-components/react/use-render";
 import type * as React from "react";
+
 import { cn } from "../utils";
 import { Icons } from "./icons";
 
@@ -50,8 +51,6 @@ function BreadcrumbLink({
 
 function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
   return (
-    // biome-ignore lint/a11y/useFocusableInteractive: No need, links to current page
-    // biome-ignore lint/a11y/useSemanticElements: No need, links to current page
     <span
       aria-current="page"
       aria-disabled="true"

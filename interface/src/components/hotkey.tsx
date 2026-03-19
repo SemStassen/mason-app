@@ -37,10 +37,8 @@ function Hotkey({ children }: { children: string }) {
         const keys = step.split("+");
 
         return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: Fine here
           <span className="inline-flex items-center gap-1" key={stepIndex}>
             {keys.map((key, keyIndex) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: Fine here
               <span key={keyIndex}>
                 <Kbd>{formatKey(key)}</Kbd>
                 {keyIndex < keys.length - 1 && " + "}

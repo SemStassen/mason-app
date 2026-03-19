@@ -19,7 +19,6 @@ type WebPlatform = {
 type Platform = DesktopPlatform | WebPlatform;
 
 export const PLATFORM: Platform =
-  // biome-ignore lint/correctness/noUndeclaredVariables: Vite app env
   __PLATFORM__ === "desktop"
     ? ({
         platform: "desktop",

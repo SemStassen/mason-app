@@ -1,6 +1,6 @@
 import type * as React from "react";
-// biome-ignore lint/performance/noNamespaceImport: Probably fine
 import * as BaseResizable from "react-resizable-panels";
+
 import { cn } from "../utils";
 import { Icons } from "./icons";
 

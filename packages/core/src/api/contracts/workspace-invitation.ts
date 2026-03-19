@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+
 import { WorkspaceInvitation } from "#modules/workspace-invitation/index";
 
 export const CreateWorkspaceInvitationCommand = WorkspaceInvitation.jsonCreate;

@@ -1,10 +1,9 @@
 import { PgClient } from "@effect/sql-pg";
-// biome-ignore lint/performance/noNamespaceImport: Needed for PgDrizzle
 import * as PgDrizzle from "drizzle-orm/effect-postgres";
 import { Config, Effect, Layer, ServiceMap } from "effect";
 import { types as pgTypes } from "pg";
+
 import { relations } from "./relations";
-// biome-ignore lint/performance/noNamespaceImport: Needed for schema
 import * as schema from "./schema";
 
 const PgClientLayer = PgClient.layerConfig({

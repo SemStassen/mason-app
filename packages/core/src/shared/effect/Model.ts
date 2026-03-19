@@ -1,4 +1,5 @@
 import { VariantSchema } from "effect/unstable/schema";
+
 import * as Schema from "./Schema";
 
 const {
@@ -52,12 +53,13 @@ export {
 // ServerImmutable
 // ---------------------------------------------------------------------------
 
-export interface ServerImmutable<S extends Schema.Top>
-  extends VariantSchema.Field<{
-    readonly select: S;
-    readonly insert: S;
-    readonly json: S;
-  }> {}
+export interface ServerImmutable<
+  S extends Schema.Top,
+> extends VariantSchema.Field<{
+  readonly select: S;
+  readonly insert: S;
+  readonly json: S;
+}> {}
 
 /**
  * Field set once by the server and never updated.
@@ -81,13 +83,14 @@ export const ServerImmutable = <S extends Schema.Top>(
 // ServerMutable
 // ---------------------------------------------------------------------------
 
-export interface ServerMutable<S extends Schema.Top>
-  extends VariantSchema.Field<{
-    readonly select: S;
-    readonly insert: S;
-    readonly update: Schema.optionalKey<S>;
-    readonly json: S;
-  }> {}
+export interface ServerMutable<
+  S extends Schema.Top,
+> extends VariantSchema.Field<{
+  readonly select: S;
+  readonly insert: S;
+  readonly update: Schema.optionalKey<S>;
+  readonly json: S;
+}> {}
 
 /**
  * Field managed entirely by the server over the entity lifecycle.
@@ -112,13 +115,14 @@ export const ServerMutable = <S extends Schema.Top>(
 // ServerMutableOptional
 // ---------------------------------------------------------------------------
 
-export interface ServerMutableOptional<S extends Schema.Top>
-  extends VariantSchema.Field<{
-    readonly select: Schema.OptionFromNullOr<S>;
-    readonly insert: Schema.OptionFromNullOr<S>;
-    readonly update: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
-    readonly json: Schema.OptionFromNullOr<S>;
-  }> {}
+export interface ServerMutableOptional<
+  S extends Schema.Top,
+> extends VariantSchema.Field<{
+  readonly select: Schema.OptionFromNullOr<S>;
+  readonly insert: Schema.OptionFromNullOr<S>;
+  readonly update: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
+  readonly json: Schema.OptionFromNullOr<S>;
+}> {}
 
 /**
  * Optional field managed entirely by the server.
@@ -146,11 +150,11 @@ export const ServerMutableOptional = <S extends Schema.Top>(
 export interface ServerImmutableClientImmutableCreateOptional<
   S extends Schema.Top,
 > extends VariantSchema.Field<{
-    readonly select: S;
-    readonly insert: S;
-    readonly json: S;
-    readonly jsonCreate: Schema.OptionFromOptionalKey<S>;
-  }> {}
+  readonly select: S;
+  readonly insert: S;
+  readonly json: S;
+  readonly jsonCreate: Schema.OptionFromOptionalKey<S>;
+}> {}
 
 /**
  * Field immutable to both server and client after insert, but optional in the
@@ -178,13 +182,14 @@ export const ServerImmutableClientImmutableCreateOptional = <
 // ServerImmutableClientImmutable
 // ---------------------------------------------------------------------------
 
-export interface ServerImmutableClientImmutable<S extends Schema.Top>
-  extends VariantSchema.Field<{
-    readonly select: S;
-    readonly insert: S;
-    readonly json: S;
-    readonly jsonCreate: S;
-  }> {}
+export interface ServerImmutableClientImmutable<
+  S extends Schema.Top,
+> extends VariantSchema.Field<{
+  readonly select: S;
+  readonly insert: S;
+  readonly json: S;
+  readonly jsonCreate: S;
+}> {}
 
 /**
  * Field the client must provide on create and that is immutable for both
@@ -207,14 +212,15 @@ export const ServerImmutableClientImmutable = <S extends Schema.Top>(
 // ServerMutableClientImmutable
 // ---------------------------------------------------------------------------
 
-export interface ServerMutableClientImmutable<S extends Schema.Top>
-  extends VariantSchema.Field<{
-    readonly select: S;
-    readonly insert: S;
-    readonly update: Schema.optionalKey<S>;
-    readonly json: S;
-    readonly jsonCreate: S;
-  }> {}
+export interface ServerMutableClientImmutable<
+  S extends Schema.Top,
+> extends VariantSchema.Field<{
+  readonly select: S;
+  readonly insert: S;
+  readonly update: Schema.optionalKey<S>;
+  readonly json: S;
+  readonly jsonCreate: S;
+}> {}
 
 /**
  * Field the client must provide on create and cannot update afterward.
@@ -239,15 +245,16 @@ export const ServerMutableClientImmutable = <S extends Schema.Top>(
 // ServerMutableClientMutable
 // ---------------------------------------------------------------------------
 
-export interface ServerMutableClientMutable<S extends Schema.Top>
-  extends VariantSchema.Field<{
-    readonly select: S;
-    readonly insert: S;
-    readonly update: Schema.optionalKey<S>;
-    readonly json: S;
-    readonly jsonCreate: S;
-    readonly jsonUpdate: Schema.optionalKey<S>;
-  }> {}
+export interface ServerMutableClientMutable<
+  S extends Schema.Top,
+> extends VariantSchema.Field<{
+  readonly select: S;
+  readonly insert: S;
+  readonly update: Schema.optionalKey<S>;
+  readonly json: S;
+  readonly jsonCreate: S;
+  readonly jsonUpdate: Schema.optionalKey<S>;
+}> {}
 
 /**
  * Required field the client can provide on create and update freely.
@@ -271,15 +278,16 @@ export const ServerMutableClientMutable = <S extends Schema.Top>(
 // ServerMutableClientMutableCreateDefault
 // ---------------------------------------------------------------------------
 
-export interface ServerMutableClientMutableCreateDefault<S extends Schema.Top>
-  extends VariantSchema.Field<{
-    readonly select: S;
-    readonly insert: S;
-    readonly update: Schema.optionalKey<S>;
-    readonly json: S;
-    readonly jsonCreate: Schema.withDecodingDefaultKey<S>;
-    readonly jsonUpdate: Schema.optionalKey<S>;
-  }> {}
+export interface ServerMutableClientMutableCreateDefault<
+  S extends Schema.Top,
+> extends VariantSchema.Field<{
+  readonly select: S;
+  readonly insert: S;
+  readonly update: Schema.optionalKey<S>;
+  readonly json: S;
+  readonly jsonCreate: Schema.withDecodingDefaultKey<S>;
+  readonly jsonUpdate: Schema.optionalKey<S>;
+}> {}
 
 /**
  * Mutable field that can be omitted on create and defaults during decoding.
@@ -309,15 +317,16 @@ export const ServerMutableClientMutableCreateDefault = <S extends Schema.Top>(
 // ServerMutableClientMutableOptional
 // ---------------------------------------------------------------------------
 
-export interface ServerMutableClientMutableOptional<S extends Schema.Top>
-  extends VariantSchema.Field<{
-    readonly select: Schema.OptionFromNullOr<S>;
-    readonly insert: Schema.OptionFromNullOr<S>;
-    readonly update: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
-    readonly json: Schema.OptionFromNullOr<S>;
-    readonly jsonCreate: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
-    readonly jsonUpdate: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
-  }> {}
+export interface ServerMutableClientMutableOptional<
+  S extends Schema.Top,
+> extends VariantSchema.Field<{
+  readonly select: Schema.OptionFromNullOr<S>;
+  readonly insert: Schema.OptionFromNullOr<S>;
+  readonly update: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
+  readonly json: Schema.OptionFromNullOr<S>;
+  readonly jsonCreate: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
+  readonly jsonUpdate: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
+}> {}
 
 /**
  * Optional field the client can create, update, clear, or leave unchanged.
@@ -344,15 +353,15 @@ export const ServerMutableClientMutableOptional = <S extends Schema.Top>(
 export interface ServerMutableClientMutableOptionalCreateDefault<
   S extends Schema.Top,
 > extends VariantSchema.Field<{
-    readonly select: Schema.OptionFromNullOr<S>;
-    readonly insert: Schema.OptionFromNullOr<S>;
-    readonly update: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
-    readonly json: Schema.OptionFromNullOr<S>;
-    readonly jsonCreate: Schema.withDecodingDefaultKey<
-      Schema.OptionFromNullOr<S>
-    >;
-    readonly jsonUpdate: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
-  }> {}
+  readonly select: Schema.OptionFromNullOr<S>;
+  readonly insert: Schema.OptionFromNullOr<S>;
+  readonly update: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
+  readonly json: Schema.OptionFromNullOr<S>;
+  readonly jsonCreate: Schema.withDecodingDefaultKey<
+    Schema.OptionFromNullOr<S>
+  >;
+  readonly jsonUpdate: Schema.optionalKey<Schema.OptionFromNullOr<S>>;
+}> {}
 
 /**
  * Optional mutable field that can be omitted on create and defaults during

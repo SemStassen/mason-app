@@ -1,4 +1,11 @@
+import { Schema } from "effect";
+
 import type { Action, WorkspaceRole } from "./actions";
+
+export class AuthorizationError extends Schema.TaggedErrorClass<AuthorizationError>()(
+  "authorization/AuthorizationError",
+  {}
+) {}
 
 const permissionRules: Record<Action, ReadonlyArray<WorkspaceRole>> = {
   "workspace:invite_user": ["owner"],

@@ -2,14 +2,8 @@ import { WorkspaceIntegration } from "@mason/core/modules/integration";
 import { RepositoryError } from "@mason/core/shared/database";
 import { Drizzle, schema } from "@mason/db";
 import { and, eq } from "drizzle-orm";
-import {
-  Effect,
-  Layer,
-  type Option,
-  Redacted,
-  Schema,
-  ServiceMap,
-} from "effect";
+import { Effect, Layer, Redacted, Schema, ServiceMap } from "effect";
+import type { Option } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
 export interface WorkspaceIntegrationRepositoryShape {

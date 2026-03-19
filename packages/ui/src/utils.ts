@@ -1,4 +1,3 @@
-// biome-ignore lint/performance/noNamespaceImport: Fine for chrono-node
 import * as chrono from "chrono-node";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";

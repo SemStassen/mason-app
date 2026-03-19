@@ -1,40 +1,43 @@
-import { type Effect, Schema, ServiceMap } from "effect";
+import { Schema, ServiceMap } from "effect";
+import type { Effect } from "effect";
+
 import type { RepositoryError } from "#shared/database/index";
+
 import type { WorkspaceMember } from "./domain/workspace-member.entity";
 
 export class WorkspaceMemberAlreadyExistsError extends Schema.TaggedErrorClass<WorkspaceMemberAlreadyExistsError>()(
-	"workspace-member/WorkspaceMemberAlreadyExistsError",
-	{},
+  "workspace-member/WorkspaceMemberAlreadyExistsError",
+  {}
 ) {}
 
 export class WorkspaceMemberNotFoundError extends Schema.TaggedErrorClass<WorkspaceMemberNotFoundError>()(
-	"workspace-member/WorkspaceMemberNotFoundError",
-	{},
+  "workspace-member/WorkspaceMemberNotFoundError",
+  {}
 ) {}
 
 interface WorkspaceMemberModuleShape {
-	readonly createWorkspaceMember: (params: {
-		userId: WorkspaceMember["userId"];
-		workspaceId: WorkspaceMember["workspaceId"];
-		role: WorkspaceMember["role"];
-	}) => Effect.Effect<
-		WorkspaceMember,
-		WorkspaceMemberAlreadyExistsError | RepositoryError
-	>;
-	readonly assertUserWorkspaceMember: (params: {
-		workspaceId: WorkspaceMember["workspaceId"];
-		userId: WorkspaceMember["userId"];
-	}) => Effect.Effect<void, WorkspaceMemberNotFoundError | RepositoryError>;
-	readonly assertUserNotWorkspaceMember: (params: {
-		workspaceId: WorkspaceMember["workspaceId"];
-		userId: WorkspaceMember["userId"];
-	}) => Effect.Effect<
-		void,
-		WorkspaceMemberAlreadyExistsError | RepositoryError
-	>;
+  readonly createWorkspaceMember: (params: {
+    userId: WorkspaceMember["userId"];
+    workspaceId: WorkspaceMember["workspaceId"];
+    role: WorkspaceMember["role"];
+  }) => Effect.Effect<
+    WorkspaceMember,
+    WorkspaceMemberAlreadyExistsError | RepositoryError
+  >;
+  readonly assertUserWorkspaceMember: (params: {
+    workspaceId: WorkspaceMember["workspaceId"];
+    userId: WorkspaceMember["userId"];
+  }) => Effect.Effect<void, WorkspaceMemberNotFoundError | RepositoryError>;
+  readonly assertUserNotWorkspaceMember: (params: {
+    workspaceId: WorkspaceMember["workspaceId"];
+    userId: WorkspaceMember["userId"];
+  }) => Effect.Effect<
+    void,
+    WorkspaceMemberAlreadyExistsError | RepositoryError
+  >;
 }
 
 export class WorkspaceMemberModule extends ServiceMap.Service<
-	WorkspaceMemberModule,
-	WorkspaceMemberModuleShape
+  WorkspaceMemberModule,
+  WorkspaceMemberModuleShape
 >()("@mason/workspace-member/WorkspaceMemberModule") {}

@@ -1,12 +1,7 @@
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
-import {
-  ProjectArchivedError,
-  ProjectEndDateBeforeStartDateError,
-  ProjectNotFoundError,
-} from "#modules/project/index";
-import { AuthorizationError } from "#shared/authorization/index";
+
 import {
   ArchiveProjectCommand,
   ArchiveProjectResult,
@@ -16,7 +11,14 @@ import {
   RestoreProjectResult,
   UpdateProjectCommand,
   UpdateProjectResult,
-} from "../contracts";
+} from "#api/contracts/index";
+import {
+  ProjectArchivedError,
+  ProjectEndDateBeforeStartDateError,
+  ProjectNotFoundError,
+} from "#modules/project/index";
+import { AuthorizationError } from "#shared/authorization/index";
+
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const ProjectRpcGroup = RpcGroup.make(

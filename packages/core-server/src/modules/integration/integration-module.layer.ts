@@ -1,12 +1,14 @@
-import { EncryptedApiKey, PlainApiKey } from "@mason/core/shared/schemas";
-import { DateTime, Effect, Layer, Option, Redacted } from "effect";
-import { Crypto } from "#shared/crypto/index";
-import * as workspaceIntegrationTransitions from "./domain/workspace-integration.transitions";
 import {
-  IntegrationModule,
   WorkspaceIntegrationNotFoundError,
   WorkspaceIntegrationProviderAlreadyExistsError,
-} from "./integration-module.service";
+} from "@mason/core/modules/integration";
+import { EncryptedApiKey, PlainApiKey } from "@mason/core/shared/schemas";
+import { DateTime, Effect, Layer, Option, Redacted } from "effect";
+
+import { Crypto } from "#shared/crypto/index";
+
+import * as workspaceIntegrationTransitions from "./domain/workspace-integration.transitions";
+import { IntegrationModule } from "./integration-module.service";
 import { WorkspaceIntegrationRepository } from "./workspace-integration-repository.service";
 
 export const IntegrationModuleLayer = Layer.effect(

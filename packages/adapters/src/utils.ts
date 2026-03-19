@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+
 import { InternalAdapterError } from "./errors";
 
 // Simplest tiptap format storable in DB
@@ -64,7 +65,7 @@ export function fetchPaginated<A, E>({
   extractItems: (body: unknown) => Array<A>;
 }): Effect.Effect<Array<A>, E | InternalAdapterError> {
   return Effect.gen(function* () {
-    let results: Array<A> = [];
+    const results: Array<A> = [];
     let page: number | string = 1;
 
     while (true) {
@@ -80,7 +81,7 @@ export function fetchPaginated<A, E>({
         catch: (e) => new InternalAdapterError({ cause: e }),
       });
 
-      results = results.concat(items);
+      results.push(...items);
 
       const nextPage = getNextPage(response, page);
       if (!nextPage) {

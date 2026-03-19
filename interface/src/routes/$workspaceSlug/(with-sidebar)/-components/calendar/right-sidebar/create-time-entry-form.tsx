@@ -4,7 +4,7 @@ import { Icons } from "@mason/ui/icons";
 import { revalidateLogic } from "@tanstack/react-form";
 import { isEqual } from "date-fns";
 import { Schema } from "effect";
-import { useEffect } from "react";
+
 import { projectsWithTasksAtom } from "~/atoms/api";
 import {
   calendarSortedDragSelectionAtom,
@@ -177,7 +177,10 @@ function CreateTimeEntryForm() {
                 textarea={{
                   placeholder: "Notes...",
                 }}
-                description={{ className: "sr-only", children: "The description of the time entry" }}
+                description={{
+                  className: "sr-only",
+                  children: "The description of the time entry",
+                }}
                 label={{ className: "sr-only", children: "Description" }}
               />
             )}

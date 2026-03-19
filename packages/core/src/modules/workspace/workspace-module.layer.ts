@@ -1,4 +1,5 @@
 import { Effect, Layer, Option } from "effect";
+
 import * as workspaceTransitions from "./domain/workspace.transitions";
 import {
   WorkspaceModule,

@@ -1,6 +1,8 @@
 import { Option, Result } from "effect";
+
 import { WorkspaceId } from "#shared/schemas/index";
 import { generateUUID } from "#shared/utils/index";
+
 import { Workspace } from "./workspace.entity";
 
 export const createWorkspace = (

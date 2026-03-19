@@ -1,14 +1,9 @@
 import {
-  type Action,
+  AuthorizationError,
   isAllowed,
-  type WorkspaceRole,
 } from "@mason/core/shared/authorization";
-import { Effect, Layer, Schema, ServiceMap } from "effect";
-
-export class AuthorizationError extends Schema.TaggedErrorClass<AuthorizationError>()(
-  "authorization/AuthorizationError",
-  {}
-) {}
+import type { Action, WorkspaceRole } from "@mason/core/shared/authorization";
+import { Effect, Layer, ServiceMap } from "effect";
 
 export class Authorization extends ServiceMap.Service<
   Authorization,
@@ -21,15 +16,13 @@ export class Authorization extends ServiceMap.Service<
 >()("@mason/authorization/Authorization") {
   static readonly layer = Layer.effect(
     Authorization,
-    Effect.gen(function* () {
-      return {
-        ensureAllowed: (params) =>
-          Effect.gen(function* () {
-            if (!isAllowed(params)) {
-              return yield* new AuthorizationError();
-            }
-          }),
-      };
+    Effect.succeed({
+      ensureAllowed: (params) =>
+        Effect.gen(function* () {
+          if (!isAllowed(params)) {
+            return yield* new AuthorizationError();
+          }
+        }),
     })
   );
 }

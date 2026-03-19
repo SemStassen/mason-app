@@ -1,22 +1,15 @@
-import { WorkspaceIntegration } from "@mason/core/modules/integration";
+import type {
+  WorkspaceIntegration,
+  WorkspaceIntegrationNotFoundError,
+  WorkspaceIntegrationProviderAlreadyExistsError,
+} from "@mason/core/modules/integration";
 import type { RepositoryError } from "@mason/core/shared/database";
 import type {
   PlainApiKey,
   WorkspaceIntegrationId,
 } from "@mason/core/shared/schemas";
-import { type Effect, Schema, ServiceMap } from "effect";
-
-export class WorkspaceIntegrationNotFoundError extends Schema.TaggedErrorClass<WorkspaceIntegrationNotFoundError>()(
-  "integration/WorkspaceIntegrationNotFoundError",
-  {
-    workspaceIntegrationId: WorkspaceIntegration.fields.id,
-  }
-) {}
-
-export class WorkspaceIntegrationProviderAlreadyExistsError extends Schema.TaggedErrorClass<WorkspaceIntegrationProviderAlreadyExistsError>()(
-  "integration/WorkspaceIntegrationProviderAlreadyExistsError",
-  {}
-) {}
+import { ServiceMap } from "effect";
+import type { Effect } from "effect";
 
 export interface IntegrationModuleShape {
   readonly createWorkspaceIntegration: (params: {

@@ -1,6 +1,7 @@
 import { WorkspaceIntegration } from "@mason/core/modules/integration";
 import { generateUUID } from "@mason/core/shared/utils";
-import { type DateTime, Option, Result } from "effect";
+import { Option, Result } from "effect";
+import type { DateTime } from "effect";
 
 export const createWorkspaceIntegration = (params: {
   workspaceId: WorkspaceIntegration["workspaceId"];

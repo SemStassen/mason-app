@@ -82,10 +82,7 @@ export class Authentication extends ServiceMap.Service<Authentication>()(
             //     emailService.sendVerificationOTP({ email, otp, type })
             //   );
             // },
-            // biome-ignore lint/suspicious/useAwait: fine
-            sendVerificationOTP: async () => {
-              return;
-            },
+            sendVerificationOTP: () => undefined,
           }),
           organization({
             schema: {
@@ -137,6 +134,6 @@ export class Authentication extends ServiceMap.Service<Authentication>()(
   }
 ) {
   static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(Drizzle.layer),
+    Layer.provide(Drizzle.layer)
   );
 }

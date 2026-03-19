@@ -17,6 +17,7 @@ import {
   useState,
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+
 import { Hotkey } from "./hotkey";
 
 export type CommandCategory = "navigation" | "settings" | "developer";
@@ -83,8 +84,6 @@ function useRegisterCommands(cb: () => Array<ICommandItem>) {
 
   for (const cmd of commands) {
     if (cmd.hotkey) {
-      // biome-ignore lint/suspicious/noEmptyBlockStatements: This is needed to mock the close function
-      // biome-ignore lint/correctness/useHookAtTopLevel: This is fine since the order should stay the same
       useHotkeys(cmd.hotkey, () => cmd.onSelect?.({ close: () => {} }), {
         preventDefault: true,
       });

@@ -1,13 +1,7 @@
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
-import { SessionNotFoundError } from "#modules/identity/identity-module.service";
-import {
-  WorkspaceNotFoundError,
-  WorkspaceSlugAlreadyExistsError,
-} from "#modules/workspace/index";
-import { WorkspaceMemberNotFoundError } from "#modules/workspace-member/index";
-import { AuthorizationError } from "#shared/authorization/index";
+
 import {
   CheckWorkspaceSlugIsUniqueCommand,
   CheckWorkspaceSlugIsUniqueResult,
@@ -17,7 +11,15 @@ import {
   SetActiveWorkspaceResult,
   UpdateWorkspaceCommand,
   UpdateWorkspaceResult,
-} from "../contracts";
+} from "#api/contracts/index";
+import { SessionNotFoundError } from "#modules/identity/identity-module.service";
+import { WorkspaceMemberNotFoundError } from "#modules/workspace-member/index";
+import {
+  WorkspaceNotFoundError,
+  WorkspaceSlugAlreadyExistsError,
+} from "#modules/workspace/index";
+import { AuthorizationError } from "#shared/authorization/index";
+
 import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
 
 export const WorkspaceRpcGroup = RpcGroup.make(
