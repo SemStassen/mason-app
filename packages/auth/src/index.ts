@@ -1,1 +1,1 @@
-export * from "./client";
+export { Authentication, BetterAuthError } from "./client";

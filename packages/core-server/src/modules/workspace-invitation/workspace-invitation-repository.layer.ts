@@ -3,15 +3,17 @@ import {
   WorkspaceInvitationRepository,
 } from "@mason/core/modules/workspace-invitation";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { Drizzle, schema } from "@mason/db";
+import { schema } from "@mason/db";
 import { and, eq, gt } from "drizzle-orm";
 import { DateTime, Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
+import { Database } from "#shared/database/index";
+
 export const WorkspaceInvitationRepositoryLayer = Layer.effect(
   WorkspaceInvitationRepository,
   Effect.gen(function* () {
-    const drizzle = yield* Drizzle;
+    const { drizzle } = yield* Database;
 
     const insertWorkspaceInvitation = SqlSchema.findOne({
       Request: WorkspaceInvitation.insert,

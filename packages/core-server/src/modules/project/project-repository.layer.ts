@@ -1,14 +1,16 @@
 import { Project, ProjectRepository } from "@mason/core/modules/project";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { Drizzle, schema } from "@mason/db";
+import { schema } from "@mason/db";
 import { and, eq, inArray } from "drizzle-orm";
 import { DateTime, Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
+import { Database } from "#shared/database/index";
+
 export const ProjectRepositoryLayer = Layer.effect(
   ProjectRepository,
   Effect.gen(function* () {
-    const drizzle = yield* Drizzle;
+    const { drizzle } = yield* Database;
 
     const insertManyProjects = SqlSchema.findAll({
       Request: Schema.Array(Project.insert),

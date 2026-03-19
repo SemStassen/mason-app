@@ -1,16 +1,18 @@
 import { WorkspaceIntegration } from "@mason/core/modules/integration";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { Drizzle, schema } from "@mason/db";
+import { schema } from "@mason/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Redacted, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
+
+import { Database } from "#shared/database/index";
 
 import { WorkspaceIntegrationRepository } from "./workspace-integration-repository.service";
 
 export const WorkspaceIntegrationRepositoryLayer = Layer.effect(
   WorkspaceIntegrationRepository,
   Effect.gen(function* () {
-    const drizzle = yield* Drizzle;
+    const { drizzle } = yield* Database;
 
     const insertWorkspaceIntegration = SqlSchema.findOne({
       Request: WorkspaceIntegration.insert,

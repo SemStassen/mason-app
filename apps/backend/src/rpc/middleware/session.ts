@@ -3,7 +3,7 @@ import { Effect, Layer } from "effect";
 
 export const SessionMiddlewareLayer = Layer.effect(
   SessionMiddleware,
-  Effect.gen(function* () {
-    return {};
-  })
+  Effect.succeed((_effect, _options) =>
+    Effect.die("Session middleware not implemented")
+  )
 );

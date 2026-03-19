@@ -1,9 +1,8 @@
+import type { User } from "@mason/core/modules/identity";
+import type { Workspace } from "@mason/core/modules/workspace";
+import type { WorkspaceInvitation } from "@mason/core/modules/workspace-invitation";
 import { ServiceMap } from "effect";
 import type { Effect } from "effect";
-
-import type { User } from "#modules/identity/index";
-import type { WorkspaceInvitation } from "#modules/workspace-invitation/index";
-import type { Workspace } from "#modules/workspace/index";
 
 interface MailerShape {
   sendWorkspaceInvitation: (params: {

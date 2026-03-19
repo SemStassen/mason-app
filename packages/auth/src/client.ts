@@ -1,5 +1,6 @@
 import { Drizzle, schema } from "@mason/db";
-import { type BetterAuthOptions, betterAuth } from "better-auth";
+import { betterAuth } from "better-auth";
+import type { BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, emailOTP, organization } from "better-auth/plugins";
 import { Config, Effect, Layer, Schema, ServiceMap } from "effect";

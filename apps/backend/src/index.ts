@@ -1,5 +1,6 @@
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
 import { CryptoLayer } from "@mason/core-server/infra/crypto";
+import { DatabaseLayer } from "@mason/core-server/infra/database";
 import {
   SessionRepositoryLayer,
   UserRepositoryLayer,
@@ -29,8 +30,16 @@ import { HttpRouter } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import { AllRpcsGroup, AllRpcsGroupLayer } from "./rpc";
+import { SessionMiddlewareLayer } from "./rpc/middleware/session";
+import { WorkspaceMiddlewareLayer } from "./rpc/middleware/workspace";
 
-const InfraLayer = Layer.mergeAll(CryptoLayer, Authorization.layer);
+const InfraLayerWithDatabase = Layer.mergeAll(
+  CryptoLayer,
+  Authorization.layer,
+  DatabaseLayer,
+  SessionMiddlewareLayer,
+  WorkspaceMiddlewareLayer
+).pipe(Layer.provide(Drizzle.layer));
 
 const RepositoriesLayer = Layer.mergeAll(
   ProjectRepositoryLayer,
@@ -42,7 +51,7 @@ const RepositoriesLayer = Layer.mergeAll(
   WorkspaceInvitationRepositoryLayer,
   WorkspaceMemberRepositoryLayer,
   WorkspaceRepositoryLayer
-).pipe(Layer.provide(Drizzle.layer));
+);
 
 const ModulesLayer = Layer.mergeAll(
   IdentityModuleLayer,
@@ -68,7 +77,7 @@ const AllRoutesLayer = Layer.mergeAll(RpcRouteLayer);
 const MainLayer = Layer.mergeAll(
   ModulesLayer.pipe(
     Layer.provideMerge(RepositoriesLayer),
-    Layer.provideMerge(InfraLayer)
+    Layer.provideMerge(InfraLayerWithDatabase)
   )
 );
 

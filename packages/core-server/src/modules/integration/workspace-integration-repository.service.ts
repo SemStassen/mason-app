@@ -1,10 +1,12 @@
 import { WorkspaceIntegration } from "@mason/core/modules/integration";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { Drizzle, schema } from "@mason/db";
+import { schema } from "@mason/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Redacted, Schema, ServiceMap } from "effect";
 import type { Option } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
+
+import { Database } from "#shared/database/index";
 
 export interface WorkspaceIntegrationRepositoryShape {
   readonly insert: (
@@ -36,7 +38,7 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
   static readonly layer = Layer.effect(
     WorkspaceIntegrationRepository,
     Effect.gen(function* () {
-      const drizzle = yield* Drizzle;
+      const { drizzle } = yield* Database;
 
       const insertWorkspaceIntegration = SqlSchema.findOne({
         Request: WorkspaceIntegration.insert,

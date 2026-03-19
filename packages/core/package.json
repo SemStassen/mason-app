@@ -24,7 +24,6 @@
   "exports": {
     "./contracts": "./src/api/contracts/index.ts",
     "./rpc": "./src/api/rpc/index.ts",
-    "./flows/*": "./src/flows/*/index.ts",
     "./modules/*": "./src/modules/*/index.ts",
     "./shared/*": "./src/shared/*/index.ts"
   }

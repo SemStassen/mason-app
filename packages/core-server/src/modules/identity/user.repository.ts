@@ -1,14 +1,16 @@
 import { User, UserRepository } from "@mason/core/modules/identity";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { Drizzle, schema } from "@mason/db";
+import { schema } from "@mason/db";
 import { eq } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
+import { Database } from "#shared/database/index";
+
 export const UserRepositoryLayer = Layer.effect(
   UserRepository,
   Effect.gen(function* () {
-    const drizzle = yield* Drizzle;
+    const { drizzle } = yield* Database;
 
     const insertUser = SqlSchema.findOne({
       Request: User.insert,

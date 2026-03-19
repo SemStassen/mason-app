@@ -3,7 +3,7 @@ import { Effect, Layer } from "effect";
 
 export const WorkspaceMiddlewareLayer = Layer.effect(
   WorkspaceMiddleware,
-  Effect.gen(function* () {
-    return {};
-  })
+  Effect.succeed((_effect, _options) =>
+    Effect.die("Workspace middleware not implemented")
+  )
 );

@@ -21,6 +21,7 @@ const PgClientLayer = PgClient.layerConfig({
   }),
 } satisfies Config.Wrap<PgClient.PgClientConfig>);
 
+// Do not construct using the make syntax, seems to break types
 export class Drizzle extends ServiceMap.Service<
   Drizzle,
   PgDrizzle.EffectPgDatabase<typeof schema, typeof relations>
@@ -37,3 +38,14 @@ export class Drizzle extends ServiceMap.Service<
     })
   ).pipe(Layer.provide(PgClientLayer));
 }
+
+export const makePgDrizzle = Effect.gen(function* () {
+  const db = yield* PgDrizzle.make({
+    relations,
+    schema,
+  }).pipe(
+    Effect.provide(Layer.provideMerge(PgDrizzle.DefaultServices, PgClientLayer))
+  );
+
+  return db;
+});
