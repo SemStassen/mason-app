@@ -1,4 +1,3 @@
-import { Authorization } from "@mason/authorization";
 import type {
   RestoreTaskCommand,
   RestoreTaskResult,
@@ -6,6 +5,7 @@ import type {
 import { ProjectModule } from "@mason/core/modules/project";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+import { Authorization } from "#shared/authorization/index";
 
 export const restoreTaskFlow = Effect.fn("flows.restoreTaskFlow")(function* (
   request: typeof RestoreTaskCommand.Type

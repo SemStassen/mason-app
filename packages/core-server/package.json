@@ -9,7 +9,6 @@
     "typecheck": "tsc -noEmit"
   },
   "dependencies": {
-    "@mason/authorization": "workspace:*",
     "@mason/core": "workspace:*",
     "@mason/db": "workspace:*",
     "drizzle-orm": "catalog:",
@@ -19,7 +18,12 @@
     "@mason/config": "workspace:*",
     "typescript": "catalog:dev"
   },
+  "imports": {
+    "#shared/*": "./src/shared/*.ts"
+  },
   "exports": {
-    "./modules/*": "./src/modules/*/index.ts"
+    "./infra/*": "./src/infra/*/index.ts",
+    "./modules/*": "./src/modules/*/index.ts",
+    "./shared/*": "./src/shared/*/index.ts"
   }
 }

@@ -1,11 +1,11 @@
-import { Authorization } from "@mason/authorization";
 import type {
   CreateWorkspaceIntegrationCommand,
   CreateWorkspaceIntegrationResult,
 } from "@mason/core/contracts";
-import { IntegrationModule } from "@mason/core/modules/integration";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+import { Authorization } from "#shared/authorization/index";
+import { IntegrationModule } from "../integration-module.service";
 
 export const createWorkspaceIntegrationFlow = Effect.fn(
   "flows.createWorkspaceIntegrationFlow"

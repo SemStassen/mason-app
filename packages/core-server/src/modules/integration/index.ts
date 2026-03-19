@@ -1,2 +1,3 @@
 export { createWorkspaceIntegrationFlow } from "./flows/create-workspace-integration.flow";
-export { WorkspaceIntegrationRepositoryLayer } from "./workspace-integration.repository";
+export { IntegrationModuleLayer } from "./integration-module.layer";
+export { WorkspaceIntegrationRepositoryLayer } from "./workspace-integration-repository.layer";

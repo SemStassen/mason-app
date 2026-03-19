@@ -1,11 +1,8 @@
 export { Workspace } from "./domain/workspace.entity";
-
-export { WorkspaceModuleLayer } from "./workspace.layer";
-
-export { WorkspaceRepository } from "./workspace.repository";
-
+export { WorkspaceModuleLayer } from "./workspace-module.layer";
 export {
   WorkspaceModule,
   WorkspaceNotFoundError,
   WorkspaceSlugAlreadyExistsError,
-} from "./workspace.service";
+} from "./workspace-module.service";
+export { WorkspaceRepository } from "./workspace-repository.service";

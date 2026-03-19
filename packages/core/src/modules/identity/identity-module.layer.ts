@@ -5,9 +5,9 @@ import {
   IdentityModule,
   SessionNotFoundError,
   UserNotFoundError,
-} from "./identity.service";
-import { SessionRepository } from "./session.repository";
-import { UserRepository } from "./user.repository";
+} from "./identity-module.service";
+import { SessionRepository } from "./session-repository.service";
+import { UserRepository } from "./user-repository.service";
 
 export const IdentityModuleLayer = Layer.effect(
   IdentityModule,

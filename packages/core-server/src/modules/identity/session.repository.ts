@@ -21,7 +21,8 @@ export const SessionRepositoryLayer = Layer.effect(
           .update(schema.sessionsTable)
           .set(update)
           .where(eq(schema.sessionsTable.id, id))
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const findSessionById = SqlSchema.findOneOption({
@@ -31,7 +32,8 @@ export const SessionRepositoryLayer = Layer.effect(
         drizzle
           .select()
           .from(schema.sessionsTable)
-          .where(eq(schema.sessionsTable.id, id)),
+          .where(eq(schema.sessionsTable.id, id))
+          .execute(),
     });
 
     return {

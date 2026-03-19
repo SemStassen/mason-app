@@ -1,4 +1,3 @@
-import { Authorization } from "@mason/authorization";
 import type {
   UpdateWorkspaceCommand,
   UpdateWorkspaceResult,
@@ -6,6 +5,7 @@ import type {
 import { WorkspaceModule } from "@mason/core/modules/workspace";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+import { Authorization } from "#shared/authorization/index";
 
 export const updateWorkspaceFlow = Effect.fn("flows.updateWorkspaceFlow")(
   function* (request: typeof UpdateWorkspaceCommand.Type) {

@@ -1,4 +1,3 @@
-import { AuthorizationError } from "@mason/authorization";
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
@@ -7,6 +6,7 @@ import {
   TimeEntryNotFoundError,
   TimeEntryStoppedAtBeforeStartedAtError,
 } from "#modules/time/index";
+import { AuthorizationError } from "#shared/authorization/index";
 import {
   CreateTimeEntryCommand,
   CreateTimeEntryResult,

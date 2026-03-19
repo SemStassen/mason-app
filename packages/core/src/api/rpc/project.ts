@@ -1,5 +1,3 @@
-import { AuthorizationError } from "@mason/authorization";
-
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
@@ -8,6 +6,7 @@ import {
   ProjectEndDateBeforeStartDateError,
   ProjectNotFoundError,
 } from "#modules/project/index";
+import { AuthorizationError } from "#shared/authorization/index";
 import {
   ArchiveProjectCommand,
   ArchiveProjectResult,

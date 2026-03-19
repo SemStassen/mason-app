@@ -14,7 +14,7 @@ export const UserRepositoryLayer = Layer.effect(
       Request: User.insert,
       Result: User,
       execute: (data) =>
-        drizzle.insert(schema.usersTable).values(data).returning(),
+        drizzle.insert(schema.usersTable).values(data).returning().execute(),
     });
 
     const updateUser = SqlSchema.findOne({
@@ -28,7 +28,8 @@ export const UserRepositoryLayer = Layer.effect(
           .update(schema.usersTable)
           .set(update)
           .where(eq(schema.usersTable.id, id))
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const findUserById = SqlSchema.findOneOption({
@@ -38,7 +39,8 @@ export const UserRepositoryLayer = Layer.effect(
         drizzle
           .select()
           .from(schema.usersTable)
-          .where(eq(schema.usersTable.id, id)),
+          .where(eq(schema.usersTable.id, id))
+          .execute(),
     });
 
     const findUserByEmail = SqlSchema.findOneOption({
@@ -48,7 +50,8 @@ export const UserRepositoryLayer = Layer.effect(
         drizzle
           .select()
           .from(schema.usersTable)
-          .where(eq(schema.usersTable.email, email)),
+          .where(eq(schema.usersTable.email, email))
+          .execute(),
     });
 
     return {

@@ -6,5 +6,5 @@ export { restoreProjectFlow } from "./flows/restore-project.flow";
 export { restoreTaskFlow } from "./flows/restore-task.flow";
 export { updateProjectFlow } from "./flows/update-project.flow";
 export { updateTaskFlow } from "./flows/update-task.flow";
-export { ProjectRepositoryLayer } from "./project.repository";
-export { TaskRepositoryLayer } from "./task.repository";
+export { ProjectRepositoryLayer } from "./project-repository.layer";
+export { TaskRepositoryLayer } from "./task-repository.layer";

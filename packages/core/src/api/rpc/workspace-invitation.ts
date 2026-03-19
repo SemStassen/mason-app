@@ -1,8 +1,6 @@
-import { AuthorizationError } from "@mason/authorization";
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
-
 import {
   WorkspaceInvitationEmailMismatchError,
   WorkspaceInvitationExpiredError,
@@ -10,6 +8,7 @@ import {
   WorkspaceInvitationNotPendingError,
 } from "#modules/workspace-invitation/index";
 import { WorkspaceMemberAlreadyExistsError } from "#modules/workspace-member/index";
+import { AuthorizationError } from "#shared/authorization/index";
 import {
   AcceptWorkspaceInvitationCommand,
   AcceptWorkspaceInvitationResult,

@@ -14,7 +14,11 @@ export const WorkspaceRepositoryLayer = Layer.effect(
       Request: Workspace.insert,
       Result: Workspace,
       execute: (data) =>
-        drizzle.insert(schema.workspacesTable).values(data).returning(),
+        drizzle
+          .insert(schema.workspacesTable)
+          .values(data)
+          .returning()
+          .execute(),
     });
 
     const updateWorkspace = SqlSchema.findOne({
@@ -28,7 +32,8 @@ export const WorkspaceRepositoryLayer = Layer.effect(
           .update(schema.workspacesTable)
           .set(update)
           .where(eq(schema.workspacesTable.id, id))
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const findWorkspaceById = SqlSchema.findOneOption({
@@ -38,7 +43,8 @@ export const WorkspaceRepositoryLayer = Layer.effect(
         drizzle
           .select()
           .from(schema.workspacesTable)
-          .where(eq(schema.workspacesTable.id, id)),
+          .where(eq(schema.workspacesTable.id, id))
+          .execute(),
     });
 
     const findWorkspaceBySlug = SqlSchema.findOneOption({
@@ -48,7 +54,8 @@ export const WorkspaceRepositoryLayer = Layer.effect(
         drizzle
           .select()
           .from(schema.workspacesTable)
-          .where(eq(schema.workspacesTable.slug, slug)),
+          .where(eq(schema.workspacesTable.slug, slug))
+          .execute(),
     });
 
     return {

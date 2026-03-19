@@ -1,5 +1,8 @@
 import { Schema } from "effect";
 
+export type WorkspaceRole = typeof WorkspaceRole.Type;
+export const WorkspaceRole = Schema.Literals(["owner", "member"]);
+
 const WorkspaceAction = Schema.Literals([
   "workspace:invite_user",
   "workspace:cancel_invite",

@@ -143,23 +143,12 @@
         "typescript": "catalog:dev",
       },
     },
-    "packages/authorization": {
-      "name": "@mason/authorization",
-      "dependencies": {
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@mason/config": "workspace:*",
-        "typescript": "catalog:dev",
-      },
-    },
     "packages/config": {
       "name": "@mason/config",
     },
     "packages/core": {
       "name": "@mason/core",
       "dependencies": {
-        "@mason/authorization": "workspace:*",
         "effect": "catalog:",
         "uuid": "^13.0.0",
       },
@@ -171,7 +160,6 @@
     "packages/core-server": {
       "name": "@mason/core-server",
       "dependencies": {
-        "@mason/authorization": "workspace:*",
         "@mason/core": "workspace:*",
         "@mason/db": "workspace:*",
         "drizzle-orm": "catalog:",
@@ -561,8 +549,6 @@
     "@mason/adapters": ["@mason/adapters@workspace:packages/adapters"],
 
     "@mason/auth": ["@mason/auth@workspace:packages/auth"],
-
-    "@mason/authorization": ["@mason/authorization@workspace:packages/authorization"],
 
     "@mason/backend": ["@mason/backend@workspace:apps/backend"],
 

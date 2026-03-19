@@ -4,9 +4,6 @@ export {
   TimeEntryAlreadyRunningError,
   TimeEntryStoppedAtBeforeStartedAtError,
 } from "./domain/time-entry.errors";
-
-export { TimeModuleLayer } from "./time.layer";
-
-export { TimeEntryNotFoundError, TimeModule } from "./time.service";
-
-export { TimeEntryRepository } from "./time-entry.repository";
+export { TimeEntryRepository } from "./time-entry-repository.service";
+export { TimeModuleLayer } from "./time-module.layer";
+export { TimeEntryNotFoundError, TimeModule } from "./time-module.service";

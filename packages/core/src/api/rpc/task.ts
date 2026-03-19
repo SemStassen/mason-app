@@ -1,13 +1,12 @@
-import { AuthorizationError } from "@mason/authorization";
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
-
 import {
   ProjectArchivedError,
   ProjectNotFoundError,
   TaskNotFoundError,
 } from "#modules/project/index";
+import { AuthorizationError } from "#shared/authorization/index";
 import {
   ArchiveTaskCommand,
   ArchiveTaskResult,

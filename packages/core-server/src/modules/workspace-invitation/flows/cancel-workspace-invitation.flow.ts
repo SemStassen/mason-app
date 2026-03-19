@@ -1,4 +1,3 @@
-import { Authorization } from "@mason/authorization";
 import type {
   CancelWorkspaceInvitationCommand,
   CancelWorkspaceInvitationResult,
@@ -6,6 +5,7 @@ import type {
 import { WorkspaceInvitationModule } from "@mason/core/modules/workspace-invitation";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+import { Authorization } from "#shared/authorization/index";
 
 export const cancelWorkspaceInvitationFlow = Effect.fn(
   "flows.cancelWorkspaceInvitationFlow"

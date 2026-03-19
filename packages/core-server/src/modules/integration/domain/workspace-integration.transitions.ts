@@ -1,7 +1,6 @@
+import { WorkspaceIntegration } from "@mason/core/modules/integration";
+import { generateUUID } from "@mason/core/shared/utils";
 import { type DateTime, Option, Result } from "effect";
-import { WorkspaceIntegrationId } from "#shared/schemas/index";
-import { generateUUID } from "#shared/utils/index";
-import { WorkspaceIntegration } from "./workspace-integration.entity";
 
 export const createWorkspaceIntegration = (params: {
   workspaceId: WorkspaceIntegration["workspaceId"];
@@ -14,7 +13,7 @@ export const createWorkspaceIntegration = (params: {
 
   return Result.succeed(
     WorkspaceIntegration.make({
-      id: WorkspaceIntegrationId.makeUnsafe(generateUUID()),
+      id: WorkspaceIntegration.fields.id.makeUnsafe(generateUUID()),
       workspaceId: params.workspaceId,
       createdByWorkspaceMemberId: params.createdByWorkspaceMemberId,
       apiKey: params.apiKey,

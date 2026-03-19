@@ -2,9 +2,8 @@ import { DateTime, Effect, Layer, Option } from "effect";
 import { TimeEntryAlreadyRunningError } from "./domain/time-entry.errors";
 
 import * as timeEntryTransitions from "./domain/time-entry.transitions";
-
-import { TimeEntryNotFoundError, TimeModule } from "./time.service";
-import { TimeEntryRepository } from "./time-entry.repository";
+import { TimeEntryRepository } from "./time-entry-repository.service";
+import { TimeEntryNotFoundError, TimeModule } from "./time-module.service";
 
 export const TimeModuleLayer = Layer.effect(
   TimeModule,

@@ -1,4 +1,4 @@
-import { WorkspaceRole } from "@mason/authorization";
+import { WorkspaceRole } from "#shared/authorization/index";
 import { Model, Schema } from "#shared/effect/index";
 import {
   Email,

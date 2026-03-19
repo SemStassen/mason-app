@@ -1,10 +1,10 @@
 import { DateTime, Effect, Layer, Option } from "effect";
 import * as workspaceInvitationTransitions from "./domain/workspace-invitation.transitions";
-import { WorkspaceInvitationRepository } from "./workspace-invitation.repository";
 import {
   WorkspaceInvitationModule,
   WorkspaceInvitationNotFoundError,
-} from "./workspace-invitation.service";
+} from "./workspace-invitation-module.service";
+import { WorkspaceInvitationRepository } from "./workspace-invitation-repository.service";
 
 export const WorkspaceInvitationModuleLayer = Layer.effect(
   WorkspaceInvitationModule,

@@ -17,7 +17,8 @@ export const ProjectRepositoryLayer = Layer.effect(
         drizzle
           .insert(schema.projectsTable)
           .values([...data])
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const updateProject = SqlSchema.findOne({
@@ -37,7 +38,8 @@ export const ProjectRepositoryLayer = Layer.effect(
               eq(schema.projectsTable.id, id)
             )
           )
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const archiveManyProjects = SqlSchema.findAll({
@@ -59,7 +61,8 @@ export const ProjectRepositoryLayer = Layer.effect(
                 inArray(schema.projectsTable.id, ids)
               )
             )
-            .returning();
+            .returning()
+            .execute();
         }),
     });
 
@@ -79,7 +82,8 @@ export const ProjectRepositoryLayer = Layer.effect(
               inArray(schema.projectsTable.id, ids)
             )
           )
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const findProjectById = SqlSchema.findOneOption({
@@ -97,7 +101,8 @@ export const ProjectRepositoryLayer = Layer.effect(
               eq(schema.projectsTable.workspaceId, workspaceId),
               eq(schema.projectsTable.id, id)
             )
-          ),
+          )
+          .execute(),
     });
 
     const findManyByIds = SqlSchema.findAll({
@@ -115,7 +120,8 @@ export const ProjectRepositoryLayer = Layer.effect(
               eq(schema.projectsTable.workspaceId, workspaceId),
               inArray(schema.projectsTable.id, ids)
             )
-          ),
+          )
+          .execute(),
     });
 
     return {

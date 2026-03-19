@@ -1,1 +1,1 @@
-export { WorkspaceMemberRepositoryLayer } from "./workspace-member.repository";
+export { WorkspaceMemberRepositoryLayer } from "./workspace-member-repository.layer";

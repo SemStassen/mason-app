@@ -17,7 +17,8 @@ export const TaskRepositoryLayer = Layer.effect(
         drizzle
           .insert(schema.tasksTable)
           .values([...data])
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const updateTask = SqlSchema.findOne({
@@ -37,7 +38,8 @@ export const TaskRepositoryLayer = Layer.effect(
               eq(schema.tasksTable.id, id)
             )
           )
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const archiveManyTasks = SqlSchema.findAll({
@@ -59,7 +61,8 @@ export const TaskRepositoryLayer = Layer.effect(
                 inArray(schema.tasksTable.id, ids)
               )
             )
-            .returning();
+            .returning()
+            .execute();
         }),
     });
 
@@ -79,7 +82,8 @@ export const TaskRepositoryLayer = Layer.effect(
               inArray(schema.tasksTable.id, ids)
             )
           )
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const findTaskById = SqlSchema.findOneOption({
@@ -97,7 +101,8 @@ export const TaskRepositoryLayer = Layer.effect(
               eq(schema.tasksTable.workspaceId, workspaceId),
               eq(schema.tasksTable.id, id)
             )
-          ),
+          )
+          .execute(),
     });
 
     return {

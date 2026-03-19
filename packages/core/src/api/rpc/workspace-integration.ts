@@ -1,8 +1,8 @@
-import { AuthorizationError } from "@mason/authorization";
 import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { Rpc, RpcGroup } from "effect/unstable/rpc";
 import { WorkspaceIntegrationProviderAlreadyExistsError } from "#modules/integration/integration.service";
+import { AuthorizationError } from "#shared/authorization/index";
 import {
   CreateWorkspaceIntegrationCommand,
   CreateWorkspaceIntegrationResult,

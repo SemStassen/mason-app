@@ -17,7 +17,8 @@ export const TimeEntryRepositoryLayer = Layer.effect(
         drizzle
           .insert(schema.timeEntriesTable)
           .values([...data])
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const updateTimeEntry = SqlSchema.findOne({
@@ -37,7 +38,8 @@ export const TimeEntryRepositoryLayer = Layer.effect(
               eq(schema.timeEntriesTable.id, id)
             )
           )
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const hardDeleteManyTimeEntries = SqlSchema.findAll({
@@ -54,7 +56,8 @@ export const TimeEntryRepositoryLayer = Layer.effect(
               eq(schema.timeEntriesTable.workspaceId, workspaceId),
               inArray(schema.timeEntriesTable.id, ids)
             )
-          ),
+          )
+          .execute(),
     });
 
     const findTimeEntryById = SqlSchema.findOneOption({
@@ -72,7 +75,8 @@ export const TimeEntryRepositoryLayer = Layer.effect(
               eq(schema.timeEntriesTable.workspaceId, workspaceId),
               eq(schema.timeEntriesTable.id, id)
             )
-          ),
+          )
+          .execute(),
     });
 
     const findRunningTimeEntryByWorkspaceMemberId = SqlSchema.findOneOption({
@@ -91,7 +95,8 @@ export const TimeEntryRepositoryLayer = Layer.effect(
               eq(schema.timeEntriesTable.workspaceMemberId, workspaceMemberId),
               isNull(schema.timeEntriesTable.stoppedAt)
             )
-          ),
+          )
+          .execute(),
     });
 
     return {

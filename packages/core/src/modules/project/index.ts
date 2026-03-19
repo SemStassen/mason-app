@@ -6,15 +6,12 @@ export {
 } from "./domain/project.errors";
 
 export { Task } from "./domain/task.entity";
-
-export { ProjectModuleLayer } from "./project.layer";
-
-export { ProjectRepository } from "./project.repository";
-
+export { ProjectModuleLayer } from "./project-module.layer";
 export {
   ProjectModule,
   ProjectNotFoundError,
   TaskNotFoundError,
-} from "./project.service";
+} from "./project-module.service";
+export { ProjectRepository } from "./project-repository.service";
 
-export { TaskRepository } from "./task.repository";
+export { TaskRepository } from "./task-repository.service";

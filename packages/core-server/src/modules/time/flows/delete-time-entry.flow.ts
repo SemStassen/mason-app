@@ -1,4 +1,3 @@
-import { Authorization } from "@mason/authorization";
 import type {
   DeleteTimeEntryCommand,
   DeleteTimeEntryResult,
@@ -6,6 +5,7 @@ import type {
 import { TimeModule } from "@mason/core/modules/time";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+import { Authorization } from "#shared/authorization/index";
 
 export const deleteTimeEntryFlow = Effect.fn("flows.deleteTimeEntryFlow")(
   function* (request: typeof DeleteTimeEntryCommand.Type) {

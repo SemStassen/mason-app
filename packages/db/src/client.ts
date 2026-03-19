@@ -22,20 +22,19 @@ const PgClientLayer = PgClient.layerConfig({
   }),
 } satisfies Config.Wrap<PgClient.PgClientConfig>);
 
-export class Drizzle extends ServiceMap.Service<Drizzle>()(
-  "@mason/db/Drizzle",
-  {
-    make: Effect.gen(function* () {
+export class Drizzle extends ServiceMap.Service<
+  Drizzle,
+  PgDrizzle.EffectPgDatabase<typeof schema, typeof relations>
+>()("@mason/db/Drizzle") {
+  static readonly layer = Layer.effect(
+    this,
+    Effect.gen(function* () {
       const db = yield* PgDrizzle.make({
         relations,
         schema,
       }).pipe(Effect.provide(PgDrizzle.DefaultServices));
 
       return db;
-    }),
-  }
-) {
-  static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(PgClientLayer)
-  );
+    })
+  ).pipe(Layer.provide(PgClientLayer));
 }

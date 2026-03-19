@@ -1,4 +1,3 @@
-import { Authorization } from "@mason/authorization";
 import type {
   CreateTimeEntryCommand,
   CreateTimeEntryResult,
@@ -6,6 +5,7 @@ import type {
 import { TimeModule } from "@mason/core/modules/time";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+import { Authorization } from "#shared/authorization/index";
 
 export const createTimeEntryFlow = Effect.fn("flows.createTimeEntryFlow")(
   function* (request: typeof CreateTimeEntryCommand.Type) {

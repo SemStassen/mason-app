@@ -1,13 +1,13 @@
 import { Effect, Layer, Option } from "effect";
 import * as projectTransitions from "./domain/project.transitions";
 import * as taskTransitions from "./domain/task.transitions";
-import { ProjectRepository } from "./project.repository";
 import {
   ProjectModule,
   ProjectNotFoundError,
   TaskNotFoundError,
-} from "./project.service";
-import { TaskRepository } from "./task.repository";
+} from "./project-module.service";
+import { ProjectRepository } from "./project-repository.service";
+import { TaskRepository } from "./task-repository.service";
 
 export const ProjectModuleLayer = Layer.effect(
   ProjectModule,

@@ -1,4 +1,3 @@
-import { Authorization } from "@mason/authorization";
 import type {
   CreateWorkspaceInvitationCommand,
   CreateWorkspaceInvitationResult,
@@ -9,6 +8,7 @@ import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
 import { SessionContext, WorkspaceContext } from "@mason/core/shared/auth";
 import { Mailer } from "@mason/core/shared/email";
 import { Effect, Option } from "effect";
+import { Authorization } from "#shared/authorization/index";
 
 export const createWorkspaceInvitationFlow = Effect.fn(
   "flows.createWorkspaceInvitationFlow"

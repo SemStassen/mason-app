@@ -1,12 +1,10 @@
-import {
-  WorkspaceIntegration,
-  WorkspaceIntegrationRepository,
-} from "@mason/core/modules/integration";
+import { WorkspaceIntegration } from "@mason/core/modules/integration";
 import { RepositoryError } from "@mason/core/shared/database";
 import { Drizzle, schema } from "@mason/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Redacted, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
+import { WorkspaceIntegrationRepository } from "./workspace-integration-repository.service";
 
 export const WorkspaceIntegrationRepositoryLayer = Layer.effect(
   WorkspaceIntegrationRepository,
@@ -23,7 +21,8 @@ export const WorkspaceIntegrationRepositoryLayer = Layer.effect(
             ...data,
             encryptedApiKey: Redacted.value(data.apiKey),
           })
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const updateWorkspaceIntegration = SqlSchema.findOne({
@@ -48,7 +47,8 @@ export const WorkspaceIntegrationRepositoryLayer = Layer.effect(
               eq(schema.workspaceIntegrationsTable.id, id)
             )
           )
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const hardDeleteWorkspaceIntegration = SqlSchema.findOneOption({
@@ -65,7 +65,8 @@ export const WorkspaceIntegrationRepositoryLayer = Layer.effect(
               eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
               eq(schema.workspaceIntegrationsTable.id, id)
             )
-          ),
+          )
+          .execute(),
     });
 
     const findWorkspaceIntegrationById = SqlSchema.findOneOption({
@@ -83,7 +84,8 @@ export const WorkspaceIntegrationRepositoryLayer = Layer.effect(
               eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
               eq(schema.workspaceIntegrationsTable.id, id)
             )
-          ),
+          )
+          .execute(),
     });
 
     const findWorkspaceIntegrationByProvider = SqlSchema.findOneOption({
@@ -101,7 +103,8 @@ export const WorkspaceIntegrationRepositoryLayer = Layer.effect(
               eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
               eq(schema.workspaceIntegrationsTable.provider, provider)
             )
-          ),
+          )
+          .execute(),
     });
 
     return {

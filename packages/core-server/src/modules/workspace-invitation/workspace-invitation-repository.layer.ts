@@ -20,7 +20,8 @@ export const WorkspaceInvitationRepositoryLayer = Layer.effect(
         drizzle
           .insert(schema.workspaceInvitationsTable)
           .values(data)
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const updateWorkspaceInvitation = SqlSchema.findOne({
@@ -40,7 +41,8 @@ export const WorkspaceInvitationRepositoryLayer = Layer.effect(
               eq(schema.workspaceInvitationsTable.id, id)
             )
           )
-          .returning(),
+          .returning()
+          .execute(),
     });
 
     const findWorkspaceInvitationById = SqlSchema.findOneOption({
@@ -58,7 +60,8 @@ export const WorkspaceInvitationRepositoryLayer = Layer.effect(
               eq(schema.workspaceInvitationsTable.workspaceId, workspaceId),
               eq(schema.workspaceInvitationsTable.id, id)
             )
-          ),
+          )
+          .execute(),
     });
 
     const findWorkspaceInvitationByInvitationId = SqlSchema.findOneOption({
@@ -68,7 +71,8 @@ export const WorkspaceInvitationRepositoryLayer = Layer.effect(
         drizzle
           .select()
           .from(schema.workspaceInvitationsTable)
-          .where(eq(schema.workspaceInvitationsTable.id, id)),
+          .where(eq(schema.workspaceInvitationsTable.id, id))
+          .execute(),
     });
 
     const findActivePendingWorkspaceInvitationByEmail = SqlSchema.findOneOption(
@@ -95,7 +99,8 @@ export const WorkspaceInvitationRepositoryLayer = Layer.effect(
                     DateTime.toDate(now)
                   )
                 )
-              );
+              )
+              .execute();
           }),
       }
     );

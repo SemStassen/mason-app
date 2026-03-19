@@ -1,5 +1,5 @@
 {
-	"extends": "@mason/config/package.tsconfig.json",
-	"include": ["src"],
-	"exclude": ["dist"]
+  "extends": "@mason/config/package.tsconfig.json",
+  "include": ["src"],
+  "exclude": ["dist"]
 }
