@@ -13,7 +13,7 @@
   "dependencies": {
     "@base-ui-components/react": "catalog:frontend",
     "@dnd-kit/react": "^0.1.21",
-    "@effect-atom/atom-react": "^0.4.0",
+    "@effect/atom-react": "catalog:",
     "@electric-sql/pglite": "^0.3.14",
     "@electric-sql/pglite-repl": "^0.2.32",
     "@mason/ui": "workspace:*",

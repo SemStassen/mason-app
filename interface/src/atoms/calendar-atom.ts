@@ -1,7 +1,7 @@
-import { AtomRef } from "@effect-atom/atom";
+import { AtomRef } from "@effect/atom-react";
 import { addDays, isEqual, subDays } from "date-fns";
 
-type ICalendarAtom = {
+interface ICalendarAtom {
   view: "days";
   daysInView: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   selectedDate: Date;
@@ -11,7 +11,7 @@ type ICalendarAtom = {
     secondSelected: Date;
   } | null;
   isDragSelectionActive: boolean;
-};
+}
 
 const calendarAtom = AtomRef.make<ICalendarAtom>({
   view: "days",

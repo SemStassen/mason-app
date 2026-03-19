@@ -9,8 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@effect/sql-drizzle": "^0.48.1",
-    "@effect/sql-pg": "^0.50.3",
+    "@effect/sql-drizzle": "catalog:",
+    "@effect/sql-pg": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
     "pg": "^8.19.0"

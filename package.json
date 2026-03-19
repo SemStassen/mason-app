@@ -22,7 +22,11 @@
       "packages/*"
     ],
     "catalog": {
+      "@effect/atom-react": "^4.0.0-beta.34",
+      "@effect/opentelemetry": "^4.0.0-beta.34",
       "@effect/platform-bun": "^4.0.0-beta.34",
+      "@effect/sql-drizzle": "^4.0.0-beta.34",
+      "@effect/sql-pg": "^4.0.0-beta.34",
       "drizzle-orm": "1.0.0-beta.18-7eb39f0",
       "effect": "^4.0.0-beta.34"
     },

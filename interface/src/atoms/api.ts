@@ -1,9 +1,8 @@
-import { Atom, Result } from "@effect-atom/atom-react";
-import {
-  type CreateWorkspaceIntegrationRequest,
-  WorkspaceIntegrationResponse,
-} from "@mason/api-contract/dto/workspace-integration.dto";
+import { Atom, Result } from "@effect/atom-react";
+import { WorkspaceIntegrationResponse } from "@mason/api-contract/dto/workspace-integration.dto";
+import type { CreateWorkspaceIntegrationRequest } from "@mason/api-contract/dto/workspace-integration.dto";
 import { Effect } from "effect";
+
 import { MasonAtomClient, MasonClient } from "~/client";
 
 const workspaceIntegrationsAtomReadonly = MasonAtomClient.query(

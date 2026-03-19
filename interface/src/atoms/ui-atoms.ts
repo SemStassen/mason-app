@@ -1,4 +1,4 @@
-import { AtomRef } from "@effect-atom/atom-react";
+import { AtomRef } from "@effect/atom-react";
 
 export const debugSheetAtom = AtomRef.make({ isOpen: false });
 export function toggleDebugSheet() {

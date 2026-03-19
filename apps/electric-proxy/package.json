@@ -11,8 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@effect/platform": "^0.87.0",
-    "@effect/platform-bun": "^0.87.0",
+    "@effect/platform-bun": "catalog:",
     "@electric-sql/client": "^1.4.0",
     "effect": "catalog:"
   },

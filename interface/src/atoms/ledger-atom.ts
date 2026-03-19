@@ -1,5 +1,6 @@
-import { Atom } from "@effect-atom/atom-react";
+import { Atom } from "@effect/atom-react";
 import { Effect } from "effect";
+
 import { LedgerService } from "~/core/services/ledger";
 
 const runtimeAtom = Atom.runtime(LedgerService.Default);

@@ -1,7 +1,8 @@
+import { AtomHttpApi } from "@effect/atom-react";
 import { FetchHttpClient, HttpApiClient, HttpClient } from "@effect/platform";
-import { AtomHttpApi } from "@effect-atom/atom-react";
 import { MasonApi } from "@mason/api-contract";
 import { Effect, Layer, Match } from "effect";
+
 import { PLATFORM } from "./utils/constants";
 
 const MasonHttpClient = Layer.provide(
@@ -12,21 +13,21 @@ const MasonHttpClient = Layer.provide(
       const baseFetch =
         PLATFORM.platform === "desktop" ? PLATFORM.fetch : fetch;
 
-        if (PLATFORM.platform === "desktop") {
-          return (input: RequestInfo | URL, init?: RequestInit) => {
-            const token = localStorage.getItem("mason-bearer-token");
-            const headers = new Headers(init?.headers);
-            if (token) {
-              headers.set("Authorization", `Bearer ${token}`);
-            }
-            return baseFetch(input, {
-              ...init,
-              headers,
-            });
-          };
-        }
+      if (PLATFORM.platform === "desktop") {
+        return (input: RequestInfo | URL, init?: RequestInit) => {
+          const token = localStorage.getItem("mason-bearer-token");
+          const headers = new Headers(init?.headers);
+          if (token) {
+            headers.set("Authorization", `Bearer ${token}`);
+          }
+          return baseFetch(input, {
+            ...init,
+            headers,
+          });
+        };
+      }
 
-        return fetch;
+      return fetch;
     })
   )
 );
