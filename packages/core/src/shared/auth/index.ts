@@ -4,18 +4,22 @@ import type { Session, User } from "#modules/identity/index";
 import type { WorkspaceMember } from "#modules/workspace-member/index";
 import type { Workspace } from "#modules/workspace/index";
 
+export interface SessionContextShape {
+  session: Session;
+  user: User;
+}
+
 export class SessionContext extends ServiceMap.Service<
   SessionContext,
-  {
-    session: Session;
-    user: User;
-  }
+  SessionContextShape
 >()("@mason/shared/SessionContext") {}
+
+export interface WorkspaceContextShape {
+  member: WorkspaceMember;
+  workspace: Workspace;
+}
 
 export class WorkspaceContext extends ServiceMap.Service<
   WorkspaceContext,
-  {
-    member: WorkspaceMember;
-    workspace: Workspace;
-  }
+  WorkspaceContextShape
 >()("@mason/shared/WorkspaceContext") {}

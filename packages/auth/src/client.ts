@@ -3,7 +3,7 @@ import { betterAuth } from "better-auth";
 import type { BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, emailOTP, organization } from "better-auth/plugins";
-import { Config, Effect, Schema, ServiceMap } from "effect";
+import { Config, Effect, Layer, Schema, ServiceMap } from "effect";
 
 export class BetterAuthError extends Schema.TaggedErrorClass<BetterAuthError>()(
   "shared/BetterAuthError",
@@ -12,8 +12,8 @@ export class BetterAuthError extends Schema.TaggedErrorClass<BetterAuthError>()(
   }
 ) {}
 
-export class Authentication extends ServiceMap.Service<Authentication>()(
-  "@mason/auth/Authentication",
+export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
+  "@mason/auth/BetterAuth",
   {
     make: Effect.gen(function* () {
       const authConfig = yield* Config.all({
@@ -83,7 +83,7 @@ export class Authentication extends ServiceMap.Service<Authentication>()(
             //     emailService.sendVerificationOTP({ email, otp, type })
             //   );
             // },
-            sendVerificationOTP: () => undefined,
+            sendVerificationOTP: () => Promise.resolve(),
           }),
           organization({
             schema: {
@@ -130,7 +130,9 @@ export class Authentication extends ServiceMap.Service<Authentication>()(
           })
       );
 
-      return { use } as const;
-    }).pipe(Effect.catchTags({ ConfigError: (error) => Effect.die(error) })),
+      return { use };
+    }),
   }
-) {}
+) {
+  static readonly layer = Layer.effect(BetterAuth, BetterAuth.make);
+}

@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mason/auth": "workspace:*",
     "@mason/core": "workspace:*",
     "@mason/db": "workspace:*",
     "drizzle-orm": "catalog:",

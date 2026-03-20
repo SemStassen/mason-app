@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",
+    "@mason/auth": "workspace:*",
     "@mason/core": "workspace:*",
     "@mason/core-server": "workspace:*",
     "@mason/db": "workspace:*",

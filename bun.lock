@@ -21,6 +21,7 @@
       "name": "@mason/backend",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
+        "@mason/auth": "workspace:*",
         "@mason/core": "workspace:*",
         "@mason/core-server": "workspace:*",
         "@mason/db": "workspace:*",
@@ -162,6 +163,7 @@
     "packages/core-server": {
       "name": "@mason/core-server",
       "dependencies": {
+        "@mason/auth": "workspace:*",
         "@mason/core": "workspace:*",
         "@mason/db": "workspace:*",
         "drizzle-orm": "catalog:",

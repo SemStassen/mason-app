@@ -1,1 +1,1 @@
-export { Authentication, BetterAuthError } from "./client";
+export { BetterAuth, BetterAuthError } from "./client";
