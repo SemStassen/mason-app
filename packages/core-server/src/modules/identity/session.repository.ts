@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
-import { Database } from "#shared/database/index";
+import { Database } from "@mason/db";
 
 export const SessionRepositoryLayer = Layer.effect(
   SessionRepository,

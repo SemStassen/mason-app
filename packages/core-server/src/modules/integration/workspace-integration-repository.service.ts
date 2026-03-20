@@ -6,7 +6,7 @@ import { Effect, Layer, Redacted, Schema, ServiceMap } from "effect";
 import type { Option } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
-import { Database } from "#shared/database/index";
+import { Database } from "@mason/db";
 
 export interface WorkspaceIntegrationRepositoryShape {
   readonly insert: (

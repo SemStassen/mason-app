@@ -1,6 +1,6 @@
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
 import { CryptoLayer } from "@mason/core-server/infra/crypto";
-import { DatabaseLayer } from "@mason/core-server/infra/database";
+import { DatabaseLayer } from "@mason/db";
 import {
   SessionRepositoryLayer,
   UserRepositoryLayer,
@@ -24,7 +24,6 @@ import { TimeModuleLayer } from "@mason/core/modules/time";
 import { WorkspaceModuleLayer } from "@mason/core/modules/workspace";
 import { WorkspaceInvitationModuleLayer } from "@mason/core/modules/workspace-invitation";
 import { WorkspaceMemberModuleLayer } from "@mason/core/modules/workspace-member";
-import { Drizzle } from "@mason/db";
 import { Config, Layer } from "effect";
 import { HttpRouter } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
@@ -39,7 +38,7 @@ const InfraLayerWithDatabase = Layer.mergeAll(
   DatabaseLayer,
   SessionMiddlewareLayer,
   WorkspaceMiddlewareLayer
-).pipe(Layer.provide(Drizzle.layer));
+);
 
 const RepositoriesLayer = Layer.mergeAll(
   ProjectRepositoryLayer,

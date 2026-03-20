@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Redacted, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
-import { Database } from "#shared/database/index";
+import { Database } from "@mason/db";
 
 import { WorkspaceIntegrationRepository } from "./workspace-integration-repository.service";
 

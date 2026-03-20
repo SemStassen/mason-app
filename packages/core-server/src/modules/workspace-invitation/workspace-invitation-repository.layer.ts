@@ -8,7 +8,7 @@ import { and, eq, gt } from "drizzle-orm";
 import { DateTime, Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
-import { Database } from "#shared/database/index";
+import { Database } from "@mason/db";
 
 export const WorkspaceInvitationRepositoryLayer = Layer.effect(
   WorkspaceInvitationRepository,

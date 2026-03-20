@@ -1,6 +1,9 @@
-import type { Drizzle } from "@mason/db";
+import type * as PgDrizzle from "drizzle-orm/effect-postgres";
 import { Schema, ServiceMap } from "effect";
 import type { Effect } from "effect";
+
+import type { relations } from "./relations";
+import type * as schema from "./schema";
 
 export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   "infra/DatabaseError",
@@ -9,8 +12,13 @@ export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   }
 ) {}
 
+export type DrizzleDb = PgDrizzle.EffectPgDatabase<
+  typeof schema,
+  typeof relations
+>;
+
 export interface DatabaseShape {
-  readonly drizzle: Drizzle["Service"];
+  readonly drizzle: DrizzleDb;
   /**
    * Run operations in a transaction.
    *
@@ -62,5 +70,5 @@ export interface DatabaseShape {
 }
 
 export class Database extends ServiceMap.Service<Database, DatabaseShape>()(
-  "@mason/shared/Database"
+  "@mason/db/Database"
 ) {}

@@ -5,7 +5,7 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
-import { Database } from "#shared/database/index";
+import { Database } from "@mason/db";
 
 export const TimeEntryRepositoryLayer = Layer.effect(
   TimeEntryRepository,

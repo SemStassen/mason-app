@@ -3,12 +3,10 @@ import {
   WorkspaceMemberRepository,
 } from "@mason/core/modules/workspace-member";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { schema } from "@mason/db";
+import { Database, schema } from "@mason/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
-
-import { Database } from "#shared/database/index";
 
 export const WorkspaceMemberRepositoryLayer = Layer.effect(
   WorkspaceMemberRepository,

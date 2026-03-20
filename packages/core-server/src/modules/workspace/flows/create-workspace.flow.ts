@@ -8,7 +8,7 @@ import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
 import { SessionContext } from "@mason/core/shared/auth";
 import { Effect, Option } from "effect";
 
-import { Database } from "#shared/database/index";
+import { Database } from "@mason/db";
 
 export const createWorkspaceFlow = Effect.fn("flows.createWorkspaceFlow")(
   function* (request: typeof CreateWorkspaceCommand.Type) {

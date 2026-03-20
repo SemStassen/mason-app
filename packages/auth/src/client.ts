@@ -1,9 +1,9 @@
-import { Drizzle, schema } from "@mason/db";
+import { Database, schema } from "@mason/db";
 import { betterAuth } from "better-auth";
 import type { BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, emailOTP, organization } from "better-auth/plugins";
-import { Config, Effect, Layer, Schema, ServiceMap } from "effect";
+import { Config, Effect, Schema, ServiceMap } from "effect";
 
 export class BetterAuthError extends Schema.TaggedErrorClass<BetterAuthError>()(
   "shared/BetterAuthError",
@@ -21,12 +21,12 @@ export class Authentication extends ServiceMap.Service<Authentication>()(
         googleClientSecret: Config.string("GOOGLE_CLIENT_SECRET"),
       });
 
-      const drizzle = yield* Drizzle;
+      const db = yield* Database;
 
       // This is required to be separate for the type inference to work in the customSession plugin
       const betterAuthOptions = {
         appName: "Mason",
-        database: drizzleAdapter(drizzle, {
+        database: drizzleAdapter(db.drizzle, {
           provider: "pg",
           schema: schema,
         }),
@@ -133,8 +133,4 @@ export class Authentication extends ServiceMap.Service<Authentication>()(
       return { use } as const;
     }).pipe(Effect.catchTags({ ConfigError: (error) => Effect.die(error) })),
   }
-) {
-  static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(Drizzle.layer)
-  );
-}
+) {}
