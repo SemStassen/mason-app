@@ -1,26 +1,22 @@
 import { Project, ProjectRepository } from "@mason/core/modules/project";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { schema } from "@mason/db";
+import { Database, schema } from "@mason/db";
 import { and, eq, inArray } from "drizzle-orm";
 import { DateTime, Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
-import { Database } from "@mason/db";
-
 export const ProjectRepositoryLayer = Layer.effect(
   ProjectRepository,
   Effect.gen(function* () {
-    const { drizzle } = yield* Database;
+    const db = yield* Database;
 
     const insertManyProjects = SqlSchema.findAll({
       Request: Schema.Array(Project.insert),
       Result: Project,
       execute: (data) =>
-        drizzle
-          .insert(schema.projectsTable)
-          .values([...data])
-          .returning()
-          .execute(),
+        db.drizzle((drizzle) =>
+          drizzle.insert(schema.projectsTable).values([...data]).returning().execute()
+        ),
     });
 
     const updateProject = SqlSchema.findOne({
@@ -31,17 +27,19 @@ export const ProjectRepositoryLayer = Layer.effect(
       }),
       Result: Project,
       execute: ({ workspaceId, id, update }) =>
-        drizzle
-          .update(schema.projectsTable)
-          .set(update)
-          .where(
-            and(
-              eq(schema.projectsTable.workspaceId, workspaceId),
-              eq(schema.projectsTable.id, id)
+        db.drizzle((drizzle) =>
+          drizzle
+            .update(schema.projectsTable)
+            .set(update)
+            .where(
+              and(
+                eq(schema.projectsTable.workspaceId, workspaceId),
+                eq(schema.projectsTable.id, id)
+              )
             )
-          )
-          .returning()
-          .execute(),
+            .returning()
+            .execute()
+        ),
     });
 
     const archiveManyProjects = SqlSchema.findAll({
@@ -54,17 +52,19 @@ export const ProjectRepositoryLayer = Layer.effect(
         Effect.gen(function* () {
           const now = yield* DateTime.now;
 
-          return yield* drizzle
-            .update(schema.projectsTable)
-            .set({ archivedAt: DateTime.toDate(now) })
-            .where(
-              and(
-                eq(schema.projectsTable.workspaceId, workspaceId),
-                inArray(schema.projectsTable.id, ids)
+          return yield* db.drizzle((drizzle) =>
+            drizzle
+              .update(schema.projectsTable)
+              .set({ archivedAt: DateTime.toDate(now) })
+              .where(
+                and(
+                  eq(schema.projectsTable.workspaceId, workspaceId),
+                  inArray(schema.projectsTable.id, ids)
+                )
               )
-            )
-            .returning()
-            .execute();
+              .returning()
+              .execute()
+          );
         }),
     });
 
@@ -75,17 +75,19 @@ export const ProjectRepositoryLayer = Layer.effect(
       }),
       Result: Project,
       execute: ({ workspaceId, ids }) =>
-        drizzle
-          .update(schema.projectsTable)
-          .set({ archivedAt: null })
-          .where(
-            and(
-              eq(schema.projectsTable.workspaceId, workspaceId),
-              inArray(schema.projectsTable.id, ids)
+        db.drizzle((drizzle) =>
+          drizzle
+            .update(schema.projectsTable)
+            .set({ archivedAt: null })
+            .where(
+              and(
+                eq(schema.projectsTable.workspaceId, workspaceId),
+                inArray(schema.projectsTable.id, ids)
+              )
             )
-          )
-          .returning()
-          .execute(),
+            .returning()
+            .execute()
+        ),
     });
 
     const findProjectById = SqlSchema.findOneOption({
@@ -95,16 +97,18 @@ export const ProjectRepositoryLayer = Layer.effect(
       }),
       Result: Project,
       execute: ({ workspaceId, id }) =>
-        drizzle
-          .select()
-          .from(schema.projectsTable)
-          .where(
-            and(
-              eq(schema.projectsTable.workspaceId, workspaceId),
-              eq(schema.projectsTable.id, id)
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.projectsTable)
+            .where(
+              and(
+                eq(schema.projectsTable.workspaceId, workspaceId),
+                eq(schema.projectsTable.id, id)
+              )
             )
-          )
-          .execute(),
+            .execute()
+        ),
     });
 
     const findManyByIds = SqlSchema.findAll({
@@ -114,16 +118,18 @@ export const ProjectRepositoryLayer = Layer.effect(
       }),
       Result: Project,
       execute: ({ workspaceId, ids }) =>
-        drizzle
-          .select()
-          .from(schema.projectsTable)
-          .where(
-            and(
-              eq(schema.projectsTable.workspaceId, workspaceId),
-              inArray(schema.projectsTable.id, ids)
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.projectsTable)
+            .where(
+              and(
+                eq(schema.projectsTable.workspaceId, workspaceId),
+                inArray(schema.projectsTable.id, ids)
+              )
             )
-          )
-          .execute(),
+            .execute()
+        ),
     });
 
     return {

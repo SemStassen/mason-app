@@ -26,7 +26,7 @@ export class Authentication extends ServiceMap.Service<Authentication>()(
       // This is required to be separate for the type inference to work in the customSession plugin
       const betterAuthOptions = {
         appName: "Mason",
-        database: drizzleAdapter(db.drizzle, {
+        database: drizzleAdapter(db.unsafeDrizzle, {
           provider: "pg",
           schema: schema,
         }),

@@ -11,17 +11,19 @@ import { SqlSchema } from "effect/unstable/sql";
 export const WorkspaceMemberRepositoryLayer = Layer.effect(
   WorkspaceMemberRepository,
   Effect.gen(function* () {
-    const { drizzle } = yield* Database;
+    const db = yield* Database;
 
     const insertWorkspaceMember = SqlSchema.findOne({
       Request: WorkspaceMember.insert,
       Result: WorkspaceMember,
       execute: (data) =>
-        drizzle
-          .insert(schema.workspaceMembersTable)
-          .values(data)
-          .returning()
-          .execute(),
+        db.drizzle((drizzle) =>
+          drizzle
+            .insert(schema.workspaceMembersTable)
+            .values(data)
+            .returning()
+            .execute()
+        ),
     });
 
     const updateWorkspaceMember = SqlSchema.findOne({
@@ -32,17 +34,19 @@ export const WorkspaceMemberRepositoryLayer = Layer.effect(
       }),
       Result: WorkspaceMember,
       execute: ({ workspaceId, id, update }) =>
-        drizzle
-          .update(schema.workspaceMembersTable)
-          .set(update)
-          .where(
-            and(
-              eq(schema.workspaceMembersTable.workspaceId, workspaceId),
-              eq(schema.workspaceMembersTable.id, id)
+        db.drizzle((drizzle) =>
+          drizzle
+            .update(schema.workspaceMembersTable)
+            .set(update)
+            .where(
+              and(
+                eq(schema.workspaceMembersTable.workspaceId, workspaceId),
+                eq(schema.workspaceMembersTable.id, id)
+              )
             )
-          )
-          .returning()
-          .execute(),
+            .returning()
+            .execute()
+        ),
     });
 
     const findWorkspaceMemberById = SqlSchema.findOneOption({
@@ -52,16 +56,18 @@ export const WorkspaceMemberRepositoryLayer = Layer.effect(
       }),
       Result: WorkspaceMember,
       execute: ({ workspaceId, id }) =>
-        drizzle
-          .select()
-          .from(schema.workspaceMembersTable)
-          .where(
-            and(
-              eq(schema.workspaceMembersTable.workspaceId, workspaceId),
-              eq(schema.workspaceMembersTable.id, id)
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.workspaceMembersTable)
+            .where(
+              and(
+                eq(schema.workspaceMembersTable.workspaceId, workspaceId),
+                eq(schema.workspaceMembersTable.id, id)
+              )
             )
-          )
-          .execute(),
+            .execute()
+        ),
     });
 
     const findWorkspaceMemberByUserId = SqlSchema.findOneOption({
@@ -71,16 +77,18 @@ export const WorkspaceMemberRepositoryLayer = Layer.effect(
       }),
       Result: WorkspaceMember,
       execute: ({ workspaceId, userId }) =>
-        drizzle
-          .select()
-          .from(schema.workspaceMembersTable)
-          .where(
-            and(
-              eq(schema.workspaceMembersTable.workspaceId, workspaceId),
-              eq(schema.workspaceMembersTable.userId, userId)
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.workspaceMembersTable)
+            .where(
+              and(
+                eq(schema.workspaceMembersTable.workspaceId, workspaceId),
+                eq(schema.workspaceMembersTable.userId, userId)
+              )
             )
-          )
-          .execute(),
+            .execute()
+        ),
     });
 
     return {

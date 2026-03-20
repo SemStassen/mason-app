@@ -1,26 +1,22 @@
 import { Task, TaskRepository } from "@mason/core/modules/project";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { schema } from "@mason/db";
+import { Database, schema } from "@mason/db";
 import { and, eq, inArray } from "drizzle-orm";
 import { DateTime, Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
-import { Database } from "@mason/db";
-
 export const TaskRepositoryLayer = Layer.effect(
   TaskRepository,
   Effect.gen(function* () {
-    const { drizzle } = yield* Database;
+    const db = yield* Database;
 
     const insertManyTasks = SqlSchema.findAll({
       Request: Schema.Array(Task.insert),
       Result: Task,
       execute: (data) =>
-        drizzle
-          .insert(schema.tasksTable)
-          .values([...data])
-          .returning()
-          .execute(),
+        db.drizzle((drizzle) =>
+          drizzle.insert(schema.tasksTable).values([...data]).returning().execute()
+        ),
     });
 
     const updateTask = SqlSchema.findOne({
@@ -31,17 +27,19 @@ export const TaskRepositoryLayer = Layer.effect(
       }),
       Result: Task,
       execute: ({ workspaceId, id, update }) =>
-        drizzle
-          .update(schema.tasksTable)
-          .set(update)
-          .where(
-            and(
-              eq(schema.tasksTable.workspaceId, workspaceId),
-              eq(schema.tasksTable.id, id)
+        db.drizzle((drizzle) =>
+          drizzle
+            .update(schema.tasksTable)
+            .set(update)
+            .where(
+              and(
+                eq(schema.tasksTable.workspaceId, workspaceId),
+                eq(schema.tasksTable.id, id)
+              )
             )
-          )
-          .returning()
-          .execute(),
+            .returning()
+            .execute()
+        ),
     });
 
     const archiveManyTasks = SqlSchema.findAll({
@@ -54,17 +52,19 @@ export const TaskRepositoryLayer = Layer.effect(
         Effect.gen(function* () {
           const now = yield* DateTime.now;
 
-          return yield* drizzle
-            .update(schema.tasksTable)
-            .set({ archivedAt: DateTime.toDate(now) })
-            .where(
-              and(
-                eq(schema.tasksTable.workspaceId, workspaceId),
-                inArray(schema.tasksTable.id, ids)
+          return yield* db.drizzle((drizzle) =>
+            drizzle
+              .update(schema.tasksTable)
+              .set({ archivedAt: DateTime.toDate(now) })
+              .where(
+                and(
+                  eq(schema.tasksTable.workspaceId, workspaceId),
+                  inArray(schema.tasksTable.id, ids)
+                )
               )
-            )
-            .returning()
-            .execute();
+              .returning()
+              .execute()
+          );
         }),
     });
 
@@ -75,17 +75,19 @@ export const TaskRepositoryLayer = Layer.effect(
       }),
       Result: Task,
       execute: ({ workspaceId, ids }) =>
-        drizzle
-          .update(schema.tasksTable)
-          .set({ archivedAt: null })
-          .where(
-            and(
-              eq(schema.tasksTable.workspaceId, workspaceId),
-              inArray(schema.tasksTable.id, ids)
+        db.drizzle((drizzle) =>
+          drizzle
+            .update(schema.tasksTable)
+            .set({ archivedAt: null })
+            .where(
+              and(
+                eq(schema.tasksTable.workspaceId, workspaceId),
+                inArray(schema.tasksTable.id, ids)
+              )
             )
-          )
-          .returning()
-          .execute(),
+            .returning()
+            .execute()
+        ),
     });
 
     const findTaskById = SqlSchema.findOneOption({
@@ -95,16 +97,18 @@ export const TaskRepositoryLayer = Layer.effect(
       }),
       Result: Task,
       execute: ({ workspaceId, id }) =>
-        drizzle
-          .select()
-          .from(schema.tasksTable)
-          .where(
-            and(
-              eq(schema.tasksTable.workspaceId, workspaceId),
-              eq(schema.tasksTable.id, id)
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.tasksTable)
+            .where(
+              and(
+                eq(schema.tasksTable.workspaceId, workspaceId),
+                eq(schema.tasksTable.id, id)
+              )
             )
-          )
-          .execute(),
+            .execute()
+        ),
     });
 
     return {

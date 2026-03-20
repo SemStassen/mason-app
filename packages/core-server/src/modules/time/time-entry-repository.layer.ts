@@ -1,26 +1,26 @@
 import { TimeEntry, TimeEntryRepository } from "@mason/core/modules/time";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { schema } from "@mason/db";
+import { Database, schema } from "@mason/db";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
-import { Database } from "@mason/db";
-
 export const TimeEntryRepositoryLayer = Layer.effect(
   TimeEntryRepository,
   Effect.gen(function* () {
-    const { drizzle } = yield* Database;
+    const db = yield* Database;
 
     const insertManyTimeEntries = SqlSchema.findAll({
       Request: Schema.Array(TimeEntry.insert),
       Result: TimeEntry,
       execute: (data) =>
-        drizzle
-          .insert(schema.timeEntriesTable)
-          .values([...data])
-          .returning()
-          .execute(),
+        db.drizzle((drizzle) =>
+          drizzle
+            .insert(schema.timeEntriesTable)
+            .values([...data])
+            .returning()
+            .execute()
+        ),
     });
 
     const updateTimeEntry = SqlSchema.findOne({
@@ -31,17 +31,19 @@ export const TimeEntryRepositoryLayer = Layer.effect(
       }),
       Result: TimeEntry,
       execute: ({ workspaceId, id, update }) =>
-        drizzle
-          .update(schema.timeEntriesTable)
-          .set(update)
-          .where(
-            and(
-              eq(schema.timeEntriesTable.workspaceId, workspaceId),
-              eq(schema.timeEntriesTable.id, id)
+        db.drizzle((drizzle) =>
+          drizzle
+            .update(schema.timeEntriesTable)
+            .set(update)
+            .where(
+              and(
+                eq(schema.timeEntriesTable.workspaceId, workspaceId),
+                eq(schema.timeEntriesTable.id, id)
+              )
             )
-          )
-          .returning()
-          .execute(),
+            .returning()
+            .execute()
+        ),
     });
 
     const hardDeleteManyTimeEntries = SqlSchema.findAll({
@@ -51,15 +53,17 @@ export const TimeEntryRepositoryLayer = Layer.effect(
       }),
       Result: Schema.Void,
       execute: ({ workspaceId, ids }) =>
-        drizzle
-          .delete(schema.timeEntriesTable)
-          .where(
-            and(
-              eq(schema.timeEntriesTable.workspaceId, workspaceId),
-              inArray(schema.timeEntriesTable.id, ids)
+        db.drizzle((drizzle) =>
+          drizzle
+            .delete(schema.timeEntriesTable)
+            .where(
+              and(
+                eq(schema.timeEntriesTable.workspaceId, workspaceId),
+                inArray(schema.timeEntriesTable.id, ids)
+              )
             )
-          )
-          .execute(),
+            .execute()
+        ),
     });
 
     const findTimeEntryById = SqlSchema.findOneOption({
@@ -69,16 +73,18 @@ export const TimeEntryRepositoryLayer = Layer.effect(
       }),
       Result: TimeEntry,
       execute: ({ workspaceId, id }) =>
-        drizzle
-          .select()
-          .from(schema.timeEntriesTable)
-          .where(
-            and(
-              eq(schema.timeEntriesTable.workspaceId, workspaceId),
-              eq(schema.timeEntriesTable.id, id)
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.timeEntriesTable)
+            .where(
+              and(
+                eq(schema.timeEntriesTable.workspaceId, workspaceId),
+                eq(schema.timeEntriesTable.id, id)
+              )
             )
-          )
-          .execute(),
+            .execute()
+        ),
     });
 
     const findRunningTimeEntryByWorkspaceMemberId = SqlSchema.findOneOption({
@@ -88,17 +94,19 @@ export const TimeEntryRepositoryLayer = Layer.effect(
       }),
       Result: TimeEntry,
       execute: ({ workspaceId, workspaceMemberId }) =>
-        drizzle
-          .select()
-          .from(schema.timeEntriesTable)
-          .where(
-            and(
-              eq(schema.timeEntriesTable.workspaceId, workspaceId),
-              eq(schema.timeEntriesTable.workspaceMemberId, workspaceMemberId),
-              isNull(schema.timeEntriesTable.stoppedAt)
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.timeEntriesTable)
+            .where(
+              and(
+                eq(schema.timeEntriesTable.workspaceId, workspaceId),
+                eq(schema.timeEntriesTable.workspaceMemberId, workspaceMemberId),
+                isNull(schema.timeEntriesTable.stoppedAt)
+              )
             )
-          )
-          .execute(),
+            .execute()
+        ),
     });
 
     return {

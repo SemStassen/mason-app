@@ -1,12 +1,10 @@
 import { WorkspaceIntegration } from "@mason/core/modules/integration";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { schema } from "@mason/db";
+import { Database, schema } from "@mason/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Redacted, Schema, ServiceMap } from "effect";
 import type { Option } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
-
-import { Database } from "@mason/db";
 
 export interface WorkspaceIntegrationRepositoryShape {
   readonly insert: (
@@ -38,20 +36,22 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
   static readonly layer = Layer.effect(
     WorkspaceIntegrationRepository,
     Effect.gen(function* () {
-      const { drizzle } = yield* Database;
+      const db = yield* Database;
 
       const insertWorkspaceIntegration = SqlSchema.findOne({
         Request: WorkspaceIntegration.insert,
         Result: WorkspaceIntegration,
         execute: (data) =>
-          drizzle
-            .insert(schema.workspaceIntegrationsTable)
-            .values({
-              ...data,
-              encryptedApiKey: Redacted.value(data.apiKey),
-            })
-            .returning()
-            .execute(),
+          db.drizzle((drizzle) =>
+            drizzle
+              .insert(schema.workspaceIntegrationsTable)
+              .values({
+                ...data,
+                encryptedApiKey: Redacted.value(data.apiKey),
+              })
+              .returning()
+              .execute()
+          ),
       });
 
       const updateWorkspaceIntegration = SqlSchema.findOne({
@@ -62,22 +62,24 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
         }),
         Result: WorkspaceIntegration,
         execute: ({ workspaceId, id, update }) =>
-          drizzle
-            .update(schema.workspaceIntegrationsTable)
-            .set({
-              ...update,
-              ...(update.apiKey
-                ? { encryptedApiKey: Redacted.value(update.apiKey) }
-                : {}),
-            })
-            .where(
-              and(
-                eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
-                eq(schema.workspaceIntegrationsTable.id, id)
+          db.drizzle((drizzle) =>
+            drizzle
+              .update(schema.workspaceIntegrationsTable)
+              .set({
+                ...update,
+                ...(update.apiKey
+                  ? { encryptedApiKey: Redacted.value(update.apiKey) }
+                  : {}),
+              })
+              .where(
+                and(
+                  eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(schema.workspaceIntegrationsTable.id, id)
+                )
               )
-            )
-            .returning()
-            .execute(),
+              .returning()
+              .execute()
+          ),
       });
 
       const hardDeleteWorkspaceIntegration = SqlSchema.findOneOption({
@@ -87,15 +89,17 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
         }),
         Result: Schema.Void,
         execute: ({ workspaceId, id }) =>
-          drizzle
-            .delete(schema.workspaceIntegrationsTable)
-            .where(
-              and(
-                eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
-                eq(schema.workspaceIntegrationsTable.id, id)
+          db.drizzle((drizzle) =>
+            drizzle
+              .delete(schema.workspaceIntegrationsTable)
+              .where(
+                and(
+                  eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(schema.workspaceIntegrationsTable.id, id)
+                )
               )
-            )
-            .execute(),
+              .execute()
+          ),
       });
 
       const findWorkspaceIntegrationById = SqlSchema.findOneOption({
@@ -105,16 +109,18 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
         }),
         Result: WorkspaceIntegration,
         execute: ({ workspaceId, id }) =>
-          drizzle
-            .select()
-            .from(schema.workspaceIntegrationsTable)
-            .where(
-              and(
-                eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
-                eq(schema.workspaceIntegrationsTable.id, id)
+          db.drizzle((drizzle) =>
+            drizzle
+              .select()
+              .from(schema.workspaceIntegrationsTable)
+              .where(
+                and(
+                  eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(schema.workspaceIntegrationsTable.id, id)
+                )
               )
-            )
-            .execute(),
+              .execute()
+          ),
       });
 
       const findWorkspaceIntegrationByProvider = SqlSchema.findOneOption({
@@ -124,16 +130,18 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
         }),
         Result: WorkspaceIntegration,
         execute: ({ workspaceId, provider }) =>
-          drizzle
-            .select()
-            .from(schema.workspaceIntegrationsTable)
-            .where(
-              and(
-                eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
-                eq(schema.workspaceIntegrationsTable.provider, provider)
+          db.drizzle((drizzle) =>
+            drizzle
+              .select()
+              .from(schema.workspaceIntegrationsTable)
+              .where(
+                and(
+                  eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(schema.workspaceIntegrationsTable.provider, provider)
+                )
               )
-            )
-            .execute(),
+              .execute()
+          ),
       });
 
       return {

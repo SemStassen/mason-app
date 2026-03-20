@@ -1,26 +1,22 @@
 import { Workspace, WorkspaceRepository } from "@mason/core/modules/workspace";
 import { RepositoryError } from "@mason/core/shared/repository";
-import { schema } from "@mason/db";
+import { Database, schema } from "@mason/db";
 import { eq } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
-import { Database } from "@mason/db";
-
 export const WorkspaceRepositoryLayer = Layer.effect(
   WorkspaceRepository,
   Effect.gen(function* () {
-    const { drizzle } = yield* Database;
+    const db = yield* Database;
 
     const insertWorkspace = SqlSchema.findOne({
       Request: Workspace.insert,
       Result: Workspace,
       execute: (data) =>
-        drizzle
-          .insert(schema.workspacesTable)
-          .values(data)
-          .returning()
-          .execute(),
+        db.drizzle((drizzle) =>
+          drizzle.insert(schema.workspacesTable).values(data).returning().execute()
+        ),
     });
 
     const updateWorkspace = SqlSchema.findOne({
@@ -30,34 +26,40 @@ export const WorkspaceRepositoryLayer = Layer.effect(
       }),
       Result: Workspace,
       execute: ({ id, update }) =>
-        drizzle
-          .update(schema.workspacesTable)
-          .set(update)
-          .where(eq(schema.workspacesTable.id, id))
-          .returning()
-          .execute(),
+        db.drizzle((drizzle) =>
+          drizzle
+            .update(schema.workspacesTable)
+            .set(update)
+            .where(eq(schema.workspacesTable.id, id))
+            .returning()
+            .execute()
+        ),
     });
 
     const findWorkspaceById = SqlSchema.findOneOption({
       Request: Workspace.fields.id,
       Result: Workspace,
       execute: (id) =>
-        drizzle
-          .select()
-          .from(schema.workspacesTable)
-          .where(eq(schema.workspacesTable.id, id))
-          .execute(),
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.workspacesTable)
+            .where(eq(schema.workspacesTable.id, id))
+            .execute()
+        ),
     });
 
     const findWorkspaceBySlug = SqlSchema.findOneOption({
       Request: Workspace.fields.slug,
       Result: Workspace,
       execute: (slug) =>
-        drizzle
-          .select()
-          .from(schema.workspacesTable)
-          .where(eq(schema.workspacesTable.slug, slug))
-          .execute(),
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.workspacesTable)
+            .where(eq(schema.workspacesTable.slug, slug))
+            .execute()
+        ),
     });
 
     return {

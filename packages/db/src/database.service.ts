@@ -17,8 +17,25 @@ export type DrizzleDb = PgDrizzle.EffectPgDatabase<
   typeof relations
 >;
 
+export type TransactionDb = Parameters<
+  Parameters<DrizzleDb["transaction"]>[0]
+>[0];
+
 export interface DatabaseShape {
-  readonly drizzle: DrizzleDb;
+  /**
+   * Integration-only escape hatch. This always points to the base client and
+   * does not follow transaction context.
+   */
+  readonly unsafeDrizzle: DrizzleDb;
+  /**
+   * Preferred query entrypoint for application code.
+   *
+   * Resolves to the currently active transaction when called inside
+   * `withTransaction`, otherwise resolves to the base client.
+   */
+  readonly drizzle: <A, E, R>(
+    f: (drizzle: DrizzleDb | TransactionDb) => Effect.Effect<A, E, R>
+  ) => Effect.Effect<A, E, R>;
   /**
    * Run operations in a transaction.
    *
