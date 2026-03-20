@@ -1,5 +1,5 @@
 {
-  "name": "@mason/auth",
+  "name": "@mason/notifications",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,16 +10,14 @@
   },
   "dependencies": {
     "@mason/core": "workspace:*",
-    "@mason/db": "workspace:*",
-    "@mason/notifications": "workspace:*",
-    "better-auth": "^1.5.5",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
     "typescript": "catalog:dev"
   },
+  "imports": {},
   "exports": {
-    ".": "./src/index.ts"
+    "./mailer": "./src/mailer/index.ts"
   }
 }

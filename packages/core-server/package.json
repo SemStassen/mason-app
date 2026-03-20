@@ -12,6 +12,7 @@
     "@mason/auth": "workspace:*",
     "@mason/core": "workspace:*",
     "@mason/db": "workspace:*",
+    "@mason/notifications": "workspace:*",
     "drizzle-orm": "catalog:",
     "effect": "catalog:"
   },
