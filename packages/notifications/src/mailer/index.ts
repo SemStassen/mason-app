@@ -1,8 +1,7 @@
 import type { User } from "@mason/core/modules/identity";
 import type { Workspace } from "@mason/core/modules/workspace";
 import type { WorkspaceInvitation } from "@mason/core/modules/workspace-invitation";
-import { ServiceMap } from "effect";
-import type { Effect } from "effect";
+import { Layer, ServiceMap, Effect } from "effect";
 
 interface MailerShape {
   sendSignInOtp: (params: {
@@ -30,4 +29,17 @@ interface MailerShape {
 
 export class Mailer extends ServiceMap.Service<Mailer, MailerShape>()(
   "@mason/shared/Mailer"
-) {}
+) {
+  static readonly layerDev = Layer.effect(
+    this,
+    Effect.succeed({
+      sendSignInOtp: (params) => Effect.logInfo("sendSignInOtp", params),
+      sendEmailVerificationOtp: (params) =>
+        Effect.logInfo("sendEmailVerificationOtp", params),
+      sendPasswordResetOtp: (params) =>
+        Effect.logInfo("sendPasswordResetOtp", params),
+      sendWorkspaceInvitation: (params) =>
+        Effect.logInfo("sendWorkspaceInvitation", params),
+    })
+  );
+}

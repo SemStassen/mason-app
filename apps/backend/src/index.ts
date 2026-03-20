@@ -26,6 +26,7 @@ import { WorkspaceModuleLayer } from "@mason/core/modules/workspace";
 import { WorkspaceInvitationModuleLayer } from "@mason/core/modules/workspace-invitation";
 import { WorkspaceMemberModuleLayer } from "@mason/core/modules/workspace-member";
 import { DatabaseLayer } from "@mason/db";
+import { Mailer } from "@mason/notifications/mailer";
 import { Config, Layer } from "effect";
 import { HttpRouter } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
@@ -44,16 +45,12 @@ const RepositoriesLayer = Layer.mergeAll(
   WorkspaceInvitationRepositoryLayer,
   WorkspaceMemberRepositoryLayer,
   WorkspaceRepositoryLayer
-);
-
-const RepositoriesWithDatabaseLayer = RepositoriesLayer.pipe(
-  Layer.provideMerge(DatabaseLayer)
-);
+).pipe(Layer.provideMerge(DatabaseLayer));
 
 const RequestContextLayer = RequestContextResolver.layer.pipe(
   Layer.provideMerge(BetterAuth.layer),
-  Layer.provideMerge(RepositoriesWithDatabaseLayer),
-  Layer.provideMerge(DatabaseLayer)
+  Layer.provideMerge(Mailer.layerDev),
+  Layer.provideMerge(RepositoriesLayer)
 );
 
 const RpcMiddlewareLayer = Layer.mergeAll(
@@ -64,8 +61,7 @@ const RpcMiddlewareLayer = Layer.mergeAll(
 const InfraLayer = Layer.mergeAll(
   CryptoLayer,
   Authorization.layer,
-  DatabaseLayer,
-  RepositoriesWithDatabaseLayer,
+  RepositoriesLayer,
   RpcMiddlewareLayer
 );
 
@@ -88,15 +84,10 @@ const RpcRouteLayer = RpcServer.layerHttp({
   Layer.provide(AllRpcsGroupLayer)
 );
 
-const AllRoutesLayer = Layer.mergeAll(RpcRouteLayer);
+const MainLayer = ModulesLayer.pipe(Layer.provideMerge(InfraLayer));
 
-const MainLayer = Layer.mergeAll(
-  ModulesLayer.pipe(Layer.provideMerge(InfraLayer))
-);
-
-const ServerLayer = HttpRouter.serve(AllRoutesLayer).pipe(
+const ServerLayer = HttpRouter.serve(RpcRouteLayer).pipe(
   Layer.provide(MainLayer),
-  Layer.provide(DatabaseLayer),
   Layer.provide(
     BunHttpServer.layerConfig(
       Config.all({
