@@ -6,7 +6,8 @@
     "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
     "format": "oxfmt --write .",
     "lint": "oxlint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:push": "bun --env-file=.env.local run drizzle-kit push"
   },
   "dependencies": {
     "@effect/sql-pg": "catalog:",
@@ -17,7 +18,7 @@
   "devDependencies": {
     "@mason/config": "workspace:*",
     "@types/pg": "^8.18.0",
-    "drizzle-kit": "1.0.0-beta.15-859cf75",
+    "drizzle-kit": "catalog:dev",
     "typescript": "catalog:dev"
   },
   "imports": {

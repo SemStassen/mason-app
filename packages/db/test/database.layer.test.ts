@@ -3,8 +3,8 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { DatabaseLayer } from "./database.layer";
-import { Database } from "./database.service";
+import { DatabaseLayer } from "../src/database.layer";
+import { Database } from "../src/database.service";
 
 interface MockDrizzle {
   readonly label: string;
@@ -25,22 +25,18 @@ const createMockDrizzle = (label: string): MockDrizzle => ({
 const getLabel = (value: unknown) => (value as MockDrizzle).label;
 
 vi.mock("drizzle-orm/effect-postgres", async () => {
-    const EffectModule = await import("effect/Effect");
-    const LayerModule = await import("effect/Layer");
+  const EffectModule = await import("effect/Effect");
+  const LayerModule = await import("effect/Layer");
 
-    return {
-      make: vi.fn(() => EffectModule.succeed(mockState.baseDrizzle as never)),
-      DefaultServices: LayerModule.empty as never,
-    };
-  });
+  return {
+    make: vi.fn(() => EffectModule.succeed(mockState.baseDrizzle as never)),
+    DefaultServices: LayerModule.empty as never,
+  };
+});
 
-vi.mock(
-  "./relations",
-  () =>
-    ({
-      relations: {} as never,
-    })
-);
+vi.mock("./relations", () => ({
+  relations: {} as never,
+}));
 
 describe("database layer", () => {
   it("uses active transaction drizzle for nested transactions", async () => {

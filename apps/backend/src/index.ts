@@ -1,6 +1,5 @@
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
 import { CryptoLayer } from "@mason/core-server/infra/crypto";
-import { DatabaseLayer } from "@mason/db";
 import {
   SessionRepositoryLayer,
   UserRepositoryLayer,
@@ -24,6 +23,7 @@ import { TimeModuleLayer } from "@mason/core/modules/time";
 import { WorkspaceModuleLayer } from "@mason/core/modules/workspace";
 import { WorkspaceInvitationModuleLayer } from "@mason/core/modules/workspace-invitation";
 import { WorkspaceMemberModuleLayer } from "@mason/core/modules/workspace-member";
+import { DatabaseLayer } from "@mason/db";
 import { Config, Layer } from "effect";
 import { HttpRouter } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
@@ -32,7 +32,7 @@ import { AllRpcsGroup, AllRpcsGroupLayer } from "./rpc";
 import { SessionMiddlewareLayer } from "./rpc/middleware/session";
 import { WorkspaceMiddlewareLayer } from "./rpc/middleware/workspace";
 
-const InfraLayerWithDatabase = Layer.mergeAll(
+const InfraLayer = Layer.mergeAll(
   CryptoLayer,
   Authorization.layer,
   DatabaseLayer,
@@ -76,7 +76,7 @@ const AllRoutesLayer = Layer.mergeAll(RpcRouteLayer);
 const MainLayer = Layer.mergeAll(
   ModulesLayer.pipe(
     Layer.provideMerge(RepositoriesLayer),
-    Layer.provideMerge(InfraLayerWithDatabase)
+    Layer.provideMerge(InfraLayer)
   )
 );
 
