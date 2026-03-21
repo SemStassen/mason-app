@@ -46,12 +46,11 @@ export const TimeEntryRepositoryLayer = Layer.effect(
         ),
     });
 
-    const hardDeleteManyTimeEntries = SqlSchema.findAll({
+    const hardDeleteManyTimeEntries = SqlSchema.void({
       Request: Schema.Struct({
         workspaceId: TimeEntry.fields.workspaceId,
         ids: Schema.Array(TimeEntry.fields.id),
       }),
-      Result: Schema.Void,
       execute: ({ workspaceId, ids }) =>
         db.drizzle((drizzle) =>
           drizzle

@@ -15,7 +15,11 @@ export const ProjectRepositoryLayer = Layer.effect(
       Result: Project,
       execute: (data) =>
         db.drizzle((drizzle) =>
-          drizzle.insert(schema.projectsTable).values([...data]).returning().execute()
+          drizzle
+            .insert(schema.projectsTable)
+            .values([...data])
+            .returning()
+            .execute()
         ),
     });
 

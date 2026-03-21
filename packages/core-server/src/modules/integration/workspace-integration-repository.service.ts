@@ -82,12 +82,11 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
           ),
       });
 
-      const hardDeleteWorkspaceIntegration = SqlSchema.findOneOption({
+      const hardDeleteWorkspaceIntegration = SqlSchema.void({
         Request: Schema.Struct({
           workspaceId: WorkspaceIntegration.fields.workspaceId,
           id: WorkspaceIntegration.fields.id,
         }),
-        Result: Schema.Void,
         execute: ({ workspaceId, id }) =>
           db.drizzle((drizzle) =>
             drizzle

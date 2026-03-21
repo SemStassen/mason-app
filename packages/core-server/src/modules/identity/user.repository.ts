@@ -15,7 +15,11 @@ export const UserRepositoryLayer = Layer.effect(
       Result: User,
       execute: (data) =>
         db.drizzle((drizzle) =>
-          drizzle.insert(schema.usersTable).values(data).returning().execute()
+          drizzle
+            .insert(schema.usersTable)
+            .values(data)
+            .returning()
+            .execute()
         ),
     });
 

@@ -15,7 +15,11 @@ export const TaskRepositoryLayer = Layer.effect(
       Result: Task,
       execute: (data) =>
         db.drizzle((drizzle) =>
-          drizzle.insert(schema.tasksTable).values([...data]).returning().execute()
+          drizzle
+            .insert(schema.tasksTable)
+            .values([...data])
+            .returning()
+            .execute()
         ),
     });
 

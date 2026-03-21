@@ -1,4 +1,4 @@
-import type * as PgDrizzle from "drizzle-orm/effect-postgres";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Schema, ServiceMap } from "effect";
 import type { Effect } from "effect";
 
@@ -12,10 +12,7 @@ export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   }
 ) {}
 
-export type DrizzleDb = PgDrizzle.EffectPgDatabase<
-  typeof schema,
-  typeof relations
->;
+export type DrizzleDb = NodePgDatabase<typeof schema, typeof relations>;
 
 export type TransactionDb = Parameters<
   Parameters<DrizzleDb["transaction"]>[0]
@@ -23,19 +20,23 @@ export type TransactionDb = Parameters<
 
 export interface DatabaseShape {
   /**
-   * Integration-only escape hatch. This always points to the base client and
-   * does not follow transaction context.
+   * Integration-only escape hatch to plain Drizzle.
    */
   readonly unsafeDrizzle: DrizzleDb;
   /**
    * Preferred query entrypoint for application code.
    *
-   * Resolves to the currently active transaction when called inside
-   * `withTransaction`, otherwise resolves to the base client.
+   * TEMPORARY COMPATIBILITY:
+   * This callback currently accepts either an Effect or a Promise result while
+   * we are on plain Drizzle + pg. Keep Promise handling centralized in the DB
+   * layer only.
+   *
+   * TODO(db-v4-effect): When switching back to the Effect SQL v4 driver,
+   * remove `Promise<A>` from this signature so `drizzle` is Effect-only.
    */
-  readonly drizzle: <A, E, R>(
-    f: (drizzle: DrizzleDb | TransactionDb) => Effect.Effect<A, E, R>
-  ) => Effect.Effect<A, E, R>;
+  readonly drizzle: <A, E, R = never>(
+    f: (drizzle: DrizzleDb | TransactionDb) => Effect.Effect<A, E, R> | Promise<A>
+  ) => Effect.Effect<A, E | DatabaseError, R>;
   /**
    * Run operations in a transaction.
    *

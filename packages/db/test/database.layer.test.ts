@@ -1,94 +1,109 @@
-/* oxlint-disable eslint-plugin-vitest/no-importing-vitest-globals, eslint-plugin-vitest/prefer-import-in-mock, eslint-plugin-jest/no-untyped-mock-factory */
+/* oxlint-disable eslint-plugin-vitest/no-importing-vitest-globals, eslint-plugin-vitest/prefer-import-in-mock, eslint-plugin-import/no-relative-parent-imports, eslint-plugin-jest/no-untyped-mock-factory, eslint/class-methods-use-this, eslint-plugin-vitest/prefer-called-once */
 
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import { DatabaseLayer } from "../src/database.layer";
-import { Database } from "../src/database.service";
-
-interface MockDrizzle {
-  readonly label: string;
-  readonly transaction: <A, E, R>(
-    f: (transaction: MockDrizzle) => Effect.Effect<A, E, R>
-  ) => Effect.Effect<A, E, R>;
-}
+import * as schema from "../src/schema";
 
 const mockState = vi.hoisted(() => ({
-  baseDrizzle: null as MockDrizzle | null,
+  execute: vi.fn(() => Promise.resolve([{ createdAt: "2026-01-01" }])),
+  transaction: vi.fn(
+    (run: (tx: unknown) => Promise<unknown>) =>
+      run({
+        select: () => ({
+          from: () => ({
+            execute: mockState.execute,
+          }),
+        }),
+        transaction: mockState.transaction,
+      })
+  ),
 }));
 
-const createMockDrizzle = (label: string): MockDrizzle => ({
-  label,
-  transaction: (f) => Effect.suspend(() => f(createMockDrizzle(`${label}.tx`))),
-});
+vi.mock("pg", () => ({
+  Pool: class MockPool {
+    end() {
+      return Promise.resolve();
+    }
+  },
+}));
 
-const getLabel = (value: unknown) => (value as MockDrizzle).label;
+vi.mock("drizzle-orm/node-postgres", () => ({
+  drizzle: vi.fn(() => ({
+    select: () => ({
+      from: () => ({
+        execute: mockState.execute,
+      }),
+    }),
+    transaction: mockState.transaction,
+  })),
+}));
 
-vi.mock("drizzle-orm/effect-postgres", async () => {
-  const EffectModule = await import("effect/Effect");
-  const LayerModule = await import("effect/Layer");
-
-  return {
-    make: vi.fn(() => EffectModule.succeed(mockState.baseDrizzle as never)),
-    DefaultServices: LayerModule.empty as never,
-  };
-});
-
-vi.mock("./relations", () => ({
+vi.mock("../src/relations", () => ({
   relations: {} as never,
 }));
 
 describe("database layer", () => {
-  it("uses active transaction drizzle for nested transactions", async () => {
-    mockState.baseDrizzle = createMockDrizzle("base");
+  it("executes plain drizzle queries through db.drizzle", async () => {
+    process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
+
+    const { DatabaseLayer } = await import("../src/database.layer");
+    const { Database } = await import("../src/database.service");
 
     const result = await Effect.runPromise(
       Effect.gen(function* () {
         const db = yield* Database;
 
-        const outside = yield* db.drizzle((drizzle) =>
-          Effect.succeed(getLabel(drizzle))
+        return yield* db.drizzle((drizzle) =>
+          drizzle.select().from(schema.workspacesTable).execute()
         );
-
-        const nested = yield* db.withTransaction(
-          Effect.gen(function* () {
-            const inTransaction = yield* Database;
-
-            const inside = yield* inTransaction.drizzle((drizzle) =>
-              Effect.succeed(getLabel(drizzle))
-            );
-
-            const insideNested = yield* inTransaction.withTransaction(
-              Effect.gen(function* () {
-                const nestedTransaction = yield* Database;
-                return yield* nestedTransaction.drizzle((drizzle) =>
-                  Effect.succeed(getLabel(drizzle))
-                );
-              })
-            );
-
-            return {
-              inside,
-              insideNested,
-              unsafeInside: getLabel(inTransaction.unsafeDrizzle),
-            };
-          })
-        );
-
-        return {
-          outside,
-          unsafeOutside: getLabel(db.unsafeDrizzle),
-          ...nested,
-        };
       }).pipe(Effect.provide(DatabaseLayer))
     );
 
-    expect(result).toStrictEqual({
-      outside: "base",
-      inside: "base.tx",
-      insideNested: "base.tx.tx",
-      unsafeOutside: "base",
-      unsafeInside: "base",
-    });
+    expect(result).toStrictEqual([{ createdAt: "2026-01-01" }]);
+    expect(mockState.execute).toHaveBeenCalledOnce();
+  });
+
+  it("executes effect-based callbacks through db.drizzle", async () => {
+    process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
+
+    const { DatabaseLayer } = await import("../src/database.layer");
+    const { Database } = await import("../src/database.service");
+
+    const result = await Effect.runPromise(
+      Effect.gen(function* () {
+        const db = yield* Database;
+
+        return yield* db.drizzle((drizzle) =>
+          Effect.tryPromise({
+            try: () => drizzle.select().from(schema.workspacesTable).execute(),
+            catch: (cause) => cause,
+          })
+        );
+      }).pipe(Effect.provide(DatabaseLayer))
+    );
+
+    expect(result).toStrictEqual([{ createdAt: "2026-01-01" }]);
+  });
+
+  it("uses drizzle transaction for withTransaction", async () => {
+    process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
+
+    const { DatabaseLayer } = await import("../src/database.layer");
+    const { Database } = await import("../src/database.service");
+
+    await Effect.runPromise(
+      Effect.gen(function* () {
+        const db = yield* Database;
+
+        return yield* db.withTransaction(
+          db.drizzle((drizzle) =>
+            drizzle.select().from(schema.workspacesTable).execute()
+          )
+        );
+      }).pipe(Effect.provide(DatabaseLayer))
+    );
+
+    expect(mockState.transaction).toHaveBeenCalledOnce();
   });
 });

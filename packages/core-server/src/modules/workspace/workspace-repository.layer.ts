@@ -15,7 +15,11 @@ export const WorkspaceRepositoryLayer = Layer.effect(
       Result: Workspace,
       execute: (data) =>
         db.drizzle((drizzle) =>
-          drizzle.insert(schema.workspacesTable).values(data).returning().execute()
+          drizzle
+            .insert(schema.workspacesTable)
+            .values(data)
+            .returning()
+            .execute()
         ),
     });
 
