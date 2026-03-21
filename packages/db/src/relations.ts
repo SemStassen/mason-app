@@ -4,9 +4,18 @@ import * as schema from "./schema";
 
 const identityRelations = defineRelations(schema, (r) => ({
   usersTable: {
-    sessions: r.many.sessionsTable(),
-    accounts: r.many.accountsTable(),
-    workspaceMemberships: r.many.workspaceMembersTable(),
+    sessions: r.many.sessionsTable({
+      from: r.usersTable.id,
+      to: r.sessionsTable.userId,
+    }),
+    accounts: r.many.accountsTable({
+      from: r.usersTable.id,
+      to: r.accountsTable.userId,
+    }),
+    workspaceMemberships: r.many.workspaceMembersTable({
+      from: r.usersTable.id,
+      to: r.workspaceMembersTable.userId,
+    }),
   },
   sessionsTable: {
     user: r.one.usersTable({
@@ -65,8 +74,14 @@ const workspaceMemberRelations = defineRelations(schema, (r) => ({
       from: r.workspaceMembersTable.workspaceId,
       to: r.workspacesTable.id,
     }),
-    sentWorkspaceInvitations: r.many.workspaceInvitationsTable(),
-    timeEntries: r.many.timeEntriesTable(),
+    sentWorkspaceInvitations: r.many.workspaceInvitationsTable({
+      from: r.workspaceMembersTable.id,
+      to: r.workspaceInvitationsTable.inviterId,
+    }),
+    timeEntries: r.many.timeEntriesTable({
+      from: r.workspaceMembersTable.id,
+      to: r.timeEntriesTable.workspaceMemberId,
+    }),
   },
 }));
 
@@ -76,17 +91,32 @@ const projectRelations = defineRelations(schema, (r) => ({
       from: r.projectsTable.workspaceId,
       to: r.workspacesTable.id,
     }),
-    tasks: r.many.tasksTable(),
-    timeEntries: r.many.timeEntriesTable(),
-    integrations: r.many.projectIntegrationsTable(),
+    tasks: r.many.tasksTable({
+      from: r.projectsTable.id,
+      to: r.tasksTable.projectId,
+    }),
+    timeEntries: r.many.timeEntriesTable({
+      from: r.projectsTable.id,
+      to: r.timeEntriesTable.projectId,
+    }),
+    integrations: r.many.projectIntegrationsTable({
+      from: r.projectsTable.id,
+      to: r.projectIntegrationsTable.projectId,
+    }),
   },
   tasksTable: {
     project: r.one.projectsTable({
       from: r.tasksTable.projectId,
       to: r.projectsTable.id,
     }),
-    timeEntries: r.many.timeEntriesTable(),
-    integrations: r.many.taskIntegrationsTable(),
+    timeEntries: r.many.timeEntriesTable({
+      from: r.tasksTable.id,
+      to: r.timeEntriesTable.taskId,
+    }),
+    integrations: r.many.taskIntegrationsTable({
+      from: r.tasksTable.id,
+      to: r.taskIntegrationsTable.taskId,
+    }),
   },
 }));
 
@@ -109,10 +139,22 @@ const timeRelations = defineRelations(schema, (r) => ({
 
 const workspaceRelations = defineRelations(schema, (r) => ({
   workspacesTable: {
-    members: r.many.workspaceMembersTable(),
-    integrations: r.many.workspaceIntegrationsTable(),
-    projects: r.many.projectsTable(),
-    timeEntries: r.many.timeEntriesTable(),
+    members: r.many.workspaceMembersTable({
+      from: r.workspacesTable.id,
+      to: r.workspaceMembersTable.workspaceId,
+    }),
+    integrations: r.many.workspaceIntegrationsTable({
+      from: r.workspacesTable.id,
+      to: r.workspaceIntegrationsTable.workspaceId,
+    }),
+    projects: r.many.projectsTable({
+      from: r.workspacesTable.id,
+      to: r.projectsTable.workspaceId,
+    }),
+    timeEntries: r.many.timeEntriesTable({
+      from: r.workspacesTable.id,
+      to: r.timeEntriesTable.workspaceId,
+    }),
   },
 }));
 
