@@ -19,7 +19,7 @@
   "devDependencies": {
     "@mason/config": "workspace:*",
     "@tailwindcss/vite": "catalog:dev",
-    "@tanstack/router-plugin": "^1.132.51",
+    "@tanstack/router-plugin": "^1.167.2",
     "@types/react": "catalog:dev",
     "@types/react-dom": "catalog:dev",
     "@vitejs/plugin-react": "catalog:dev",
