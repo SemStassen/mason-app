@@ -5,14 +5,13 @@
     "build": "turbo build",
     "clean": "turbo clean --parallel && rm -rf .turbo/cache node_modules",
     "dev": "turbo dev --parallel",
-    "docker:up": "docker compose -f ./docker-compose.yml up -d",
     "format": "oxfmt --write .",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "subtree:create:effect": "git remote add effect https://github.com/Effect-TS/effect-smol && git subtree add --prefix=.better-agents/effect effect main --squash",
     "subtree:update:effect": "git subtree pull --prefix=.better-agents/effect effect main --squash",
-    "check": "ultracite check",
-    "fix": "ultracite fix"
+    "ultracite:check": "ultracite check",
+    "ultracite:fix": "ultracite fix"
   },
   "private": true,
   "workspaces": {
