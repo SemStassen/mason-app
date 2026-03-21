@@ -1,43 +1,28 @@
-import { Avatar as AvatarPrimitive } from "@base-ui-components/react/avatar";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "../utils";
+import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar";
+import type React from "react";
 
-const avatarVariants = cva(
-  "inline-flex shrink-0 select-none items-center justify-center overflow-hidden bg-background align-middle font-medium text-xs",
-  {
-    variants: {
-      size: {
-        default: "size-8",
-        sm: "size-6",
-      },
-      rounded: {
-        full: "rounded-full",
-        lg: "rounded-lg",
-      },
-    },
-    defaultVariants: {
-      size: "default",
-      rounded: "full",
-    },
-  }
-);
+import { cn } from "#utils/cn";
 
-function Avatar({
+export function Avatar({
   className,
-  rounded,
-  size,
   ...props
-}: AvatarPrimitive.Root.Props & VariantProps<typeof avatarVariants>) {
+}: AvatarPrimitive.Root.Props): React.ReactElement {
   return (
     <AvatarPrimitive.Root
-      className={cn(avatarVariants({ className, size, rounded }))}
+      className={cn(
+        "inline-flex size-8 shrink-0 select-none items-center justify-center overflow-hidden rounded-full bg-background align-middle font-medium text-xs",
+        className
+      )}
       data-slot="avatar"
       {...props}
     />
   );
 }
 
-function AvatarImage({ className, ...props }: AvatarPrimitive.Image.Props) {
+export function AvatarImage({
+  className,
+  ...props
+}: AvatarPrimitive.Image.Props): React.ReactElement {
   return (
     <AvatarPrimitive.Image
       className={cn("size-full object-cover", className)}
@@ -47,14 +32,14 @@ function AvatarImage({ className, ...props }: AvatarPrimitive.Image.Props) {
   );
 }
 
-function AvatarFallback({
+export function AvatarFallback({
   className,
   ...props
-}: AvatarPrimitive.Fallback.Props) {
+}: AvatarPrimitive.Fallback.Props): React.ReactElement {
   return (
     <AvatarPrimitive.Fallback
       className={cn(
-        "flex size-full items-center justify-center bg-muted",
+        "flex size-full items-center justify-center rounded-full bg-muted",
         className
       )}
       data-slot="avatar-fallback"
@@ -63,4 +48,4 @@ function AvatarFallback({
   );
 }
 
-export { Avatar, AvatarImage, AvatarFallback };
+export { AvatarPrimitive };

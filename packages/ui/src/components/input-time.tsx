@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
-import { type ChronoLocale, chronoParse } from "../utils";
-import { Input, type InputProps } from "./input.coss";
 
-export interface InputTimeProps
-  extends Omit<InputProps, "value" | "onChange" | "defaultValue"> {
+import { chronoParse } from "#utils/chrono";
+import type { ChronoLocale } from "#utils/chrono";
+
+import { Input } from "./input.coss";
+import type { InputProps } from "./input.coss";
+
+export interface InputTimeProps extends Omit<
+  InputProps,
+  "value" | "onChange" | "defaultValue"
+> {
   format: (date: Date) => string;
   locale?: ChronoLocale;
   value?: Date | null;

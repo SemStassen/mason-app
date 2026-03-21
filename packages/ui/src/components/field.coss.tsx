@@ -1,91 +1,54 @@
-import { Field as FieldPrimitive } from "@base-ui-components/react/field";
-import { Fieldset as FieldsetPrimitive } from "@base-ui-components/react/fieldset";
-import { cva, type VariantProps } from "class-variance-authority";
-import { useMemo } from "react";
-import { cn } from "../utils";
+import { Field as FieldPrimitive } from "@base-ui/react/field";
+import type React from "react";
 
-function Fieldset({ className, ...props }: FieldsetPrimitive.Root.Props) {
-  return (
-    <FieldsetPrimitive.Root
-      className={cn("flex w-full flex-col gap-6", className)}
-      data-slot="fieldset"
-      {...props}
-    />
-  );
-}
-function FieldsetLegend({
+import { cn } from "#utils/cn";
+
+export function Field({
   className,
   ...props
-}: FieldsetPrimitive.Legend.Props) {
-  return (
-    <FieldsetPrimitive.Legend
-      className={cn("font-semibold", className)}
-      data-slot="fieldset-legend"
-      {...props}
-    />
-  );
-}
-
-const fieldGroupVariants = cva(
-  "group/field-group @container/field-group flex w-full gap-7 data-[slot=checkbox-group]:gap-3 [&>[data-slot=field-group]]:gap-4",
-  {
-    variants: {
-      direction: {
-        horizontal: "flex-row items-center",
-        vertical: "flex-col",
-      },
-    },
-    defaultVariants: {
-      direction: "vertical",
-    },
-  }
-);
-
-function FieldGroup({
-  className,
-  direction,
-  ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof fieldGroupVariants>) {
-  return (
-    <div
-      className={cn(fieldGroupVariants({ direction, className }))}
-      data-slot="field-group"
-      {...props}
-    />
-  );
-}
-
-export interface FieldProps extends FieldPrimitive.Root.Props {
-  orientation?: "horizontal" | "vertical";
-}
-function Field({ className, orientation = "vertical", ...props }: FieldProps) {
+}: FieldPrimitive.Root.Props): React.ReactElement {
   return (
     <FieldPrimitive.Root
-      className={cn(
-        "flex items-start gap-2",
-        orientation === "horizontal" ? "flex-row" : "flex-col",
-        className
-      )}
+      className={cn("flex flex-col items-start gap-2", className)}
       data-slot="field"
       {...props}
     />
   );
 }
 
-export interface FieldLabelProps extends FieldPrimitive.Label.Props {}
-function FieldLabel({ className, ...props }: FieldLabelProps) {
+export function FieldLabel({
+  className,
+  ...props
+}: FieldPrimitive.Label.Props): React.ReactElement {
   return (
     <FieldPrimitive.Label
-      className={cn("inline-flex items-center gap-2 text-sm/4", className)}
+      className={cn(
+        "inline-flex items-center gap-2 font-medium text-base/4.5 text-foreground sm:text-sm/4",
+        className
+      )}
       data-slot="field-label"
       {...props}
     />
   );
 }
 
-export interface FieldDescriptionProps
-  extends FieldPrimitive.Description.Props {}
-function FieldDescription({ className, ...props }: FieldDescriptionProps) {
+export function FieldItem({
+  className,
+  ...props
+}: FieldPrimitive.Item.Props): React.ReactElement {
+  return (
+    <FieldPrimitive.Item
+      className={cn("flex", className)}
+      data-slot="field-item"
+      {...props}
+    />
+  );
+}
+
+export function FieldDescription({
+  className,
+  ...props
+}: FieldPrimitive.Description.Props): React.ReactElement {
   return (
     <FieldPrimitive.Description
       className={cn("text-muted-foreground text-xs", className)}
@@ -94,50 +57,23 @@ function FieldDescription({ className, ...props }: FieldDescriptionProps) {
     />
   );
 }
-export interface FieldErrorProps extends FieldPrimitive.Error.Props {
-  errors?: Array<{ message?: string }>;
-}
-function FieldError({
+
+export function FieldError({
   className,
-  errors,
-  children,
   ...props
-}: FieldErrorProps) {
-  const error = useMemo(() => {
-    if (!errors?.length) {
-      return null;
-    }
-
-    const uniqueErrors = [
-      ...new Map(errors.map((e) => [e?.message, e])).values(),
-    ];
-
-    return uniqueErrors[0]?.message;
-  }, [errors]);
-
+}: FieldPrimitive.Error.Props): React.ReactElement {
   return (
     <FieldPrimitive.Error
       className={cn("text-destructive-foreground text-xs", className)}
       data-slot="field-error"
       {...props}
-    >
-      {children ? children : <span>{error}</span>}
-    </FieldPrimitive.Error>
+    />
   );
 }
 
-export interface FieldControlProps extends FieldPrimitive.Control.Props {}
-const FieldControl = FieldPrimitive.Control;
-const FieldValidity = FieldPrimitive.Validity;
+export const FieldControl: typeof FieldPrimitive.Control =
+  FieldPrimitive.Control;
+export const FieldValidity: typeof FieldPrimitive.Validity =
+  FieldPrimitive.Validity;
 
-export {
-  Fieldset,
-  FieldsetLegend,
-  FieldGroup,
-  Field,
-  FieldLabel,
-  FieldDescription,
-  FieldError,
-  FieldControl,
-  FieldValidity,
-};
+export { FieldPrimitive };

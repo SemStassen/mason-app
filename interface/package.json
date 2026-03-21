@@ -11,11 +11,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@base-ui-components/react": "catalog:frontend",
-    "@dnd-kit/react": "^0.1.21",
+    "@base-ui/react": "catalog:frontend",
+    "@dnd-kit/react": "^0.3.2",
     "@effect/atom-react": "catalog:",
-    "@electric-sql/pglite": "^0.3.14",
-    "@electric-sql/pglite-repl": "^0.2.32",
+    "@electric-sql/pglite": "^0.4.1",
+    "@electric-sql/pglite-repl": "^0.3.1",
     "@mason/ui": "workspace:*",
     "@tanstack/react-form": "catalog:frontend",
     "@tanstack/react-router": "^1.134.17",
@@ -32,8 +32,8 @@
     "zod": "^4.1.5"
   },
   "devDependencies": {
-    "@inlang/cli": "^3.0.12",
-    "@inlang/paraglide-js": "2.4.0",
+    "@inlang/cli": "^3.1.9",
+    "@inlang/paraglide-js": "2.15.1",
     "@mason/config": "workspace:*",
     "@types/react": "catalog:dev",
     "@types/react-dom": "catalog:dev",
