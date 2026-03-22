@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@sindresorhus/slugify": "^3.0.0",
     "effect": "catalog:",
     "uuid": "catalog:"
   },
@@ -23,6 +24,7 @@
   },
   "exports": {
     "./contracts": "./src/api/contracts/index.ts",
+    "./http": "./src/api/http/index.ts",
     "./rpc": "./src/api/rpc/index.ts",
     "./modules/*": "./src/modules/*/index.ts",
     "./shared/*": "./src/shared/*/index.ts"

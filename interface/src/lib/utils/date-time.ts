@@ -15,10 +15,10 @@ const TIME_FORMATS = {
 
 type TimeFormat = (typeof TIME_FORMATS)[keyof typeof TIME_FORMATS];
 
-type DateTimeConfig = {
+interface DateTimeConfig {
   locale: Locale;
   timeFormat: TimeFormat;
-};
+}
 
 const defaultConfig: DateTimeConfig = {
   locale: "en",

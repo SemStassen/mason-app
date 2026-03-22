@@ -31,6 +31,7 @@ import { Config, Layer } from "effect";
 import { HttpRouter } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
+import { httpApiRoutesLayer } from "./http";
 import { AllRpcsGroup, AllRpcsGroupLayer } from "./rpc";
 import { SessionMiddlewareLayer } from "./rpc/middleware/session";
 import { WorkspaceMiddlewareLayer } from "./rpc/middleware/workspace";
@@ -84,9 +85,23 @@ const RpcRouteLayer = RpcServer.layerHttp({
   Layer.provide(AllRpcsGroupLayer)
 );
 
+const AllRoutesLayer = Layer.mergeAll(httpApiRoutesLayer, RpcRouteLayer).pipe(
+  Layer.provide(
+    HttpRouter.cors({
+      allowedOrigins: [
+        "http://localhost:3000",
+        "tauri://localhost",
+        "http://tauri.localhost",
+      ],
+      allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      credentials: true,
+    })
+  )
+);
+
 const MainLayer = ModulesLayer.pipe(Layer.provideMerge(InfraLayer));
 
-const ServerLayer = HttpRouter.serve(RpcRouteLayer).pipe(
+const ServerLayer = HttpRouter.serve(AllRoutesLayer).pipe(
   Layer.provide(MainLayer),
   Layer.provide(
     BunHttpServer.layerConfig(

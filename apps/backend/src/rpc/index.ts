@@ -1,11 +1,12 @@
-import { PingRpcGroup, WorkspaceRpcGroup } from "@mason/core/rpc";
+import { AuthRpcGroup, WorkspaceRpcGroup } from "@mason/core/rpc";
 import { Layer } from "effect";
-import { PingRpcGroupLayer } from "./handlers/ping";
+
+import { AuthRpcGroupLayer } from "./handlers/auth";
 import { WorkspaceRpcGroupLayer } from "./handlers/workspace";
 
-export const AllRpcsGroup = PingRpcGroup.merge(WorkspaceRpcGroup);
+export const AllRpcsGroup = AuthRpcGroup.merge(WorkspaceRpcGroup);
 
 export const AllRpcsGroupLayer = Layer.mergeAll(
-  PingRpcGroupLayer,
+  AuthRpcGroupLayer,
   WorkspaceRpcGroupLayer
 );

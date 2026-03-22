@@ -20,5 +20,5 @@ export class WorkspaceMiddleware extends RpcMiddleware.Service<
   }
 >()("@mason/shared/WorkspaceMiddleware", {
   error: HttpApiError.Forbidden,
-  requiredForClient: true,
+  requiredForClient: false,
 }) {}

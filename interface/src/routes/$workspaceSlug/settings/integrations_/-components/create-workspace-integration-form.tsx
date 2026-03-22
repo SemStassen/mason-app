@@ -1,7 +1,8 @@
 import { useAtomSet } from "@effect-atom/atom-react";
-import { toast } from "@mason/ui/sonner";
+import { toastManager } from "@mason/ui/toast";
 import { Effect } from "effect";
 import z from "zod";
+
 import { createWorkspaceIntegrationAtom } from "~/atoms/api";
 import { useAppForm } from "~/components/form";
 
@@ -30,10 +31,16 @@ function CreateWorkspaceIntegrationForm({ provider }: { provider: "float" }) {
         Effect.runPromise(
           Effect.match(exit, {
             onFailure: () => {
-              toast.error("Failed to create workspace integration");
+              toastManager.add({
+                type: "error",
+                title: "Failed to create workspace integration",
+              });
             },
             onSuccess: () => {
-              toast.success("Workspace integration created");
+              toastManager.add({
+                type: "error",
+                title: "Workspace integration created",
+              });
               form.reset();
             },
           })

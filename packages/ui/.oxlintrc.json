@@ -4,6 +4,6 @@
     "./../../.oxlintrc.json"
   ],
   "rules": {
-    "eslint/no-use-before-define": "off",
+    "eslint/no-use-before-define": "off"
   }
 }
