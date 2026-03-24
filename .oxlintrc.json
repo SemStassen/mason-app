@@ -48,6 +48,7 @@
     ],
     "unicorn/no-useless-undefined": "off",
     "unicorn/no-array-method-this-argument": "off",
+    "react-perf/jsx-no-new-function-as-prop": "off",
     "no-restricted-imports": [
       "error",
       {

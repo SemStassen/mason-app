@@ -1,9 +1,14 @@
 import { Layer, ManagedRuntime } from "effect";
 
-import { MasonRpcClient } from "./rpc/client";
+import { MasonApiClient } from "./api/client";
+import { MasonAtomRpcClient } from "./rpc/client";
 import { TracerLayer } from "./telemetry";
 
-export const runtimeLayer = Layer.mergeAll(MasonRpcClient.layer, TracerLayer);
+export const runtimeLayer = Layer.mergeAll(
+  MasonApiClient.layer,
+  MasonAtomRpcClient.layer,
+  TracerLayer
+);
 
 /**
  * Managed runtime for imperative Effect execution

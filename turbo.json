@@ -1,22 +1,46 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env*"],
+  "globalDependencies": [
+    "**/.env*"
+  ],
   "ui": "tui",
   "tasks": {
+    "db:export": {
+      "inputs": [
+        "src/db/schema.ts"
+      ],
+      "outputs": [
+        "src/db/schema.sql"
+      ],
+      
+    },
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "dependsOn": [
+        "^build",
+        "db:export"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
       "outputs": []
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "dependsOn": [
+        "db:export"
+      ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "dependsOn": [
+        "^typecheck"
+      ]
     },
     "clean": {
       "cache": false

@@ -4,6 +4,8 @@
     "./../.oxlintrc.json"
   ],
   "rules": {
-    "eslint/no-use-before-define": "off"
+    "eslint/no-use-before-define": "off",
+    "react/no-children-prop": "off",
+    "import/no-relative-parent-imports": "off"
   }
 }

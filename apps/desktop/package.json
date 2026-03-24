@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
+    "@rolldown/plugin-babel": "catalog:dev",
     "@tailwindcss/vite": "catalog:dev",
     "@tauri-apps/cli": "^2.8.4",
     "@types/react": "catalog:dev",
@@ -31,7 +32,6 @@
     "@vitejs/plugin-react": "catalog:dev",
     "babel-plugin-react-compiler": "catalog:dev",
     "typescript": "catalog:dev",
-    "vite": "catalog:dev",
-    "vite-tsconfig-paths": "catalog:dev"
+    "vite": "catalog:dev"
   }
 }

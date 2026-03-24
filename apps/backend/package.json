@@ -7,7 +7,7 @@
     "format": "oxfmt --write .",
     "lint": "oxlint .",
     "typecheck": "tsc --noEmit",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "NODE_ENV=development bun run --watch src/index.ts"
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",

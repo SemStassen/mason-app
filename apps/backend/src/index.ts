@@ -1,5 +1,5 @@
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
-import { BetterAuth } from "@mason/auth";
+import { BetterAuth, RequestContextResolver } from "@mason/auth";
 import { CryptoLayer } from "@mason/core-server/infra/crypto";
 import {
   SessionRepositoryLayer,
@@ -18,7 +18,10 @@ import { WorkspaceRepositoryLayer } from "@mason/core-server/modules/workspace";
 import { WorkspaceInvitationRepositoryLayer } from "@mason/core-server/modules/workspace-invitation";
 import { WorkspaceMemberRepositoryLayer } from "@mason/core-server/modules/workspace-member";
 import { Authorization } from "@mason/core-server/shared/authorization";
-import { RequestContextResolver } from "@mason/core-server/shared/request-context-resolver";
+import {
+  RpcSessionMiddlewareLayer,
+  RpcWorkspaceMiddlewareLayer,
+} from "@mason/core-server/shared/middleware";
 import { IdentityModuleLayer } from "@mason/core/modules/identity";
 import { ProjectModuleLayer } from "@mason/core/modules/project";
 import { TimeModuleLayer } from "@mason/core/modules/time";
@@ -31,10 +34,9 @@ import { Config, Layer } from "effect";
 import { HttpRouter } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
-import { httpApiRoutesLayer } from "./http";
+import { HttpApiRoutesLayer } from "./http";
+import { BetterAuthRoutesLayer } from "./routes/better-auth";
 import { AllRpcsGroup, AllRpcsGroupLayer } from "./rpc";
-import { SessionMiddlewareLayer } from "./rpc/middleware/session";
-import { WorkspaceMiddlewareLayer } from "./rpc/middleware/workspace";
 
 const RepositoriesLayer = Layer.mergeAll(
   ProjectRepositoryLayer,
@@ -55,8 +57,8 @@ const RequestContextLayer = RequestContextResolver.layer.pipe(
 );
 
 const RpcMiddlewareLayer = Layer.mergeAll(
-  SessionMiddlewareLayer,
-  WorkspaceMiddlewareLayer
+  RpcSessionMiddlewareLayer,
+  RpcWorkspaceMiddlewareLayer
 ).pipe(Layer.provideMerge(RequestContextLayer));
 
 const InfraLayer = Layer.mergeAll(
@@ -85,14 +87,14 @@ const RpcRouteLayer = RpcServer.layerHttp({
   Layer.provide(AllRpcsGroupLayer)
 );
 
-const AllRoutesLayer = Layer.mergeAll(httpApiRoutesLayer, RpcRouteLayer).pipe(
+const AllRoutesLayer = Layer.mergeAll(
+  HttpApiRoutesLayer,
+  RpcRouteLayer,
+  BetterAuthRoutesLayer
+).pipe(
   Layer.provide(
     HttpRouter.cors({
-      allowedOrigins: [
-        "http://localhost:3000",
-        "tauri://localhost",
-        "http://tauri.localhost",
-      ],
+      allowedOrigins: ["tauri://localhost", "http://tauri.localhost"],
       allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
     })
@@ -113,4 +115,4 @@ const ServerLayer = HttpRouter.serve(AllRoutesLayer).pipe(
   )
 );
 
-ServerLayer.pipe(Layer.launch, BunRuntime.runMain);
+Layer.launch(ServerLayer).pipe(BunRuntime.runMain);

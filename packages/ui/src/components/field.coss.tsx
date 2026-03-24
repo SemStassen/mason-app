@@ -3,10 +3,8 @@ import type React from "react";
 
 import { cn } from "#utils/cn";
 
-export function Field({
-  className,
-  ...props
-}: FieldPrimitive.Root.Props): React.ReactElement {
+export type FieldProps = FieldPrimitive.Root.Props;
+export function Field({ className, ...props }: FieldProps): React.ReactElement {
   return (
     <FieldPrimitive.Root
       className={cn("flex flex-col items-start gap-2", className)}
@@ -16,10 +14,11 @@ export function Field({
   );
 }
 
+export type FieldLabelProps = FieldPrimitive.Label.Props;
 export function FieldLabel({
   className,
   ...props
-}: FieldPrimitive.Label.Props): React.ReactElement {
+}: FieldLabelProps): React.ReactElement {
   return (
     <FieldPrimitive.Label
       className={cn(
@@ -45,10 +44,11 @@ export function FieldItem({
   );
 }
 
+export type FieldDescriptionProps = FieldPrimitive.Description.Props;
 export function FieldDescription({
   className,
   ...props
-}: FieldPrimitive.Description.Props): React.ReactElement {
+}: FieldDescriptionProps): React.ReactElement {
   return (
     <FieldPrimitive.Description
       className={cn("text-muted-foreground text-xs", className)}
@@ -70,9 +70,10 @@ export function FieldError({
     />
   );
 }
-
+export type FieldControlProps = FieldPrimitive.Control.Props;
 export const FieldControl: typeof FieldPrimitive.Control =
   FieldPrimitive.Control;
+
 export const FieldValidity: typeof FieldPrimitive.Validity =
   FieldPrimitive.Validity;
 

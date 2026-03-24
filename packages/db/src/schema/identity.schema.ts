@@ -5,14 +5,17 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { tableId, tableMetadata } from "#utils/snippets";
 
 export const usersTable = pgTable("users", {
   id: tableId,
   // General
+  /** @deprecated Moved to `workspace_member`. Kept for Better Auth compatibility.  */
   displayName: varchar("display_name").notNull(),
   email: varchar("email").notNull(),
   emailVerified: boolean("email_verified").default(false).notNull(),
+  /** @deprecated Moved to `workspace_member`. Kept for Better Auth compatibility.  */
   imageUrl: varchar("image_url"),
   // Metadata
   ...tableMetadata,

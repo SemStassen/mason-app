@@ -1,12 +1,19 @@
-import { Model, Schema } from "#shared/effect/index";
-import { HexColor, ProjectId, WorkspaceId } from "#shared/schemas/index";
+import { Schema } from "effect";
+
+import { Model } from "#internal/effect/index";
+import {
+  HexColor,
+  NonEmptyTrimmedString,
+  ProjectId,
+  WorkspaceId,
+} from "#shared/schemas/index";
 
 export class Project extends Model.Class<Project>("Project")(
   {
     id: Model.ServerImmutableClientImmutableCreateOptional(ProjectId),
     workspaceId: Model.ServerImmutable(WorkspaceId),
     name: Model.ServerMutableClientMutable(
-      Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(255))
+      NonEmptyTrimmedString.check(Schema.isMaxLength(255))
     ),
     hexColor: Model.ServerMutableClientMutableCreateDefault(HexColor, {
       defaultValue: () => HexColor.makeUnsafe("#000000"),

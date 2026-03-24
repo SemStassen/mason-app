@@ -8,7 +8,7 @@ export class SessionMiddleware extends RpcMiddleware.Service<
   {
     provides: SessionContext;
   }
->()("@mason/shared/SessionMiddleware", {
+>()("@mason/core/rpc/SessionMiddleware", {
   error: HttpApiError.Unauthorized,
   requiredForClient: true,
 }) {}
@@ -18,7 +18,7 @@ export class WorkspaceMiddleware extends RpcMiddleware.Service<
   {
     provides: WorkspaceContext;
   }
->()("@mason/shared/WorkspaceMiddleware", {
+>()("@mason/core/rpc/WorkspaceMiddleware", {
   error: HttpApiError.Forbidden,
   requiredForClient: false,
 }) {}

@@ -3,8 +3,11 @@ import { Config, Effect, Layer } from "effect";
 import { Pool } from "pg";
 
 import { Database, DatabaseError } from "./database.service";
-import type { DatabaseShape, DrizzleDb, TransactionDb } from "./database.service";
-import { relations } from "./relations";
+import type {
+  DatabaseShape,
+  DrizzleDb,
+  TransactionDb,
+} from "./database.service";
 import * as schema from "./schema";
 
 // TODO(db-v4-effect): remove this Promise compatibility check when migrating
@@ -27,13 +30,16 @@ const DatabaseLayerBase = Layer.effect(
 
     const drizzle: DrizzleDb = makeDrizzle({
       client: pool,
-      relations,
       schema,
     });
 
-    const makeDatabase = (currentDrizzle: DrizzleDb | TransactionDb): DatabaseShape => {
+    const makeDatabase = (
+      currentDrizzle: DrizzleDb | TransactionDb
+    ): DatabaseShape => {
       const runDrizzle = <A, E, R = never>(
-        f: (drizzle: DrizzleDb | TransactionDb) => Effect.Effect<A, E, R> | Promise<A>
+        f: (
+          drizzle: DrizzleDb | TransactionDb
+        ) => Effect.Effect<A, E, R> | Promise<A>
       ): Effect.Effect<A, E | DatabaseError, R> =>
         Effect.suspend(() => {
           const result = f(currentDrizzle);
@@ -66,10 +72,7 @@ const DatabaseLayerBase = Layer.effect(
                 currentDrizzle.transaction((transaction) =>
                   Effect.runPromiseWith(services)(
                     effect.pipe(
-                      Effect.provideService(
-                        Database,
-                        makeDatabase(transaction)
-                      )
+                      Effect.provideService(Database, makeDatabase(transaction))
                     )
                   )
                 ),

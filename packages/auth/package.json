@@ -12,7 +12,7 @@
     "@mason/core": "workspace:*",
     "@mason/db": "workspace:*",
     "@mason/notifications": "workspace:*",
-    "better-auth": "^1.5.5",
+    "better-auth": "catalog:",
     "effect": "catalog:"
   },
   "devDependencies": {

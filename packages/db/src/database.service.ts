@@ -2,7 +2,6 @@ import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Schema, ServiceMap } from "effect";
 import type { Effect } from "effect";
 
-import type { relations } from "./relations";
 import type * as schema from "./schema";
 
 export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
@@ -12,7 +11,7 @@ export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   }
 ) {}
 
-export type DrizzleDb = NodePgDatabase<typeof schema, typeof relations>;
+export type DrizzleDb = NodePgDatabase<typeof schema>;
 
 export type TransactionDb = Parameters<
   Parameters<DrizzleDb["transaction"]>[0]
@@ -35,7 +34,9 @@ export interface DatabaseShape {
    * remove `Promise<A>` from this signature so `drizzle` is Effect-only.
    */
   readonly drizzle: <A, E, R = never>(
-    f: (drizzle: DrizzleDb | TransactionDb) => Effect.Effect<A, E, R> | Promise<A>
+    f: (
+      drizzle: DrizzleDb | TransactionDb
+    ) => Effect.Effect<A, E, R> | Promise<A>
   ) => Effect.Effect<A, E | DatabaseError, R>;
   /**
    * Run operations in a transaction.

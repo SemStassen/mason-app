@@ -1,5 +1,7 @@
+import { Schema } from "effect";
+
+import { Model } from "#internal/effect/index";
 import { WorkspaceRole } from "#shared/authorization/index";
-import { Model, Schema } from "#shared/effect/index";
 import {
   Email,
   WorkspaceId,

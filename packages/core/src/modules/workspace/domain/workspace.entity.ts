@@ -1,18 +1,18 @@
-import { Model, Schema } from "#shared/effect/index";
-import { WorkspaceId } from "#shared/schemas/index";
+import { Schema } from "effect";
+
+import { Model } from "#internal/effect/index";
+import { NonEmptyTrimmedString, WorkspaceId } from "#shared/schemas/index";
 
 export class Workspace extends Model.Class<Workspace>("Workspace")(
   {
     id: Model.ServerImmutable(WorkspaceId),
     name: Model.ServerMutableClientMutable(
-      Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(100))
+      NonEmptyTrimmedString.check(Schema.isMaxLength(100))
     ),
     slug: Model.ServerMutableClientMutable(
-      Schema.NonEmptyTrimmedString.check(Schema.isMaxLength(100))
+      NonEmptyTrimmedString.check(Schema.isMaxLength(100))
     ),
-    logoUrl: Model.ServerMutableClientMutableOptional(
-      Schema.NonEmptyTrimmedString
-    ),
+    logoUrl: Model.ServerMutableClientMutableOptional(NonEmptyTrimmedString),
   },
   {
     identifier: "Workspace",

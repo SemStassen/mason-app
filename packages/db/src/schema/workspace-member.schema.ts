@@ -1,5 +1,7 @@
 import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
+
 import { tableId, tableMetadata, tableSoftDelete } from "#utils/snippets";
+
 import { usersTable } from "./identity.schema";
 import { workspacesTable } from "./workspace.schema";
 
@@ -13,7 +15,9 @@ export const workspaceMembersTable = pgTable("workspace_members", {
     .references(() => workspacesTable.id, { onDelete: "cascade" })
     .notNull(),
   // General
+  displayName: varchar("display_name").notNull(),
   role: varchar("role").notNull(),
+  imageUrl: varchar("image_url"),
   // Metadata
   ...tableSoftDelete,
   ...tableMetadata,

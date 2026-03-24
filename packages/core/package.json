@@ -19,6 +19,7 @@
   },
   "imports": {
     "#api/*": "./src/api/*.ts",
+    "#internal/*": "./src/internal/*.ts",
     "#modules/*": "./src/modules/*.ts",
     "#shared/*": "./src/shared/*.ts"
   },

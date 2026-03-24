@@ -1,4 +1,5 @@
-import { Button, type ButtonProps } from "@mason/ui/button";
+import { Button } from "@mason/ui/button";
+import type { ButtonProps } from "@mason/ui/button";
 import {
   Combobox,
   ComboboxEmpty,
@@ -10,16 +11,20 @@ import {
 import {
   Field,
   FieldControl,
-  type FieldControlProps,
   FieldDescription,
-  type FieldDescriptionProps,
   FieldError,
   FieldLabel,
-  type FieldLabelProps,
-  type FieldProps,
 } from "@mason/ui/field";
-import { Input, type InputProps } from "@mason/ui/input";
-import { InputTime, type InputTimeProps } from "@mason/ui/input-time";
+import type {
+  FieldControlProps,
+  FieldDescriptionProps,
+  FieldLabelProps,
+  FieldProps,
+} from "@mason/ui/field";
+import { Input } from "@mason/ui/input";
+import type { InputProps } from "@mason/ui/input";
+import { InputTime } from "@mason/ui/input-time";
+import type { InputTimeProps } from "@mason/ui/input-time";
 import {
   Select,
   SelectContent,
@@ -27,14 +32,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@mason/ui/select";
-import { Textarea, type TextareaProps } from "@mason/ui/textarea";
+import { Textarea } from "@mason/ui/textarea";
+import type { TextareaProps } from "@mason/ui/textarea";
 import type { TimePickerProps } from "@mason/ui/time-picker";
 import {
   createFormHook,
   createFormHookContexts,
   useStore,
 } from "@tanstack/react-form";
-import { formatter } from "~/utils/date-time";
+
+import { formatter } from "~/lib/utils/date-time";
 
 const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts();
@@ -164,14 +171,14 @@ function TimeField({
     <Field {...field}>
       <FieldLabel {...label} />
       <InputTime
-      format={formatter.time}
-      onBlur={fieldCtx.handleBlur}
-      onChange={(value: Date | null) => {
-        fieldCtx.handleChange(value ? value.toISOString() : null);
-      }}
-      step={step}
-      value={fieldCtx.state.value ? new Date(fieldCtx.state.value) : null}
-      {...input}
+        format={formatter.time}
+        onBlur={fieldCtx.handleBlur}
+        onChange={(value: Date | null) => {
+          fieldCtx.handleChange(value ? value.toISOString() : null);
+        }}
+        step={step}
+        value={fieldCtx.state.value ? new Date(fieldCtx.state.value) : null}
+        {...input}
       />
       <FieldDescription {...description} />
       <FieldError errors={errors} />
@@ -244,8 +251,14 @@ function ComboBoxField<
     <Field {...field}>
       <FieldLabel {...label} />
       {/* We need to map the value to the actual item object and onValueChange to the item value */}
-      <Combobox items={items} onValueChange={(item) => {fieldCtx.handleChange(item.value)}} value={items.find((item) => item.value === fieldCtx.state.value)} >
-        <ComboboxInput placeholder={placeholder} onBlur={fieldCtx.handleBlur}/>
+      <Combobox
+        items={items}
+        onValueChange={(item) => {
+          fieldCtx.handleChange(item.value);
+        }}
+        value={items.find((item) => item.value === fieldCtx.state.value)}
+      >
+        <ComboboxInput placeholder={placeholder} onBlur={fieldCtx.handleBlur} />
         <ComboboxPopup>
           <ComboboxEmpty>{emptyMessage}</ComboboxEmpty>
           <ComboboxList>

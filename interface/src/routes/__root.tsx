@@ -1,7 +1,7 @@
 import { createRootRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
 
-import { MasonRpcClient } from "~/lib/rpc/client";
+import { MasonAtomRpcClient } from "~/lib/rpc/client";
 import { runtime } from "~/lib/runtime";
 
 import { AppProviders } from "./-app-providers";
@@ -10,7 +10,7 @@ export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
     const sessionResult = await runtime.runPromise(
       Effect.gen(function* () {
-        const client = yield* MasonRpcClient;
+        const client = yield* MasonAtomRpcClient;
         return yield* client("Auth.GetSession", undefined);
       }).pipe(Effect.catch(() => Effect.succeed(null)))
     );
@@ -22,10 +22,12 @@ export const Route = createRootRoute({
           to: "/sign-up",
         });
       }
-      return;
+      return undefined;
     }
 
     const { user, session } = sessionResult;
+
+    return { user, session };
 
     // Early return for now
 

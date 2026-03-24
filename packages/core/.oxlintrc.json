@@ -11,10 +11,6 @@
         "cases": {
           "kebabCase": true
         },
-        "ignore": [
-          "^Model\\.ts$",
-          "^Schema\\.ts$"
-        ]
       }
     ]
   }

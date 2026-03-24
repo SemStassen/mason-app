@@ -1,6 +1,6 @@
-import { Option } from "effect";
+import { Option, Schema } from "effect";
 
-import { Model, Schema } from "#shared/effect/index";
+import { Model } from "#internal/effect/index";
 import {
   ProjectId,
   TaskId,

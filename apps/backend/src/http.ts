@@ -4,6 +4,6 @@ import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 import { PingHttpGroupLayer } from "./routes/ping";
 
-export const httpApiRoutesLayer = HttpApiBuilder.layer(MasonApi).pipe(
+export const HttpApiRoutesLayer = HttpApiBuilder.layer(MasonApi).pipe(
   Layer.provide(PingHttpGroupLayer)
 );

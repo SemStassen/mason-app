@@ -1,2 +1,2 @@
 export * from "./ids";
-export * from "./value-objects";
+export * from "./primitives";

@@ -1,27 +1,35 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
+import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import viteReact from "@vitejs/plugin-react";
-import path from "path";
-import { fileURLToPath } from "url";
+import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import tsConfigPaths from "vite-tsconfig-paths";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: "src",
+  envDir: "..",
   clearScreen: false,
+  resolve: {
+    tsconfigPaths: true,
+  },
   server: {
-    port: 8002,
+    port: 3000,
     proxy: {
       "/api": {
-        target: "http://localhost:8001",
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+      "/rpc": {
+        target: "http://localhost:3001",
         changeOrigin: true,
       },
     },
   },
-
   optimizeDeps: {
     exclude: ["@electric-sql/pglite"],
   },
@@ -32,14 +40,8 @@ export default defineConfig({
     __PLATFORM__: JSON.stringify("web"),
   },
   plugins: [
-    tsConfigPaths({
-      projects: [
-        path.resolve(__dirname, "../../interface/tsconfig.json"),
-        path.resolve(__dirname, "../../packages/api-contract/tsconfig.json"),
-      ],
-    }),
     paraglideVitePlugin({
-      project: path.resolve(__dirname, "../../interface/project.inlang"),
+      project: path.resolve(__dirname, "../../project.inlang"),
       outdir: path.resolve(__dirname, "../../interface/src/paraglide"),
     }),
     tanstackRouter({
@@ -52,10 +54,9 @@ export default defineConfig({
       routeFileIgnorePrefix: "-",
     }),
     tailwindcss(),
-    viteReact({
-      babel: {
-        plugins: ["babel-plugin-react-compiler"],
-      },
+    viteReact(),
+    babel({
+      presets: [reactCompilerPreset()],
     }),
   ],
   build: {

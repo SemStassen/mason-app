@@ -1,19 +1,20 @@
+import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
-import viteReact from "@vitejs/plugin-react";
-import path from "path";
-import { fileURLToPath } from "url";
+import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import tsConfigPaths from "vite-tsconfig-paths";
 
 const host = process.env.TAURI_DEV_HOST;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: "src",
+  envDir: "..",
   // Use a relative base so assets work when loaded from the app bundle (file://)
   base: "./",
   // Prevent Vite from obscuring rust errors
   clearScreen: false,
+  resolve: {
+    tsconfigPaths: true,
+  },
   optimizeDeps: {
     exclude: ["@electric-sql/pglite"],
   },
@@ -40,17 +41,10 @@ export default defineConfig({
     __PLATFORM__: JSON.stringify("desktop"),
   },
   plugins: [
-    tsConfigPaths({
-      projects: [
-        path.resolve(__dirname, "../../interface/tsconfig.json"),
-        path.resolve(__dirname, "../../packages/api-contract/tsconfig.json"),
-      ],
-    }),
     tailwindcss(),
-    viteReact({
-      babel: {
-        plugins: ["babel-plugin-react-compiler"],
-      },
+    viteReact(),
+    babel({
+      presets: [reactCompilerPreset()],
     }),
   ],
   build: {

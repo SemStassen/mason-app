@@ -1,4 +1,4 @@
-import { Model } from "#shared/effect/index";
+import { Model } from "#internal/effect/index";
 import { SessionId, UserId, WorkspaceId } from "#shared/schemas/index";
 
 export class Session extends Model.Class<Session>("Session")(

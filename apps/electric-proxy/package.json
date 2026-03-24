@@ -13,6 +13,11 @@
   "dependencies": {
     "@effect/platform-bun": "catalog:",
     "@electric-sql/client": "^1.4.0",
+    "@mason/auth": "workspace:*",
+    "@mason/core": "workspace:*",
+    "@mason/core-server": "workspace:*",
+    "@mason/db": "workspace:*",
+    "@mason/notifications": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

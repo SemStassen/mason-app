@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
+    "@rolldown/plugin-babel": "catalog:dev",
     "@tailwindcss/vite": "catalog:dev",
     "@tanstack/router-plugin": "^1.167.2",
     "@types/react": "catalog:dev",
@@ -25,7 +26,6 @@
     "@vitejs/plugin-react": "catalog:dev",
     "babel-plugin-react-compiler": "catalog:dev",
     "typescript": "catalog:dev",
-    "vite": "catalog:dev",
-    "vite-tsconfig-paths": "catalog:dev"
+    "vite": "catalog:dev"
   }
 }
