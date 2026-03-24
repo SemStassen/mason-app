@@ -16,7 +16,9 @@ export const db = new PGliteWorker(
     type: "module",
   }),
   {
-    dataDir: "idb://mason",
+    meta: {
+      workspaceMemberId: "default",
+    },
     relaxedDurability: true,
     extensions: {
       electric: electricSync(),

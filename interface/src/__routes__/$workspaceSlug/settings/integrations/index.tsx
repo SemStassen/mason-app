@@ -4,6 +4,7 @@ import { Badge } from "@mason/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@mason/ui/card";
 import { Icons } from "@mason/ui/icons";
 import { createFileRoute, Link } from "@tanstack/react-router";
+
 import { workspaceIntegrationsAtom } from "~/atoms/api";
 
 export const Route = createFileRoute("/$workspaceSlug/settings/integrations/")({

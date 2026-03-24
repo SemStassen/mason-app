@@ -6,10 +6,12 @@ import {
   useNavigate,
 } from "@tanstack/react-router";
 import { useCallback } from "react";
+
 import {
   AppCommandsDialog,
   useRegisterCommands,
 } from "~/components/app-commands-dialog";
+
 import { DebugSheet } from "./-components/debug-sheet";
 import { WorkspaceProviders } from "./-components/workspace-providers";
 

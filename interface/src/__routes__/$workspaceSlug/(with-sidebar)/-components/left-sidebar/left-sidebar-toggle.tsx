@@ -1,6 +1,7 @@
 import { useAtomRef } from "@effect-atom/atom-react";
 import { Button } from "@mason/ui/button";
 import { Icons } from "@mason/ui/icons";
+
 import { leftSidebarAtom, toggleLeftSidebar } from "~/atoms/ui-atoms";
 import { useRegisterCommands } from "~/components/app-commands-dialog";
 

@@ -1,4 +1,5 @@
 import { differenceInMinutes, endOfDay, startOfDay } from "date-fns";
+
 import { FIRST_VISIBLE_HOUR, LAST_VISIBLE_HOUR } from ".";
 import type { ITimeEntry } from "./types";
 

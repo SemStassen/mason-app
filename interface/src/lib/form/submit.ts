@@ -1,8 +1,9 @@
 import type { AnyFormOptions } from "@tanstack/react-form";
 import { Effect, Result, Schema } from "effect";
 
-export type SubmitProps =
-  Parameters<NonNullable<AnyFormOptions["onSubmit"]>>[0];
+export type SubmitProps = Parameters<
+  NonNullable<AnyFormOptions["onSubmit"]>
+>[0];
 
 export type ParsedSubmitProps<T> = Omit<SubmitProps, "value"> & {
   value: T;

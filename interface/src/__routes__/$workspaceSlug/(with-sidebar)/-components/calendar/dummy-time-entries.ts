@@ -5,6 +5,7 @@ import {
   endOfWeek,
   startOfWeek,
 } from "date-fns";
+
 import type { ITimeEntry } from "./types";
 
 // Generate dummy time entries from previous week to next week

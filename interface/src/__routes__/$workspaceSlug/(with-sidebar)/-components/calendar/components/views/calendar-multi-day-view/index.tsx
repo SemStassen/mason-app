@@ -7,6 +7,7 @@ import {
   setHours,
   setMinutes,
 } from "date-fns";
+
 import {
   calendarDaysInViewAtom,
   calendarDragSelectionAtom,
@@ -17,6 +18,7 @@ import {
   setIsDragSelectionActive,
 } from "~/atoms/calendar-atom";
 import { formatter } from "~/lib/utils/date-time";
+
 import {
   CALENDAR_DAY_HEADER_HEIGHT_VAR,
   CALENDAR_HEADER_HEIGHT_VAR,

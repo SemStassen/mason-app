@@ -1,7 +1,9 @@
 import { useAtomValue } from "@effect-atom/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+
 import { projectsWithTasksAtom } from "~/atoms/api";
+
 import { ProjectsTable } from "./-components/projects-table";
 import { RightSidebar } from "./-components/right-sidebar";
 

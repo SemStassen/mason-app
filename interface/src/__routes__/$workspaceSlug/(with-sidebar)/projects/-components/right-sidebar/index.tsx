@@ -1,6 +1,7 @@
 import { Button } from "@mason/ui/button";
 import { Icons } from "@mason/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
+
 import type { Project, Task } from "~/types";
 
 const SIDEBAR_WIDTH = 450;

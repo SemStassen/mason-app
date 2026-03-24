@@ -16,6 +16,7 @@ import {
 } from "@mason/ui/menu";
 import { Link, useRouteContext, useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
+
 import { MasonClient } from "~/client";
 
 function WorkspaceDropdownMenu() {

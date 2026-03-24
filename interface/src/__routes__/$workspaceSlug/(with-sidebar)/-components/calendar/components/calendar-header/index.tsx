@@ -2,7 +2,9 @@ import { useAtomRef } from "@effect-atom/atom-react";
 import { Button } from "@mason/ui/button";
 import { Icons } from "@mason/ui/icons";
 import { motion } from "motion/react";
+
 import { leftSidebarAtom } from "~/atoms/ui-atoms";
+
 import { CALENDAR_HEADER_HEIGHT_VAR } from "../..";
 import { DateNavigator } from "./date-navigator";
 import { OptionsDropdown } from "./options-dropdown";

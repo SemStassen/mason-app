@@ -1,10 +1,12 @@
 import { useAtomRef } from "@effect-atom/atom-react";
 import { AnimatePresence, motion } from "motion/react";
+
 import {
   calendarIsDragSelectionActiveAtom,
   calendarSortedDragSelectionAtom,
 } from "~/atoms/calendar-atom";
 import { useConditionalMemo } from "~/hooks/use-conditional-memo";
+
 import { CreateTimeEntryForm } from "./create-time-entry-form";
 
 const SIDEBAR_WIDTH = 400;

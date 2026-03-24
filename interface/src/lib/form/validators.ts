@@ -6,7 +6,8 @@ import type { SubmitProps } from "./submit";
 export const createDynamicValidator = <T, E>(schema: Schema.Codec<T, E>) =>
   Schema.toStandardSchemaV1(schema);
 
-export const createSubmitValidator = <T, E>(schema: Schema.Codec<T, E>) =>
+export const createSubmitValidator =
+  <T, E>(schema: Schema.Codec<T, E>) =>
   async (props: SubmitProps) => {
     const result = await decodeUnknownToResult(schema)(props.value);
 

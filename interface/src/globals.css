@@ -5,9 +5,9 @@
 
 /* https://base-ui.com/react/overview/quick-start */
 .root {
-    isolation: isolate;
+  isolation: isolate;
 }
 
 body {
-    position: relative;
+  position: relative;
 }

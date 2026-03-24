@@ -10,9 +10,9 @@
         "src/db/schema.ts"
       ],
       "outputs": [
-        "src/db/schema.sql"
-      ],
-      
+        "src/db/schema.sql",
+        "src/db/schema-hash.ts"
+      ]
     },
     "build": {
       "dependsOn": [

@@ -1,0 +1,1 @@
+export const SCHEMA_HASH = "40fee4e4323767f3f45cf73b792761d604fb30372cb65496442e02ed7a85c3a7" as const;
