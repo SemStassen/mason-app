@@ -1,11 +1,6 @@
 {
   "extends": "@mason/config/package.tsconfig.json",
-  "include": [
-    "src",
-    "test"
-  ],
-  "exclude": [
-    "dist"
-  ],
+  "include": ["src", "test"],
+  "exclude": ["dist"],
   "compilerOptions": {}
 }

@@ -9,11 +9,10 @@ export const createWorkspace = (
   data: typeof Workspace.jsonCreate.Type
 ): Result.Result<Workspace, never> =>
   Result.succeed(
-    Workspace.make({
+    Workspace.makeUnsafe({
       id: WorkspaceId.makeUnsafe(generateUUID()),
-      name: data.name,
-      slug: data.slug,
       logoUrl: data.logoUrl ?? Option.none(),
+      ...data,
     })
   );
 
@@ -25,6 +24,6 @@ export const updateWorkspace = (params: {
   never
 > =>
   Result.succeed({
-    entity: Workspace.make({ ...params.workspace, ...params.data }),
+    entity: Workspace.makeUnsafe({ ...params.workspace, ...params.data }),
     changes: params.data,
   });

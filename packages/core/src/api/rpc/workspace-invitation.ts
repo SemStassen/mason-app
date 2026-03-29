@@ -21,7 +21,7 @@ import {
 import { WorkspaceMemberAlreadyExistsError } from "#modules/workspace-member/index";
 import { AuthorizationError } from "#shared/authorization/index";
 
-import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
+import { RpcSessionMiddleware, RpcWorkspaceMiddleware } from "./middleware";
 
 export const WorkspaceInvitationRpcGroup = RpcGroup.make(
   Rpc.make("WorkspaceInvitation.Create", {
@@ -33,8 +33,8 @@ export const WorkspaceInvitationRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware),
 
   Rpc.make("WorkspaceInvitation.Cancel", {
     payload: CancelWorkspaceInvitationCommand,
@@ -47,8 +47,8 @@ export const WorkspaceInvitationRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware),
 
   Rpc.make("WorkspaceInvitation.Accept", {
     payload: AcceptWorkspaceInvitationCommand,
@@ -61,7 +61,7 @@ export const WorkspaceInvitationRpcGroup = RpcGroup.make(
       WorkspaceInvitationExpiredError,
       HttpApiError.InternalServerError,
     ]),
-  }).middleware(SessionMiddleware),
+  }).middleware(RpcSessionMiddleware),
 
   Rpc.make("WorkspaceInvitation.Reject", {
     payload: RejectWorkspaceInvitationCommand,
@@ -73,5 +73,5 @@ export const WorkspaceInvitationRpcGroup = RpcGroup.make(
       WorkspaceInvitationExpiredError,
       HttpApiError.InternalServerError,
     ]),
-  }).middleware(SessionMiddleware)
+  }).middleware(RpcSessionMiddleware)
 );

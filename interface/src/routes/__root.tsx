@@ -1,94 +1,39 @@
 import { createRootRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Effect } from "effect";
+import { AtomRegistry } from "effect/unstable/reactivity";
 
-import { MasonAtomRpcClient } from "~/lib/rpc/client";
+import { sessionAtom } from "~/atoms/auth";
+import { atomRegistry } from "~/atoms/registry";
 import { runtime } from "~/lib/runtime";
-
-import { AppProviders } from "./-app-providers";
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
-    const sessionResult = await runtime.runPromise(
-      Effect.gen(function* () {
-        const client = yield* MasonAtomRpcClient;
-        return yield* client("Auth.GetSession", undefined);
-      }).pipe(Effect.catch(() => Effect.succeed(null)))
+    const session = await runtime.runPromise(
+      AtomRegistry.getResult(atomRegistry, sessionAtom, {
+        suspendOnWaiting: true,
+      }).pipe(
+        Effect.catchTags({
+          Unauthorized: () => Effect.succeed(null),
+        })
+      )
     );
 
     // If no session or user, redirect to sign-up (unless already there)
-    if (!sessionResult) {
+    if (!session) {
       if (!["/sign-up"].includes(location.pathname)) {
         throw redirect({
           to: "/sign-up",
         });
       }
-      return undefined;
+
+      return null;
     }
 
-    const { user, session } = sessionResult;
-
-    return { user, session };
-
-    // Early return for now
-
-    // // If user exists but has no workspaces, redirect to create-workspace
-    // // At create-workspace we show a return button when workspaces do exist.
-    // // So no need to check for that here
-    // if (user.memberships.length === 0) {
-    //   if (!["/create-workspace"].includes(location.pathname)) {
-    //     throw redirect({
-    //       to: "/create-workspace",
-    //     });
-    //   }
-    //   return;
-    // }
-
-    // const activeWorkspace = user.memberships.find(
-    //   (membership) => membership.workspace.id === session.activeWorkspaceId
-    // )?.workspace;
-
-    // // This should never happen.
-    // // But if it does, we need to set the active workspace to the first workspace as a fallback
-    // if (!activeWorkspace) {
-    //   await Effect.runPromise(
-    //     MasonClient.Workspace.SetActive({
-    //       payload: {
-    //         workspaceId: user.memberships[0].workspace.id,
-    //       },
-    //     }).pipe(
-    //       Effect.catchTags({
-    //         Unauthorized: () => Effect.succeed(null),
-    //         InternalServerError: () => Effect.succeed(null),
-    //       }),
-    //       Effect.catchAll(() => Effect.succeed(null))
-    //     )
-    //   );
-    //   return;
-    // }
-
-    // if (
-    //   !(
-    //     location.pathname.startsWith(`/${activeWorkspace.slug}`) ||
-    //     ["/create-workspace"].includes(location.pathname)
-    //   )
-    // ) {
-    //   throw redirect({
-    //     to: "/$workspaceSlug",
-    //     params: {
-    //       workspaceSlug: activeWorkspace.slug,
-    //     },
-    //   });
-    // }
-
-    // return { user: { ...user, activeWorkspace } };
+    return session;
   },
   component: RootLayout,
 });
 
 function RootLayout() {
-  return (
-    <AppProviders>
-      <Outlet />
-    </AppProviders>
-  );
+  return <Outlet />;
 }

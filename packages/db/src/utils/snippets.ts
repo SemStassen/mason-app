@@ -1,7 +1,9 @@
 import { sql } from "drizzle-orm";
 import { timestamp, uuid } from "drizzle-orm/pg-core";
 
-export const tableId = uuid("id").primaryKey().default(sql`uuidv7()`);
+export const tableId = uuid("id")
+  .primaryKey()
+  .default(sql`uuidv7()`);
 
 export const tableMetadata = {
   createdAt: timestamp("created_at", {

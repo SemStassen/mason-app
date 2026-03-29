@@ -8,11 +8,12 @@ import {
 
 import { tableId, tableMetadata } from "#utils/snippets";
 
+import { workspacesTable } from "./workspace.schema";
+
 export const usersTable = pgTable("users", {
   id: tableId,
   // General
-  /** @deprecated Moved to `workspace_member`. Kept for Better Auth compatibility.  */
-  displayName: varchar("display_name").notNull(),
+  fullName: varchar("full_name").notNull(),
   email: varchar("email").notNull(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   /** @deprecated Moved to `workspace_member`. Kept for Better Auth compatibility.  */
@@ -35,7 +36,10 @@ export const sessionsTable = pgTable("sessions", {
   }).notNull(),
   ipAddress: varchar("ip_address").notNull(),
   userAgent: varchar("user_agent").notNull(),
-  activeWorkspaceId: uuid("active_workspace_id"),
+  lastActiveWorkspaceId: uuid("last_active_workspace_id").references(
+    () => workspacesTable.id,
+    { onDelete: "set null" }
+  ),
   // Metadata
   ...tableMetadata,
 });

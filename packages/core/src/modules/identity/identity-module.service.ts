@@ -22,13 +22,11 @@ export class UserNotFoundError extends Schema.TaggedErrorClass<UserNotFoundError
 ) {}
 
 interface IdentityModuleShape {
-  readonly setActiveWorkspace: (params: {
+  readonly setLastActiveWorkspace: (params: {
     sessionId: Session["id"];
-    workspaceId: Session["activeWorkspaceId"];
+    workspaceId: Session["lastActiveWorkspaceId"];
   }) => Effect.Effect<Session, SessionNotFoundError | RepositoryError>;
-  readonly createUser: (
-    data: typeof User.jsonCreate.Type
-  ) => Effect.Effect<User, RepositoryError>;
+
   readonly updateUser: (params: {
     userId: User["id"];
     data: typeof User.jsonUpdate.Type;

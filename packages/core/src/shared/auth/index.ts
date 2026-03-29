@@ -15,7 +15,7 @@ export class SessionContext extends ServiceMap.Service<
 >()("@mason/shared/SessionContext") {}
 
 export interface WorkspaceContextShape {
-  member: WorkspaceMember;
+  workspaceMember: WorkspaceMember;
   workspace: Workspace;
 }
 

@@ -1,7 +1,7 @@
 import { Workspace, WorkspaceRepository } from "@mason/core/modules/workspace";
 import { RepositoryError } from "@mason/core/shared/repository";
 import { Database, schema } from "@mason/db";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
 
@@ -66,6 +66,19 @@ export const WorkspaceRepositoryLayer = Layer.effect(
         ),
     });
 
+    const listWorkspacesByIds = SqlSchema.findAll({
+      Request: Schema.Array(Workspace.fields.id),
+      Result: Workspace,
+      execute: (ids) =>
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.workspacesTable)
+            .where(inArray(schema.workspacesTable.id, ids))
+            .execute()
+        ),
+    });
+
     return {
       insert: (data) =>
         insertWorkspace(data).pipe(
@@ -81,6 +94,10 @@ export const WorkspaceRepositoryLayer = Layer.effect(
         ),
       findBySlug: (slug) =>
         findWorkspaceBySlug(slug).pipe(
+          Effect.mapError((e) => new RepositoryError({ cause: e }))
+        ),
+      listByIds: (ids) =>
+        listWorkspacesByIds(ids).pipe(
           Effect.mapError((e) => new RepositoryError({ cause: e }))
         ),
     };

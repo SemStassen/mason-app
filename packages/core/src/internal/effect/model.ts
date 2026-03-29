@@ -287,6 +287,42 @@ export const ServerMutableClientMutable = <S extends Schema.Top>(
   });
 
 // ---------------------------------------------------------------------------
+// ServerMutableClientMutableCreateOptional
+// ---------------------------------------------------------------------------
+
+export interface ServerMutableClientMutableCreateOptional<
+  S extends Schema.Top,
+> extends VariantSchema.Field<{
+  readonly select: S;
+  readonly insert: S;
+  readonly update: Schema.optionalKey<S>;
+  readonly json: S;
+  readonly jsonCreate: Schema.optionalKey<S>;
+  readonly jsonUpdate: Schema.optionalKey<S>;
+}> {}
+
+/**
+ * Required field the client can update freely, but may omit on create.
+ *
+ * When absent from the create payload, the value must be derived by the
+ * service layer before calling the repository.
+ *
+ * @example
+ * displayName: ServerMutableClientMutableCreateOptional(NonEmptyTrimmedString)
+ */
+export const ServerMutableClientMutableCreateOptional = <S extends Schema.Top>(
+  schema: S
+): ServerMutableClientMutableCreateOptional<S> =>
+  Field({
+    select: schema,
+    insert: schema,
+    update: Schema.optionalKey(schema),
+    json: schema,
+    jsonCreate: Schema.optionalKey(schema),
+    jsonUpdate: Schema.optionalKey(schema),
+  });
+
+// ---------------------------------------------------------------------------
 // ServerMutableClientMutableCreateDefault
 // ---------------------------------------------------------------------------
 

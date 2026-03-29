@@ -9,7 +9,7 @@ import {
 import { WorkspaceIntegrationProviderAlreadyExistsError } from "#modules/integration/index";
 import { AuthorizationError } from "#shared/authorization/index";
 
-import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
+import { RpcSessionMiddleware, RpcWorkspaceMiddleware } from "./middleware";
 
 export const WorkspaceIntegrationRpcGroup = RpcGroup.make(
   Rpc.make("WorkspaceIntegration.Create", {
@@ -21,6 +21,6 @@ export const WorkspaceIntegrationRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware)
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware)
 );

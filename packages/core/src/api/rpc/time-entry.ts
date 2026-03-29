@@ -17,7 +17,7 @@ import {
 } from "#modules/time/index";
 import { AuthorizationError } from "#shared/authorization/index";
 
-import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
+import { RpcSessionMiddleware, RpcWorkspaceMiddleware } from "./middleware";
 
 export const TimeEntryRpcGroup = RpcGroup.make(
   Rpc.make("TimeEntry.Create", {
@@ -30,8 +30,8 @@ export const TimeEntryRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware),
 
   Rpc.make("TimeEntry.Update", {
     payload: UpdateTimeEntryCommand,
@@ -44,8 +44,8 @@ export const TimeEntryRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware),
 
   Rpc.make("TimeEntry.Delete", {
     payload: DeleteTimeEntryCommand,
@@ -56,6 +56,6 @@ export const TimeEntryRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware)
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware)
 );

@@ -8,6 +8,7 @@ import { WorkspaceRepositoryLayer } from "@mason/core-server/modules/workspace";
 import { WorkspaceMemberRepositoryLayer } from "@mason/core-server/modules/workspace-member";
 import { DatabaseLayer } from "@mason/db";
 import { Mailer } from "@mason/notifications/mailer";
+import { makeObservabilityLayer } from "@mason/observability";
 import { Config, Layer } from "effect";
 import { HttpRouter } from "effect/unstable/http";
 
@@ -33,15 +34,24 @@ const allRoutesLayer = Layer.mergeAll(
 ).pipe(
   Layer.provide(
     HttpRouter.cors({
-      allowedOrigins: ["tauri://localhost", "http://tauri.localhost"],
+      allowedOrigins: [
+        "tauri://localhost",
+        "http://tauri.localhost",
+        "http://localhost:8002",
+      ],
       allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
     })
   )
 );
 
+const ObservabilityLayer = makeObservabilityLayer({
+  serviceName: "mason-electric-proxy",
+});
+
 const ServerLayer = HttpRouter.serve(allRoutesLayer).pipe(
   Layer.provide(RequestContextLayer),
+  Layer.provide(ObservabilityLayer),
   Layer.provide(BunHttpClient.layer),
   Layer.provide(
     BunHttpServer.layerConfig(

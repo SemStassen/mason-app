@@ -10,19 +10,6 @@ export const UserRepositoryLayer = Layer.effect(
   Effect.gen(function* () {
     const db = yield* Database;
 
-    const insertUser = SqlSchema.findOne({
-      Request: User.insert,
-      Result: User,
-      execute: (data) =>
-        db.drizzle((drizzle) =>
-          drizzle
-            .insert(schema.usersTable)
-            .values(data)
-            .returning()
-            .execute()
-        ),
-    });
-
     const updateUser = SqlSchema.findOne({
       Request: Schema.Struct({
         id: User.fields.id,
@@ -67,10 +54,6 @@ export const UserRepositoryLayer = Layer.effect(
     });
 
     return {
-      insert: (data) =>
-        insertUser(data).pipe(
-          Effect.mapError((e) => new RepositoryError({ cause: e }))
-        ),
       update: (params) =>
         updateUser(params).pipe(
           Effect.mapError((e) => new RepositoryError({ cause: e }))

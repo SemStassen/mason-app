@@ -6,17 +6,19 @@ import { describe, expect, it, vi } from "vitest";
 import * as schema from "../src/schema";
 
 const mockState = vi.hoisted(() => ({
-  execute: vi.fn(() => Promise.resolve([{ createdAt: "2026-01-01" }])),
-  transaction: vi.fn(
-    (run: (tx: unknown) => Promise<unknown>) =>
-      run({
-        select: () => ({
-          from: () => ({
-            execute: mockState.execute,
-          }),
+  rootExecute: vi.fn(() => Promise.resolve([{ createdAt: "2026-01-01" }])),
+  transactionExecute: vi.fn(() =>
+    Promise.resolve([{ createdAt: "2026-01-02" }])
+  ),
+  transaction: vi.fn((run: (tx: unknown) => Promise<unknown>) =>
+    run({
+      select: () => ({
+        from: () => ({
+          execute: mockState.transactionExecute,
         }),
-        transaction: mockState.transaction,
-      })
+      }),
+      transaction: mockState.transaction,
+    })
   ),
 }));
 
@@ -32,7 +34,7 @@ vi.mock("drizzle-orm/node-postgres", () => ({
   drizzle: vi.fn(() => ({
     select: () => ({
       from: () => ({
-        execute: mockState.execute,
+        execute: mockState.rootExecute,
       }),
     }),
     transaction: mockState.transaction,
@@ -44,7 +46,10 @@ vi.mock("../src/relations", () => ({
 }));
 
 describe("database layer", () => {
-  it("executes plain drizzle queries through db.drizzle", async () => {
+  it("executes effect-based callbacks through db.drizzle", async () => {
+    mockState.rootExecute.mockClear();
+    mockState.transactionExecute.mockClear();
+    mockState.transaction.mockClear();
     process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
 
     const { DatabaseLayer } = await import("../src/database.layer");
@@ -61,10 +66,14 @@ describe("database layer", () => {
     );
 
     expect(result).toStrictEqual([{ createdAt: "2026-01-01" }]);
-    expect(mockState.execute).toHaveBeenCalledOnce();
+    expect(mockState.rootExecute).toHaveBeenCalledOnce();
+    expect(mockState.transactionExecute).not.toHaveBeenCalled();
   });
 
-  it("executes effect-based callbacks through db.drizzle", async () => {
+  it("executes plain drizzle queries through db.drizzle", async () => {
+    mockState.rootExecute.mockClear();
+    mockState.transactionExecute.mockClear();
+    mockState.transaction.mockClear();
     process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
 
     const { DatabaseLayer } = await import("../src/database.layer");
@@ -84,15 +93,20 @@ describe("database layer", () => {
     );
 
     expect(result).toStrictEqual([{ createdAt: "2026-01-01" }]);
+    expect(mockState.rootExecute).toHaveBeenCalledOnce();
+    expect(mockState.transactionExecute).not.toHaveBeenCalled();
   });
 
-  it("uses drizzle transaction for withTransaction", async () => {
+  it("uses the transaction connection for db.drizzle inside withTransaction", async () => {
+    mockState.rootExecute.mockClear();
+    mockState.transactionExecute.mockClear();
+    mockState.transaction.mockClear();
     process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
 
     const { DatabaseLayer } = await import("../src/database.layer");
     const { Database } = await import("../src/database.service");
 
-    await Effect.runPromise(
+    const result = await Effect.runPromise(
       Effect.gen(function* () {
         const db = yield* Database;
 
@@ -104,6 +118,38 @@ describe("database layer", () => {
       }).pipe(Effect.provide(DatabaseLayer))
     );
 
+    expect(result).toStrictEqual([{ createdAt: "2026-01-02" }]);
     expect(mockState.transaction).toHaveBeenCalledOnce();
+    expect(mockState.transactionExecute).toHaveBeenCalledOnce();
+    expect(mockState.rootExecute).not.toHaveBeenCalled();
+  });
+
+  it("keeps unsafeDrizzle bound to the root connection", async () => {
+    mockState.rootExecute.mockClear();
+    mockState.transactionExecute.mockClear();
+    mockState.transaction.mockClear();
+    process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
+
+    const { DatabaseLayer } = await import("../src/database.layer");
+    const { Database } = await import("../src/database.service");
+
+    const result = await Effect.runPromise(
+      Effect.gen(function* () {
+        const db = yield* Database;
+
+        return yield* db.withTransaction(
+          Effect.tryPromise({
+            try: () =>
+              db.unsafeDrizzle.select().from(schema.workspacesTable).execute(),
+            catch: (cause) => cause,
+          })
+        );
+      }).pipe(Effect.provide(DatabaseLayer))
+    );
+
+    expect(result).toStrictEqual([{ createdAt: "2026-01-01" }]);
+    expect(mockState.transaction).toHaveBeenCalledOnce();
+    expect(mockState.rootExecute).toHaveBeenCalledOnce();
+    expect(mockState.transactionExecute).not.toHaveBeenCalled();
   });
 });

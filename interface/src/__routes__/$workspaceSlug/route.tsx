@@ -11,6 +11,7 @@ import {
   AppCommandsDialog,
   useRegisterCommands,
 } from "~/components/app-commands-dialog";
+import { getPgliteInstance, startFeatureSync } from "~/db";
 
 import { DebugSheet } from "./-components/debug-sheet";
 import { WorkspaceProviders } from "./-components/workspace-providers";
@@ -23,8 +24,42 @@ export const Route = createFileRoute("/$workspaceSlug")({
     }
     return { user: context.user };
   },
+  loader: async ({ location }) => {
+    const db = getPgliteInstance();
+    const workspaceSlug = location.pathname
+      .split("/")
+      .find((part) => part.length > 0);
+
+    if (!workspaceSlug) {
+      throw notFound();
+    }
+
+    const workspaceResult = await db.query<{ id: string }>(
+      `SELECT id FROM workspaces WHERE slug = $1 LIMIT 1`,
+      [workspaceSlug]
+    );
+
+    const workspaceId = workspaceResult.rows.at(0)?.id;
+
+    if (!workspaceId) {
+      throw notFound();
+    }
+
+    await startFeatureSync(db, { workspaceId });
+  },
+  pendingComponent: WorkspaceLoadingScreen,
   component: Layout,
 });
+
+function WorkspaceLoadingScreen() {
+  return (
+    <div className="grid h-screen w-screen place-content-center bg-background px-8 text-foreground">
+      <p className="text-sm text-muted-foreground" role="status">
+        Loading workspace…
+      </p>
+    </div>
+  );
+}
 
 function Layout() {
   const navigate = useNavigate();

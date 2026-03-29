@@ -3,7 +3,7 @@ import { WorkspaceIntegrationResponse } from "@mason/api-contract/dto/workspace-
 import type { CreateWorkspaceIntegrationRequest } from "@mason/api-contract/dto/workspace-integration.dto";
 import { Effect } from "effect";
 
-import { MasonAtomClient, MasonClient } from "~/lib/rpc/client";
+import { MasonAtomClient, MasonClient } from "~/lib/rpc/atom-client";
 
 const workspaceIntegrationsAtomReadonly = MasonAtomClient.query(
   "WorkspaceIntegration",

@@ -5,11 +5,12 @@ import type {
 import { TimeModule } from "@mason/core/modules/time";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+
 import { Authorization } from "#shared/authorization/index";
 
 export const deleteTimeEntryFlow = Effect.fn("flows.deleteTimeEntryFlow")(
   function* (request: typeof DeleteTimeEntryCommand.Type) {
-    const { member, workspace } = yield* WorkspaceContext;
+    const { workspaceMember, workspace } = yield* WorkspaceContext;
 
     const authz = yield* Authorization;
 
@@ -17,7 +18,7 @@ export const deleteTimeEntryFlow = Effect.fn("flows.deleteTimeEntryFlow")(
 
     yield* authz.ensureAllowed({
       action: "time:delete_time_entry",
-      role: member.role,
+      role: workspaceMember.role,
     });
 
     yield* timeModule.hardDeleteTimeEntries({

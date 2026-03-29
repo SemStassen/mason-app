@@ -1,25 +1,31 @@
 import {
+  SessionNotFoundError,
   SessionRepository,
+  UserNotFoundError,
   UserRepository,
 } from "@mason/core/modules/identity";
-import { WorkspaceRepository } from "@mason/core/modules/workspace";
-import { WorkspaceMemberRepository } from "@mason/core/modules/workspace-member";
+import {
+  WorkspaceRepository,
+  WorkspaceNotFoundError,
+} from "@mason/core/modules/workspace";
+import {
+  WorkspaceMemberRepository,
+  WorkspaceMemberNotFoundError,
+} from "@mason/core/modules/workspace-member";
 import type {
   SessionContextShape,
   WorkspaceContextShape,
 } from "@mason/core/shared/auth";
+import type { RepositoryError } from "@mason/core/shared/repository";
+import type { WorkspaceId } from "@mason/core/shared/schemas";
 import { SessionId, UserId } from "@mason/core/shared/schemas";
 import { Effect, Layer, Schema, ServiceMap, Option } from "effect";
 
+import type { BetterAuthError } from "./better-auth";
 import { BetterAuth } from "./better-auth";
 
-export class UnauthenticatedError extends Schema.TaggedErrorClass<UnauthenticatedError>()(
-  "auth/UnauthenticatedError",
-  {}
-) {}
-
-export class WorkspaceAccessDeniedError extends Schema.TaggedErrorClass<WorkspaceAccessDeniedError>()(
-  "auth/WorkspaceAccessDeniedError",
+export class InvalidSessionError extends Schema.TaggedErrorClass<InvalidSessionError>()(
+  "auth/InvalidSessionError",
   {}
 ) {}
 
@@ -28,10 +34,21 @@ export class RequestContextResolver extends ServiceMap.Service<
   {
     resolveSessionContext: (params: {
       headers: Readonly<Record<string, string | undefined>>;
-    }) => Effect.Effect<SessionContextShape, UnauthenticatedError>;
+    }) => Effect.Effect<
+      SessionContextShape,
+      | InvalidSessionError
+      | BetterAuthError
+      | SessionNotFoundError
+      | UserNotFoundError
+      | RepositoryError
+    >;
     resolveWorkspaceContext: (params: {
-      sessionContext: SessionContextShape;
-    }) => Effect.Effect<WorkspaceContextShape, WorkspaceAccessDeniedError>;
+      userId: UserId;
+      workspaceId: WorkspaceId;
+    }) => Effect.Effect<
+      WorkspaceContextShape,
+      WorkspaceNotFoundError | WorkspaceMemberNotFoundError | RepositoryError
+    >;
   }
 >()("@mason/auth/RequestContextResolver") {
   static readonly layer = Layer.effect(
@@ -54,12 +71,12 @@ export class RequestContextResolver extends ServiceMap.Service<
             }
           }
 
-          const authSession = yield* betterAuth
-            .use((client) => client.api.getSession({ headers }))
-            .pipe(Effect.mapError(() => new UnauthenticatedError()));
+          const authSession = yield* betterAuth.use((client) =>
+            client.api.getSession({ headers })
+          );
 
           if (authSession === null) {
-            return yield* new UnauthenticatedError();
+            return yield* new InvalidSessionError();
           }
 
           const [sessionId, userId] = yield* Effect.all(
@@ -68,62 +85,84 @@ export class RequestContextResolver extends ServiceMap.Service<
               Schema.decodeUnknownEffect(UserId)(authSession.user.id),
             ],
             { concurrency: "unbounded" }
-          ).pipe(Effect.mapError(() => new UnauthenticatedError()));
+          ).pipe(Effect.mapError(() => new InvalidSessionError()));
 
-          const [maybeSession, maybeUser] = yield* Effect.all(
-            [
-              sessionRepository.findById(sessionId),
-              userRepository.findById(userId),
-            ],
+          const { session, user } = yield* Effect.all(
+            {
+              maybeSession: sessionRepository.findById(sessionId),
+              maybeUser: userRepository.findById(userId),
+            },
             { concurrency: "unbounded" }
           ).pipe(
-            Effect.catchTag("RepositoryError", () =>
-              Effect.fail(new UnauthenticatedError())
+            Effect.flatMap(({ maybeSession, maybeUser }) =>
+              Effect.all({
+                session: Option.match(maybeSession, {
+                  onNone: () =>
+                    Effect.fail(
+                      new SessionNotFoundError({
+                        sessionId: sessionId,
+                      })
+                    ),
+                  onSome: Effect.succeed,
+                }),
+                user: Option.match(maybeUser, {
+                  onNone: () =>
+                    Effect.fail(
+                      new UserNotFoundError({
+                        userId: userId,
+                      })
+                    ),
+                  onSome: Effect.succeed,
+                }),
+              })
             )
           );
 
-          if (Option.isNone(maybeSession) || Option.isNone(maybeUser)) {
-            return yield* new UnauthenticatedError();
-          }
-
           return {
-            session: maybeSession.value,
-            user: maybeUser.value,
+            session,
+            user,
           };
         }),
         resolveWorkspaceContext: Effect.fn(
           "RequestContextResolver.resolveWorkspaceContext"
         )(function* (params) {
-          const workspaceId = yield* Option.match(
-            params.sessionContext.session.activeWorkspaceId,
+          // Queries run in parallel for performance, but option checks are sequential
+          // so WorkspaceNotFoundError always surfaces before WorkspaceMemberNotFoundError
+          const { maybeWorkspace, maybeWorkspaceMember } = yield* Effect.all(
             {
-              onNone: () => Effect.fail(new WorkspaceAccessDeniedError()),
-              onSome: Effect.succeed,
-            }
-          );
-
-          const [maybeWorkspace, maybeMember] = yield* Effect.all(
-            [
-              workspaceRepository.findById(workspaceId),
-              workspaceMemberRepository.findMembership({
-                workspaceId,
-                userId: params.sessionContext.user.id,
+              maybeWorkspace: workspaceRepository.findById(params.workspaceId),
+              maybeWorkspaceMember: workspaceMemberRepository.findMembership({
+                workspaceId: params.workspaceId,
+                userId: params.userId,
               }),
-            ],
+            },
             { concurrency: "unbounded" }
-          ).pipe(
-            Effect.catchTag("RepositoryError", () =>
-              Effect.fail(new WorkspaceAccessDeniedError())
-            )
           );
 
-          if (Option.isNone(maybeWorkspace) || Option.isNone(maybeMember)) {
-            return yield* new WorkspaceAccessDeniedError();
-          }
+          const workspace = yield* Option.match(maybeWorkspace, {
+            onNone: () =>
+              Effect.fail(
+                new WorkspaceNotFoundError({ workspaceId: params.workspaceId })
+              ),
+            onSome: Effect.succeed,
+          });
+
+          const workspaceMember = yield* Option.match(maybeWorkspaceMember, {
+            onNone: () =>
+              Effect.fail(
+                new WorkspaceMemberNotFoundError({
+                  lookup: {
+                    workspaceId: params.workspaceId,
+                    userId: params.userId,
+                  },
+                })
+              ),
+            onSome: Effect.succeed,
+          });
 
           return {
-            workspace: maybeWorkspace.value,
-            member: maybeMember.value,
+            workspace,
+            workspaceMember,
           };
         }),
       };

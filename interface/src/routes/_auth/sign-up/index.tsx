@@ -7,6 +7,7 @@ import type React from "react";
 import { useState } from "react";
 
 import { betterAuthClient } from "~/lib/better-auth";
+import { m } from "~/paraglide/messages";
 
 import { EnterEmailStep } from "./-components/enter-email-step";
 import { VerifyEmailStep } from "./-components/verify-email-step";
@@ -32,15 +33,15 @@ function SignUpPage() {
       <>
         <div className="space-y-6">
           <h1 className="text-center font-medium text-2xl">
-            Create your workspace
+            {m.auth_signUp_chooseMethod_heading()}
           </h1>
           <Button className="w-full" onClick={handleGoogleSignUp} size="lg">
             <Icons.Google />
-            Continue with Google
+            {m.auth_signUp_chooseMethod_google()}
           </Button>
           <Separator className="relative">
             <div className="-translate-x-1/2 -translate-y-1/2 -top-full absolute left-1/2 bg-background px-2">
-              or
+              {m.common_or()}
             </div>
           </Separator>
           <div className="space-y-4">
@@ -51,16 +52,16 @@ function SignUpPage() {
               variant="outline"
             >
               <Icons.Mail />
-              Continue with Email
+              {m.auth_signUp_chooseMethod_email()}
             </Button>
           </div>
         </div>
         <div className="text-sm">
           <span className="text-muted-foreground">
-            Already have an account?{" "}
+            {m.auth_signUp_chooseMethod_alreadyHaveAccount()}{" "}
           </span>
           <Link className="inline-flex items-center gap-0.5" to="/sign-in">
-            Sign in <Icons.ArrowRight />
+            {m.auth_signUp_chooseMethod_signIn()} <Icons.ArrowRight />
           </Link>
         </div>
       </>

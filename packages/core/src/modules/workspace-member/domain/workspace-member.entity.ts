@@ -16,10 +16,8 @@ export class WorkspaceMember extends Model.Class<WorkspaceMember>(
     id: Model.ServerImmutable(WorkspaceMemberId),
     workspaceId: Model.ServerImmutable(WorkspaceId),
     userId: Model.ServerImmutable(UserId),
-    displayName: Model.ServerMutableClientMutable(
-      NonEmptyTrimmedString.check(Schema.isMaxLength(100))
-    ),
-    role: Model.ServerMutableClientMutable(WorkspaceRole),
+    displayName: Model.ServerMutableClientMutable(NonEmptyTrimmedString),
+    role: Model.ServerMutable(WorkspaceRole),
     imageUrl: Model.ServerMutableClientMutableOptional(NonEmptyTrimmedString),
     deletedAt: Model.ServerMutableOptional(Schema.DateTimeUtcFromDate),
   },

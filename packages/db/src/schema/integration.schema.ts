@@ -1,8 +1,10 @@
 import { jsonb, pgTable, unique, uuid, varchar } from "drizzle-orm/pg-core";
+
 import { tableId, tableMetadata } from "#utils/snippets";
+
 import { projectsTable, tasksTable } from "./project.schema";
-import { workspacesTable } from "./workspace.schema";
 import { workspaceMembersTable } from "./workspace-member.schema";
+import { workspacesTable } from "./workspace.schema";
 
 export const workspaceIntegrationsTable = pgTable(
   "workspace_integrations",

@@ -1,13 +1,6 @@
-import { Button } from "@mason/ui/button";
-import { Icons } from "@mason/ui/icons";
-import {
-  createFileRoute,
-  Link,
-  notFound,
-  Outlet,
-} from "@tanstack/react-router";
+import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_onboarding")({
+export const Route = createFileRoute("/_app/_onboarding")({
   beforeLoad: ({ context }) => {
     if (!("user" in context) || !("session" in context)) {
       throw notFound();

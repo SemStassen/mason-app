@@ -6,9 +6,8 @@ import { IdentityModule } from "@mason/core/modules/identity";
 import { WorkspaceModule } from "@mason/core/modules/workspace";
 import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
 import { SessionContext } from "@mason/core/shared/auth";
-import { Effect, Option } from "effect";
-
 import { Database } from "@mason/db";
+import { Effect, Option } from "effect";
 
 export const createWorkspaceFlow = Effect.fn("flows.createWorkspaceFlow")(
   function* (request: typeof CreateWorkspaceCommand.Type) {
@@ -29,6 +28,9 @@ export const createWorkspaceFlow = Effect.fn("flows.createWorkspaceFlow")(
             workspaceId: workspace.id,
             userId: user.id,
             role: "owner",
+            data: {
+              displayName: user.fullName,
+            },
           })
           .pipe(
             Effect.catchTags({
@@ -39,7 +41,7 @@ export const createWorkspaceFlow = Effect.fn("flows.createWorkspaceFlow")(
             })
           );
 
-        yield* identityModule.setActiveWorkspace({
+        yield* identityModule.setLastActiveWorkspace({
           workspaceId: Option.some(workspace.id),
           sessionId: session.id,
         });

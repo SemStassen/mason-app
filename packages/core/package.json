@@ -28,6 +28,7 @@
     "./http": "./src/api/http/index.ts",
     "./rpc": "./src/api/rpc/index.ts",
     "./modules/*": "./src/modules/*/index.ts",
-    "./shared/*": "./src/shared/*/index.ts"
+    "./shared/*": "./src/shared/*/index.ts",
+    "./shared/headers": "./src/shared/headers.ts"
   }
 }

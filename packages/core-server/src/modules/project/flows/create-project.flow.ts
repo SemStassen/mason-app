@@ -5,11 +5,12 @@ import type {
 import { ProjectModule } from "@mason/core/modules/project";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+
 import { Authorization } from "#shared/authorization/index";
 
 export const createProjectFlow = Effect.fn("flows.createProjectFlow")(
   function* (request: typeof CreateProjectCommand.Type) {
-    const { member, workspace } = yield* WorkspaceContext;
+    const { workspaceMember, workspace } = yield* WorkspaceContext;
 
     const authz = yield* Authorization;
 
@@ -17,7 +18,7 @@ export const createProjectFlow = Effect.fn("flows.createProjectFlow")(
 
     yield* authz.ensureAllowed({
       action: "project:create",
-      role: member.role,
+      role: workspaceMember.role,
     });
 
     const [createdProject] = yield* projectModule.createProjects({

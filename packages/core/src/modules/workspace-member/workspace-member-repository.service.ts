@@ -22,6 +22,9 @@ export interface WorkspaceMemberRepositoryShape {
     workspaceId: WorkspaceMember["workspaceId"];
     userId: WorkspaceMember["userId"];
   }) => Effect.Effect<Option.Option<WorkspaceMember>, RepositoryError>;
+  readonly listByUserId: (
+    userId: WorkspaceMember["userId"]
+  ) => Effect.Effect<ReadonlyArray<WorkspaceMember>, RepositoryError>;
 }
 
 export class WorkspaceMemberRepository extends ServiceMap.Service<

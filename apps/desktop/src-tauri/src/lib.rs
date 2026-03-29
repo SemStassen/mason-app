@@ -18,6 +18,7 @@ pub fn run() {
 
     // Build and run Tauri app
     tauri::Builder::default()
+        .plugin(tauri_plugin_stronghold::Builder::new(|pass| todo!()).build())
         // The single_instance plugin should always be first
         .plugin(tauri_plugin_single_instance::init(|_app, argv, _cwd| {
             println!("a new app instance was opened with {argv:?} and the deep link event was already triggered");

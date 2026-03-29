@@ -8,7 +8,7 @@ import {
   deleteWorkspaceIntegrationAtom,
   workspaceIntegrationsAtom,
 } from "~/atoms/api";
-import { MasonAtomClient } from "~/lib/rpc/client";
+import { MasonAtomClient } from "~/lib/rpc/atom-client";
 import { formatter } from "~/lib/utils/date-time";
 
 import { CreateWorkspaceIntegrationForm } from "../-components/create-workspace-integration-form";

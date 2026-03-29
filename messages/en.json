@@ -1,5 +1,6 @@
   {
     "$schema": "https://inlang.com/schema/inlang-message-format",
+    "common_or": "or",
     "error_notFound_title": "Not found",
     "error_notFound_description": "We could not find the page you were looking for.",
     "error_unexpected_title": "Something went wrong",
@@ -7,6 +8,11 @@
     "action_cancel": "Cancel",
     "action_tryAgain": "Try again",
     "auth_signUp_back": "Back to login",
+    "auth_signUp_chooseMethod_heading": "Create your workspace",
+    "auth_signUp_chooseMethod_google": "Continue with Google",
+    "auth_signUp_chooseMethod_email": "Continue with Email",
+    "auth_signUp_chooseMethod_alreadyHaveAccount": "Already have an account?",
+    "auth_signUp_chooseMethod_signIn": "Sign in",
     "auth_signUp_enterEmail_heading": "What's your email address?",
     "auth_signUp_enterEmail_email_label": "Email",
     "auth_signUp_enterEmail_email_placeholder": "Enter your email address",

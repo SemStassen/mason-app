@@ -5,11 +5,12 @@ import type {
 import { ProjectModule } from "@mason/core/modules/project";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+
 import { Authorization } from "#shared/authorization/index";
 
 export const archiveProjectFlow = Effect.fn("flows.archiveProjectFlow")(
   function* (request: typeof ArchiveProjectCommand.Type) {
-    const { member, workspace } = yield* WorkspaceContext;
+    const { workspaceMember, workspace } = yield* WorkspaceContext;
 
     const authz = yield* Authorization;
 
@@ -17,7 +18,7 @@ export const archiveProjectFlow = Effect.fn("flows.archiveProjectFlow")(
 
     yield* authz.ensureAllowed({
       action: "project:archive",
-      role: member.role,
+      role: workspaceMember.role,
     });
 
     yield* projectModule.archiveProject({

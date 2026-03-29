@@ -1,8 +1,10 @@
 import type { PropsWithChildren } from "react";
 
-import { db, PGliteProvider } from "~/db";
+import { getPgliteInstance, PGliteProvider } from "~/db";
 
 function WorkspaceProviders({ children }: PropsWithChildren) {
+  const db = getPgliteInstance();
+
   return <PGliteProvider db={db}>{children}</PGliteProvider>;
 }
 

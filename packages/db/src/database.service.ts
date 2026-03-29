@@ -17,13 +17,27 @@ export type TransactionDb = Parameters<
   Parameters<DrizzleDb["transaction"]>[0]
 >[0];
 
+export type ActiveConnection = DrizzleDb | TransactionDb;
+
+export type DrizzleCallbackResult<A, E, R = never> =
+  | Effect.Effect<A, E, R>
+  | Promise<A>;
+
 export interface DatabaseShape {
   /**
-   * Integration-only escape hatch to plain Drizzle.
+   * Integration-only escape hatch to the root Drizzle client.
+   *
+   * This bypasses fiber-local transaction context. Prefer `drizzle(...)` for
+   * application code that should participate in `withTransaction(...)`.
+   * Use this only for integrations that must talk directly to the root driver,
+   * such as Better Auth.
    */
   readonly unsafeDrizzle: DrizzleDb;
   /**
    * Preferred query entrypoint for application code.
+   *
+   * Resolves the active Drizzle connection for the current fiber, using either
+   * the root client or the innermost active transaction.
    *
    * TEMPORARY COMPATIBILITY:
    * This callback currently accepts either an Effect or a Promise result while
@@ -34,12 +48,14 @@ export interface DatabaseShape {
    * remove `Promise<A>` from this signature so `drizzle` is Effect-only.
    */
   readonly drizzle: <A, E, R = never>(
-    f: (
-      drizzle: DrizzleDb | TransactionDb
-    ) => Effect.Effect<A, E, R> | Promise<A>
+    f: (drizzle: ActiveConnection) => DrizzleCallbackResult<A, E, R>
   ) => Effect.Effect<A, E | DatabaseError, R>;
   /**
    * Run operations in a transaction.
+   *
+   * This swaps the active connection for the current fiber. Repositories may
+   * safely capture `Database` once and still participate in nested
+   * `withTransaction(...)` calls through `drizzle(...)`.
    *
    * **Error Handling:**
    * - If the effect fails with any error, the transaction is rolled back

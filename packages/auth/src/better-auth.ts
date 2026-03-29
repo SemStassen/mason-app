@@ -7,7 +7,7 @@ import { bearer, emailOTP } from "better-auth/plugins";
 import { Config, Effect, Layer, Schema, ServiceMap } from "effect";
 
 export class BetterAuthError extends Schema.TaggedErrorClass<BetterAuthError>()(
-  "shared/BetterAuthError",
+  "auth/BetterAuthError",
   {
     cause: Schema.Unknown,
   }
@@ -57,7 +57,7 @@ export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
           modelName: "usersTable",
           fields: {
             image: "imageUrl",
-            name: "displayName",
+            name: "fullName",
           },
         },
         session: {

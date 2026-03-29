@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
+import { devtools } from "@tanstack/devtools-vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
@@ -18,17 +19,7 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   server: {
-    port: 3000,
-    proxy: {
-      "/api": {
-        target: "http://localhost:3001",
-        changeOrigin: true,
-      },
-      "/rpc": {
-        target: "http://localhost:3001",
-        changeOrigin: true,
-      },
-    },
+    port: 8002,
   },
   optimizeDeps: {
     exclude: ["@electric-sql/pglite"],
@@ -40,6 +31,7 @@ export default defineConfig({
     __PLATFORM__: JSON.stringify("web"),
   },
   plugins: [
+    devtools(),
     paraglideVitePlugin({
       project: path.resolve(__dirname, "../../project.inlang"),
       outdir: path.resolve(__dirname, "../../interface/src/paraglide"),

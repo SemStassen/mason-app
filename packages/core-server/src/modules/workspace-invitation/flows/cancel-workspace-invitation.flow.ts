@@ -5,12 +5,13 @@ import type {
 import { WorkspaceInvitationModule } from "@mason/core/modules/workspace-invitation";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+
 import { Authorization } from "#shared/authorization/index";
 
 export const cancelWorkspaceInvitationFlow = Effect.fn(
   "flows.cancelWorkspaceInvitationFlow"
 )(function* (request: typeof CancelWorkspaceInvitationCommand.Type) {
-  const { member, workspace } = yield* WorkspaceContext;
+  const { workspaceMember, workspace } = yield* WorkspaceContext;
 
   const authz = yield* Authorization;
 
@@ -18,7 +19,7 @@ export const cancelWorkspaceInvitationFlow = Effect.fn(
 
   yield* authz.ensureAllowed({
     action: "workspace:cancel_invite",
-    role: member.role,
+    role: workspaceMember.role,
   });
 
   yield* workspaceInvitationModule.cancelWorkspaceInvitation({

@@ -1,7 +1,8 @@
 import { Layer, ManagedRuntime } from "effect";
+import { Atom } from "effect/unstable/reactivity";
 
 import { MasonApiClient } from "./api/client";
-import { MasonAtomRpcClient } from "./rpc/client";
+import { MasonAtomRpcClient } from "./rpc/atom-client";
 import { TracerLayer } from "./telemetry";
 
 export const runtimeLayer = Layer.mergeAll(
@@ -21,4 +22,6 @@ export const runtimeLayer = Layer.mergeAll(
  *
  * Used by collections.ts and other imperative code that calls runtime.runPromise().
  */
-export const runtime = ManagedRuntime.make(runtimeLayer);
+export const runtime = ManagedRuntime.make(runtimeLayer, {
+  memoMap: Atom.defaultMemoMap,
+});

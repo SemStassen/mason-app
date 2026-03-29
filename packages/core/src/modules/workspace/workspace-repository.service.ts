@@ -19,6 +19,9 @@ export interface WorkspaceRepositoryShape {
   readonly findBySlug: (
     slug: Workspace["slug"]
   ) => Effect.Effect<Option.Option<Workspace>, RepositoryError>;
+  readonly listByIds: (
+    ids: ReadonlyArray<Workspace["id"]>
+  ) => Effect.Effect<ReadonlyArray<Workspace>, RepositoryError>;
 }
 
 export class WorkspaceRepository extends ServiceMap.Service<

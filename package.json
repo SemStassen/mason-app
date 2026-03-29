@@ -22,13 +22,13 @@
       "packages/*"
     ],
     "catalog": {
-      "@effect/atom-react": "^4.0.0-beta.35",
-      "@effect/opentelemetry": "^4.0.0-beta.35",
-      "@effect/platform-bun": "^4.0.0-beta.35",
-      "@effect/sql-pg": "^4.0.0-beta.35",
+      "@effect/atom-react": "^4.0.0-beta.40",
+      "@effect/opentelemetry": "^4.0.0-beta.40",
+      "@effect/platform-bun": "^4.0.0-beta.40",
+      "@effect/sql-pg": "^4.0.0-beta.40",
       "better-auth": "^1.5.6",
       "drizzle-orm": "1.0.0-beta.18-7eb39f0",
-      "effect": "^4.0.0-beta.35",
+      "effect": "^4.0.0-beta.40",
       "uuid": "^13.0.0"
     },
     "catalogs": {

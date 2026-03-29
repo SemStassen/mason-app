@@ -38,7 +38,7 @@ export const createProject = (params: {
   Result.gen(function* () {
     const { id, ...rest } = params.data;
 
-    const project = Project.make({
+    const project = Project.makeUnsafe({
       id: Option.getOrElse(id, () => ProjectId.makeUnsafe(generateUUID())),
       workspaceId: params.workspaceId,
       archivedAt: Option.none(),
@@ -63,7 +63,7 @@ export const updateProject = (params: {
   Result.gen(function* () {
     yield* ensureProjectNotArchived(params.project);
 
-    const updatedProject = Project.make({
+    const updatedProject = Project.makeUnsafe({
       ...params.project,
       ...params.data,
     });

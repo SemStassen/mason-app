@@ -6,7 +6,9 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
 import { tableArchive, tableId, tableMetadata } from "#utils/snippets";
+
 import { workspacesTable } from "./workspace.schema";
 
 export const projectsTable = pgTable("projects", {

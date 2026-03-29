@@ -2,9 +2,8 @@ import { Schema, ServiceMap } from "effect";
 import type { Effect } from "effect";
 
 import type { RepositoryError } from "#shared/repository/index";
-import { WorkspaceId } from "#shared/schemas/index";
 
-import type { Workspace } from "./domain/workspace.entity";
+import { Workspace } from "./domain/workspace.entity";
 
 export class WorkspaceSlugAlreadyExistsError extends Schema.TaggedErrorClass<WorkspaceSlugAlreadyExistsError>()(
   "workspace/WorkspaceSlugAlreadyExistsError",
@@ -17,7 +16,7 @@ export class WorkspaceSlugAlreadyExistsError extends Schema.TaggedErrorClass<Wor
 export class WorkspaceNotFoundError extends Schema.TaggedErrorClass<WorkspaceNotFoundError>()(
   "workspace/WorkspaceNotFoundError",
   {
-    workspaceId: WorkspaceId,
+    workspaceId: Workspace.fields.id,
   },
   {
     httpApiStatus: 404,
@@ -41,6 +40,9 @@ interface WorkspaceModuleShape {
   readonly checkWorkspaceSlugAvailability: (
     slug: Workspace["slug"]
   ) => Effect.Effect<boolean, RepositoryError>;
+  readonly listWorkspacesByIds: (
+    ids: ReadonlyArray<Workspace["id"]>
+  ) => Effect.Effect<ReadonlyArray<Workspace>, RepositoryError>;
 }
 
 export class WorkspaceModule extends ServiceMap.Service<

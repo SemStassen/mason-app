@@ -5,11 +5,12 @@ import type {
 import { TimeModule } from "@mason/core/modules/time";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+
 import { Authorization } from "#shared/authorization/index";
 
 export const createTimeEntryFlow = Effect.fn("flows.createTimeEntryFlow")(
   function* (request: typeof CreateTimeEntryCommand.Type) {
-    const { member, workspace } = yield* WorkspaceContext;
+    const { workspaceMember, workspace } = yield* WorkspaceContext;
 
     const authz = yield* Authorization;
 
@@ -17,12 +18,12 @@ export const createTimeEntryFlow = Effect.fn("flows.createTimeEntryFlow")(
 
     yield* authz.ensureAllowed({
       action: "time:create_time_entry",
-      role: member.role,
+      role: workspaceMember.role,
     });
 
     const [createdTimeEntry] = yield* timeModule.createTimeEntries({
       workspaceId: workspace.id,
-      workspaceMemberId: member.id,
+      workspaceMemberId: workspaceMember.id,
       data: [request],
     });
 

@@ -15,7 +15,7 @@ export const createWorkspaceInvitationFlow = Effect.fn(
   "flows.createWorkspaceInvitationFlow"
 )(function* (request: typeof CreateWorkspaceInvitationCommand.Type) {
   const { user } = yield* SessionContext;
-  const { member, workspace } = yield* WorkspaceContext;
+  const { workspaceMember, workspace } = yield* WorkspaceContext;
 
   const authz = yield* Authorization;
   const mailer = yield* Mailer;
@@ -26,7 +26,7 @@ export const createWorkspaceInvitationFlow = Effect.fn(
 
   yield* authz.ensureAllowed({
     action: "workspace:invite_user",
-    role: member.role,
+    role: workspaceMember.role,
   });
 
   /** Assert that the user is not already a member of the workspace */
@@ -46,14 +46,14 @@ export const createWorkspaceInvitationFlow = Effect.fn(
   const createdWorkspaceInvitation =
     yield* workspaceInvitationModule.createOrRenewPendingWorkspaceInvitation({
       workspaceId: workspace.id,
-      inviterId: member.id,
+      inviterId: workspaceMember.id,
       data: request,
     });
 
   yield* mailer.sendWorkspaceInvitation({
     email: request.email,
     workspace: workspace,
-    inviterName: user.displayName,
+    inviterName: user.fullName,
     invitationId: createdWorkspaceInvitation.id,
   });
 

@@ -77,6 +77,13 @@ export const WorkspaceModuleLayer = Layer.effect(
 
         return Option.isNone(maybeWorkspace);
       }),
+      listWorkspacesByIds: Effect.fn("workspace.listWorkspacesByIds")(
+        function* (ids) {
+          const workspaces = yield* workspaceRepo.listByIds(ids);
+
+          return workspaces;
+        }
+      ),
     };
   })
 );

@@ -5,7 +5,7 @@ export class Session extends Model.Class<Session>("Session")(
   {
     id: Model.ServerImmutable(SessionId),
     userId: Model.ServerImmutable(UserId),
-    activeWorkspaceId: Model.ServerMutableOptional(WorkspaceId),
+    lastActiveWorkspaceId: Model.ServerMutableOptional(WorkspaceId),
   },
   {
     identifier: "Session",

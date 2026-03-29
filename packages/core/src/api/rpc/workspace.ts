@@ -7,20 +7,19 @@ import {
   CheckWorkspaceSlugIsUniqueResult,
   CreateWorkspaceCommand,
   CreateWorkspaceResult,
-  SetActiveWorkspaceCommand,
-  SetActiveWorkspaceResult,
+  ListWorkspacesCommand,
+  ListWorkspacesResult,
   UpdateWorkspaceCommand,
   UpdateWorkspaceResult,
 } from "#api/contracts/index";
 import { SessionNotFoundError } from "#modules/identity/identity-module.service";
-import { WorkspaceMemberNotFoundError } from "#modules/workspace-member/index";
 import {
   WorkspaceNotFoundError,
   WorkspaceSlugAlreadyExistsError,
 } from "#modules/workspace/index";
 import { AuthorizationError } from "#shared/authorization/index";
 
-import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
+import { RpcSessionMiddleware, RpcWorkspaceMiddleware } from "./middleware";
 
 export const WorkspaceRpcGroup = RpcGroup.make(
   Rpc.make("Workspace.Create", {
@@ -31,7 +30,7 @@ export const WorkspaceRpcGroup = RpcGroup.make(
       SessionNotFoundError,
       HttpApiError.InternalServerError,
     ]),
-  }).middleware(SessionMiddleware),
+  }).middleware(RpcSessionMiddleware),
 
   Rpc.make("Workspace.Update", {
     payload: UpdateWorkspaceCommand,
@@ -43,21 +42,18 @@ export const WorkspaceRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware),
 
   Rpc.make("Workspace.CheckSlugIsUnique", {
     payload: CheckWorkspaceSlugIsUniqueCommand,
     success: CheckWorkspaceSlugIsUniqueResult,
     error: Schema.Union([HttpApiError.InternalServerError]),
-  }).middleware(SessionMiddleware),
+  }).middleware(RpcSessionMiddleware),
 
-  Rpc.make("Workspace.SetActive", {
-    payload: SetActiveWorkspaceCommand,
-    success: SetActiveWorkspaceResult,
-    error: Schema.Union([
-      WorkspaceMemberNotFoundError,
-      HttpApiError.InternalServerError,
-    ]),
-  }).middleware(SessionMiddleware)
+  Rpc.make("Workspace.List", {
+    payload: ListWorkspacesCommand,
+    success: ListWorkspacesResult,
+    error: Schema.Union([HttpApiError.InternalServerError]),
+  }).middleware(RpcSessionMiddleware)
 );

@@ -16,6 +16,7 @@
     "@mason/core-server": "workspace:*",
     "@mason/db": "workspace:*",
     "@mason/notifications": "workspace:*",
+    "@mason/observability": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

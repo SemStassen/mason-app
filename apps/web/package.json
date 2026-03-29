@@ -20,6 +20,7 @@
     "@mason/config": "workspace:*",
     "@rolldown/plugin-babel": "catalog:dev",
     "@tailwindcss/vite": "catalog:dev",
+    "@tanstack/devtools-vite": "^0.6.0",
     "@tanstack/router-plugin": "^1.167.2",
     "@types/react": "catalog:dev",
     "@types/react-dom": "catalog:dev",

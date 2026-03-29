@@ -5,11 +5,12 @@ import type {
 import { WorkspaceModule } from "@mason/core/modules/workspace";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+
 import { Authorization } from "#shared/authorization/index";
 
 export const updateWorkspaceFlow = Effect.fn("flows.updateWorkspaceFlow")(
   function* (request: typeof UpdateWorkspaceCommand.Type) {
-    const { member, workspace } = yield* WorkspaceContext;
+    const { workspaceMember, workspace } = yield* WorkspaceContext;
 
     const authz = yield* Authorization;
 
@@ -17,7 +18,7 @@ export const updateWorkspaceFlow = Effect.fn("flows.updateWorkspaceFlow")(
 
     yield* authz.ensureAllowed({
       action: "workspace:patch",
-      role: member.role,
+      role: workspaceMember.role,
     });
 
     const updatedWorkspace = yield* workspaceModule.updateWorkspace({

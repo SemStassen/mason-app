@@ -17,7 +17,7 @@ export const IdentityModuleLayer = Layer.effect(
     const userRepo = yield* UserRepository;
 
     return {
-      setActiveWorkspace: Effect.fn("identity.setActiveWorkspace")(
+      setLastActiveWorkspace: Effect.fn("identity.setLastActiveWorkspace")(
         function* (params) {
           const session = yield* sessionRepo.findById(params.sessionId).pipe(
             Effect.flatMap(
@@ -32,11 +32,9 @@ export const IdentityModuleLayer = Layer.effect(
           );
 
           const { entity, changes } = yield* Effect.fromResult(
-            sessionTransitions.updateSession({
+            sessionTransitions.updateSessionLastActiveWorkspace({
               session: session,
-              data: {
-                activeWorkspaceId: params.workspaceId,
-              },
+              lastActiveWorkspaceId: params.workspaceId,
             })
           );
 
@@ -48,15 +46,6 @@ export const IdentityModuleLayer = Layer.effect(
           return persistedSession;
         }
       ),
-      createUser: Effect.fn("identity.createUser")(function* (params) {
-        const user = yield* Effect.fromResult(
-          userTransitions.createUser(params)
-        );
-
-        const persistedUser = yield* userRepo.insert(user);
-
-        return persistedUser;
-      }),
       updateUser: Effect.fn("identity.updateUser")(function* (params) {
         const user = yield* userRepo.findById(params.userId).pipe(
           Effect.flatMap(

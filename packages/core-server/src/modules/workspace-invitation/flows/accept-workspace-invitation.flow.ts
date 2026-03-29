@@ -6,9 +6,8 @@ import { IdentityModule } from "@mason/core/modules/identity";
 import { WorkspaceInvitationModule } from "@mason/core/modules/workspace-invitation";
 import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
 import { SessionContext } from "@mason/core/shared/auth";
-import { Effect, Option } from "effect";
-
 import { Database } from "@mason/db";
+import { Effect, Option } from "effect";
 
 export const acceptWorkspaceInvitationFlow = Effect.fn(
   "flows.acceptWorkspaceInvitationFlow"
@@ -33,10 +32,13 @@ export const acceptWorkspaceInvitationFlow = Effect.fn(
         workspaceId: invitation.workspaceId,
         userId: user.id,
         role: invitation.role,
+        data: {
+          displayName: user.fullName,
+        },
       });
 
       yield* identityModule
-        .setActiveWorkspace({
+        .setLastActiveWorkspace({
           sessionId: session.id,
           workspaceId: Option.some(invitation.workspaceId),
         })

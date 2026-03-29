@@ -1,10 +1,10 @@
-import { SessionMiddleware } from "@mason/core/rpc";
+import { RpcSessionMiddleware } from "@mason/core/rpc";
 import { Effect } from "effect";
 import { Headers } from "effect/unstable/http";
 import { RpcMiddleware } from "effect/unstable/rpc";
 
-export const SessionMiddlewareLayerClient = RpcMiddleware.layerClient(
-  SessionMiddleware,
+export const RpcSessionMiddlewareLayerClient = RpcMiddleware.layerClient(
+  RpcSessionMiddleware,
   ({ request, next }) =>
     Effect.gen(function* () {
       const token = localStorage.getItem("access_token");
@@ -17,6 +17,10 @@ export const SessionMiddlewareLayerClient = RpcMiddleware.layerClient(
         );
         return yield* next({ ...request, headers: newHeaders });
       }
+
+      yield* Effect.logWarning(
+        "RpcSessionMiddlewareLayerClient: no access_token found, request will be unauthenticated"
+      );
 
       return yield* next(request);
     })

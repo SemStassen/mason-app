@@ -1,24 +1,33 @@
+import { Schema } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 import { RpcMiddleware } from "effect/unstable/rpc";
 
 import type { SessionContext, WorkspaceContext } from "#shared/auth/index";
 
-export class SessionMiddleware extends RpcMiddleware.Service<
-  SessionMiddleware,
+export class RpcSessionMiddleware extends RpcMiddleware.Service<
+  RpcSessionMiddleware,
   {
     provides: SessionContext;
   }
->()("@mason/core/rpc/SessionMiddleware", {
-  error: HttpApiError.Unauthorized,
+>()("@mason/core/RpcSessionMiddleware", {
+  error: Schema.Union([
+    HttpApiError.Unauthorized,
+    HttpApiError.InternalServerError,
+  ]),
   requiredForClient: true,
 }) {}
 
-export class WorkspaceMiddleware extends RpcMiddleware.Service<
-  WorkspaceMiddleware,
+export class RpcWorkspaceMiddleware extends RpcMiddleware.Service<
+  RpcWorkspaceMiddleware,
   {
     provides: WorkspaceContext;
+    requires: RpcSessionMiddleware;
   }
->()("@mason/core/rpc/WorkspaceMiddleware", {
-  error: HttpApiError.Forbidden,
+>()("@mason/core/RpcWorkspaceMiddleware", {
+  error: Schema.Union([
+    HttpApiError.Unauthorized,
+    HttpApiError.Forbidden,
+    HttpApiError.InternalServerError,
+  ]),
   requiredForClient: false,
 }) {}

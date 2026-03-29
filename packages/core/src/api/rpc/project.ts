@@ -19,7 +19,7 @@ import {
 } from "#modules/project/index";
 import { AuthorizationError } from "#shared/authorization/index";
 
-import { SessionMiddleware, WorkspaceMiddleware } from "./middleware";
+import { RpcSessionMiddleware, RpcWorkspaceMiddleware } from "./middleware";
 
 export const ProjectRpcGroup = RpcGroup.make(
   Rpc.make("Project.Create", {
@@ -31,8 +31,8 @@ export const ProjectRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware),
 
   Rpc.make("Project.Update", {
     payload: UpdateProjectCommand,
@@ -45,8 +45,8 @@ export const ProjectRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware),
 
   Rpc.make("Project.Archive", {
     payload: ArchiveProjectCommand,
@@ -57,8 +57,8 @@ export const ProjectRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware),
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware),
 
   Rpc.make("Project.Restore", {
     payload: RestoreProjectCommand,
@@ -69,6 +69,6 @@ export const ProjectRpcGroup = RpcGroup.make(
       HttpApiError.InternalServerError,
     ]),
   })
-    .middleware(SessionMiddleware)
-    .middleware(WorkspaceMiddleware)
+    .middleware(RpcSessionMiddleware)
+    .middleware(RpcWorkspaceMiddleware)
 );

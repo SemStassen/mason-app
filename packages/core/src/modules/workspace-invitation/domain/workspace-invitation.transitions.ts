@@ -20,7 +20,7 @@ export const createWorkspaceInvitation = (params: {
   now: DateTime.Utc;
 }): Result.Result<WorkspaceInvitation, never> =>
   Result.succeed(
-    WorkspaceInvitation.make({
+    WorkspaceInvitation.makeUnsafe({
       id: WorkspaceInvitationId.makeUnsafe(generateUUID()),
       workspaceId: params.workspaceId,
       inviterId: params.inviterId,
@@ -71,7 +71,7 @@ export const renewWorkspaceInvitation = (params: {
     const changes = { expiresAt: defaultExpiration(params.now) };
 
     return {
-      entity: WorkspaceInvitation.make({
+      entity: WorkspaceInvitation.makeUnsafe({
         ...params.workspaceInvitation,
         ...changes,
       }),
@@ -96,7 +96,7 @@ export const cancelWorkspaceInvitation = (params: {
     const changes = { status: "canceled" as const };
 
     return {
-      entity: WorkspaceInvitation.make({
+      entity: WorkspaceInvitation.makeUnsafe({
         ...params.workspaceInvitation,
         ...changes,
       }),
@@ -125,7 +125,7 @@ export const acceptWorkspaceInvitation = (params: {
     const changes = { status: "accepted" as const };
 
     return {
-      entity: WorkspaceInvitation.make({
+      entity: WorkspaceInvitation.makeUnsafe({
         ...params.workspaceInvitation,
         ...changes,
       }),
@@ -154,7 +154,7 @@ export const rejectWorkspaceInvitation = (params: {
     const changes = { status: "rejected" as const };
 
     return {
-      entity: WorkspaceInvitation.make({
+      entity: WorkspaceInvitation.makeUnsafe({
         ...params.workspaceInvitation,
         ...changes,
       }),

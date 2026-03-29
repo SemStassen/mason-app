@@ -1,4 +1,4 @@
-import { BunHttpServer, BunRuntime } from "@effect/platform-bun";
+import { BunHttpClient, BunHttpServer, BunRuntime } from "@effect/platform-bun";
 import { BetterAuth, RequestContextResolver } from "@mason/auth";
 import { CryptoLayer } from "@mason/core-server/infra/crypto";
 import {
@@ -30,6 +30,7 @@ import { WorkspaceInvitationModuleLayer } from "@mason/core/modules/workspace-in
 import { WorkspaceMemberModuleLayer } from "@mason/core/modules/workspace-member";
 import { DatabaseLayer } from "@mason/db";
 import { Mailer } from "@mason/notifications/mailer";
+import { makeObservabilityLayer } from "@mason/observability";
 import { Config, Layer } from "effect";
 import { HttpRouter } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
@@ -94,7 +95,11 @@ const AllRoutesLayer = Layer.mergeAll(
 ).pipe(
   Layer.provide(
     HttpRouter.cors({
-      allowedOrigins: ["tauri://localhost", "http://tauri.localhost"],
+      allowedOrigins: [
+        "tauri://localhost",
+        "http://tauri.localhost",
+        "http://localhost:8002",
+      ],
       allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
     })
@@ -103,8 +108,14 @@ const AllRoutesLayer = Layer.mergeAll(
 
 const MainLayer = ModulesLayer.pipe(Layer.provideMerge(InfraLayer));
 
+const ObservabilityLayer = makeObservabilityLayer({
+  serviceName: "mason-backend",
+});
+
 const ServerLayer = HttpRouter.serve(AllRoutesLayer).pipe(
   Layer.provide(MainLayer),
+  Layer.provide(ObservabilityLayer),
+  Layer.provide(BunHttpClient.layer),
   Layer.provide(
     BunHttpServer.layerConfig(
       Config.all({

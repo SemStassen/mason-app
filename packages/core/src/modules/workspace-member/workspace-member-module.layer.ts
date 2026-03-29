@@ -22,9 +22,10 @@ export const WorkspaceMemberModuleLayer = Layer.effect(
       workspaceId: WorkspaceMember["workspaceId"];
       userId: WorkspaceMember["userId"];
     }) {
-      const maybeMember = yield* workspaceMemberRepo.findMembership(params);
+      const maybeWorkspaceMember =
+        yield* workspaceMemberRepo.findMembership(params);
 
-      if (Option.isSome(maybeMember)) {
+      if (Option.isSome(maybeWorkspaceMember)) {
         return yield* new WorkspaceMemberAlreadyExistsError();
       }
     });
@@ -50,13 +51,27 @@ export const WorkspaceMemberModuleLayer = Layer.effect(
       assertUserWorkspaceMember: Effect.fn(
         "workspace-member.assertUserWorkspaceMember"
       )(function* (params: { workspaceId: WorkspaceId; userId: UserId }) {
-        const maybeMember = yield* workspaceMemberRepo.findMembership(params);
+        const maybeWorkspaceMember =
+          yield* workspaceMemberRepo.findMembership(params);
 
-        if (Option.isNone(maybeMember)) {
-          return yield* new WorkspaceMemberNotFoundError();
+        if (Option.isNone(maybeWorkspaceMember)) {
+          return yield* new WorkspaceMemberNotFoundError({
+            lookup: {
+              workspaceId: params.workspaceId,
+              userId: params.userId,
+            },
+          });
         }
       }),
       assertUserNotWorkspaceMember: assertUserNotWorkspaceMember,
+      listByUserId: Effect.fn("workspace-member.listByUserId")(
+        function* (userId) {
+          const workspaceMembers =
+            yield* workspaceMemberRepo.listByUserId(userId);
+
+          return workspaceMembers;
+        }
+      ),
     };
   })
 );

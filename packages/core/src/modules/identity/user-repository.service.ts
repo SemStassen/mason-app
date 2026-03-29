@@ -6,9 +6,6 @@ import type { RepositoryError } from "#shared/repository/index";
 import type { User } from "./domain/user.entity";
 
 export interface UserRepositoryShape {
-  readonly insert: (
-    data: typeof User.insert.Type
-  ) => Effect.Effect<User, RepositoryError>;
   readonly update: (params: {
     id: User["id"];
     update: typeof User.update.Type;

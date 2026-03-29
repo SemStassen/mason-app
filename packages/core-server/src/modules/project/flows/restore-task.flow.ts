@@ -5,12 +5,13 @@ import type {
 import { ProjectModule } from "@mason/core/modules/project";
 import { WorkspaceContext } from "@mason/core/shared/auth";
 import { Effect } from "effect";
+
 import { Authorization } from "#shared/authorization/index";
 
 export const restoreTaskFlow = Effect.fn("flows.restoreTaskFlow")(function* (
   request: typeof RestoreTaskCommand.Type
 ) {
-  const { member, workspace } = yield* WorkspaceContext;
+  const { workspaceMember, workspace } = yield* WorkspaceContext;
 
   const authz = yield* Authorization;
 
@@ -18,7 +19,7 @@ export const restoreTaskFlow = Effect.fn("flows.restoreTaskFlow")(function* (
 
   yield* authz.ensureAllowed({
     action: "project:restore_task",
-    role: member.role,
+    role: workspaceMember.role,
   });
 
   yield* projectModule.restoreTask({

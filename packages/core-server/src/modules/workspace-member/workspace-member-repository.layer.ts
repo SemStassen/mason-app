@@ -91,6 +91,19 @@ export const WorkspaceMemberRepositoryLayer = Layer.effect(
         ),
     });
 
+    const listWorkspaceMembersByUserId = SqlSchema.findAll({
+      Request: WorkspaceMember.fields.userId,
+      Result: WorkspaceMember,
+      execute: (userId) =>
+        db.drizzle((drizzle) =>
+          drizzle
+            .select()
+            .from(schema.workspaceMembersTable)
+            .where(eq(schema.workspaceMembersTable.userId, userId))
+            .execute()
+        ),
+    });
+
     return {
       insert: (data) =>
         insertWorkspaceMember(data).pipe(
@@ -106,6 +119,10 @@ export const WorkspaceMemberRepositoryLayer = Layer.effect(
         ),
       findMembership: (params) =>
         findWorkspaceMemberByUserId(params).pipe(
+          Effect.mapError((e) => new RepositoryError({ cause: e }))
+        ),
+      listByUserId: (userId) =>
+        listWorkspaceMembersByUserId(userId).pipe(
           Effect.mapError((e) => new RepositoryError({ cause: e }))
         ),
     };

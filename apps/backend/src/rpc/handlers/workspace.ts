@@ -1,7 +1,7 @@
 import {
   checkWorkspaceSlugIsUniqueFlow,
   createWorkspaceFlow,
-  setActiveWorkspaceFlow,
+  listWorkspacesFlow,
   updateWorkspaceFlow,
 } from "@mason/core-server/modules/workspace";
 import { WorkspaceRpcGroup } from "@mason/core/rpc";
@@ -10,19 +10,19 @@ import { HttpApiError } from "effect/unstable/httpapi";
 
 export const WorkspaceRpcGroupLayer = WorkspaceRpcGroup.toLayer(
   Effect.succeed({
-    "Workspace.Create": (payload) =>
-      Effect.gen(function* () {
+    "Workspace.Create": Effect.fn("rpc.workspace.create")(
+      function* (payload) {
         const workspace = yield* createWorkspaceFlow(payload);
 
         return workspace;
-      }).pipe(
-        Effect.catchTags({
-          RepositoryError: () =>
-            Effect.fail(new HttpApiError.InternalServerError()),
-          "infra/DatabaseError": () =>
-            Effect.fail(new HttpApiError.InternalServerError()),
-        })
-      ),
+      },
+      Effect.catchTags({
+        RepositoryError: () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
+        "infra/DatabaseError": () =>
+          Effect.fail(new HttpApiError.InternalServerError()),
+      })
+    ),
     "Workspace.Update": (payload) =>
       Effect.gen(function* () {
         const workspace = yield* updateWorkspaceFlow(payload);
@@ -45,11 +45,12 @@ export const WorkspaceRpcGroupLayer = WorkspaceRpcGroup.toLayer(
             Effect.fail(new HttpApiError.InternalServerError()),
         })
       ),
-    "Workspace.SetActive": (payload) =>
-      Effect.gen(function* () {
-        const workspace = yield* setActiveWorkspaceFlow(payload);
 
-        return workspace;
+    "Workspace.List": (payload) =>
+      Effect.gen(function* () {
+        const workspaces = yield* listWorkspacesFlow(payload);
+
+        return workspaces;
       }).pipe(
         Effect.catchTags({
           RepositoryError: () =>
