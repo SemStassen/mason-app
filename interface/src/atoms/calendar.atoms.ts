@@ -1,5 +1,7 @@
-import { AtomRef } from "@effect/atom-react";
 import { addDays, isEqual, subDays } from "date-fns";
+import { Atom, AtomRef } from "effect/unstable/reactivity";
+
+import { atomRegistry } from "./registry";
 
 interface ICalendarAtom {
   view: "days";
@@ -13,11 +15,17 @@ interface ICalendarAtom {
   isDragSelectionActive: boolean;
 }
 
+const startOfMinute = (date: Date) => {
+  const nextDate = new Date(date);
+  nextDate.setSeconds(0, 0);
+  return nextDate;
+};
+
 const calendarAtom = AtomRef.make<ICalendarAtom>({
   view: "days",
   daysInView: 7,
   selectedDate: new Date(),
-  currentTime: new Date(),
+  currentTime: startOfMinute(new Date()),
   dragSelection: null,
   isDragSelectionActive: false,
 });
@@ -122,28 +130,3 @@ export function setIsDragSelectionActive(isDragSelectionActive: boolean) {
     isDragSelectionActive: isDragSelectionActive,
   }));
 }
-
-export function _setCurrentTime(currentTime: Date) {
-  calendarAtom.update((value) => ({
-    ...value,
-    currentTime: currentTime,
-  }));
-}
-
-// IIFE to update the currentTime atom
-(() => {
-  const now = new Date();
-  const secondsUntilNextMinute = 60 - now.getSeconds();
-  const millisecondsUntilNextMinute =
-    secondsUntilNextMinute * 1000 - now.getMilliseconds();
-
-  // Initial timeout to sync with the next minute
-  setTimeout(() => {
-    _setCurrentTime(new Date());
-
-    // Then update every minute exactly
-    setInterval(() => {
-      _setCurrentTime(new Date());
-    }, 60 * 1000);
-  }, millisecondsUntilNextMinute);
-})();

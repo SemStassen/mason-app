@@ -1,6 +1,6 @@
 import { useAtomRef } from "@effect-atom/atom-react";
 
-import { calendarViewAtom } from "~/atoms/calendar-atom";
+import { calendarViewAtom } from "~/atoms/calendar.atoms";
 
 import { CalendarHeader } from "./components/calendar-header";
 import { DndProvider } from "./components/dnd/dnd-provider";

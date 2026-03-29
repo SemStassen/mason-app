@@ -16,7 +16,7 @@ import {
   setDragSelectionFirst,
   setDragSelectionSecond,
   setIsDragSelectionActive,
-} from "~/atoms/calendar-atom";
+} from "~/atoms/calendar.atoms";
 import { formatter } from "~/lib/utils/date-time";
 
 import {

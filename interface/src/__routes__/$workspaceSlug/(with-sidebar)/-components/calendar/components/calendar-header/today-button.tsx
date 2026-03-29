@@ -5,7 +5,7 @@ import { isToday } from "date-fns";
 import {
   calendarSelectedDateAtom,
   setCalendarSelectedDate,
-} from "~/atoms/calendar-atom";
+} from "~/atoms/calendar.atoms";
 
 function TodayButton() {
   const selectedDate = useAtomRef(calendarSelectedDateAtom);

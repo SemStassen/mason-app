@@ -13,6 +13,7 @@ import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppOnboardingRouteRouteImport } from './routes/_app/_onboarding/route'
+import { Route as AppWorkspaceSlugRouteRouteImport } from './routes/_app/$workspaceSlug/route'
 import { Route as AuthSignUpIndexRouteImport } from './routes/_auth/sign-up/index'
 import { Route as AuthSignInIndexRouteImport } from './routes/_auth/sign-in/index'
 import { Route as AppWorkspaceSlugIndexRouteImport } from './routes/_app/$workspaceSlug/index'
@@ -36,6 +37,11 @@ const AppOnboardingRouteRoute = AppOnboardingRouteRouteImport.update({
   id: '/_onboarding',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppWorkspaceSlugRouteRoute = AppWorkspaceSlugRouteRouteImport.update({
+  id: '/$workspaceSlug',
+  path: '/$workspaceSlug',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AuthSignUpIndexRoute = AuthSignUpIndexRouteImport.update({
   id: '/sign-up/',
   path: '/sign-up/',
@@ -47,9 +53,9 @@ const AuthSignInIndexRoute = AuthSignInIndexRouteImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AppWorkspaceSlugIndexRoute = AppWorkspaceSlugIndexRouteImport.update({
-  id: '/$workspaceSlug/',
-  path: '/$workspaceSlug/',
-  getParentRoute: () => AppRouteRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppWorkspaceSlugRouteRoute,
 } as any)
 const AppOnboardingProfileIndexRoute =
   AppOnboardingProfileIndexRouteImport.update({
@@ -66,6 +72,7 @@ const AppOnboardingCreateWorkspaceIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/$workspaceSlug': typeof AppWorkspaceSlugRouteRouteWithChildren
   '/$workspaceSlug/': typeof AppWorkspaceSlugIndexRoute
   '/sign-in/': typeof AuthSignInIndexRoute
   '/sign-up/': typeof AuthSignUpIndexRoute
@@ -84,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
+  '/_app/$workspaceSlug': typeof AppWorkspaceSlugRouteRouteWithChildren
   '/_app/_onboarding': typeof AppOnboardingRouteRouteWithChildren
   '/_app/': typeof AppIndexRoute
   '/_app/$workspaceSlug/': typeof AppWorkspaceSlugIndexRoute
@@ -96,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$workspaceSlug'
     | '/$workspaceSlug/'
     | '/sign-in/'
     | '/sign-up/'
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_auth'
+    | '/_app/$workspaceSlug'
     | '/_app/_onboarding'
     | '/_app/'
     | '/_app/$workspaceSlug/'
@@ -157,6 +167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOnboardingRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/$workspaceSlug': {
+      id: '/_app/$workspaceSlug'
+      path: '/$workspaceSlug'
+      fullPath: '/$workspaceSlug'
+      preLoaderRoute: typeof AppWorkspaceSlugRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_auth/sign-up/': {
       id: '/_auth/sign-up/'
       path: '/sign-up'
@@ -173,10 +190,10 @@ declare module '@tanstack/react-router' {
     }
     '/_app/$workspaceSlug/': {
       id: '/_app/$workspaceSlug/'
-      path: '/$workspaceSlug'
+      path: '/'
       fullPath: '/$workspaceSlug/'
       preLoaderRoute: typeof AppWorkspaceSlugIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      parentRoute: typeof AppWorkspaceSlugRouteRoute
     }
     '/_app/_onboarding/profile/': {
       id: '/_app/_onboarding/profile/'
@@ -195,6 +212,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppWorkspaceSlugRouteRouteChildren {
+  AppWorkspaceSlugIndexRoute: typeof AppWorkspaceSlugIndexRoute
+}
+
+const AppWorkspaceSlugRouteRouteChildren: AppWorkspaceSlugRouteRouteChildren = {
+  AppWorkspaceSlugIndexRoute: AppWorkspaceSlugIndexRoute,
+}
+
+const AppWorkspaceSlugRouteRouteWithChildren =
+  AppWorkspaceSlugRouteRoute._addFileChildren(
+    AppWorkspaceSlugRouteRouteChildren,
+  )
+
 interface AppOnboardingRouteRouteChildren {
   AppOnboardingCreateWorkspaceIndexRoute: typeof AppOnboardingCreateWorkspaceIndexRoute
   AppOnboardingProfileIndexRoute: typeof AppOnboardingProfileIndexRoute
@@ -210,15 +240,15 @@ const AppOnboardingRouteRouteWithChildren =
   AppOnboardingRouteRoute._addFileChildren(AppOnboardingRouteRouteChildren)
 
 interface AppRouteRouteChildren {
+  AppWorkspaceSlugRouteRoute: typeof AppWorkspaceSlugRouteRouteWithChildren
   AppOnboardingRouteRoute: typeof AppOnboardingRouteRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
-  AppWorkspaceSlugIndexRoute: typeof AppWorkspaceSlugIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppWorkspaceSlugRouteRoute: AppWorkspaceSlugRouteRouteWithChildren,
   AppOnboardingRouteRoute: AppOnboardingRouteRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
-  AppWorkspaceSlugIndexRoute: AppWorkspaceSlugIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(

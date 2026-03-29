@@ -2,7 +2,7 @@ import { useAtomRef } from "@effect-atom/atom-react";
 import { cn } from "@mason/ui/utils";
 import { isSameDay } from "date-fns";
 
-import { calendarCurrentTimeAtom } from "~/atoms/calendar-atom";
+import { calendarCurrentTimeAtom } from "~/atoms/calendar.atoms";
 import { formatter } from "~/lib/utils/date-time";
 
 import {

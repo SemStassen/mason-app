@@ -15,7 +15,7 @@ import {
 import {
   calendarDaysInViewAtom,
   setCalendarDaysInView,
-} from "~/atoms/calendar-atom";
+} from "~/atoms/calendar.atoms";
 
 function OptionsDropdown() {
   const daysInView = useAtomRef(calendarDaysInViewAtom);

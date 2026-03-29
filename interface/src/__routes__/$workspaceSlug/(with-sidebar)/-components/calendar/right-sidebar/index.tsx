@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import {
   calendarIsDragSelectionActiveAtom,
   calendarSortedDragSelectionAtom,
-} from "~/atoms/calendar-atom";
+} from "~/atoms/calendar.atoms";
 import { useConditionalMemo } from "~/hooks/use-conditional-memo";
 
 import { CreateTimeEntryForm } from "./create-time-entry-form";

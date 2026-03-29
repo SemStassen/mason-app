@@ -10,7 +10,7 @@ import {
   calendarSortedDragSelectionAtom,
   setDragSelectionFirst,
   setDragSelectionSecond,
-} from "~/atoms/calendar-atom";
+} from "~/atoms/calendar.atoms";
 import { useAppForm } from "~/components/form";
 
 const createTimeEntrySchema = Schema.standardSchemaV1(

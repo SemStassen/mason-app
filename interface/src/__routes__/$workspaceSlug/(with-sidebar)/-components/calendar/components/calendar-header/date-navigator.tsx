@@ -9,7 +9,7 @@ import {
   goToNextPeriod,
   goToPreviousPeriod,
   setCalendarSelectedDate,
-} from "~/atoms/calendar-atom";
+} from "~/atoms/calendar.atoms";
 import { formatter } from "~/lib/utils/date-time";
 
 function DateNavigator() {

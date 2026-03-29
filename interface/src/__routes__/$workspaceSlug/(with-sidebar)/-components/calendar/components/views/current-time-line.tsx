@@ -1,6 +1,6 @@
 import { useAtomRef } from "@effect-atom/atom-react";
 
-import { calendarCurrentTimeAtom } from "~/atoms/calendar-atom";
+import { calendarCurrentTimeAtom } from "~/atoms/calendar.atoms";
 import { formatter } from "~/utils/date-time";
 me";
 import { FIRST_VISIBLE_HOUR, LAST_VISIBLE_HOUR } from "../..";
