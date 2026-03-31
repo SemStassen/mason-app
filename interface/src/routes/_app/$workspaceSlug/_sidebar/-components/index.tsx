@@ -1,13 +1,13 @@
-import { useAtomRef } from "@effect-atom/atom-react";
+import { useAtom, useAtomValue } from "@effect/atom-react";
 import { Button } from "@mason/ui/button";
-import { type IconProps, Icons } from "@mason/ui/icons";
+import { Icons } from "@mason/ui/icons";
+import type { IconProps } from "@mason/ui/icons";
 import { Link, linkOptions } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
-import { leftSidebarAtom } from "~/atoms/ui-atoms";
+import { isLeftSidebarOpenAtom } from "~/atoms/ui-atoms";
 
-import { LedgerToggle } from "./ledger-toggle";
 import { UserDropdownMenu } from "./user-dropdown-menu";
 import { WorkspaceDropdownMenu } from "./workspace-dropdown-menu";
 
@@ -34,7 +34,7 @@ const NAV_ITEMS = [
 ];
 
 function LeftSidebar() {
-  const { isOpen } = useAtomRef(leftSidebarAtom);
+  const isOpen = useAtomValue(isLeftSidebarOpenAtom);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
 
   const handleResize = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -105,7 +105,6 @@ function LeftSidebar() {
                 )}
                 variant="ghost"
               />
-              <LedgerToggle />
               {/* Wrap in a div to avoid layout shift when the dropdown menu is open */}
               <div>
                 <UserDropdownMenu />

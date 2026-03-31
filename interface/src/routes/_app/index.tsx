@@ -6,10 +6,6 @@ import { runtime } from "~/lib/runtime";
 
 export const Route = createFileRoute("/_app/")({
   beforeLoad: async ({ context }) => {
-    if (!("session" in context)) {
-      throw redirect({ to: "/sign-up" });
-    }
-
     const workspaces = await runtime.runPromise(
       Effect.gen(function* () {
         const client = yield* MasonAtomRpcClient;
@@ -23,7 +19,7 @@ export const Route = createFileRoute("/_app/")({
     }
 
     const lastActiveWorkspaceId = Option.getOrUndefined(
-      context.session.lastActiveWorkspaceId
+      context.auth.session.lastActiveWorkspaceId
     );
 
     const targetWorkspace =

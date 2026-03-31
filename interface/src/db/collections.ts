@@ -1,24 +1,65 @@
-import type { Project } from "@mason/core/modules/project";
-import type { WorkspaceMember } from "@mason/core/modules/workspace-member";
-import { persistedCollectionOptions } from "@tanstack/browser-db-sqlite-persistence";
-import { createCollection } from "@tanstack/react-db";
+import { Project } from "@mason/core/modules/project";
+import { WorkspaceMember } from "@mason/core/modules/workspace-member";
+import {
+  BrowserCollectionCoordinator,
+  createBrowserWASQLitePersistence,
+  openBrowserWASQLiteOPFSDatabase,
+} from "@tanstack/browser-db-sqlite-persistence";
+import { Schema } from "effect";
 
-import { persistence } from "./persistence";
+import { env } from "~/lib/env";
 
-export const workspaceMembersCollection = createCollection(
-  persistedCollectionOptions<typeof WorkspaceMember.json.Type, string>({
-    id: `workspace-members`,
-    getKey: (workspaceMember) => workspaceMember.id,
-    persistence,
+import { createCollectionTemp } from "./create-collection-temp";
+
+export async function createWorkspaceCollections(workspaceId: string) {
+  const database = await openBrowserWASQLiteOPFSDatabase({
+    databaseName: `mason-${workspaceId}.sqlite`,
+  });
+
+  const coordinator = new BrowserCollectionCoordinator({
+    dbName: `mason-${workspaceId}`,
+  });
+
+  const workspaceMembersCollection = createCollectionTemp({
+    persistence: createBrowserWASQLitePersistence<
+      typeof WorkspaceMember.json.Type,
+      string | number
+    >({
+      database,
+      coordinator,
+    }),
     schemaVersion: 1,
-  })
-);
+    id: "workspace-members",
+    schema: Schema.toStandardSchemaV1(WorkspaceMember.json),
+    getKey: (wm) => wm.id,
+    shapeOptions: {
+      url: `${env.VITE_ELECTRIC_PROXY_URL}/workspace-members`,
+    },
+  });
 
-export const projectsCollection = createCollection(
-  persistedCollectionOptions<typeof Project.json.Type, string>({
+  const projectsCollection = createCollectionTemp({
+    persistence: createBrowserWASQLitePersistence<
+      typeof Project.json.Type,
+      string | number
+    >({
+      database,
+      coordinator,
+    }),
+    schemaVersion: 1,
     id: "projects",
-    getKey: (project) => project.id,
-    persistence,
-    schemaVersion: 1,
-  })
-);
+    schema: Schema.toStandardSchemaV1(Project.json),
+    getKey: (wm) => wm.id,
+    shapeOptions: {
+      url: `${env.VITE_ELECTRIC_PROXY_URL}/projects`,
+    },
+  });
+
+  return {
+    workspaceMembersCollection,
+    projectsCollection,
+    close: async () => {
+      coordinator.dispose();
+      await database.close?.();
+    },
+  };
+}

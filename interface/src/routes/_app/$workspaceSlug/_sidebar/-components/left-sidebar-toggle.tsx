@@ -1,12 +1,13 @@
-import { useAtomRef } from "@effect-atom/atom-react";
+import { useAtom } from "@effect/atom-react";
 import { Button } from "@mason/ui/button";
 import { Icons } from "@mason/ui/icons";
 
-import { leftSidebarAtom, toggleLeftSidebar } from "~/atoms/ui-atoms";
+import { isLeftSidebarOpenAtom } from "~/atoms/ui-atoms";
 import { useRegisterCommands } from "~/components/app-commands-dialog";
 
 function LeftSidebarToggle() {
-  const { isOpen } = useAtomRef(leftSidebarAtom);
+  const [isOpen, setIsOpen] = useAtom(isLeftSidebarOpenAtom);
+  const toggleIsOpen = () => setIsOpen((o) => !o);
 
   useRegisterCommands(() => [
     {
@@ -15,14 +16,14 @@ function LeftSidebarToggle() {
       hotkey: "bracketleft",
       category: "navigation",
       onSelect: (dialog) => {
-        toggleLeftSidebar();
+        toggleIsOpen();
         dialog.close();
       },
     },
   ]);
 
   return (
-    <Button onClick={toggleLeftSidebar} size="icon" variant="ghost">
+    <Button onClick={toggleIsOpen} size="icon" variant="ghost">
       <Icons.Sidebar />
     </Button>
   );

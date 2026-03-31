@@ -14,43 +14,40 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@mason/ui/menu";
-import { Link, useRouteContext, useRouter } from "@tanstack/react-router";
-import { Effect } from "effect";
+import { Link, useRouter } from "@tanstack/react-router";
 
-import { MasonClient } from "~/client";
+import { Route as WorkspaceRoute } from "~/routes/_app/$workspaceSlug/route";
 
 function WorkspaceDropdownMenu() {
   const router = useRouter();
-  const { user } = useRouteContext({
-    from: "/$workspaceSlug",
-  });
+  const { workspace, workspaces } = WorkspaceRoute.useRouteContext();
 
-  const handleSetActiveWorkspace = async (workspaceId: string) => {
-    await Effect.runPromise(
-      Effect.gen(function* () {
-        yield* MasonClient.Workspace.SetActive({
-          payload: {
-            workspaceId: workspaceId,
-          },
-        });
+  // const handleSetActiveWorkspace = async (workspaceId: string) => {
+  //   await Effect.runPromise(
+  //     Effect.gen(function* () {
+  //       yield* MasonClient.Workspace.SetActive({
+  //         payload: {
+  //           workspaceId: workspaceId,
+  //         },
+  //       });
 
-        router.invalidate();
-      }).pipe(Effect.catchAll(() => Effect.succeed(null)))
-    );
-  };
+  //       router.invalidate();
+  //     }).pipe(Effect.catchAll(() => Effect.succeed(null)))
+  //   );
+  // };
+
+  const handleSetActiveWorkspace = async (workspaceId: string) => {};
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
           <Button className="max-w-full" size="sm" variant="ghost">
-            <Avatar rounded="lg" size="sm">
+            <Avatar>
               <AvatarImage />
-              <AvatarFallback>
-                {user.activeWorkspace?.name.charAt(0)}
-              </AvatarFallback>
+              <AvatarFallback>{workspace.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <span className="truncate">{user.activeWorkspace?.name}</span>
+            <span className="truncate">{workspace.name}</span>
             <Icons.ChevronDown />
           </Button>
         }
@@ -60,14 +57,14 @@ function WorkspaceDropdownMenu() {
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Switch workspace</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
-              <DropdownMenuRadioGroup value={user.activeWorkspace.id}>
-                {user.memberships.map(({ workspace }) => (
+              <DropdownMenuRadioGroup value={workspace.id}>
+                {workspaces.map((w) => (
                   <DropdownMenuRadioItem
-                    key={workspace.id}
-                    onClick={() => handleSetActiveWorkspace(workspace.id)}
-                    value={workspace.id}
+                    key={w.id}
+                    onClick={() => handleSetActiveWorkspace(w.id)}
+                    value={w.id}
                   >
-                    {workspace.name}
+                    {w.name}
                   </DropdownMenuRadioItem>
                 ))}
               </DropdownMenuRadioGroup>

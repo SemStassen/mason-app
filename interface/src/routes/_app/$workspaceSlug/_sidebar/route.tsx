@@ -1,9 +1,9 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { LeftSidebar } from "./-components/left-sidebar";
-import { LeftSidebarToggle } from "./-components/left-sidebar/left-sidebar-toggle";
+import { LeftSidebar } from "./-components";
+import { LeftSidebarToggle } from "./-components/left-sidebar-toggle";
 
-export const Route = createFileRoute("/$workspaceSlug/(with-sidebar)")({
+export const Route = createFileRoute("/_app/$workspaceSlug/_sidebar")({
   component: Layout,
 });
 

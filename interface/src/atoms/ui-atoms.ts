@@ -1,4 +1,3 @@
-export const leftSidebarAtom = AtomRef.make({ isOpen: true });
-export function toggleLeftSidebar() {
-  leftSidebarAtom.update(({ isOpen }) => ({ isOpen: !isOpen }));
-}
+import { Atom } from "effect/unstable/reactivity";
+
+export const isLeftSidebarOpenAtom = Atom.make(true);

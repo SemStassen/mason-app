@@ -4,6 +4,7 @@ import { Icons } from "@mason/ui/icons";
 import { Separator } from "@mason/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@mason/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mason/ui/tabs";
+import { useRouteContext } from "@tanstack/react-router";
 import {
   addDays,
   addHours,
@@ -22,6 +23,7 @@ export const isDebugSheetOpenAtom = Atom.make(false);
 function DebugSheet() {
   const [isOpen, setIsOpen] = useAtom(isDebugSheetOpenAtom);
   const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
+  const { workspace } = useRouteContext({ from: "/_app/$workspaceSlug" });
 
   const toggleDebugSheet = () => setIsOpen((o) => !o);
 
@@ -41,6 +43,7 @@ function DebugSheet() {
           <TabsContent className="space-y-4" value="mason">
             <ul>
               <li>Platform: {PLATFORM.platform}</li>
+              <li>Workspace: {workspace.name}</li>
             </ul>
             <Separator />
             <div className="flex flex-row gap-2">

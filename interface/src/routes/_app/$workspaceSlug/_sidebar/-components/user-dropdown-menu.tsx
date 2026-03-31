@@ -10,21 +10,16 @@ import {
   DropdownMenuTrigger,
 } from "@mason/ui/menu";
 import { Link, useRouteContext } from "@tanstack/react-router";
-import { Effect } from "effect";
 
-import { MasonClient } from "~/client";
+import { betterAuthClient } from "~/lib/better-auth";
 
 function UserDropdownMenu() {
   const { user } = useRouteContext({
-    from: "/$workspaceSlug",
+    from: "/_app/$workspaceSlug",
   });
 
   const handleSignOut = async () => {
-    await Effect.runPromise(
-      MasonClient.Auth.SignOut().pipe(
-        Effect.catchAll(() => Effect.succeed(null))
-      )
-    );
+    await betterAuthClient.signOut();
   };
 
   return (
@@ -32,15 +27,15 @@ function UserDropdownMenu() {
       <DropdownMenuTrigger
         render={
           <Button className="h-fit w-full py-4" variant="ghost">
-            <Avatar rounded="lg">
+            <Avatar>
               <AvatarImage />
-              <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{user.fullName.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-start">
-              <div className="truncate text-sm">{user.displayName}</div>
+              <div className="truncate text-sm">{user.fullName}</div>
               <div className="truncate font-normal text-xs">{user.email}</div>
             </div>
-            <Icons.ChevronUpDown />
+            <Icons.ChevronsUpDown />
           </Button>
         }
       />

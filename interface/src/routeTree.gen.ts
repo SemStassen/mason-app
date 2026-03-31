@@ -16,9 +16,11 @@ import { Route as AppOnboardingRouteRouteImport } from './routes/_app/_onboardin
 import { Route as AppWorkspaceSlugRouteRouteImport } from './routes/_app/$workspaceSlug/route'
 import { Route as AuthSignUpIndexRouteImport } from './routes/_auth/sign-up/index'
 import { Route as AuthSignInIndexRouteImport } from './routes/_auth/sign-in/index'
-import { Route as AppWorkspaceSlugIndexRouteImport } from './routes/_app/$workspaceSlug/index'
+import { Route as AppWorkspaceSlugSidebarRouteRouteImport } from './routes/_app/$workspaceSlug/_sidebar/route'
 import { Route as AppOnboardingProfileIndexRouteImport } from './routes/_app/_onboarding/profile/index'
 import { Route as AppOnboardingCreateWorkspaceIndexRouteImport } from './routes/_app/_onboarding/create-workspace/index'
+import { Route as AppWorkspaceSlugSidebarIndexRouteImport } from './routes/_app/$workspaceSlug/_sidebar/index'
+import { Route as AppWorkspaceSlugSidebarProjectsIndexRouteImport } from './routes/_app/$workspaceSlug/_sidebar/projects/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
@@ -52,11 +54,11 @@ const AuthSignInIndexRoute = AuthSignInIndexRouteImport.update({
   path: '/sign-in/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-const AppWorkspaceSlugIndexRoute = AppWorkspaceSlugIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppWorkspaceSlugRouteRoute,
-} as any)
+const AppWorkspaceSlugSidebarRouteRoute =
+  AppWorkspaceSlugSidebarRouteRouteImport.update({
+    id: '/_sidebar',
+    getParentRoute: () => AppWorkspaceSlugRouteRoute,
+  } as any)
 const AppOnboardingProfileIndexRoute =
   AppOnboardingProfileIndexRouteImport.update({
     id: '/profile/',
@@ -69,23 +71,37 @@ const AppOnboardingCreateWorkspaceIndexRoute =
     path: '/create-workspace/',
     getParentRoute: () => AppOnboardingRouteRoute,
   } as any)
+const AppWorkspaceSlugSidebarIndexRoute =
+  AppWorkspaceSlugSidebarIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppWorkspaceSlugSidebarRouteRoute,
+  } as any)
+const AppWorkspaceSlugSidebarProjectsIndexRoute =
+  AppWorkspaceSlugSidebarProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => AppWorkspaceSlugSidebarRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/$workspaceSlug': typeof AppWorkspaceSlugRouteRouteWithChildren
-  '/$workspaceSlug/': typeof AppWorkspaceSlugIndexRoute
+  '/$workspaceSlug': typeof AppWorkspaceSlugSidebarRouteRouteWithChildren
   '/sign-in/': typeof AuthSignInIndexRoute
   '/sign-up/': typeof AuthSignUpIndexRoute
+  '/$workspaceSlug/': typeof AppWorkspaceSlugSidebarIndexRoute
   '/create-workspace/': typeof AppOnboardingCreateWorkspaceIndexRoute
   '/profile/': typeof AppOnboardingProfileIndexRoute
+  '/$workspaceSlug/projects/': typeof AppWorkspaceSlugSidebarProjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
-  '/$workspaceSlug': typeof AppWorkspaceSlugIndexRoute
+  '/$workspaceSlug': typeof AppWorkspaceSlugSidebarIndexRoute
   '/sign-in': typeof AuthSignInIndexRoute
   '/sign-up': typeof AuthSignUpIndexRoute
   '/create-workspace': typeof AppOnboardingCreateWorkspaceIndexRoute
   '/profile': typeof AppOnboardingProfileIndexRoute
+  '/$workspaceSlug/projects': typeof AppWorkspaceSlugSidebarProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,22 +110,25 @@ export interface FileRoutesById {
   '/_app/$workspaceSlug': typeof AppWorkspaceSlugRouteRouteWithChildren
   '/_app/_onboarding': typeof AppOnboardingRouteRouteWithChildren
   '/_app/': typeof AppIndexRoute
-  '/_app/$workspaceSlug/': typeof AppWorkspaceSlugIndexRoute
+  '/_app/$workspaceSlug/_sidebar': typeof AppWorkspaceSlugSidebarRouteRouteWithChildren
   '/_auth/sign-in/': typeof AuthSignInIndexRoute
   '/_auth/sign-up/': typeof AuthSignUpIndexRoute
+  '/_app/$workspaceSlug/_sidebar/': typeof AppWorkspaceSlugSidebarIndexRoute
   '/_app/_onboarding/create-workspace/': typeof AppOnboardingCreateWorkspaceIndexRoute
   '/_app/_onboarding/profile/': typeof AppOnboardingProfileIndexRoute
+  '/_app/$workspaceSlug/_sidebar/projects/': typeof AppWorkspaceSlugSidebarProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/$workspaceSlug'
-    | '/$workspaceSlug/'
     | '/sign-in/'
     | '/sign-up/'
+    | '/$workspaceSlug/'
     | '/create-workspace/'
     | '/profile/'
+    | '/$workspaceSlug/projects/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -118,6 +137,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/create-workspace'
     | '/profile'
+    | '/$workspaceSlug/projects'
   id:
     | '__root__'
     | '/_app'
@@ -125,11 +145,13 @@ export interface FileRouteTypes {
     | '/_app/$workspaceSlug'
     | '/_app/_onboarding'
     | '/_app/'
-    | '/_app/$workspaceSlug/'
+    | '/_app/$workspaceSlug/_sidebar'
     | '/_auth/sign-in/'
     | '/_auth/sign-up/'
+    | '/_app/$workspaceSlug/_sidebar/'
     | '/_app/_onboarding/create-workspace/'
     | '/_app/_onboarding/profile/'
+    | '/_app/$workspaceSlug/_sidebar/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -188,11 +210,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/_app/$workspaceSlug/': {
-      id: '/_app/$workspaceSlug/'
-      path: '/'
-      fullPath: '/$workspaceSlug/'
-      preLoaderRoute: typeof AppWorkspaceSlugIndexRouteImport
+    '/_app/$workspaceSlug/_sidebar': {
+      id: '/_app/$workspaceSlug/_sidebar'
+      path: ''
+      fullPath: '/$workspaceSlug'
+      preLoaderRoute: typeof AppWorkspaceSlugSidebarRouteRouteImport
       parentRoute: typeof AppWorkspaceSlugRouteRoute
     }
     '/_app/_onboarding/profile/': {
@@ -209,15 +231,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOnboardingCreateWorkspaceIndexRouteImport
       parentRoute: typeof AppOnboardingRouteRoute
     }
+    '/_app/$workspaceSlug/_sidebar/': {
+      id: '/_app/$workspaceSlug/_sidebar/'
+      path: '/'
+      fullPath: '/$workspaceSlug/'
+      preLoaderRoute: typeof AppWorkspaceSlugSidebarIndexRouteImport
+      parentRoute: typeof AppWorkspaceSlugSidebarRouteRoute
+    }
+    '/_app/$workspaceSlug/_sidebar/projects/': {
+      id: '/_app/$workspaceSlug/_sidebar/projects/'
+      path: '/projects'
+      fullPath: '/$workspaceSlug/projects/'
+      preLoaderRoute: typeof AppWorkspaceSlugSidebarProjectsIndexRouteImport
+      parentRoute: typeof AppWorkspaceSlugSidebarRouteRoute
+    }
   }
 }
 
+interface AppWorkspaceSlugSidebarRouteRouteChildren {
+  AppWorkspaceSlugSidebarIndexRoute: typeof AppWorkspaceSlugSidebarIndexRoute
+  AppWorkspaceSlugSidebarProjectsIndexRoute: typeof AppWorkspaceSlugSidebarProjectsIndexRoute
+}
+
+const AppWorkspaceSlugSidebarRouteRouteChildren: AppWorkspaceSlugSidebarRouteRouteChildren =
+  {
+    AppWorkspaceSlugSidebarIndexRoute: AppWorkspaceSlugSidebarIndexRoute,
+    AppWorkspaceSlugSidebarProjectsIndexRoute:
+      AppWorkspaceSlugSidebarProjectsIndexRoute,
+  }
+
+const AppWorkspaceSlugSidebarRouteRouteWithChildren =
+  AppWorkspaceSlugSidebarRouteRoute._addFileChildren(
+    AppWorkspaceSlugSidebarRouteRouteChildren,
+  )
+
 interface AppWorkspaceSlugRouteRouteChildren {
-  AppWorkspaceSlugIndexRoute: typeof AppWorkspaceSlugIndexRoute
+  AppWorkspaceSlugSidebarRouteRoute: typeof AppWorkspaceSlugSidebarRouteRouteWithChildren
 }
 
 const AppWorkspaceSlugRouteRouteChildren: AppWorkspaceSlugRouteRouteChildren = {
-  AppWorkspaceSlugIndexRoute: AppWorkspaceSlugIndexRoute,
+  AppWorkspaceSlugSidebarRouteRoute:
+    AppWorkspaceSlugSidebarRouteRouteWithChildren,
 }
 
 const AppWorkspaceSlugRouteRouteWithChildren =
