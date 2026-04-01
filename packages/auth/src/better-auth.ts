@@ -1,5 +1,5 @@
-import { Email } from "@mason/core/shared/schemas";
 import { getAllowedOrigins } from "@mason/core/shared/config";
+import { Email } from "@mason/core/shared/schemas";
 import { Database, schema } from "@mason/db";
 import { Mailer } from "@mason/notifications/mailer";
 import { betterAuth } from "better-auth";
@@ -21,6 +21,7 @@ export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
   {
     make: Effect.gen(function* () {
       const authConfig = yield* Config.all({
+        betterAuthSecret: Config.string("BETTER_AUTH_SECRET"),
         googleClientId: Config.string("GOOGLE_CLIENT_ID"),
         googleClientSecret: Config.string("GOOGLE_CLIENT_SECRET"),
       });
@@ -33,6 +34,7 @@ export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
 
       const betterAuthClient = betterAuth({
         appName: "Mason",
+        secret: authConfig.betterAuthSecret,
         database: drizzleAdapter(db.unsafeDrizzle, {
           provider: "pg",
           schema: schema,

@@ -9,7 +9,6 @@
     "format": "oxfmt --write .",
     "lint": "oxlint .",
     "typecheck": "tsc --noEmit",
-    "db:export": "drizzle-kit export --sql > src/db/schema.sql && bun scripts/hash-schema.ts",
     "paraglide:compile": "npx @inlang/paraglide-js compile --project ../project.inlang --outdir ./src/paraglide"
   },
   "dependencies": {
