@@ -3,12 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun build --target=bun --outdir=dist src/index.ts",
     "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
-    "dev": "bun run --hot src/index.ts",
     "format": "oxfmt --write .",
     "lint": "oxlint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dev": "bun run --hot src/index.ts",
+    "build": "bun build --target=bun --outdir=dist src/index.ts"
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",
