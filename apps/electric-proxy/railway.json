@@ -2,6 +2,7 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "RAILPACK",
+    "buildCommand": "turbo build --filter=@mason/electric-proxy",
     "watchPatterns": [
       "apps/electric-proxy/**",
       "packages/**",
