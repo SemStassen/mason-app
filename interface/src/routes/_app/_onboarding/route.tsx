@@ -11,8 +11,9 @@ export const Route = createFileRoute("/_app/_onboarding")({
 
     return {
       activeWorkspace:
-        context.workspaces.find((workspace) => workspace.id === activeWorkspaceId) ??
-        null,
+        context.workspaces.find(
+          (workspace) => workspace.id === activeWorkspaceId
+        ) ?? null,
       session: context.auth.session,
       user: context.auth.user,
     };
@@ -43,7 +44,8 @@ function AuthLayout() {
         </Button>
       )}
       <p className="fixed top-4 right-4 text-muted-foreground text-sm">
-        You are already logged in as <span className="text-foreground">{user.email}</span>
+        You are already logged in as{" "}
+        <span className="text-foreground">{user.email}</span>
       </p>
 
       <Outlet />

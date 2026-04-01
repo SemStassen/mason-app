@@ -34,7 +34,7 @@ services:
       # See https://electric-sql.com/docs/guides/security
       ELECTRIC_INSECURE: true
     ports:
-      - "5133:5133"
+      - "5133:3000"
     networks:
       - internal
     depends_on:

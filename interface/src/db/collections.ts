@@ -1,5 +1,6 @@
 import { Project } from "@mason/core/modules/project";
 import { WorkspaceMember } from "@mason/core/modules/workspace-member";
+import { WORKSPACE_ID_HEADER } from "@mason/core/shared/headers";
 import {
   BrowserCollectionCoordinator,
   createBrowserWASQLitePersistence,
@@ -10,6 +11,10 @@ import { Schema } from "effect";
 import { env } from "~/lib/env";
 
 import { createCollectionTemp } from "./create-collection-temp";
+
+export type WorkspaceCollections = Awaited<
+  ReturnType<typeof createWorkspaceCollections>
+>;
 
 export async function createWorkspaceCollections(workspaceId: string) {
   const database = await openBrowserWASQLiteOPFSDatabase({
@@ -34,6 +39,15 @@ export async function createWorkspaceCollections(workspaceId: string) {
     getKey: (wm) => wm.id,
     shapeOptions: {
       url: `${env.VITE_ELECTRIC_PROXY_URL}/workspace-members`,
+      fetchClient: (url, options) =>
+        fetch(url, {
+          ...options,
+          credentials: "include",
+          headers: {
+            ...options?.headers,
+            [WORKSPACE_ID_HEADER]: workspaceId,
+          },
+        }),
     },
   });
 
@@ -51,6 +65,15 @@ export async function createWorkspaceCollections(workspaceId: string) {
     getKey: (wm) => wm.id,
     shapeOptions: {
       url: `${env.VITE_ELECTRIC_PROXY_URL}/projects`,
+      fetchClient: (url, options) =>
+        fetch(url, {
+          ...options,
+          credentials: "include",
+          headers: {
+            ...options?.headers,
+            [WORKSPACE_ID_HEADER]: workspaceId,
+          },
+        }),
     },
   });
 

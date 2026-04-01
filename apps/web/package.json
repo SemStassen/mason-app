@@ -12,20 +12,10 @@
     "machine-translate": "inlang machine translate --project project.inlang"
   },
   "dependencies": {
-    "@mason/interface": "workspace:*",
-    "react": "catalog:frontend",
-    "react-dom": "catalog:frontend"
+    "@mason/interface": "workspace:*"
   },
   "devDependencies": {
     "@mason/config": "workspace:*",
-    "@rolldown/plugin-babel": "catalog:dev",
-    "@tailwindcss/vite": "catalog:dev",
-    "@tanstack/devtools-vite": "^0.6.0",
-    "@tanstack/router-plugin": "^1.167.12",
-    "@types/react": "catalog:dev",
-    "@types/react-dom": "catalog:dev",
-    "@vitejs/plugin-react": "catalog:dev",
-    "babel-plugin-react-compiler": "catalog:dev",
     "typescript": "catalog:dev",
     "vite": "catalog:dev"
   }

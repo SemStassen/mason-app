@@ -1,7 +1,6 @@
-import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { projectsCollection } from "~/db/collections";
+import { useWorkspaceLiveQuery } from "~/db/use-workspace-live-query";
 
 export const Route = createFileRoute("/_app/$workspaceSlug/_sidebar/projects/")(
   {
@@ -10,9 +9,9 @@ export const Route = createFileRoute("/_app/$workspaceSlug/_sidebar/projects/")(
 );
 
 function RouteComponent() {
-  const { data: projects } = useLiveQuery((q) =>
-    q.from({ p: projectsCollection })
+  const { data: projects } = useWorkspaceLiveQuery((q, db) =>
+    q.from({ project: db.projectsCollection })
   );
 
-  return <div>Hello "/_app/$workspaceSlug/_sidebar/projects/"!</div>;
+  return <div>{projects?.length ?? 0} projects</div>;
 }

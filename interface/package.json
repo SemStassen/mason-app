@@ -37,16 +37,25 @@
     "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@inlang/paraglide-js": "^2.15.1",
     "@mason/config": "workspace:*",
-    "@tanstack/react-devtools": "^0.10.0",
+    "@rolldown/plugin-babel": "catalog:dev",
+    "@tailwindcss/vite": "catalog:dev",
+    "@tanstack/devtools-vite": "^0.6.0",
+    "@tanstack/router-plugin": "^1.167.12",
+    "@tanstack/react-devtools": "^0.10.1",
     "@tanstack/react-form-devtools": "^0.2.19",
     "@tanstack/react-router-devtools": "^1.166.11",
     "@types/react": "catalog:dev",
     "@types/react-dom": "catalog:dev",
+    "@vitejs/plugin-react": "catalog:dev",
+    "babel-plugin-react-compiler": "catalog:dev",
     "drizzle-kit": "catalog:dev",
-    "typescript": "catalog:dev"
+    "typescript": "catalog:dev",
+    "vite": "catalog:dev"
   },
   "exports": {
-    ".": "./src/exports.ts"
+    ".": "./src/exports.ts",
+    "./vite": "./vite.config.ts"
   }
 }

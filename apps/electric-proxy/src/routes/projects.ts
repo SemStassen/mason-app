@@ -4,13 +4,9 @@ import {
   HttpWorkspaceMiddleware,
 } from "@mason/core-server/shared/middleware";
 import { WorkspaceContext } from "@mason/core/shared/auth";
-import { Config, Effect, Layer, Option, Schema } from "effect";
-import {
-  Headers,
-  HttpClient,
-  HttpRouter,
-  HttpServerResponse,
-} from "effect/unstable/http";
+import { Cause, Config, Effect, Layer, Option, Stream } from "effect";
+import { Headers, HttpRouter, HttpServerResponse } from "effect/unstable/http";
+import { HttpApiError } from "effect/unstable/httpapi";
 
 const electricConfig = Config.all({
   electricUrl: Config.string("ELECTRIC_URL"),
@@ -18,25 +14,15 @@ const electricConfig = Config.all({
   sourceSecret: Config.string("ELECTRIC_SOURCE_SECRET").pipe(Config.option),
 });
 
-const encodeJsonString = Schema.encodeSync(
-  Schema.fromJsonString(Schema.String)
-);
-
 export const ProjectsRouteLayer = HttpRouter.add(
   "GET",
   "/projects",
   (request) =>
     Effect.gen(function* () {
-      // Effect's request URL can be relative depending on runtime adapter.
-      // Normalizing to an absolute URL keeps search-param handling consistent.
-      const requestUrl = request.url.startsWith("http")
-        ? new URL(request.url)
-        : new URL(request.url, "http://localhost");
-
       const workspaceContext = yield* WorkspaceContext;
-
       const { electricUrl, sourceId, sourceSecret } = yield* electricConfig;
 
+      const requestUrl = new URL(request.url, "http://localhost");
       const originUrl = new URL("/v1/shape", electricUrl);
 
       // Forward only Electric protocol parameters from the client.
@@ -46,40 +32,46 @@ export const ProjectsRouteLayer = HttpRouter.add(
           originUrl.searchParams.set(key, value);
         }
       }
+      Option.map(sourceId, (id) => originUrl.searchParams.set("source_id", id));
+      Option.map(sourceSecret, (secret) =>
+        originUrl.searchParams.set("secret", secret)
+      );
 
       originUrl.searchParams.set("table", "projects");
-
-      if (Option.isSome(sourceId)) {
-        originUrl.searchParams.set("source_id", sourceId.value);
-      }
-
-      if (Option.isSome(sourceSecret)) {
-        originUrl.searchParams.set("secret", sourceSecret.value);
-      }
-
       // Apply row-level security
       originUrl.searchParams.set(
         "where",
-        `"workspace_id" = ${encodeJsonString(workspaceContext.workspace.id)}`
+        `workspace_id = '${workspaceContext.workspace.id}'`
       );
 
-      const upstream = yield* HttpClient.get(originUrl);
+      // We use raw fetch instead of Effect's HttpClient because HttpClient eagerly
+      // locks the response body's ReadableStream before we can proxy it as a stream.
+      const response = yield* Effect.tryPromise({
+        try: () => fetch(originUrl.toString()),
+        catch: () => new HttpApiError.InternalServerError(),
+      });
 
       // Upstream fetch may already be decompressed; stale encoding/length headers
       // can break browser decoding for streamed proxy responses.
-      const noEncoding = Headers.remove(upstream.headers, "content-encoding");
-      const noLength = Headers.remove(noEncoding, "content-length");
-      const vary = Option.match(Headers.get(noLength, "vary"), {
-        onNone: () => "Authorization",
-        onSome: (value) =>
-          value.includes("Authorization") ? value : `${value}, Authorization`,
-      });
-      const headers = Headers.set(noLength, "vary", vary);
+      const responseHeaders = Headers.set(
+        Headers.removeMany(
+          Headers.fromInput(Object.fromEntries(response.headers.entries())),
+          ["content-encoding", "content-length"]
+        ),
+        "vary",
+        "Authorization, Cookie"
+      );
 
-      return HttpServerResponse.stream(upstream.stream, {
-        status: upstream.status,
-        headers,
-      });
+      return HttpServerResponse.stream(
+        Stream.fromReadableStream({
+          evaluate: () => response.body!,
+          onError: (e) => new Cause.UnknownError(e),
+        }),
+        {
+          status: response.status,
+          headers: responseHeaders,
+        }
+      );
     })
 ).pipe(
   Layer.provide([HttpSessionMiddleware.layer, HttpWorkspaceMiddleware.layer])

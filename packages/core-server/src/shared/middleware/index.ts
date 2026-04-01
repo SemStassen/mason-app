@@ -111,6 +111,7 @@ export const HttpSessionMiddleware = HttpRouter.middleware<{
           sessionContext
         );
       }).pipe(
+        Effect.tapError((e) => Effect.logDebug(e)),
         Effect.catchTags({
           "auth/InvalidSessionError": () =>
             Effect.fail(new HttpApiError.Unauthorized()),
@@ -167,6 +168,7 @@ export const HttpWorkspaceMiddleware = HttpRouter.middleware<{
           workspaceContext
         );
       }).pipe(
+        Effect.tapError((e) => Effect.logDebug(e)),
         Effect.catchTags({
           "workspace/WorkspaceNotFoundError": () =>
             Effect.fail(new HttpApiError.Forbidden()),

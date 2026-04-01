@@ -1,11 +1,19 @@
 {
   "extends": "@mason/config/base.tsconfig.json",
-  "include": ["src", "src/globals.d.ts", "../apps/desktop/src/globals.d.ts"],
-  "exclude": ["dist"],
+  "include": [
+    "src",
+    "src/globals.d.ts",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "dist"
+  ],
   "compilerOptions": {
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": [
+        "./src/*"
+      ],
     },
-    "exactOptionalPropertyTypes": false
-  }
+    "exactOptionalPropertyTypes": false,
+  },
 }

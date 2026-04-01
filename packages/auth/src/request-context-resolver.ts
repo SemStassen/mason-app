@@ -123,6 +123,12 @@ export class RequestContextResolver extends ServiceMap.Service<
             user,
           };
         }),
+        /**
+         * Resolves workspace context for a given user and workspace.
+         *
+         * Verifies that the workspace exists and that the user is an active member,
+         * ensuring a user can only access workspaces they belong to.
+         */
         resolveWorkspaceContext: Effect.fn(
           "RequestContextResolver.resolveWorkspaceContext"
         )(function* (params) {

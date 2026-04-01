@@ -5,9 +5,9 @@ import { atomRegistry } from "./registry";
 
 const ONE_MINUTE_IN_MS = 60 * 1000;
 
-export const currentTimeAtom = Atom.make(
-  startOfMinute(new Date())
-).pipe(Atom.keepAlive);
+export const currentTimeAtom = Atom.make(startOfMinute(new Date())).pipe(
+  Atom.keepAlive
+);
 
 export function setCurrentTime(currentTime: Date) {
   atomRegistry.set(currentTimeAtom, startOfMinute(currentTime));

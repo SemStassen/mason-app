@@ -1,13 +1,12 @@
 import { ELECTRIC_PROTOCOL_QUERY_PARAMS } from "@electric-sql/client";
-import { HttpSessionMiddleware } from "@mason/core-server/shared/middleware";
-import { SessionContext } from "@mason/core/shared/auth";
-import { Config, Effect, Layer, Option, Schema } from "effect";
 import {
-  Headers,
-  HttpClient,
-  HttpRouter,
-  HttpServerResponse,
-} from "effect/unstable/http";
+  HttpSessionMiddleware,
+  HttpWorkspaceMiddleware,
+} from "@mason/core-server/shared/middleware";
+import { SessionContext, WorkspaceContext } from "@mason/core/shared/auth";
+import { Cause, Config, Effect, Layer, Option, Stream } from "effect";
+import { Headers, HttpRouter, HttpServerResponse } from "effect/unstable/http";
+import { HttpApiError } from "effect/unstable/httpapi";
 
 const electricConfig = Config.all({
   electricUrl: Config.string("ELECTRIC_URL"),
@@ -15,32 +14,15 @@ const electricConfig = Config.all({
   sourceSecret: Config.string("ELECTRIC_SOURCE_SECRET").pipe(Config.option),
 });
 
-const encodeJsonString = Schema.encodeSync(
-  Schema.fromJsonString(Schema.Unknown)
-);
-
 export const WorkspacesRouteLayer = HttpRouter.add(
   "GET",
   "/workspaces",
   (request) =>
     Effect.gen(function* () {
-      // Effect's request URL can be relative depending on runtime adapter.
-      // Normalizing to an absolute URL keeps search-param handling consistent.
-      const requestUrl = request.url.startsWith("http")
-        ? new URL(request.url)
-        : new URL(request.url, "http://localhost");
-
-      const { session } = yield* SessionContext;
-      const { activeWorkspaceId } = session;
-
-      if (Option.isNone(activeWorkspaceId)) {
-        return HttpServerResponse.text("forbidden", {
-          status: 403,
-        });
-      }
-
+      const sessionContext = yield* SessionContext;
       const { electricUrl, sourceId, sourceSecret } = yield* electricConfig;
 
+      const requestUrl = new URL(request.url, "http://localhost");
       const originUrl = new URL("/v1/shape", electricUrl);
 
       // Forward only Electric protocol parameters from the client.
@@ -50,39 +32,45 @@ export const WorkspacesRouteLayer = HttpRouter.add(
           originUrl.searchParams.set(key, value);
         }
       }
+      Option.map(sourceId, (id) => originUrl.searchParams.set("source_id", id));
+      Option.map(sourceSecret, (secret) =>
+        originUrl.searchParams.set("secret", secret)
+      );
 
       originUrl.searchParams.set("table", "workspaces");
-
-      if (Option.isSome(sourceId)) {
-        originUrl.searchParams.set("source_id", sourceId.value);
-      }
-
-      if (Option.isSome(sourceSecret)) {
-        originUrl.searchParams.set("secret", sourceSecret.value);
-      }
-
       // Apply row-level security
       originUrl.searchParams.set(
         "where",
-        `id IN (SELECT workspace_id FROM workspace_members WHERE user_id = ${encodeJsonString(session.userId)})`
+        `id IN (SELECT workspace_id FROM workspace_members WHERE user_id = ${sessionContext.user.id})`
       );
 
-      const upstream = yield* HttpClient.get(originUrl);
+      // We use raw fetch instead of Effect's HttpClient because HttpClient eagerly
+      // locks the response body's ReadableStream before we can proxy it as a stream.
+      const response = yield* Effect.tryPromise({
+        try: () => fetch(originUrl.toString()),
+        catch: () => new HttpApiError.InternalServerError(),
+      });
 
       // Upstream fetch may already be decompressed; stale encoding/length headers
       // can break browser decoding for streamed proxy responses.
-      const noEncoding = Headers.remove(upstream.headers, "content-encoding");
-      const noLength = Headers.remove(noEncoding, "content-length");
-      const vary = Option.match(Headers.get(noLength, "vary"), {
-        onNone: () => "Authorization",
-        onSome: (value) =>
-          value.includes("Authorization") ? value : `${value}, Authorization`,
-      });
-      const headers = Headers.set(noLength, "vary", vary);
+      const responseHeaders = Headers.set(
+        Headers.removeMany(
+          Headers.fromInput(Object.fromEntries(response.headers.entries())),
+          ["content-encoding", "content-length"]
+        ),
+        "vary",
+        "Authorization, Cookie"
+      );
 
-      return HttpServerResponse.stream(upstream.stream, {
-        status: upstream.status,
-        headers,
-      });
+      return HttpServerResponse.stream(
+        Stream.fromReadableStream({
+          evaluate: () => response.body!,
+          onError: (e) => new Cause.UnknownError(e),
+        }),
+        {
+          status: response.status,
+          headers: responseHeaders,
+        }
+      );
     })
-).pipe(Layer.provide(HttpSessionMiddleware.layer));
+).pipe(Layer.provide([HttpSessionMiddleware.layer]));
