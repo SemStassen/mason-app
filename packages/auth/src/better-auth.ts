@@ -1,10 +1,13 @@
 import { Email } from "@mason/core/shared/schemas";
+import { getAllowedOrigins } from "@mason/core/shared/config";
 import { Database, schema } from "@mason/db";
 import { Mailer } from "@mason/notifications/mailer";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, emailOTP } from "better-auth/plugins";
 import { Config, Effect, Layer, Schema, ServiceMap } from "effect";
+
+const trustedOrigins = getAllowedOrigins(process.env.FRONTEND_ORIGINS);
 
 export class BetterAuthError extends Schema.TaggedErrorClass<BetterAuthError>()(
   "auth/BetterAuthError",
@@ -34,8 +37,7 @@ export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
           provider: "pg",
           schema: schema,
         }),
-        trustedOrigins:
-          process.env.NODE_ENV === "development" ? ["http://localhost:*"] : [],
+        trustedOrigins,
         advanced: {
           database: {
             generateId: false,

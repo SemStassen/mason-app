@@ -1,5 +1,6 @@
 import { BunHttpClient, BunHttpServer, BunRuntime } from "@effect/platform-bun";
 import { BetterAuth, RequestContextResolver } from "@mason/auth";
+import { getAllowedOrigins } from "@mason/core/shared/config";
 import {
   SessionRepositoryLayer,
   UserRepositoryLayer,
@@ -10,10 +11,17 @@ import { DatabaseLayer } from "@mason/db";
 import { Mailer } from "@mason/notifications/mailer";
 import { makeObservabilityLayer } from "@mason/observability";
 import { Config, Layer } from "effect";
-import { HttpRouter } from "effect/unstable/http";
+import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
 
 import { ProjectsRouteLayer } from "./routes/projects";
+import { WorkspaceMembersRouteLayer } from "./routes/workspace-members";
 import { WorkspacesRouteLayer } from "./routes/workspaces";
+
+const allowedOrigins = getAllowedOrigins(process.env.FRONTEND_ORIGINS);
+
+const HealthRouteLayer = HttpRouter.add("GET", "/health", () =>
+  HttpServerResponse.json({ status: "ok" })
+);
 
 const RepositoriesLayer = Layer.mergeAll(
   SessionRepositoryLayer,
@@ -29,16 +37,14 @@ const RequestContextLayer = RequestContextResolver.layer.pipe(
 );
 
 const allRoutesLayer = Layer.mergeAll(
+  HealthRouteLayer,
   WorkspacesRouteLayer,
+  WorkspaceMembersRouteLayer,
   ProjectsRouteLayer
 ).pipe(
   Layer.provide(
     HttpRouter.cors({
-      allowedOrigins: [
-        "tauri://localhost",
-        "http://tauri.localhost",
-        "http://localhost:8002",
-      ],
+      allowedOrigins,
       allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
     })

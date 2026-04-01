@@ -22,6 +22,7 @@ import {
   RpcSessionMiddlewareLayer,
   RpcWorkspaceMiddlewareLayer,
 } from "@mason/core-server/shared/middleware";
+import { getAllowedOrigins } from "@mason/core/shared/config";
 import { IdentityModuleLayer } from "@mason/core/modules/identity";
 import { ProjectModuleLayer } from "@mason/core/modules/project";
 import { TimeModuleLayer } from "@mason/core/modules/time";
@@ -32,12 +33,18 @@ import { DatabaseLayer } from "@mason/db";
 import { Mailer } from "@mason/notifications/mailer";
 import { makeObservabilityLayer } from "@mason/observability";
 import { Config, Layer } from "effect";
-import { HttpRouter } from "effect/unstable/http";
+import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import { HttpApiRoutesLayer } from "./http";
 import { BetterAuthRoutesLayer } from "./routes/better-auth";
 import { AllRpcsGroup, AllRpcsGroupLayer } from "./rpc";
+
+const allowedOrigins = getAllowedOrigins(process.env.FRONTEND_ORIGINS);
+
+const HealthRouteLayer = HttpRouter.add("GET", "/health", () =>
+  HttpServerResponse.json({ status: "ok" })
+);
 
 const RepositoriesLayer = Layer.mergeAll(
   ProjectRepositoryLayer,
@@ -89,17 +96,14 @@ const RpcRouteLayer = RpcServer.layerHttp({
 );
 
 const AllRoutesLayer = Layer.mergeAll(
+  HealthRouteLayer,
   HttpApiRoutesLayer,
   RpcRouteLayer,
   BetterAuthRoutesLayer
 ).pipe(
   Layer.provide(
     HttpRouter.cors({
-      allowedOrigins: [
-        "tauri://localhost",
-        "http://tauri.localhost",
-        "http://localhost:8002",
-      ],
+      allowedOrigins,
       allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
     })

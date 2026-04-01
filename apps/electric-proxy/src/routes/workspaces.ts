@@ -1,9 +1,6 @@
 import { ELECTRIC_PROTOCOL_QUERY_PARAMS } from "@electric-sql/client";
-import {
-  HttpSessionMiddleware,
-  HttpWorkspaceMiddleware,
-} from "@mason/core-server/shared/middleware";
-import { SessionContext, WorkspaceContext } from "@mason/core/shared/auth";
+import { HttpSessionMiddleware } from "@mason/core-server/shared/middleware";
+import { SessionContext } from "@mason/core/shared/auth";
 import { Cause, Config, Effect, Layer, Option, Stream } from "effect";
 import { Headers, HttpRouter, HttpServerResponse } from "effect/unstable/http";
 import { HttpApiError } from "effect/unstable/httpapi";
