@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun build --outdir=dist src/index.ts",
+    "build": "bun build --target=bun --outdir=dist src/index.ts",
     "clean": "rm -rf node_modules dist .turbo tsconfig.tsbuildinfo",
     "dev": "bun run --hot src/index.ts",
     "format": "oxfmt --write .",
