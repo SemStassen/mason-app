@@ -1,5 +1,9 @@
 import { BunHttpClient, BunHttpServer, BunRuntime } from "@effect/platform-bun";
-import { BetterAuth, RequestContextResolver } from "@mason/auth";
+import {
+  BetterAuth,
+  BetterAuthConfig,
+  RequestContextResolver,
+} from "@mason/auth";
 import { CryptoLayer } from "@mason/core-server/infra/crypto";
 import {
   SessionRepositoryLayer,
@@ -22,29 +26,23 @@ import {
   RpcSessionMiddlewareLayer,
   RpcWorkspaceMiddlewareLayer,
 } from "@mason/core-server/shared/middleware";
-import { getAllowedOrigins } from "@mason/core/shared/config";
 import { IdentityModuleLayer } from "@mason/core/modules/identity";
 import { ProjectModuleLayer } from "@mason/core/modules/project";
 import { TimeModuleLayer } from "@mason/core/modules/time";
 import { WorkspaceModuleLayer } from "@mason/core/modules/workspace";
 import { WorkspaceInvitationModuleLayer } from "@mason/core/modules/workspace-invitation";
 import { WorkspaceMemberModuleLayer } from "@mason/core/modules/workspace-member";
+import { parseOrigins } from "@mason/core/shared/config";
 import { DatabaseLayer } from "@mason/db";
 import { Mailer } from "@mason/notifications/mailer";
 import { makeObservabilityLayer } from "@mason/observability";
-import { Config, Layer } from "effect";
+import { Config, Effect, Layer } from "effect";
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import { HttpApiRoutesLayer } from "./http";
 import { BetterAuthRoutesLayer } from "./routes/better-auth";
 import { AllRpcsGroup, AllRpcsGroupLayer } from "./rpc";
-
-const allowedOrigins = getAllowedOrigins(process.env.FRONTEND_ORIGINS);
-
-const HealthRouteLayer = HttpRouter.add("GET", "/health", () =>
-  HttpServerResponse.json({ status: "ok" })
-);
 
 const RepositoriesLayer = Layer.mergeAll(
   ProjectRepositoryLayer,
@@ -59,7 +57,9 @@ const RepositoriesLayer = Layer.mergeAll(
 ).pipe(Layer.provideMerge(DatabaseLayer));
 
 const RequestContextLayer = RequestContextResolver.layer.pipe(
-  Layer.provideMerge(BetterAuth.layer),
+  Layer.provideMerge(
+    BetterAuth.layer.pipe(Layer.provide(BetterAuthConfig.layer))
+  ),
   Layer.provideMerge(Mailer.layerDev),
   Layer.provideMerge(RepositoriesLayer)
 );
@@ -95,6 +95,10 @@ const RpcRouteLayer = RpcServer.layerHttp({
   Layer.provide(AllRpcsGroupLayer)
 );
 
+const HealthRouteLayer = HttpRouter.add("GET", "/health", () =>
+  HttpServerResponse.json({ status: "ok" })
+);
+
 const AllRoutesLayer = Layer.mergeAll(
   HealthRouteLayer,
   HttpApiRoutesLayer,
@@ -103,7 +107,13 @@ const AllRoutesLayer = Layer.mergeAll(
 ).pipe(
   Layer.provide(
     HttpRouter.cors({
-      allowedOrigins,
+      allowedOrigins: Effect.runSync(
+        Effect.gen(function* () {
+          const frontendOrigins = yield* Config.string("FRONTEND_ORIGINS");
+
+          return yield* parseOrigins(frontendOrigins);
+        })
+      ),
       allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
     })

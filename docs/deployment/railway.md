@@ -80,4 +80,6 @@ VITE_ELECTRIC_PROXY_URL=https://<proxy-domain>
 1. `backend` and `electric-proxy` both expose `GET /health` for Railway health checks.
 2. `FRONTEND_ORIGINS` is a comma-separated allowlist used by backend CORS, proxy CORS, and Better Auth trusted origins.
 3. `backend` and `electric-proxy` use Railpack with `bun run apps/.../src/index.ts` start commands.
-4. Start with exact Vercel URLs in `FRONTEND_ORIGINS`. Add more preview domains only when you need them.
+4. `FRONTEND_ORIGINS` is required in every environment, including local development.
+5. For local development, set `FRONTEND_ORIGINS=tauri://localhost,http://tauri.localhost,http://localhost:8002`.
+6. Start with exact Vercel URLs in `FRONTEND_ORIGINS`. Add more preview domains only when you need them.

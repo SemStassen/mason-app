@@ -1,13 +1,12 @@
-import { getAllowedOrigins } from "@mason/core/shared/config";
 import { Email } from "@mason/core/shared/schemas";
 import { Database, schema } from "@mason/db";
 import { Mailer } from "@mason/notifications/mailer";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, emailOTP } from "better-auth/plugins";
-import { Config, Effect, Layer, Schema, ServiceMap } from "effect";
+import { Effect, Layer, Schema, ServiceMap } from "effect";
 
-const trustedOrigins = getAllowedOrigins(process.env.FRONTEND_ORIGINS);
+import { BetterAuthConfig } from "./better-auth-config";
 
 export class BetterAuthError extends Schema.TaggedErrorClass<BetterAuthError>()(
   "auth/BetterAuthError",
@@ -20,11 +19,7 @@ export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
   "@mason/auth/BetterAuth",
   {
     make: Effect.gen(function* () {
-      const authConfig = yield* Config.all({
-        betterAuthSecret: Config.string("BETTER_AUTH_SECRET"),
-        googleClientId: Config.string("GOOGLE_CLIENT_ID"),
-        googleClientSecret: Config.string("GOOGLE_CLIENT_SECRET"),
-      });
+      const betterAuthConfig = yield* BetterAuthConfig;
 
       const db = yield* Database;
       const mailer = yield* Mailer;
@@ -34,12 +29,12 @@ export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
 
       const betterAuthClient = betterAuth({
         appName: "Mason",
-        secret: authConfig.betterAuthSecret,
+        secret: betterAuthConfig.secret,
         database: drizzleAdapter(db.unsafeDrizzle, {
           provider: "pg",
           schema: schema,
         }),
-        trustedOrigins,
+        trustedOrigins: betterAuthConfig.trustedOrigins,
         advanced: {
           database: {
             generateId: false,
@@ -51,8 +46,8 @@ export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
         },
         socialProviders: {
           google: {
-            clientId: authConfig.googleClientId,
-            clientSecret: authConfig.googleClientSecret,
+            clientId: betterAuthConfig.googleClientId,
+            clientSecret: betterAuthConfig.googleClientSecret,
             accessType: "offline",
             prompt: "select_account consent",
           },
