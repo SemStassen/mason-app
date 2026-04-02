@@ -6,8 +6,8 @@ import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import reactCompiler from "babel-plugin-react-compiler";
 import viteReact from "@vitejs/plugin-react";
+import reactCompiler from "babel-plugin-react-compiler";
 import { defineConfig } from "vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

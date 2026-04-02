@@ -103,7 +103,10 @@ export const parseOrigins = (rawOrigins: string) =>
               });
             }
 
-            if (wildcardUrl.username.length > 0 || wildcardUrl.password.length > 0) {
+            if (
+              wildcardUrl.username.length > 0 ||
+              wildcardUrl.password.length > 0
+            ) {
               return yield* new InvalidFrontendOriginsError({
                 message: `Origin patterns must not include credentials: ${rawOrigin}`,
               });
@@ -114,7 +117,9 @@ export const parseOrigins = (rawOrigins: string) =>
             return `${protocol}://${prefix}*.${hostname}${port === undefined ? "" : `:${port}`}`;
           }
 
-          const url = yield* Schema.decodeUnknownEffect(Schema.URLFromString)(rawOrigin).pipe(
+          const url = yield* Schema.decodeUnknownEffect(Schema.URLFromString)(
+            rawOrigin
+          ).pipe(
             Effect.mapError(
               () =>
                 new InvalidFrontendOriginsError({

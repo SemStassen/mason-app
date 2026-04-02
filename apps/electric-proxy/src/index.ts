@@ -60,8 +60,11 @@ const CorsLayer = HttpRouter.middleware(
     allowedOrigins: (origin) => matchesAllowedOrigin(origin, allowedOrigins),
     allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
-  })
-).layer;
+  }),
+  {
+    global: true,
+  }
+);
 
 const allRoutesLayer = Layer.mergeAll(
   HealthRouteLayer,
