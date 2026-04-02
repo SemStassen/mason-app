@@ -1,5 +1,5 @@
-import { WorkspaceIntegration } from "@mason/core/modules/integration";
-import { generateUUID } from "@mason/core/shared/utils";
+import { WorkspaceIntegration } from "@recount/core/modules/integration";
+import { generateUUID } from "@recount/core/shared/utils";
 import { Option, Result } from "effect";
 import type { DateTime } from "effect";
 

@@ -1,6 +1,6 @@
-import { User, UserRepository } from "@mason/core/modules/identity";
-import { RepositoryError } from "@mason/core/shared/repository";
-import { Database, schema } from "@mason/db";
+import { User, UserRepository } from "@recount/core/modules/identity";
+import { RepositoryError } from "@recount/core/shared/repository";
+import { Database, schema } from "@recount/db";
 import { eq } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";

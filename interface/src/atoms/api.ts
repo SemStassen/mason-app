@@ -1,11 +1,11 @@
 import { Atom, Result } from "@effect/atom-react";
-import { WorkspaceIntegrationResponse } from "@mason/api-contract/dto/workspace-integration.dto";
-import type { CreateWorkspaceIntegrationRequest } from "@mason/api-contract/dto/workspace-integration.dto";
+import { WorkspaceIntegrationResponse } from "@recount/api-contract/dto/workspace-integration.dto";
+import type { CreateWorkspaceIntegrationRequest } from "@recount/api-contract/dto/workspace-integration.dto";
 import { Effect } from "effect";
 
-import { MasonAtomClient, MasonClient } from "~/lib/rpc/atom-client";
+import { RecountAtomClient, RecountClient } from "~/lib/rpc/atom-client";
 
-const workspaceIntegrationsAtomReadonly = MasonAtomClient.query(
+const workspaceIntegrationsAtomReadonly = RecountAtomClient.query(
   "WorkspaceIntegration",
   "List",
   {
@@ -34,9 +34,9 @@ export const createWorkspaceIntegrationAtom = Atom.optimisticFn(
 
       return [...current, optimisticResponse];
     },
-    fn: MasonAtomClient.runtime.fn(
+    fn: RecountAtomClient.runtime.fn(
       Effect.fnUntraced(function* (update) {
-        return yield* MasonClient.WorkspaceIntegration.Create({
+        return yield* RecountClient.WorkspaceIntegration.Create({
           payload: update,
         });
       })
@@ -47,9 +47,9 @@ export const createWorkspaceIntegrationAtom = Atom.optimisticFn(
 export const deleteWorkspaceIntegrationAtom = Atom.family((id: string) =>
   Atom.optimisticFn(workspaceIntegrationsAtom, {
     reducer: (current) => current.filter((i) => i.id !== id),
-    fn: MasonAtomClient.runtime.fn(
+    fn: RecountAtomClient.runtime.fn(
       Effect.fnUntraced(function* () {
-        return yield* MasonClient.WorkspaceIntegration.Delete({
+        return yield* RecountClient.WorkspaceIntegration.Delete({
           path: { id },
         });
       })
@@ -57,13 +57,13 @@ export const deleteWorkspaceIntegrationAtom = Atom.family((id: string) =>
   })
 );
 
-const projectsAtomReadonly = MasonAtomClient.query("Project", "List", {
+const projectsAtomReadonly = RecountAtomClient.query("Project", "List", {
   reactivityKeys: ["projects"],
 }).pipe(Atom.map(Result.getOrElse(() => [])), Atom.keepAlive);
 
 export const projectsAtom = Atom.optimistic(projectsAtomReadonly);
 
-const tasksAtomReadonly = MasonAtomClient.query("Task", "List", {
+const tasksAtomReadonly = RecountAtomClient.query("Task", "List", {
   reactivityKeys: ["tasks"],
 }).pipe(Atom.map(Result.getOrElse(() => [])), Atom.keepAlive);
 

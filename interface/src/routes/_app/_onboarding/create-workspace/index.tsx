@@ -1,11 +1,11 @@
-import { Workspace } from "@mason/core/modules/workspace";
-import { slugify } from "@mason/core/shared/utils";
+import { Workspace } from "@recount/core/modules/workspace";
+import { slugify } from "@recount/core/shared/utils";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
-} from "@mason/ui/input-group";
+} from "@recount/ui/input-group";
 import { defaultValidationLogic } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Effect, Schema } from "effect";
@@ -16,7 +16,7 @@ import {
   createParsedSubmitHandler,
   createSubmitValidator,
 } from "~/lib/form";
-import { MasonAtomRpcClient } from "~/lib/rpc/atom-client";
+import { RecountAtomRpcClient } from "~/lib/rpc/atom-client";
 import { runtime } from "~/lib/runtime";
 
 export const Route = createFileRoute("/_app/_onboarding/create-workspace/")({
@@ -44,7 +44,7 @@ function RouteComponent() {
     onSubmit: createParsedSubmitHandler(schema, async ({ value }) => {
       await runtime.runPromise(
         Effect.gen(function* () {
-          const client = yield* MasonAtomRpcClient;
+          const client = yield* RecountAtomRpcClient;
 
           const res = yield* client("Workspace.Create", {
             name: value.name,
@@ -102,7 +102,7 @@ function RouteComponent() {
                       {...props}
                     />
                     <InputGroupAddon>
-                      <InputGroupText>mason.app/</InputGroupText>
+                      <InputGroupText>recount.app/</InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
                 ),

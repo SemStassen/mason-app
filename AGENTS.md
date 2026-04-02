@@ -1,4 +1,4 @@
-# Mason Agent Playbook
+# Recount Agent Playbook
 
 This guide is for agentic coding tools operating in this monorepo.
 Stack: Bun workspaces + Turbo + TypeScript + Effect + Oxlint/Oxfmt (Ultracite preset).

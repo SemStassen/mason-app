@@ -3,17 +3,20 @@ import {
   BetterAuth,
   BetterAuthConfig,
   RequestContextResolver,
-} from "@mason/auth";
+} from "@recount/auth";
 import {
   SessionRepositoryLayer,
   UserRepositoryLayer,
-} from "@mason/core-server/modules/identity";
-import { WorkspaceRepositoryLayer } from "@mason/core-server/modules/workspace";
-import { WorkspaceMemberRepositoryLayer } from "@mason/core-server/modules/workspace-member";
-import { matchesAllowedOrigin, parseOrigins } from "@mason/core/shared/config";
-import { DatabaseLayer } from "@mason/db";
-import { Mailer } from "@mason/notifications/mailer";
-import { makeObservabilityLayer } from "@mason/observability";
+} from "@recount/core-server/modules/identity";
+import { WorkspaceRepositoryLayer } from "@recount/core-server/modules/workspace";
+import { WorkspaceMemberRepositoryLayer } from "@recount/core-server/modules/workspace-member";
+import {
+  matchesAllowedOrigin,
+  parseOrigins,
+} from "@recount/core/shared/config";
+import { DatabaseLayer } from "@recount/db";
+import { Mailer } from "@recount/notifications/mailer";
+import { makeObservabilityLayer } from "@recount/observability";
 import { Config, Effect, Layer } from "effect";
 import {
   HttpMiddleware,
@@ -68,7 +71,7 @@ const allRoutesLayer = Layer.mergeAll(
 ).pipe(Layer.provide(CorsLayer));
 
 const ObservabilityLayer = makeObservabilityLayer({
-  serviceName: "mason-electric-proxy",
+  serviceName: "recount-electric-proxy",
 });
 
 const ServerLayer = HttpRouter.serve(allRoutesLayer).pipe(

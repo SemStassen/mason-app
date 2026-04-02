@@ -1,9 +1,9 @@
 import {
   WorkspaceInvitation,
   WorkspaceInvitationRepository,
-} from "@mason/core/modules/workspace-invitation";
-import { RepositoryError } from "@mason/core/shared/repository";
-import { Database, schema } from "@mason/db";
+} from "@recount/core/modules/workspace-invitation";
+import { RepositoryError } from "@recount/core/shared/repository";
+import { Database, schema } from "@recount/db";
 import { and, eq, gt } from "drizzle-orm";
 import { DateTime, Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
@@ -100,7 +100,10 @@ export const WorkspaceInvitationRepositoryLayer = Layer.effect(
                 .from(schema.workspaceInvitationsTable)
                 .where(
                   and(
-                    eq(schema.workspaceInvitationsTable.workspaceId, workspaceId),
+                    eq(
+                      schema.workspaceInvitationsTable.workspaceId,
+                      workspaceId
+                    ),
                     eq(schema.workspaceInvitationsTable.email, email),
                     eq(schema.workspaceInvitationsTable.status, "pending"),
                     gt(

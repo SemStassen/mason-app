@@ -1,9 +1,9 @@
 import type {
   UpdateTimeEntryCommand,
   UpdateTimeEntryResult,
-} from "@mason/core/contracts";
-import { TimeModule } from "@mason/core/modules/time";
-import { WorkspaceContext } from "@mason/core/shared/auth";
+} from "@recount/core/contracts";
+import { TimeModule } from "@recount/core/modules/time";
+import { WorkspaceContext } from "@recount/core/shared/auth";
 import { Effect } from "effect";
 
 import { Authorization } from "#shared/authorization/index";

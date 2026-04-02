@@ -1,5 +1,5 @@
-import { Button } from "@mason/ui/button";
-import { Icons } from "@mason/ui/icons";
+import { Button } from "@recount/ui/button";
+import { Icons } from "@recount/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
 
 import type { Project, Task } from "~/types";

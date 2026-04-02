@@ -1,4 +1,8 @@
-import { AuthRpcGroup, UserRpcGroup, WorkspaceRpcGroup } from "@mason/core/rpc";
+import {
+  AuthRpcGroup,
+  UserRpcGroup,
+  WorkspaceRpcGroup,
+} from "@recount/core/rpc";
 import { Layer } from "effect";
 import {
   FetchHttpClient,
@@ -44,8 +48,8 @@ const AtomRpcProtocolLayer = Layer.mergeAll(
   Reactivity.layer
 );
 
-export class MasonAtomRpcClient extends AtomRpc.Service<MasonAtomRpcClient>()(
-  "@mason/interface/MasonAtomRpcClient",
+export class RecountAtomRpcClient extends AtomRpc.Service<RecountAtomRpcClient>()(
+  "@recount/interface/RecountAtomRpcClient",
   {
     group: allRpcGroups,
     protocol: AtomRpcProtocolLayer,

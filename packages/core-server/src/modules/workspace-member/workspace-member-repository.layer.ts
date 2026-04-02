@@ -1,9 +1,9 @@
 import {
   WorkspaceMember,
   WorkspaceMemberRepository,
-} from "@mason/core/modules/workspace-member";
-import { RepositoryError } from "@mason/core/shared/repository";
-import { Database, schema } from "@mason/db";
+} from "@recount/core/modules/workspace-member";
+import { RepositoryError } from "@recount/core/shared/repository";
+import { Database, schema } from "@recount/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";

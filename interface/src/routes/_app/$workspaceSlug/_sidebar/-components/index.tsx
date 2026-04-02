@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "@effect/atom-react";
-import { Button } from "@mason/ui/button";
-import { Icons } from "@mason/ui/icons";
-import type { IconProps } from "@mason/ui/icons";
+import { Button } from "@recount/ui/button";
+import { Icons } from "@recount/ui/icons";
+import type { IconProps } from "@recount/ui/icons";
 import { Link, linkOptions } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";

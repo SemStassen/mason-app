@@ -1,5 +1,5 @@
 {
-  "name": "@mason/web",
+  "name": "@recount/web",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,10 +12,10 @@
     "machine-translate": "inlang machine translate --project project.inlang"
   },
   "dependencies": {
-    "@mason/interface": "workspace:*"
+    "@recount/interface": "workspace:*"
   },
   "devDependencies": {
-    "@mason/config": "workspace:*",
+    "@recount/config": "workspace:*",
     "typescript": "catalog:dev",
     "vite": "catalog:dev"
   }

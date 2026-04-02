@@ -1,5 +1,5 @@
 {
-  "name": "@mason/backend",
+  "name": "@recount/backend",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,16 +12,16 @@
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",
-    "@mason/auth": "workspace:*",
-    "@mason/core": "workspace:*",
-    "@mason/core-server": "workspace:*",
-    "@mason/db": "workspace:*",
-    "@mason/notifications": "workspace:*",
-    "@mason/observability": "workspace:*",
+    "@recount/auth": "workspace:*",
+    "@recount/core": "workspace:*",
+    "@recount/core-server": "workspace:*",
+    "@recount/db": "workspace:*",
+    "@recount/notifications": "workspace:*",
+    "@recount/observability": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
-    "@mason/config": "workspace:*",
+    "@recount/config": "workspace:*",
     "typescript": "catalog:dev"
   }
 }

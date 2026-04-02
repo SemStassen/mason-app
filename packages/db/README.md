@@ -1,4 +1,4 @@
-# @mason/db
+# @recount/db
 
 ## Temporary Drizzle driver note
 

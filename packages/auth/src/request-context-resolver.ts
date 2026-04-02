@@ -3,22 +3,22 @@ import {
   SessionRepository,
   UserNotFoundError,
   UserRepository,
-} from "@mason/core/modules/identity";
+} from "@recount/core/modules/identity";
 import {
   WorkspaceRepository,
   WorkspaceNotFoundError,
-} from "@mason/core/modules/workspace";
+} from "@recount/core/modules/workspace";
 import {
   WorkspaceMemberRepository,
   WorkspaceMemberNotFoundError,
-} from "@mason/core/modules/workspace-member";
+} from "@recount/core/modules/workspace-member";
 import type {
   SessionContextShape,
   WorkspaceContextShape,
-} from "@mason/core/shared/auth";
-import type { RepositoryError } from "@mason/core/shared/repository";
-import type { WorkspaceId } from "@mason/core/shared/schemas";
-import { SessionId, UserId } from "@mason/core/shared/schemas";
+} from "@recount/core/shared/auth";
+import type { RepositoryError } from "@recount/core/shared/repository";
+import type { WorkspaceId } from "@recount/core/shared/schemas";
+import { SessionId, UserId } from "@recount/core/shared/schemas";
 import { Effect, Layer, Schema, ServiceMap, Option } from "effect";
 
 import type { BetterAuthError } from "./better-auth";
@@ -50,7 +50,7 @@ export class RequestContextResolver extends ServiceMap.Service<
       WorkspaceNotFoundError | WorkspaceMemberNotFoundError | RepositoryError
     >;
   }
->()("@mason/auth/RequestContextResolver") {
+>()("@recount/auth/RequestContextResolver") {
   static readonly layer = Layer.effect(
     RequestContextResolver,
     Effect.gen(function* () {

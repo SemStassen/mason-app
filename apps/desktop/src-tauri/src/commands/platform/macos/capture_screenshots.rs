@@ -78,7 +78,7 @@ fn capture_screen_with_sck(base_dir: &PathBuf, timestamp: u32) -> Result<Vec<Str
                             &NSArray::new()
                         );
                         
-                        let screenshot_path = base_dir.join(format!("{}_{}_mason.jpg", timestamp, idx));
+                        let screenshot_path = base_dir.join(format!("{}_{}_recount.jpg", timestamp, idx));
                         
                         SCScreenshotManager::captureImageWithFilter_configuration_completionHandler(
                             &filter,

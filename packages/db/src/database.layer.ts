@@ -48,7 +48,7 @@ const DatabaseLayerBase = Layer.effect(
     });
 
     const ActiveConnection = ServiceMap.Reference<ActiveConnection>(
-      "@mason/db/ActiveConnection",
+      "@recount/db/ActiveConnection",
       {
         defaultValue: () => drizzle,
       }

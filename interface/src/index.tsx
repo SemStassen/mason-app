@@ -1,6 +1,6 @@
 import { RegistryContext } from "@effect/atom-react";
-import { AnchoredToastProvider, ToastProvider } from "@mason/ui/toast";
-import { TooltipProvider } from "@mason/ui/tooltip";
+import { AnchoredToastProvider, ToastProvider } from "@recount/ui/toast";
+import { TooltipProvider } from "@recount/ui/tooltip";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import {
   formDevtoolsPlugin,
@@ -61,7 +61,7 @@ export const router = createRouter({
   ),
 });
 
-export function renderMasonInterface() {
+export function renderRecountInterface() {
   const rootElement = document.querySelector("#root");
 
   if (rootElement && !rootElement.innerHTML) {

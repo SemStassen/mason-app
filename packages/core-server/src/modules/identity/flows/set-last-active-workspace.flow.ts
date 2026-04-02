@@ -1,10 +1,10 @@
 import type {
   SetLastActiveWorkspaceCommand,
   SetLastActiveWorkspaceResult,
-} from "@mason/core/contracts";
-import { IdentityModule } from "@mason/core/modules/identity";
-import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
-import { SessionContext } from "@mason/core/shared/auth";
+} from "@recount/core/contracts";
+import { IdentityModule } from "@recount/core/modules/identity";
+import { WorkspaceMemberModule } from "@recount/core/modules/workspace-member";
+import { SessionContext } from "@recount/core/shared/auth";
 import { Effect, Option } from "effect";
 
 export const setLastActiveWorkspaceFlow = Effect.fn(

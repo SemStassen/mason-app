@@ -1,6 +1,6 @@
-import { Email } from "@mason/core/shared/schemas";
-import { Database, schema } from "@mason/db";
-import { Mailer } from "@mason/notifications/mailer";
+import { Email } from "@recount/core/shared/schemas";
+import { Database, schema } from "@recount/db";
+import { Mailer } from "@recount/notifications/mailer";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, emailOTP } from "better-auth/plugins";
@@ -16,7 +16,7 @@ export class BetterAuthError extends Schema.TaggedErrorClass<BetterAuthError>()(
 ) {}
 
 export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
-  "@mason/auth/BetterAuth",
+  "@recount/auth/BetterAuth",
   {
     make: Effect.gen(function* () {
       const betterAuthConfig = yield* BetterAuthConfig;
@@ -28,7 +28,7 @@ export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
       const runPromise = Effect.runPromiseWith(services);
 
       const betterAuthClient = betterAuth({
-        appName: "Mason",
+        appName: "Recount",
         secret: betterAuthConfig.secret,
         database: drizzleAdapter(db.unsafeDrizzle, {
           provider: "pg",
@@ -39,7 +39,7 @@ export class BetterAuth extends ServiceMap.Service<BetterAuth>()(
           database: {
             generateId: false,
           },
-          cookiePrefix: "mason",
+          cookiePrefix: "recount",
         },
         emailAndPassword: {
           enabled: true,

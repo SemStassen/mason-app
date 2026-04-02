@@ -1,5 +1,5 @@
 {
-  "name": "@mason/adapters",
+  "name": "@recount/adapters",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "effect": "catalog:"
   },
   "devDependencies": {
-    "@mason/config": "workspace:*",
+    "@recount/config": "workspace:*",
     "typescript": "catalog:dev"
   },
   "exports": {

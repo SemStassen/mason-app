@@ -1,5 +1,6 @@
-import type { PlainApiKey } from "@mason/framework";
+import type { PlainApiKey } from "@recount/framework";
 import { Effect, Layer, Redacted, Schema } from "effect";
+
 import { TimeTrackingIntegrationAdapter } from "../adapter";
 import { InternalAdapterError, InvalidApiKeyError } from "../errors";
 import { ExternalProject, ExternalTask } from "../models";
@@ -56,7 +57,7 @@ const floatFetch = ({ apiKey, path }: { apiKey: PlainApiKey; path: string }) =>
         fetch(`${BASE_URL}${path}`, {
           headers: {
             Authorization: `Bearer ${Redacted.value(apiKey)}`,
-            "User-Agent": "Mason app - private demo (semstassen@gmail.com)",
+            "User-Agent": "Recount app - private demo (semstassen@gmail.com)",
           },
         }),
       catch: (e) => new InternalAdapterError({ cause: e }),

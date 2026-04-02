@@ -48,4 +48,4 @@ interface TimeModuleShape {
 export class TimeModule extends ServiceMap.Service<
   TimeModule,
   TimeModuleShape
->()("@mason/time/TimeModule") {}
+>()("@recount/time/TimeModule") {}

@@ -1,8 +1,8 @@
 import { useAtomValue } from "@effect-atom/atom-react";
-import { Avatar, AvatarFallback } from "@mason/ui/avatar";
-import { Badge } from "@mason/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@mason/ui/card";
-import { Icons } from "@mason/ui/icons";
+import { Avatar, AvatarFallback } from "@recount/ui/avatar";
+import { Badge } from "@recount/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@recount/ui/card";
+import { Icons } from "@recount/ui/icons";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { workspaceIntegrationsAtom } from "~/atoms/api";

@@ -55,4 +55,4 @@ interface WorkspaceMemberModuleShape {
 export class WorkspaceMemberModule extends ServiceMap.Service<
   WorkspaceMemberModule,
   WorkspaceMemberModuleShape
->()("@mason/workspace-member/WorkspaceMemberModule") {}
+>()("@recount/workspace-member/WorkspaceMemberModule") {}

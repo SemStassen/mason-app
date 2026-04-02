@@ -3,39 +3,42 @@ import {
   BetterAuth,
   BetterAuthConfig,
   RequestContextResolver,
-} from "@mason/auth";
-import { CryptoLayer } from "@mason/core-server/infra/crypto";
+} from "@recount/auth";
+import { CryptoLayer } from "@recount/core-server/infra/crypto";
 import {
   SessionRepositoryLayer,
   UserRepositoryLayer,
-} from "@mason/core-server/modules/identity";
+} from "@recount/core-server/modules/identity";
 import {
   IntegrationModuleLayer,
   WorkspaceIntegrationRepositoryLayer,
-} from "@mason/core-server/modules/integration";
+} from "@recount/core-server/modules/integration";
 import {
   ProjectRepositoryLayer,
   TaskRepositoryLayer,
-} from "@mason/core-server/modules/project";
-import { TimeEntryRepositoryLayer } from "@mason/core-server/modules/time";
-import { WorkspaceRepositoryLayer } from "@mason/core-server/modules/workspace";
-import { WorkspaceInvitationRepositoryLayer } from "@mason/core-server/modules/workspace-invitation";
-import { WorkspaceMemberRepositoryLayer } from "@mason/core-server/modules/workspace-member";
-import { Authorization } from "@mason/core-server/shared/authorization";
+} from "@recount/core-server/modules/project";
+import { TimeEntryRepositoryLayer } from "@recount/core-server/modules/time";
+import { WorkspaceRepositoryLayer } from "@recount/core-server/modules/workspace";
+import { WorkspaceInvitationRepositoryLayer } from "@recount/core-server/modules/workspace-invitation";
+import { WorkspaceMemberRepositoryLayer } from "@recount/core-server/modules/workspace-member";
+import { Authorization } from "@recount/core-server/shared/authorization";
 import {
   RpcSessionMiddlewareLayer,
   RpcWorkspaceMiddlewareLayer,
-} from "@mason/core-server/shared/middleware";
-import { IdentityModuleLayer } from "@mason/core/modules/identity";
-import { ProjectModuleLayer } from "@mason/core/modules/project";
-import { TimeModuleLayer } from "@mason/core/modules/time";
-import { WorkspaceModuleLayer } from "@mason/core/modules/workspace";
-import { WorkspaceInvitationModuleLayer } from "@mason/core/modules/workspace-invitation";
-import { WorkspaceMemberModuleLayer } from "@mason/core/modules/workspace-member";
-import { matchesAllowedOrigin, parseOrigins } from "@mason/core/shared/config";
-import { DatabaseLayer } from "@mason/db";
-import { Mailer } from "@mason/notifications/mailer";
-import { makeObservabilityLayer } from "@mason/observability";
+} from "@recount/core-server/shared/middleware";
+import { IdentityModuleLayer } from "@recount/core/modules/identity";
+import { ProjectModuleLayer } from "@recount/core/modules/project";
+import { TimeModuleLayer } from "@recount/core/modules/time";
+import { WorkspaceModuleLayer } from "@recount/core/modules/workspace";
+import { WorkspaceInvitationModuleLayer } from "@recount/core/modules/workspace-invitation";
+import { WorkspaceMemberModuleLayer } from "@recount/core/modules/workspace-member";
+import {
+  matchesAllowedOrigin,
+  parseOrigins,
+} from "@recount/core/shared/config";
+import { DatabaseLayer } from "@recount/db";
+import { Mailer } from "@recount/notifications/mailer";
+import { makeObservabilityLayer } from "@recount/observability";
 import { Config, Effect, Layer } from "effect";
 import {
   HttpMiddleware,
@@ -129,7 +132,7 @@ const AllRoutesLayer = Layer.mergeAll(
 const MainLayer = ModulesLayer.pipe(Layer.provideMerge(InfraLayer));
 
 const ObservabilityLayer = makeObservabilityLayer({
-  serviceName: "mason-backend",
+  serviceName: "recount-backend",
 });
 
 const ServerLayer = HttpRouter.serve(AllRoutesLayer).pipe(

@@ -96,4 +96,4 @@ interface ProjectModuleShape {
 export class ProjectModule extends ServiceMap.Service<
   ProjectModule,
   ProjectModuleShape
->()("@mason/project/ProjectModule") {}
+>()("@recount/project/ProjectModule") {}

@@ -3,8 +3,8 @@ import {
   createWorkspaceFlow,
   listWorkspacesFlow,
   updateWorkspaceFlow,
-} from "@mason/core-server/modules/workspace";
-import { WorkspaceRpcGroup } from "@mason/core/rpc";
+} from "@recount/core-server/modules/workspace";
+import { WorkspaceRpcGroup } from "@recount/core/rpc";
 import { Effect } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 

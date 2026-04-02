@@ -30,4 +30,4 @@ export interface WorkspaceMemberRepositoryShape {
 export class WorkspaceMemberRepository extends ServiceMap.Service<
   WorkspaceMemberRepository,
   WorkspaceMemberRepositoryShape
->()("@mason/workspace-member/WorkspaceMemberRepository") {}
+>()("@recount/workspace-member/WorkspaceMemberRepository") {}

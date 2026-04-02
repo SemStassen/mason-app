@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@mason/ui/avatar";
-import { Button } from "@mason/ui/button";
-import { Icons } from "@mason/ui/icons";
+import { Avatar, AvatarFallback, AvatarImage } from "@recount/ui/avatar";
+import { Button } from "@recount/ui/button";
+import { Icons } from "@recount/ui/icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@mason/ui/menu";
+} from "@recount/ui/menu";
 import { Link, useRouter } from "@tanstack/react-router";
 
 import { Route as WorkspaceRoute } from "~/routes/_app/$workspaceSlug/route";
@@ -25,7 +25,7 @@ function WorkspaceDropdownMenu() {
   // const handleSetActiveWorkspace = async (workspaceId: string) => {
   //   await Effect.runPromise(
   //     Effect.gen(function* () {
-  //       yield* MasonClient.Workspace.SetActive({
+  //       yield* RecountClient.Workspace.SetActive({
   //         payload: {
   //           workspaceId: workspaceId,
   //         },

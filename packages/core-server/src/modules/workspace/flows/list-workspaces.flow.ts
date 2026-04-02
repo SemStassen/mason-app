@@ -1,10 +1,10 @@
 import type {
   ListWorkspacesCommand,
   ListWorkspacesResult,
-} from "@mason/core/contracts";
-import { WorkspaceModule } from "@mason/core/modules/workspace";
-import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
-import { SessionContext } from "@mason/core/shared/auth";
+} from "@recount/core/contracts";
+import { WorkspaceModule } from "@recount/core/modules/workspace";
+import { WorkspaceMemberModule } from "@recount/core/modules/workspace-member";
+import { SessionContext } from "@recount/core/shared/auth";
 import { Effect } from "effect";
 
 export const listWorkspacesFlow = Effect.fn("flows.listWorkspacesFlow")(

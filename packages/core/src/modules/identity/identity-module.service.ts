@@ -39,4 +39,4 @@ interface IdentityModuleShape {
 export class IdentityModule extends ServiceMap.Service<
   IdentityModule,
   IdentityModuleShape
->()("@mason/identity/IdentityModule") {}
+>()("@recount/identity/IdentityModule") {}

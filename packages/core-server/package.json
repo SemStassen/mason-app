@@ -1,5 +1,5 @@
 {
-  "name": "@mason/core-server",
+  "name": "@recount/core-server",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,15 +9,15 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mason/auth": "workspace:*",
-    "@mason/core": "workspace:*",
-    "@mason/db": "workspace:*",
-    "@mason/notifications": "workspace:*",
+    "@recount/auth": "workspace:*",
+    "@recount/core": "workspace:*",
+    "@recount/db": "workspace:*",
+    "@recount/notifications": "workspace:*",
     "drizzle-orm": "catalog:",
     "effect": "catalog:"
   },
   "devDependencies": {
-    "@mason/config": "workspace:*",
+    "@recount/config": "workspace:*",
     "typescript": "catalog:dev"
   },
   "imports": {

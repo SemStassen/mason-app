@@ -1,4 +1,4 @@
-import { createInterfaceViteConfig } from "@mason/interface/vite";
+import { createInterfaceViteConfig } from "@recount/interface/vite";
 import { defineConfig, mergeConfig } from "vite";
 
 const host = process.env.TAURI_DEV_HOST;

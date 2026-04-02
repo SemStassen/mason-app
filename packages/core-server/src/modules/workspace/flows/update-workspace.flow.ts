@@ -1,9 +1,9 @@
 import type {
   UpdateWorkspaceCommand,
   UpdateWorkspaceResult,
-} from "@mason/core/contracts";
-import { WorkspaceModule } from "@mason/core/modules/workspace";
-import { WorkspaceContext } from "@mason/core/shared/auth";
+} from "@recount/core/contracts";
+import { WorkspaceModule } from "@recount/core/modules/workspace";
+import { WorkspaceContext } from "@recount/core/shared/auth";
 import { Effect } from "effect";
 
 import { Authorization } from "#shared/authorization/index";

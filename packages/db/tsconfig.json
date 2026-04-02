@@ -1,6 +1,6 @@
 {
-  "extends": "@mason/config/package.tsconfig.json",
+  "extends": "@recount/config/package.tsconfig.json",
   "include": ["src", "test"],
   "exclude": ["dist"],
-  "compilerOptions": {}
+  "compilerOptions": {},
 }

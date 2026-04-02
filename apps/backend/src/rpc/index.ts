@@ -1,4 +1,8 @@
-import { AuthRpcGroup, UserRpcGroup, WorkspaceRpcGroup } from "@mason/core/rpc";
+import {
+  AuthRpcGroup,
+  UserRpcGroup,
+  WorkspaceRpcGroup,
+} from "@recount/core/rpc";
 import { Layer } from "effect";
 
 import { AuthRpcGroupLayer } from "./handlers/auth";

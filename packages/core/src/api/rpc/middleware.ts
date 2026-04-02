@@ -9,7 +9,7 @@ export class RpcSessionMiddleware extends RpcMiddleware.Service<
   {
     provides: SessionContext;
   }
->()("@mason/core/RpcSessionMiddleware", {
+>()("@recount/core/RpcSessionMiddleware", {
   error: Schema.Union([
     HttpApiError.Unauthorized,
     HttpApiError.InternalServerError,
@@ -23,7 +23,7 @@ export class RpcWorkspaceMiddleware extends RpcMiddleware.Service<
     provides: WorkspaceContext;
     requires: RpcSessionMiddleware;
   }
->()("@mason/core/RpcWorkspaceMiddleware", {
+>()("@recount/core/RpcWorkspaceMiddleware", {
   error: Schema.Union([
     HttpApiError.Unauthorized,
     HttpApiError.Forbidden,

@@ -1,6 +1,6 @@
-import { WorkspaceIntegration } from "@mason/core/modules/integration";
-import { RepositoryError } from "@mason/core/shared/repository";
-import { Database, schema } from "@mason/db";
+import { WorkspaceIntegration } from "@recount/core/modules/integration";
+import { RepositoryError } from "@recount/core/shared/repository";
+import { Database, schema } from "@recount/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Redacted, Schema, ServiceMap } from "effect";
 import type { Option } from "effect";
@@ -32,7 +32,7 @@ export interface WorkspaceIntegrationRepositoryShape {
 export class WorkspaceIntegrationRepository extends ServiceMap.Service<
   WorkspaceIntegrationRepository,
   WorkspaceIntegrationRepositoryShape
->()("@mason/integration/WorkspaceIntegrationRepository") {
+>()("@recount/integration/WorkspaceIntegrationRepository") {
   static readonly layer = Layer.effect(
     WorkspaceIntegrationRepository,
     Effect.gen(function* () {
@@ -73,7 +73,10 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
               })
               .where(
                 and(
-                  eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(
+                    schema.workspaceIntegrationsTable.workspaceId,
+                    workspaceId
+                  ),
                   eq(schema.workspaceIntegrationsTable.id, id)
                 )
               )
@@ -93,7 +96,10 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
               .delete(schema.workspaceIntegrationsTable)
               .where(
                 and(
-                  eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(
+                    schema.workspaceIntegrationsTable.workspaceId,
+                    workspaceId
+                  ),
                   eq(schema.workspaceIntegrationsTable.id, id)
                 )
               )
@@ -114,7 +120,10 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
               .from(schema.workspaceIntegrationsTable)
               .where(
                 and(
-                  eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(
+                    schema.workspaceIntegrationsTable.workspaceId,
+                    workspaceId
+                  ),
                   eq(schema.workspaceIntegrationsTable.id, id)
                 )
               )
@@ -135,7 +144,10 @@ export class WorkspaceIntegrationRepository extends ServiceMap.Service<
               .from(schema.workspaceIntegrationsTable)
               .where(
                 and(
-                  eq(schema.workspaceIntegrationsTable.workspaceId, workspaceId),
+                  eq(
+                    schema.workspaceIntegrationsTable.workspaceId,
+                    workspaceId
+                  ),
                   eq(schema.workspaceIntegrationsTable.provider, provider)
                 )
               )

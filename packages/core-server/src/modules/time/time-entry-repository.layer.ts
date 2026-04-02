@@ -1,6 +1,6 @@
-import { TimeEntry, TimeEntryRepository } from "@mason/core/modules/time";
-import { RepositoryError } from "@mason/core/shared/repository";
-import { Database, schema } from "@mason/db";
+import { TimeEntry, TimeEntryRepository } from "@recount/core/modules/time";
+import { RepositoryError } from "@recount/core/shared/repository";
+import { Database, schema } from "@recount/db";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";
@@ -100,7 +100,10 @@ export const TimeEntryRepositoryLayer = Layer.effect(
             .where(
               and(
                 eq(schema.timeEntriesTable.workspaceId, workspaceId),
-                eq(schema.timeEntriesTable.workspaceMemberId, workspaceMemberId),
+                eq(
+                  schema.timeEntriesTable.workspaceMemberId,
+                  workspaceMemberId
+                ),
                 isNull(schema.timeEntriesTable.stoppedAt)
               )
             )

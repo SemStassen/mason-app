@@ -101,7 +101,7 @@ const Icons = {
   Italic: TextItalicIcon,
   Link: LinkSimpleIcon,
   LookingGlass: MagnifyingGlassIcon,
-  Mason: WallIcon,
+  Recount: WallIcon,
   Minus: MinusIcon,
   Moon: MoonIcon,
   Organization: UsersFourIcon,

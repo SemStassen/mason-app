@@ -1,8 +1,8 @@
-import { regex } from "@mason/core/shared/utils";
-import { Button } from "@mason/ui/button";
-import { Field } from "@mason/ui/field";
-import { Icons } from "@mason/ui/icons";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@mason/ui/input-otp";
+import { regex } from "@recount/core/shared/utils";
+import { Button } from "@recount/ui/button";
+import { Field } from "@recount/ui/field";
+import { Icons } from "@recount/ui/icons";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@recount/ui/input-otp";
 import { revalidateLogic } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { Schema } from "effect";

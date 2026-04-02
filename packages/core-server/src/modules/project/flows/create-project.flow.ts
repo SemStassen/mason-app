@@ -1,9 +1,9 @@
 import type {
   CreateProjectCommand,
   CreateProjectResult,
-} from "@mason/core/contracts";
-import { ProjectModule } from "@mason/core/modules/project";
-import { WorkspaceContext } from "@mason/core/shared/auth";
+} from "@recount/core/contracts";
+import { ProjectModule } from "@recount/core/modules/project";
+import { WorkspaceContext } from "@recount/core/shared/auth";
 import { Effect } from "effect";
 
 import { Authorization } from "#shared/authorization/index";

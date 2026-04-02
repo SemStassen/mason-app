@@ -1,4 +1,4 @@
-name: mason
+name: recount
 
 services:
   pg:
@@ -8,9 +8,9 @@ services:
     ports:
       - "5442:5432"
     environment:
-      POSTGRES_USER: mason
+      POSTGRES_USER: recount
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: mason
+      POSTGRES_DB: recount
     volumes:
       - pg:/var/lib/postgresql
     networks:
@@ -21,7 +21,7 @@ services:
       - -c
       - wal_level=logical
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mason"]
+      test: ["CMD-SHELL", "pg_isready -U recount"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,7 +29,7 @@ services:
   electric:
     image: docker.io/electricsql/electric:latest
     environment:
-      DATABASE_URL: postgresql://mason:password@pg:5432/mason?sslmode=disable
+      DATABASE_URL: postgresql://recount:password@pg:5432/recount?sslmode=disable
       # Not suitable for production. Only use insecure mode in development or if you've otherwise secured the Electric API.
       # See https://electric-sql.com/docs/guides/security
       ELECTRIC_INSECURE: true

@@ -1,6 +1,6 @@
-import { Button } from "@mason/ui/button";
-import { Icons } from "@mason/ui/icons";
-import { Separator } from "@mason/ui/separator";
+import { Button } from "@recount/ui/button";
+import { Icons } from "@recount/ui/icons";
+import { Separator } from "@recount/ui/separator";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import type React from "react";

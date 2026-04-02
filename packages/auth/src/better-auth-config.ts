@@ -1,4 +1,4 @@
-import { parseOrigins } from "@mason/core/shared/config";
+import { parseOrigins } from "@recount/core/shared/config";
 import { Config, Effect, Layer, ServiceMap } from "effect";
 
 export interface BetterAuthConfigShape {
@@ -11,7 +11,7 @@ export interface BetterAuthConfigShape {
 export class BetterAuthConfig extends ServiceMap.Service<
   BetterAuthConfig,
   BetterAuthConfigShape
->()("@mason/auth/BetterAuthConfig") {
+>()("@recount/auth/BetterAuthConfig") {
   static readonly layer = Layer.effect(
     this,
     Effect.gen(function* () {

@@ -1,8 +1,8 @@
 import type {
   CheckWorkspaceSlugIsUniqueCommand,
   CheckWorkspaceSlugIsUniqueResult,
-} from "@mason/core/contracts";
-import { WorkspaceModule } from "@mason/core/modules/workspace";
+} from "@recount/core/contracts";
+import { WorkspaceModule } from "@recount/core/modules/workspace";
 import { Effect } from "effect";
 
 export const checkWorkspaceSlugIsUniqueFlow = Effect.fn(

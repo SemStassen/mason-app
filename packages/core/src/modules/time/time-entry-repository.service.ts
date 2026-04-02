@@ -31,4 +31,4 @@ export interface TimeEntryRepositoryShape {
 export class TimeEntryRepository extends ServiceMap.Service<
   TimeEntryRepository,
   TimeEntryRepositoryShape
->()("@mason/time/TimeEntryRepository") {}
+>()("@recount/time/TimeEntryRepository") {}

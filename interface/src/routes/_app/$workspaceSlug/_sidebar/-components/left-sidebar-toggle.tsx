@@ -1,6 +1,6 @@
 import { useAtom } from "@effect/atom-react";
-import { Button } from "@mason/ui/button";
-import { Icons } from "@mason/ui/icons";
+import { Button } from "@recount/ui/button";
+import { Icons } from "@recount/ui/icons";
 
 import { isLeftSidebarOpenAtom } from "~/atoms/ui-atoms";
 import { useRegisterCommands } from "~/components/app-commands-dialog";

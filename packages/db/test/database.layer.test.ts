@@ -50,7 +50,7 @@ describe("database layer", () => {
     mockState.rootExecute.mockClear();
     mockState.transactionExecute.mockClear();
     mockState.transaction.mockClear();
-    process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
+    process.env.DATABASE_URL = "postgres://localhost:5432/recount_test";
 
     const { DatabaseLayer } = await import("../src/database.layer");
     const { Database } = await import("../src/database.service");
@@ -74,7 +74,7 @@ describe("database layer", () => {
     mockState.rootExecute.mockClear();
     mockState.transactionExecute.mockClear();
     mockState.transaction.mockClear();
-    process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
+    process.env.DATABASE_URL = "postgres://localhost:5432/recount_test";
 
     const { DatabaseLayer } = await import("../src/database.layer");
     const { Database } = await import("../src/database.service");
@@ -101,7 +101,7 @@ describe("database layer", () => {
     mockState.rootExecute.mockClear();
     mockState.transactionExecute.mockClear();
     mockState.transaction.mockClear();
-    process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
+    process.env.DATABASE_URL = "postgres://localhost:5432/recount_test";
 
     const { DatabaseLayer } = await import("../src/database.layer");
     const { Database } = await import("../src/database.service");
@@ -128,7 +128,7 @@ describe("database layer", () => {
     mockState.rootExecute.mockClear();
     mockState.transactionExecute.mockClear();
     mockState.transaction.mockClear();
-    process.env.DATABASE_URL = "postgres://localhost:5432/mason_test";
+    process.env.DATABASE_URL = "postgres://localhost:5432/recount_test";
 
     const { DatabaseLayer } = await import("../src/database.layer");
     const { Database } = await import("../src/database.service");

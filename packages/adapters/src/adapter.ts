@@ -1,10 +1,11 @@
-import type { PlainApiKey } from "@mason/framework";
+import type { PlainApiKey } from "@recount/framework";
 import { Context, type Effect } from "effect";
+
 import type { AdapterError } from "./errors";
 import type { ExternalProject, ExternalTask } from "./models";
 
 export class TimeTrackingIntegrationAdapter extends Context.Tag(
-  "@mason/adapters/TimeTrackingIntegrationAdapter"
+  "@recount/adapters/TimeTrackingIntegrationAdapter"
 )<
   TimeTrackingIntegrationAdapter,
   {

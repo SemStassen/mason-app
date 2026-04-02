@@ -1,12 +1,12 @@
 import type {
   AcceptWorkspaceInvitationCommand,
   AcceptWorkspaceInvitationResult,
-} from "@mason/core/contracts";
-import { IdentityModule } from "@mason/core/modules/identity";
-import { WorkspaceInvitationModule } from "@mason/core/modules/workspace-invitation";
-import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
-import { SessionContext } from "@mason/core/shared/auth";
-import { Database } from "@mason/db";
+} from "@recount/core/contracts";
+import { IdentityModule } from "@recount/core/modules/identity";
+import { WorkspaceInvitationModule } from "@recount/core/modules/workspace-invitation";
+import { WorkspaceMemberModule } from "@recount/core/modules/workspace-member";
+import { SessionContext } from "@recount/core/shared/auth";
+import { Database } from "@recount/db";
 import { Effect, Option } from "effect";
 
 export const acceptWorkspaceInvitationFlow = Effect.fn(

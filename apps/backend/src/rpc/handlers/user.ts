@@ -1,5 +1,5 @@
-import { updateUserMeFlow } from "@mason/core-server/modules/identity";
-import { UserRpcGroup } from "@mason/core/rpc";
+import { updateUserMeFlow } from "@recount/core-server/modules/identity";
+import { UserRpcGroup } from "@recount/core/rpc";
 import { Effect } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 

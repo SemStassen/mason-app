@@ -1,5 +1,5 @@
 import { useAtomRef } from "@effect-atom/atom-react";
-import { ScrollArea } from "@mason/ui/scroll-area";
+import { ScrollArea } from "@recount/ui/scroll-area";
 import {
   addDays,
   areIntervalsOverlapping,

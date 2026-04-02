@@ -8,5 +8,5 @@ export interface CryptoShape {
 }
 
 export class Crypto extends ServiceMap.Service<Crypto, CryptoShape>()(
-  "@mason/shared/Crypto"
+  "@recount/shared/Crypto"
 ) {}

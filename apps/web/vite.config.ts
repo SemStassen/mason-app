@@ -1,4 +1,4 @@
-import { createInterfaceViteConfig } from "@mason/interface/vite";
+import { createInterfaceViteConfig } from "@recount/interface/vite";
 import { defineConfig, mergeConfig } from "vite";
 
 export default mergeConfig(

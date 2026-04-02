@@ -1,5 +1,5 @@
 import { useAtomRef } from "@effect-atom/atom-react";
-import { cn } from "@mason/ui/utils";
+import { cn } from "@recount/ui/utils";
 import { isSameDay } from "date-fns";
 
 import { calendarCurrentTimeAtom } from "~/atoms/calendar.atoms";

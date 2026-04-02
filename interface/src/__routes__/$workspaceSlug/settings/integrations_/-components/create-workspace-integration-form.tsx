@@ -1,5 +1,5 @@
 import { useAtomSet } from "@effect-atom/atom-react";
-import { toastManager } from "@mason/ui/toast";
+import { toastManager } from "@recount/ui/toast";
 import { Effect } from "effect";
 import z from "zod";
 

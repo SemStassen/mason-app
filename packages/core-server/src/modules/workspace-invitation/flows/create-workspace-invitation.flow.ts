@@ -1,12 +1,12 @@
 import type {
   CreateWorkspaceInvitationCommand,
   CreateWorkspaceInvitationResult,
-} from "@mason/core/contracts";
-import { IdentityModule } from "@mason/core/modules/identity";
-import { WorkspaceInvitationModule } from "@mason/core/modules/workspace-invitation";
-import { WorkspaceMemberModule } from "@mason/core/modules/workspace-member";
-import { SessionContext, WorkspaceContext } from "@mason/core/shared/auth";
-import { Mailer } from "@mason/notifications/mailer";
+} from "@recount/core/contracts";
+import { IdentityModule } from "@recount/core/modules/identity";
+import { WorkspaceInvitationModule } from "@recount/core/modules/workspace-invitation";
+import { WorkspaceMemberModule } from "@recount/core/modules/workspace-member";
+import { SessionContext, WorkspaceContext } from "@recount/core/shared/auth";
+import { Mailer } from "@recount/notifications/mailer";
 import { Effect, Option } from "effect";
 
 import { Authorization } from "#shared/authorization/index";

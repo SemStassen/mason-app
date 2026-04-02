@@ -35,4 +35,4 @@ export interface ProjectRepositoryShape {
 export class ProjectRepository extends ServiceMap.Service<
   ProjectRepository,
   ProjectRepositoryShape
->()("@mason/project/ProjectRepository") {}
+>()("@recount/project/ProjectRepository") {}

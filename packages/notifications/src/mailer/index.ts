@@ -1,6 +1,6 @@
-import type { User } from "@mason/core/modules/identity";
-import type { Workspace } from "@mason/core/modules/workspace";
-import type { WorkspaceInvitation } from "@mason/core/modules/workspace-invitation";
+import type { User } from "@recount/core/modules/identity";
+import type { Workspace } from "@recount/core/modules/workspace";
+import type { WorkspaceInvitation } from "@recount/core/modules/workspace-invitation";
 import { Layer, ServiceMap, Effect } from "effect";
 
 interface MailerShape {
@@ -28,7 +28,7 @@ interface MailerShape {
 }
 
 export class Mailer extends ServiceMap.Service<Mailer, MailerShape>()(
-  "@mason/shared/Mailer"
+  "@recount/shared/Mailer"
 ) {
   static readonly layerDev = Layer.effect(
     this,

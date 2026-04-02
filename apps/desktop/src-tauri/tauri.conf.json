@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "mason",
+  "productName": "recount",
   "version": "0.1.0",
-  "identifier": "mason",
+  "identifier": "recount",
   "build": {
     "beforeDevCommand": "bun run dev:vite",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Mason",
+        "title": "Recount",
         "hiddenTitle": true,
         "width": 1400,
         "height": 750,
@@ -46,7 +46,7 @@
   "plugins": {
     "deep-link": {
       "desktop": {
-        "schemes": ["mason"]
+        "schemes": ["recount"]
       }
     }
   }

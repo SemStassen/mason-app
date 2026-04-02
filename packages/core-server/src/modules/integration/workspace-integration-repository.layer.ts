@@ -1,6 +1,6 @@
-import { WorkspaceIntegration } from "@mason/core/modules/integration";
-import { RepositoryError } from "@mason/core/shared/repository";
-import { Database, schema } from "@mason/db";
+import { WorkspaceIntegration } from "@recount/core/modules/integration";
+import { RepositoryError } from "@recount/core/shared/repository";
+import { Database, schema } from "@recount/db";
 import { and, eq } from "drizzle-orm";
 import { Effect, Layer, Redacted, Schema } from "effect";
 import { SqlSchema } from "effect/unstable/sql";

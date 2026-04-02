@@ -1,4 +1,4 @@
-import { BetterAuth } from "@mason/auth";
+import { BetterAuth } from "@recount/auth";
 import { Effect } from "effect";
 import {
   HttpRouter,

@@ -1,5 +1,5 @@
 {
-  "name": "@mason/auth",
+  "name": "@recount/auth",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,14 +9,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mason/core": "workspace:*",
-    "@mason/db": "workspace:*",
-    "@mason/notifications": "workspace:*",
+    "@recount/core": "workspace:*",
+    "@recount/db": "workspace:*",
+    "@recount/notifications": "workspace:*",
     "better-auth": "catalog:",
     "effect": "catalog:"
   },
   "devDependencies": {
-    "@mason/config": "workspace:*",
+    "@recount/config": "workspace:*",
     "typescript": "catalog:dev"
   },
   "exports": {

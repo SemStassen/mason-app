@@ -31,4 +31,4 @@ export interface TaskRepositoryShape {
 export class TaskRepository extends ServiceMap.Service<
   TaskRepository,
   TaskRepositoryShape
->()("@mason/project/TaskRepository") {}
+>()("@recount/project/TaskRepository") {}

@@ -1,4 +1,4 @@
-import { Kbd } from "@mason/ui/kbd";
+import { Kbd } from "@recount/ui/kbd";
 
 const HOTKEY_DISPLAY_MAP: Record<string, string> = {
   bracketleft: "[",

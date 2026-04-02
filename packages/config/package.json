@@ -1,5 +1,5 @@
 {
-  "name": "@mason/config",
+  "name": "@recount/config",
   "type": "module",
   "exports": {
     "./*": "./src/*"

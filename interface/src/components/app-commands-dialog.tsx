@@ -7,7 +7,7 @@ import {
   CommandItem,
   CommandList,
   CommandShortcut,
-} from "@mason/ui/command";
+} from "@recount/ui/command";
 import {
   createContext,
   useContext,

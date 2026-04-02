@@ -1,9 +1,9 @@
-import { MasonApi } from "@mason/core/http";
+import { RecountApi } from "@recount/core/http";
 import { DateTime, Effect } from "effect";
 import { HttpApiBuilder } from "effect/unstable/httpapi";
 
 export const PingHttpGroupLayer = HttpApiBuilder.group(
-  MasonApi,
+  RecountApi,
   "ping",
   (handlers) =>
     handlers.handle("ping", () =>

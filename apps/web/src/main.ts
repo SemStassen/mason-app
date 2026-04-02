@@ -1,3 +1,3 @@
-import { renderMasonInterface } from "@mason/interface";
+import { renderRecountInterface } from "@recount/interface";
 
-renderMasonInterface();
+renderRecountInterface();

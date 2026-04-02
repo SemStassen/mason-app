@@ -12,7 +12,7 @@ export interface SessionContextShape {
 export class SessionContext extends ServiceMap.Service<
   SessionContext,
   SessionContextShape
->()("@mason/shared/SessionContext") {}
+>()("@recount/shared/SessionContext") {}
 
 export interface WorkspaceContextShape {
   workspaceMember: WorkspaceMember;
@@ -22,4 +22,4 @@ export interface WorkspaceContextShape {
 export class WorkspaceContext extends ServiceMap.Service<
   WorkspaceContext,
   WorkspaceContextShape
->()("@mason/shared/WorkspaceContext") {}
+>()("@recount/shared/WorkspaceContext") {}

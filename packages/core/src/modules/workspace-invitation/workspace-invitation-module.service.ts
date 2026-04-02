@@ -61,4 +61,4 @@ export interface WorkspaceInvitationModuleShape {
 export class WorkspaceInvitationModule extends ServiceMap.Service<
   WorkspaceInvitationModule,
   WorkspaceInvitationModuleShape
->()("@mason/workspace-invitation/WorkspaceInvitationModule") {}
+>()("@recount/workspace-invitation/WorkspaceInvitationModule") {}

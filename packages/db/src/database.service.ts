@@ -105,5 +105,5 @@ export interface DatabaseShape {
 }
 
 export class Database extends ServiceMap.Service<Database, DatabaseShape>()(
-  "@mason/db/Database"
+  "@recount/db/Database"
 ) {}

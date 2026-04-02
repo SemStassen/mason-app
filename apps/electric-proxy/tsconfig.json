@@ -1,5 +1,5 @@
 {
-  "extends": "@mason/config/base.tsconfig.json",
+  "extends": "@recount/config/base.tsconfig.json",
   "include": ["src"],
   "exclude": ["dist"],
   "compilerOptions": {
@@ -8,7 +8,7 @@
       "~/application/*": ["./src/application/*"],
       "~/domains/*": ["./src/domains/*"],
       "~/infra/*": ["./src/infra/*"],
-      "~/shared/*": ["./src/shared/*"]
-    }
-  }
+      "~/shared/*": ["./src/shared/*"],
+    },
+  },
 }

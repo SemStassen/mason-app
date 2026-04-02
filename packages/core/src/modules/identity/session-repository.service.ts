@@ -18,4 +18,4 @@ export interface SessionRepositoryShape {
 export class SessionRepository extends ServiceMap.Service<
   SessionRepository,
   SessionRepositoryShape
->()("@mason/identity/SessionRepository") {}
+>()("@recount/identity/SessionRepository") {}

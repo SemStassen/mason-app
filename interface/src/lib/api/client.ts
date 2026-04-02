@@ -1,15 +1,15 @@
-import { MasonApi } from "@mason/core/http";
+import { RecountApi } from "@recount/core/http";
 import { Effect, Layer, ServiceMap } from "effect";
 import { HttpClient, HttpClientError } from "effect/unstable/http";
 import { HttpApiClient } from "effect/unstable/httpapi";
 
 import { env } from "../env";
 
-export class MasonApiClient extends ServiceMap.Service<MasonApiClient>()(
-  "@mason/interface/MasonApiClient",
+export class RecountApiClient extends ServiceMap.Service<RecountApiClient>()(
+  "@recount/interface/RecountApiClient",
   {
     make: Effect.succeed(
-      HttpApiClient.make(MasonApi, {
+      HttpApiClient.make(RecountApi, {
         baseUrl: env.VITE_BACKEND_URL,
         transformClient: (client) =>
           client.pipe(

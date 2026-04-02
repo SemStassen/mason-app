@@ -1,6 +1,6 @@
-import { Project } from "@mason/core/modules/project";
-import { WorkspaceMember } from "@mason/core/modules/workspace-member";
-import { WORKSPACE_ID_HEADER } from "@mason/core/shared/headers";
+import { Project } from "@recount/core/modules/project";
+import { WorkspaceMember } from "@recount/core/modules/workspace-member";
+import { WORKSPACE_ID_HEADER } from "@recount/core/shared/headers";
 import {
   BrowserCollectionCoordinator,
   createBrowserWASQLitePersistence,
@@ -18,11 +18,11 @@ export type WorkspaceCollections = Awaited<
 
 export async function createWorkspaceCollections(workspaceId: string) {
   const database = await openBrowserWASQLiteOPFSDatabase({
-    databaseName: `mason-${workspaceId}.sqlite`,
+    databaseName: `recount-${workspaceId}.sqlite`,
   });
 
   const coordinator = new BrowserCollectionCoordinator({
-    dbName: `mason-${workspaceId}`,
+    dbName: `recount-${workspaceId}`,
   });
 
   const workspaceMembersCollection = createCollectionTemp({

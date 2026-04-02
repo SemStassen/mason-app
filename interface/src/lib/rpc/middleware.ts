@@ -1,4 +1,4 @@
-import { RpcSessionMiddleware } from "@mason/core/rpc";
+import { RpcSessionMiddleware } from "@recount/core/rpc";
 import { Effect } from "effect";
 import { Headers } from "effect/unstable/http";
 import { RpcMiddleware } from "effect/unstable/rpc";

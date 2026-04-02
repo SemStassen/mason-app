@@ -1,5 +1,5 @@
-import { Button } from "@mason/ui/button";
-import { Icons } from "@mason/ui/icons";
+import { Button } from "@recount/ui/button";
+import { Icons } from "@recount/ui/icons";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { Option } from "effect";
 
@@ -40,7 +40,7 @@ function AuthLayout() {
           variant="ghost"
         >
           <Icons.ChevronLeft />
-          Return to Mason
+          Return to Recount
         </Button>
       )}
       <p className="fixed top-4 right-4 text-muted-foreground text-sm">

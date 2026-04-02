@@ -6,7 +6,7 @@ interface PlatformShape {
 }
 
 export class Platform extends ServiceMap.Service<Platform, PlatformShape>()(
-  "@mason/interface/lib/platform"
+  "@recount/interface/lib/platform"
 ) {
   readonly static webLayer = Effect.
 }

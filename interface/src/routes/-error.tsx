@@ -1,4 +1,4 @@
-import { Button } from "@mason/ui/button";
+import { Button } from "@recount/ui/button";
 import { Link } from "@tanstack/react-router";
 
 import { m } from "~/paraglide/messages";

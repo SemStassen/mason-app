@@ -1,5 +1,5 @@
 {
-  "name": "mason",
+  "name": "recount",
   "packageManager": "bun@1.3.0",
   "scripts": {
     "build": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide && turbo build",

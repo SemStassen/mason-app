@@ -1,7 +1,7 @@
 [package]
-name = "mason-app"
+name = "recount-app"
 version = "0.1.0"
-description = "Mason"
+description = "Recount"
 authors = ["Sem Stassen"]
 edition = "2021"
 

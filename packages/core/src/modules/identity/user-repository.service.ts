@@ -21,4 +21,4 @@ export interface UserRepositoryShape {
 export class UserRepository extends ServiceMap.Service<
   UserRepository,
   UserRepositoryShape
->()("@mason/identity/UserRepository") {}
+>()("@recount/identity/UserRepository") {}

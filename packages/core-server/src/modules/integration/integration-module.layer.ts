@@ -1,8 +1,8 @@
 import {
   WorkspaceIntegrationNotFoundError,
   WorkspaceIntegrationProviderAlreadyExistsError,
-} from "@mason/core/modules/integration";
-import { EncryptedApiKey, PlainApiKey } from "@mason/core/shared/schemas";
+} from "@recount/core/modules/integration";
+import { EncryptedApiKey, PlainApiKey } from "@recount/core/shared/schemas";
 import { DateTime, Effect, Layer, Option, Redacted } from "effect";
 
 import { Crypto } from "#shared/crypto/index";

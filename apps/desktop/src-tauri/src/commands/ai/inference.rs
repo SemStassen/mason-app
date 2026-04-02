@@ -15,7 +15,7 @@ const MAX_LENGTH: usize = 50;
 
 pub fn call_ai(image_path: Option<&str>, instruction: Option<&str>) -> Result<String> {
     ort::init()
-        .with_name("mason")
+        .with_name("recount")
         .with_execution_providers({
             #[cfg(target_os = "macos")]
             {

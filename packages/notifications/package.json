@@ -1,5 +1,5 @@
 {
-  "name": "@mason/notifications",
+  "name": "@recount/notifications",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,11 +9,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mason/core": "workspace:*",
+    "@recount/core": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
-    "@mason/config": "workspace:*",
+    "@recount/config": "workspace:*",
     "typescript": "catalog:dev"
   },
   "imports": {},

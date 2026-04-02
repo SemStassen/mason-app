@@ -1,5 +1,5 @@
 import { useAtomValue } from "@effect-atom/atom-react";
-import { Icons } from "@mason/ui/icons";
+import { Icons } from "@recount/ui/icons";
 import {
   Table,
   TableBody,
@@ -7,7 +7,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@mason/ui/table";
+} from "@recount/ui/table";
 import {
   type ColumnDef,
   flexRender,

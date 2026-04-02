@@ -1,6 +1,6 @@
 import { useAtomSet, useAtomValue } from "@effect-atom/atom-react";
-import { Button } from "@mason/ui/button";
-import { Frame, FrameHeader, FramePanel, FrameTitle } from "@mason/ui/frame";
+import { Button } from "@recount/ui/button";
+import { Frame, FrameHeader, FramePanel, FrameTitle } from "@recount/ui/frame";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTransition } from "react";
 
@@ -8,7 +8,7 @@ import {
   deleteWorkspaceIntegrationAtom,
   workspaceIntegrationsAtom,
 } from "~/atoms/api";
-import { MasonAtomClient } from "~/lib/rpc/atom-client";
+import { RecountAtomClient } from "~/lib/rpc/atom-client";
 import { formatter } from "~/lib/utils/date-time";
 
 import { CreateWorkspaceIntegrationForm } from "../-components/create-workspace-integration-form";
@@ -28,7 +28,7 @@ function RouteComponent() {
 
   const [isPending, startTransition] = useTransition();
   const syncProjects = useAtomSet(
-    MasonAtomClient.mutation("FloatWorkspaceIntegration", "Sync"),
+    RecountAtomClient.mutation("FloatWorkspaceIntegration", "Sync"),
     {
       mode: "promise",
     }

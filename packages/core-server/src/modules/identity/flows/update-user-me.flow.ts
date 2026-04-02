@@ -1,9 +1,9 @@
 import type {
   UpdateUserMeCommand,
   UpdateUserMeResult,
-} from "@mason/core/contracts";
-import { IdentityModule } from "@mason/core/modules/identity";
-import { SessionContext } from "@mason/core/shared/auth";
+} from "@recount/core/contracts";
+import { IdentityModule } from "@recount/core/modules/identity";
+import { SessionContext } from "@recount/core/shared/auth";
 import { Effect } from "effect";
 
 export const updateUserMeFlow = Effect.fn("flows.updateUserMe")(function* (

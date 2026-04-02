@@ -1,5 +1,5 @@
 import { useDroppable } from "@dnd-kit/react";
-import { cn } from "@mason/ui/utils";
+import { cn } from "@recount/ui/utils";
 
 type DroppableTimeEntryProps = React.ComponentProps<"div"> & {
   id: string;

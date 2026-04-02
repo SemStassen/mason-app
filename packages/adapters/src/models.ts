@@ -1,4 +1,4 @@
-import { JsonRecord } from "@mason/framework";
+import { JsonRecord } from "@recount/framework";
 import { Schema } from "effect";
 
 export type ExternalProject = typeof ExternalProject.Type;

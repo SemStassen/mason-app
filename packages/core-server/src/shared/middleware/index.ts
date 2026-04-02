@@ -1,8 +1,11 @@
-import { RequestContextResolver } from "@mason/auth";
-import { RpcSessionMiddleware, RpcWorkspaceMiddleware } from "@mason/core/rpc";
-import { SessionContext, WorkspaceContext } from "@mason/core/shared/auth";
-import { WORKSPACE_ID_HEADER } from "@mason/core/shared/headers";
-import { WorkspaceId } from "@mason/core/shared/schemas";
+import { RequestContextResolver } from "@recount/auth";
+import {
+  RpcSessionMiddleware,
+  RpcWorkspaceMiddleware,
+} from "@recount/core/rpc";
+import { SessionContext, WorkspaceContext } from "@recount/core/shared/auth";
+import { WORKSPACE_ID_HEADER } from "@recount/core/shared/headers";
+import { WorkspaceId } from "@recount/core/shared/schemas";
 import { Effect, Layer, Option } from "effect";
 import { HttpRouter, HttpServerRequest } from "effect/unstable/http";
 import { HttpApiError } from "effect/unstable/httpapi";

@@ -1,6 +1,6 @@
-import { setLastActiveWorkspaceFlow } from "@mason/core-server/modules/identity";
-import { AuthRpcGroup } from "@mason/core/rpc";
-import { SessionContext } from "@mason/core/shared/auth";
+import { setLastActiveWorkspaceFlow } from "@recount/core-server/modules/identity";
+import { AuthRpcGroup } from "@recount/core/rpc";
+import { SessionContext } from "@recount/core/shared/auth";
 import { Effect } from "effect";
 import { HttpApiError } from "effect/unstable/httpapi";
 

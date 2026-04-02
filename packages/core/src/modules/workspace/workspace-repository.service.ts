@@ -27,4 +27,4 @@ export interface WorkspaceRepositoryShape {
 export class WorkspaceRepository extends ServiceMap.Service<
   WorkspaceRepository,
   WorkspaceRepositoryShape
->()("@mason/workspace/WorkspaceRepository") {}
+>()("@recount/workspace/WorkspaceRepository") {}

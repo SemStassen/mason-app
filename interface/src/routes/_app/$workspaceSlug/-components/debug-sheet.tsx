@@ -1,9 +1,14 @@
 import { useAtom } from "@effect/atom-react";
-import { Button } from "@mason/ui/button";
-import { Icons } from "@mason/ui/icons";
-import { Separator } from "@mason/ui/separator";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@mason/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mason/ui/tabs";
+import { Button } from "@recount/ui/button";
+import { Icons } from "@recount/ui/icons";
+import { Separator } from "@recount/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@recount/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@recount/ui/tabs";
 import { useRouteContext } from "@tanstack/react-router";
 import {
   addDays,
@@ -32,15 +37,15 @@ function DebugSheet() {
       <SheetContent side="right">
         <SheetHeader className="flex flex-row items-center gap-2">
           <Icons.LookingGlass />
-          <SheetTitle>Mason Inspector</SheetTitle>
+          <SheetTitle>Recount Inspector</SheetTitle>
         </SheetHeader>
         <Tabs className="h-full p-2">
           <TabsList className="w-full">
             <TabsTrigger value="llm">LLM</TabsTrigger>
-            <TabsTrigger value="mason">Mason</TabsTrigger>
+            <TabsTrigger value="recount">Recount</TabsTrigger>
           </TabsList>
           <TabsContent value="llm">Not implemented yet</TabsContent>
-          <TabsContent className="space-y-4" value="mason">
+          <TabsContent className="space-y-4" value="recount">
             <ul>
               <li>Platform: {PLATFORM.platform}</li>
               <li>Workspace: {workspace.name}</li>

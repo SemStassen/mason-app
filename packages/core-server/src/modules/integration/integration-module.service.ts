@@ -2,12 +2,12 @@ import type {
   WorkspaceIntegration,
   WorkspaceIntegrationNotFoundError,
   WorkspaceIntegrationProviderAlreadyExistsError,
-} from "@mason/core/modules/integration";
-import type { RepositoryError } from "@mason/core/shared/repository";
+} from "@recount/core/modules/integration";
+import type { RepositoryError } from "@recount/core/shared/repository";
 import type {
   PlainApiKey,
   WorkspaceIntegrationId,
-} from "@mason/core/shared/schemas";
+} from "@recount/core/shared/schemas";
 import { ServiceMap } from "effect";
 import type { Effect } from "effect";
 
@@ -47,4 +47,4 @@ export interface IntegrationModuleShape {
 export class IntegrationModule extends ServiceMap.Service<
   IntegrationModule,
   IntegrationModuleShape
->()("@mason/integration/IntegrationModule") {}
+>()("@recount/integration/IntegrationModule") {}

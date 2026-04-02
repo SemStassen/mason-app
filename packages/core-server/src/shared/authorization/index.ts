@@ -1,8 +1,8 @@
 import {
   AuthorizationError,
   isAllowed,
-} from "@mason/core/shared/authorization";
-import type { Action, WorkspaceRole } from "@mason/core/shared/authorization";
+} from "@recount/core/shared/authorization";
+import type { Action, WorkspaceRole } from "@recount/core/shared/authorization";
 import { Effect, Layer, ServiceMap } from "effect";
 
 export class Authorization extends ServiceMap.Service<
@@ -13,7 +13,7 @@ export class Authorization extends ServiceMap.Service<
       role: WorkspaceRole;
     }) => Effect.Effect<void, AuthorizationError>;
   }
->()("@mason/authorization/Authorization") {
+>()("@recount/authorization/Authorization") {
   static readonly layer = Layer.effect(
     Authorization,
     Effect.succeed({

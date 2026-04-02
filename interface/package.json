@@ -1,5 +1,5 @@
 {
-  "name": "@mason/interface",
+  "name": "@recount/interface",
   "private": true,
   "type": "module",
   "scripts": {
@@ -21,8 +21,8 @@
     "@base-ui/react": "catalog:frontend",
     "@dnd-kit/react": "^0.3.2",
     "@effect/atom-react": "catalog:",
-    "@mason/core": "workspace:*",
-    "@mason/ui": "workspace:*",
+    "@recount/core": "workspace:*",
+    "@recount/ui": "workspace:*",
     "@t3-oss/env-core": "^0.13.8",
     "@tanstack/browser-db-sqlite-persistence": "^0.1.4",
     "@tanstack/electric-db-collection": "^0.2.42",
@@ -47,7 +47,7 @@
     "zod": "^4.1.5"
   },
   "devDependencies": {
-    "@mason/config": "workspace:*",
+    "@recount/config": "workspace:*",
     "@types/react": "catalog:dev",
     "@types/react-dom": "catalog:dev",
     "drizzle-kit": "catalog:dev",

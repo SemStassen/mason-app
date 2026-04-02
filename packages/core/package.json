@@ -1,5 +1,5 @@
 {
-  "name": "@mason/core",
+  "name": "@recount/core",
   "private": true,
   "type": "module",
   "scripts": {
@@ -14,7 +14,7 @@
     "uuid": "catalog:"
   },
   "devDependencies": {
-    "@mason/config": "workspace:*",
+    "@recount/config": "workspace:*",
     "typescript": "catalog:dev"
   },
   "imports": {
