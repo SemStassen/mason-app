@@ -28,7 +28,7 @@ ENCRYPTION_KEY=<64-char hex string>
 GOOGLE_CLIENT_ID=<google client id>
 GOOGLE_CLIENT_SECRET=<google client secret>
 OTEL_EXPORTER_OTLP_ENDPOINT=http://telemetry.railway.internal:4318
-FRONTEND_ORIGINS=https://your-app.vercel.app,https://your-app-git-main-yourteam.vercel.app
+FRONTEND_ORIGINS=https://your-app.vercel.app,https://your-app-*.vercel.app
 ```
 
 ### electric-proxy
@@ -40,7 +40,7 @@ ENCRYPTION_KEY=<64-char hex string>
 GOOGLE_CLIENT_ID=<google client id>
 GOOGLE_CLIENT_SECRET=<google client secret>
 OTEL_EXPORTER_OTLP_ENDPOINT=http://telemetry.railway.internal:4318
-FRONTEND_ORIGINS=https://your-app.vercel.app,https://your-app-git-main-yourteam.vercel.app
+FRONTEND_ORIGINS=https://your-app.vercel.app,https://your-app-*.vercel.app
 ```
 
 Optional:
@@ -82,4 +82,4 @@ VITE_ELECTRIC_PROXY_URL=https://<proxy-domain>
 3. `backend` and `electric-proxy` use Railpack with `bun run apps/.../src/index.ts` start commands.
 4. `FRONTEND_ORIGINS` is required in every environment, including local development.
 5. For local development, set `FRONTEND_ORIGINS=tauri://localhost,http://tauri.localhost,http://localhost:8002`.
-6. Start with exact Vercel URLs in `FRONTEND_ORIGINS`. Add more preview domains only when you need them.
+6. For Vercel, use the production URL plus a scoped preview wildcard like `https://your-app.vercel.app,https://your-app-*.vercel.app`.

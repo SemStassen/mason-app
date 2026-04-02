@@ -32,12 +32,16 @@ import { TimeModuleLayer } from "@mason/core/modules/time";
 import { WorkspaceModuleLayer } from "@mason/core/modules/workspace";
 import { WorkspaceInvitationModuleLayer } from "@mason/core/modules/workspace-invitation";
 import { WorkspaceMemberModuleLayer } from "@mason/core/modules/workspace-member";
-import { parseOrigins } from "@mason/core/shared/config";
+import { matchesAllowedOrigin, parseOrigins } from "@mason/core/shared/config";
 import { DatabaseLayer } from "@mason/db";
 import { Mailer } from "@mason/notifications/mailer";
 import { makeObservabilityLayer } from "@mason/observability";
 import { Config, Effect, Layer } from "effect";
-import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
+import {
+  HttpMiddleware,
+  HttpRouter,
+  HttpServerResponse,
+} from "effect/unstable/http";
 import { RpcSerialization, RpcServer } from "effect/unstable/rpc";
 
 import { HttpApiRoutesLayer } from "./http";
@@ -99,26 +103,28 @@ const HealthRouteLayer = HttpRouter.add("GET", "/health", () =>
   HttpServerResponse.json({ status: "ok" })
 );
 
+const allowedOrigins = Effect.runSync(
+  Effect.gen(function* () {
+    const frontendOrigins = yield* Config.string("FRONTEND_ORIGINS");
+
+    return yield* parseOrigins(frontendOrigins);
+  })
+);
+
+const CorsLayer = HttpRouter.middleware(
+  HttpMiddleware.cors({
+    allowedOrigins: (origin) => matchesAllowedOrigin(origin, allowedOrigins),
+    allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+).layer;
+
 const AllRoutesLayer = Layer.mergeAll(
   HealthRouteLayer,
   HttpApiRoutesLayer,
   RpcRouteLayer,
   BetterAuthRoutesLayer
-).pipe(
-  Layer.provide(
-    HttpRouter.cors({
-      allowedOrigins: Effect.runSync(
-        Effect.gen(function* () {
-          const frontendOrigins = yield* Config.string("FRONTEND_ORIGINS");
-
-          return yield* parseOrigins(frontendOrigins);
-        })
-      ),
-      allowedMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      credentials: true,
-    })
-  )
-);
+).pipe(Layer.provide(CorsLayer));
 
 const MainLayer = ModulesLayer.pipe(Layer.provideMerge(InfraLayer));
 
